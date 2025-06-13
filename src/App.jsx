@@ -11,8 +11,8 @@ import ProtectedRoute from './Components/ProtectedRoute';
 // import LeaveApplication from './pages/Leave/LeaveApplication';
 // import LeaveStatusPage from './pages/Leave/LeaveStatus';
 // import HolidayCalendar from './pages/Leave/HolidayCalendar';
-// import UserManagement from './pages/Users/Usermanagement';
-// import AddUser from './pages/Users/AddUser';
+import UserManagement from './pages/Users/Usermanagement';
+import AddUser from './pages/Users/AddUser';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
@@ -43,9 +43,9 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            {/* <Route path="/usermanage" element={<UserManagement />} />
-            <Route path="/add-user" element={<AddUser />} />
-            <Route path="/leaveapplication" element={<LeaveApplication />} />
+            <Route path="/usermanage" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+            <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
+            {/*<Route path="/leaveapplication" element={<LeaveApplication />} />
             <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/leavestatusPage" element={<LeaveStatusPage />} />
             <Route path="/shift-management" element={<ShiftManagement />} />
