@@ -33,8 +33,10 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/employee',
             submenu: [
-                { label: 'Employees', path: '/employee' },
                 { label: 'Add Employee', path: '/employee/add' },
+                { label: 'Department', path: '/departments' },
+                { label: 'Designation', path: '/designation' },
+                { label: 'Branch', path: '/branches' },
             ]
         },
 
@@ -157,7 +159,7 @@ const Sidebar = () => {
     const getSubmenuHeight = (itemId) => {
         const submenu = menuItems.find(item => item.id === itemId)?.submenu;
         if (!submenu) return 0;
-        return submenu.length * 36 + 16; // 36px per item + padding
+        return submenu.length * 40 + 60; // 36px per item + padding
     };
 
     return (
@@ -276,7 +278,7 @@ const Sidebar = () => {
                                                 opacity: isExpanded ? 1 : 0,
                                             }}
                                         >
-                                            <div className="ml-6 mt-2 space-y-1">
+                                            <div className="ml-6 mt-2 space-y-2">
                                                 {item.submenu.map((subItem, index) => (
                                                     <Link
                                                         key={index}

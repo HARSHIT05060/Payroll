@@ -14,9 +14,7 @@ api.interceptors.request.use(
     (config) => {
         // Add basic auth credentials
         const username = 'attendance';
-        const password =  '20$tgbsv09u';
-        
-        console.log("Basic Auth:", password);    
+        const password =  '20$tgbsv09u';    
         const basicAuth = `Basic ${btoa(`${username}:${password}`)}`;
 
         config.headers.Authorization = basicAuth;
