@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     Pencil,
     FileText,
@@ -6,175 +6,263 @@ import {
     ChevronDown,
     ChevronUp,
     UserCheck,
-    Loader2
+    Loader2,
+    AlertCircle,
+    Users,
+    Plus,
+    Settings
 } from 'lucide-react';
-import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axiosInstance';
+
+const SORT_DIRECTIONS = {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending'
+};
+
+const COLUMN_KEYS = {
+    ID: 'id',
+    NAME: 'name',
+    DEPARTMENT: 'department',
+    DESIGNATION: 'designation'
+};
+
+const KEY_MAPPING = {
+    [COLUMN_KEYS.ID]: 'employee_code',
+    [COLUMN_KEYS.NAME]: 'full_name',
+    [COLUMN_KEYS.DEPARTMENT]: 'department_name',
+    [COLUMN_KEYS.DESIGNATION]: 'designation_name'
+};
 
 export default function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: SORT_DIRECTIONS.ASCENDING
+    });
     const [selectedEmployees, setSelectedEmployees] = useState([]);
-    const [masterCheckbox, setMasterCheckbox] = useState(false);
+
     const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuth();
+
+    // Fetch employees data
+    const fetchEmployees = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            if (!user?.user_id) {
+                throw new Error('User ID is required');
+            }
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+
+            const response = await api.post('employee_list', formData);
+
+            if (response.data?.success && response.data.data) {
+                setEmployees(response.data.data);
+            } else if (response.data?.success && response.data.employees) {
+                setEmployees(response.data.employees);
+            } else if (Array.isArray(response.data)) {
+                setEmployees(response.data);
+            } else {
+                throw new Error(response.data?.message || 'Failed to fetch employees');
+            }
+
+        } catch (error) {
+            console.error("Fetch employees error:", error);
+            const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+            if (error.response?.status === 401) {
+                setError("Your session has expired. Please login again.");
+                setTimeout(() => logout?.(), 2000);
+            } else if (error.response?.status === 403) {
+                setError("You don't have permission to view employees.");
+            } else if (error.response?.status >= 500) {
+                setError("Server error. Please try again later.");
+            } else {
+                setError(errorMessage);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [user, logout]);
 
     useEffect(() => {
-        const fetchEmployees = async () => {
-            const API_BASE_URL =
-                import.meta.env.MODE === 'development'
-                    ? import.meta.env.VITE_API_URL_LOCAL
-                    : import.meta.env.VITE_API_URL_PROD;
-            try {
-                const response = await axios.get(`${API_BASE_URL}/api/employees`);
-                setEmployees(response.data);
-                setLoading(false);
-            } catch (error) {
-                setError("Failed to load employees. Please try again later.");
-                console.error("Fetch error:", error.message);
-                setLoading(false);
-            }
-        };
+        if (isAuthenticated() && user?.user_id) {
+            fetchEmployees();
+        }
+    }, [isAuthenticated, fetchEmployees, user?.user_id]);
 
-        fetchEmployees();
+    // Sorting functionality
+    const requestSort = useCallback((key) => {
+        setSortConfig(prevConfig => {
+            const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
+                ? SORT_DIRECTIONS.DESCENDING
+                : SORT_DIRECTIONS.ASCENDING;
+            return { key, direction };
+        });
     }, []);
 
-    const handleNavigation = (path) => {
-        navigate(path);
-    };
-    
-    // Sorting functionality
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-        setSortConfig({ key, direction });
-    };
+    // Memoized sorted employees
+    const sortedEmployees = useMemo(() => {
+        if (!sortConfig.key) return employees;
 
-    const getSortedEmployees = () => {
-        const sortableEmployees = [...employees];
-        if (sortConfig.key) {
-            sortableEmployees.sort((a, b) => {
-                // Define mapping between column keys and actual object properties
-                const keyMapping = {
-                    'id': 'employeeCode',
-                    'name': 'name',
-                    // Keep other mappings as they are
-                    'department': 'department',
-                    'designation': 'designation'
-                };
-                
-                // Use the mapped property name
-                const actualKey = keyMapping[sortConfig.key] || sortConfig.key;
-                
-                if (a[actualKey] < b[actualKey]) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (a[actualKey] > b[actualKey]) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sortableEmployees;
-    };
+        return [...employees].sort((a, b) => {
+            const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
+            const aValue = a[actualKey] || '';
+            const bValue = b[actualKey] || '';
+
+            if (aValue < bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [employees, sortConfig]);
+
+    // Master checkbox state
+    const masterCheckboxState = useMemo(() => {
+        if (!employees || employees.length === 0) return false;
+        return selectedEmployees.length === employees.length;
+    }, [selectedEmployees.length, employees]);
 
     // Checkbox functionality
-    const handleSelectAll = () => {
-        const newMasterState = !masterCheckbox;
-        setMasterCheckbox(newMasterState);
-        if (newMasterState) {
-            setSelectedEmployees(employees.map(emp => emp.employeeCode));
-        } else {
+    const handleSelectAll = useCallback(() => {
+        if (!employees || employees.length === 0) return;
+
+        if (masterCheckboxState) {
             setSelectedEmployees([]);
-        }
-    };
-
-    const handleSelectEmployee = (id) => {
-        const selectedIndex = selectedEmployees.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = [...selectedEmployees, id];
         } else {
-            newSelected = selectedEmployees.filter(empId => empId !== id);
+            setSelectedEmployees(employees.map(emp => emp.employee_code || emp.employee_id));
         }
+    }, [masterCheckboxState, employees]);
 
-        setSelectedEmployees(newSelected);
-        setMasterCheckbox(newSelected.length === employees.length);
-    };
+    const handleSelectEmployee = useCallback((employeeId) => {
+        setSelectedEmployees(prev => {
+            if (prev.includes(employeeId)) {
+                return prev.filter(id => id !== employeeId);
+            } else {
+                return [...prev, employeeId];
+            }
+        });
+    }, []);
 
-    const isSelected = (id) => selectedEmployees.indexOf(id) !== -1;
+    const isSelected = useCallback((employeeId) => {
+        return selectedEmployees.includes(employeeId);
+    }, [selectedEmployees]);
+
+    // Action handlers
+    const handleViewDetails = useCallback((employeeCode) => {
+        navigate(`/employee/details/${employeeCode}`);
+    }, [navigate]);
+
+    const handleEditEmployee = useCallback((employee_id) => {
+        navigate(`/add-employee?edit=${employee_id}`);
+    }, [navigate]);
 
 
-    const handleViewDetails = (employeeCode) => {
-        alert(`Viewing details for employee with ID: ${employeeCode}`);
-        // Navigation or modal logic would go here
-    };
+    const handleDuplicate = useCallback((employeeCode) => {
+        navigate(`/employee/duplicate/${employeeCode}`);
+    }, [navigate]);
 
-    const handleDuplicate = (id) => {
-        alert(`Creating a duplicate record for employee with ID: ${id}`);
-        // Duplicate logic would go here
-    };
+    // const handleAssignBranch = useCallback((employeeCode) => {
+    //     navigate(`/employee/assign-branch/${employeeCode}`);
+    // }, [navigate]);
 
-    const handleAssignBranch = (id) => {
-        alert(`Assigning branch for employee with ID: ${id}`);
-        // Branch assignment logic would go here
-    };
+    // const handleManageMobilePermission = useCallback(() => {
+    //     navigate('/employee/mobile-permissions');
+    // }, [navigate]);
 
-
-    const handleManageMobilePermission = () => {
-        alert('Managing mobile permissions');
-        // Open mobile permission management modal/page
-    };
-
-    const handleBulkAssignBranch = () => {
-        alert('Bulk assigning branch');
-        // Open branch assignment modal for selected employees
-    };
+    const handleBulkAssignBranch = useCallback(() => {
+        if (selectedEmployees.length === 0) {
+            alert('Please select at least one employee');
+            return;
+        }
+        navigate('/employee/bulk-assign-branch', {
+            state: { selectedEmployees }
+        });
+    }, [selectedEmployees, navigate]);
 
     // Render sort icon
-    const renderSortIcon = (key) => {
+    const renderSortIcon = useCallback((key) => {
         if (sortConfig.key !== key) {
-            return <ChevronDown className="ml-1 h-4 w-4" />;
+            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
         }
-        return sortConfig.direction === 'ascending' ?
+        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
             <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
             <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
-    };
+    }, [sortConfig]);
+
+    // Format date
+    const formatDate = useCallback((dateString) => {
+        if (!dateString) return '-';
+        try {
+            return new Date(dateString).toLocaleDateString('en-GB');
+        } catch {
+            return '-';
+        }
+    }, []);
+
+    // Redirect if not authenticated
+    if (!isAuthenticated()) {
+        return <Navigate to="/login" replace />;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-4">
-            <div className="bg-white rounded shadow">
+            <div className="bg-white rounded-lg shadow-sm">
                 {/* Header section */}
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h1 className="text-xl font-medium">
-                        Employee Details <span className="text-blue-500">({employees.length})</span>
-                    </h1>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={handleManageMobilePermission}
-                            className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded text-sm font-medium"
-                        >
-                            Manage Mobile Permission
-                        </button>
-                        <button
-                            onClick={handleBulkAssignBranch}
-                            className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded text-sm font-medium"
-                        >
-                            Assign Branch
-                        </button>
-                        <button
-                            onClick={() => handleNavigation('/add-employee')}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium"
-                        >
-                            Add Employee
-                        </button>
-                        <div className="relative">
-                            <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded text-sm font-medium flex items-center">
-                                Actions <ChevronDown className="ml-2 h-4 w-4" />
+                <div className="px-6 py-4 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                            <Users className="h-6 w-6 text-gray-600 mr-2" />
+                            <h1 className="text-xl font-semibold text-gray-900">
+                                Employee Management
+                            </h1>
+                            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                                {employees?.length || 0} {(employees?.length || 0) === 1 ? 'Employee' : 'Employees'}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            {/* <button
+                                onClick={handleManageMobilePermission}
+                                className="flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                            >
+                                <Settings className="h-4 w-4" />
+                                Mobile Permissions
+                            </button> */}
+
+                            <button
+                                onClick={handleBulkAssignBranch}
+                                disabled={selectedEmployees.length === 0}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${selectedEmployees.length === 0
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
+                                    }`}
+                            >
+                                <Users className="h-4 w-4" />
+                                Assign Branch
+                                {selectedEmployees.length > 0 && (
+                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+                                        {selectedEmployees.length}
+                                    </span>
+                                )}
+                            </button>
+
+                            <button
+                                onClick={() => navigate('/add-employee')}
+                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Employee
                             </button>
                         </div>
                     </div>
@@ -184,140 +272,144 @@ export default function EmployeeManagement() {
                 <div className="overflow-x-auto">
                     {loading ? (
                         <div className="flex justify-center items-center p-12">
-                            <Loader2 size={40} className="animate-spin text-blue-600" />
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                             <span className="ml-3 text-gray-600">Loading employees...</span>
                         </div>
                     ) : error ? (
-                        <div className="text-center p-6 text-red-600">
-                            <p>{error}</p>
+                        <div className="flex flex-col items-center justify-center p-12 text-center">
+                            <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+                            <p className="text-red-600 mb-4">{error}</p>
+                            <button
+                                onClick={fetchEmployees}
+                                className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                            >
+                                Try Again
+                            </button>
                         </div>
                     ) : (
-                        <table className="min-w-full">
-                            <thead className="bg-blue-50">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="w-12 px-4 py-3">
+                                    <th className="w-12 px-6 py-3">
                                         <input
                                             type="checkbox"
-                                            className="h-4 w-4"
-                                            checked={masterCheckbox}
+                                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            checked={masterCheckboxState}
                                             onChange={handleSelectAll}
                                         />
                                     </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <button
-                                            className="flex items-center text-xs font-medium text-gray-700 uppercase"
-                                            onClick={() => requestSort('id')}
-                                        >
-                                            Emp Id {renderSortIcon('id')}
-                                        </button>
+                                    {[
+                                        { key: COLUMN_KEYS.ID, label: 'Employee ID' },
+                                        { key: COLUMN_KEYS.NAME, label: 'Name' },
+                                        { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
+                                        { key: COLUMN_KEYS.DESIGNATION, label: 'Designation' }
+                                    ].map(({ key, label }) => (
+                                        <th key={`header-${key}`} className="px-6 py-3 text-left">
+                                            <button
+                                                className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                onClick={() => requestSort(key)}
+                                            >
+                                                {label}
+                                                {renderSortIcon(key)}
+                                            </button>
+                                        </th>
+                                    ))}
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date of Joining
                                     </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <button
-                                            className="flex items-center text-xs font-medium text-gray-700 uppercase"
-                                            onClick={() => requestSort('name')}
-                                        >
-                                            Name {renderSortIcon('name')}
-                                        </button>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Biometrics
                                     </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <button
-                                            className="flex items-center text-xs font-medium text-gray-700 uppercase"
-                                            onClick={() => requestSort('department')}
-                                        >
-                                            Department {renderSortIcon('department')}
-                                        </button>
-                                    </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <button
-                                            className="flex items-center text-xs font-medium text-gray-700 uppercase"
-                                            onClick={() => requestSort('designation')}
-                                        >
-                                            Designation {renderSortIcon('designation')}
-                                        </button>
-                                    </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <span className="text-xs font-medium text-gray-700 uppercase">Date Of Joining</span>
-                                    </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <span className="text-xs font-medium text-gray-700 uppercase">Biometrics Registered</span>
-                                    </th>
-                                    <th className="px-4 py-3 text-left">
-                                        <span className="text-xs font-medium text-gray-700 uppercase">Action</span>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {getSortedEmployees().length === 0 ? (
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {!sortedEmployees || sortedEmployees.length === 0 ? (
                                     <tr>
-                                        <td colSpan="8" className="px-4 py-6 text-center text-gray-500">
-                                            No employees found
+                                        <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                                            <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                            <p className="text-lg font-medium">No employees found</p>
+                                            <p className="text-sm">Start by adding your first employee</p>
                                         </td>
                                     </tr>
                                 ) : (
-                                    getSortedEmployees().map((employee) => (
-                                        <tr
-                                            key={employee.employeeCode}
-                                            className="hover:bg-gray-50"
-                                        >
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="checkbox"
-                                                    className="h-4 w-4"
-                                                    checked={isSelected(employee.employeeCode)}
-                                                    onChange={() => handleSelectEmployee(employee.employeeCode)}
-                                                />
-                                            </td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{employee.employeeCode}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{employee.name}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{employee.department}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{employee.designation}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">
-                                                {new Date(employee.dateOfJoining).toLocaleDateString('en-GB')}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">
-                                                {employee.biometrics ?
-                                                    <div className="flex items-center">
-                                                        <UserCheck size={16} className="text-green-600 mr-1" />
-                                                        <span>Face ID</span>
-                                                    </div> :
-                                                    "-"
-                                                }
-                                            </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => handleAssignBranch(employee.employeeCode)}
-                                                        className="px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 hover:bg-gray-50"
-                                                    >
-                                                        Assign Branch
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleNavigation(`/employee/${employee._id}`);
-                                                        }}
-                                                        className="p-1 text-gray-600 hover:text-blue-600 border border-gray-200 rounded"
-                                                    >
-                                                        <Pencil size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleViewDetails(employee.employeeCode)}
-                                                        className="p-1 text-gray-600 hover:text-blue-600 border border-gray-200 rounded"
-                                                    >
-                                                        <FileText size={16} />
-                                                    </button>
-                                                    {employee.hasDocs && (
-                                                        <button
-                                                            onClick={() => handleDuplicate(employee.employeeCode)}
-                                                            className="p-1 text-gray-600 hover:text-blue-600 border border-gray-200 rounded"
-                                                        >
-                                                            <ClipboardIcon size={16} />
-                                                        </button>
+                                    sortedEmployees.map((employee, index) => {
+                                        const employeeId = employee.employee_code || employee.employee_id || `employee-${index}`;
+                                        return (
+                                            <tr
+                                                key={`emp-${employeeId}`}
+                                                className={`hover:bg-gray-50 transition-colors ${isSelected(employeeId) ? 'bg-blue-50' : ''
+                                                    }`}
+                                            >
+                                                <td className="px-6 py-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                        checked={isSelected(employeeId)}
+                                                        onChange={() => handleSelectEmployee(employeeId)}
+                                                    />
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    {employee.employee_code || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {employee.full_name || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {employee.department_name || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {employee.designation_name || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {formatDate(employee.date_of_joining)}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {employee.biometrics_registered ? (
+                                                        <div className="flex items-center">
+                                                            <UserCheck className="h-4 w-4 text-green-600 mr-2" />
+                                                            <span className="text-green-600 font-medium">Registered</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-gray-400">Not Registered</span>
                                                     )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex items-center gap-2">
+                                                        {/* <button
+                                                            onClick={() => handleAssignBranch(employeeId)}
+                                                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 transition-colors"
+                                                        >
+                                                            Assign Branch
+                                                        </button> */}
+                                                        <button
+                                                            onClick={() => handleEditEmployee(employee.employee_id)}
+                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                            title="Edit Employee"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleViewDetails(employeeId)}
+                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                            title="View Details"
+                                                        >
+                                                            <FileText className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDuplicate(employeeId)}
+                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                            title="Duplicate Employee"
+                                                        >
+                                                            <ClipboardIcon className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 )}
                             </tbody>
                         </table>

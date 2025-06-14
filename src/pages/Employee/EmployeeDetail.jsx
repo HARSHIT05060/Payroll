@@ -106,7 +106,7 @@ const EmployeeDetail = () => {
             console.error("Error updating employee data:", err);
             setError(`Failed to save changes: ${err.message}`);
         } finally {
-            setLoading(false);
+            setLoading(false); 
         }
     };
 

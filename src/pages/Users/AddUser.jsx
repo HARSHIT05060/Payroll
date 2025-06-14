@@ -132,7 +132,7 @@ const AddUser = () => {
     // Determine if we're in edit mode and get the current role ID
     const isEditMode = Boolean(roleId) || Boolean(roleIdFromState);
     const currentRoleId = roleId || roleIdFromState;
-
+console.log(roleId)
     // Toast helper functions
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
