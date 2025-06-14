@@ -15,7 +15,6 @@ const useDepartments = () => {
         setError(null);
 
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('user_id', user_id);
 
@@ -43,10 +42,9 @@ const useDepartments = () => {
     }, [user_id]);
 
     const addDepartment = async (name) => {
-        if (!name.trim()) return;
+        if (!name.trim()) return { success: false, message: "Department name is required" };
 
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('name', name.trim());
             formData.append('user_id', user_id);
@@ -57,40 +55,53 @@ const useDepartments = () => {
                 }
             });
 
-            console.log("Department created:", res.data);
+            // Check if the API response indicates success or failure
+            if (res.data && res.data.success === false) {
+                // API returned success: false - handle the error
+                const errorMessage = res.data.message || "Failed to add department";
+                setError(errorMessage);
+                return { success: false, message: errorMessage };
+            }
 
-            // Refresh the departments list
+            // Check for other possible error indicators in the response
+            if (res.data && res.data.error) {
+                const errorMessage = res.data.error;
+                setError(errorMessage);
+                return { success: false, message: errorMessage };
+            }
+
+            // If we get here, assume success and refresh the departments list
             await fetchDepartments();
             return { success: true };
         } catch (err) {
             console.error("Error adding department:", err);
-            setError("Failed to add department");
-            return { success: false, error: err.message };
+
+            // Handle different types of errors
+            let errorMessage = "Failed to add department";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.data?.error) {
+                errorMessage = err.response.data.error;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            setError(errorMessage);
+            return { success: false, message: errorMessage };
         }
     };
 
     const deleteDepartment = async (id) => {
         if (!id) {
-            console.error("No ID provided for deletion");
             return { success: false, error: "No ID provided" };
         }
 
-        console.log("Attempting to delete department with ID:", id);
-        console.log("User ID:", user_id);
-
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('id', id);
             formData.append('user_id', user_id);
-
-            // Try different field names that your API might expect
-            formData.append('department_id', id); // Some APIs expect 'department_id'
-
-            console.log("FormData contents:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
+            formData.append('department_id', id);
 
             const res = await api.post("/department_delete", formData, {
                 headers: {
@@ -98,22 +109,15 @@ const useDepartments = () => {
                 }
             });
 
-            console.log("Delete API Response:", res.data);
-
-            // Check if the API returned success
             if (res.data && res.data.success === false) {
-                console.error("API returned failure:", res.data.message);
                 setError(`Delete failed: ${res.data.message}`);
                 return { success: false, error: res.data.message };
             }
 
-            // Refresh the departments list
             await fetchDepartments();
             return { success: true };
         } catch (err) {
             console.error("Error deleting department:", err);
-            console.error("Error response:", err.response?.data);
-
             const errorMessage = err.response?.data?.message || err.message || "Unknown error";
             setError(`Failed to delete department: ${errorMessage}`);
             return { success: false, error: errorMessage };

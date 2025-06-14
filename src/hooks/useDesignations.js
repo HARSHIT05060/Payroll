@@ -15,7 +15,6 @@ const useDesignations = () => {
         setError(null);
 
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('user_id', user_id);
 
@@ -25,10 +24,6 @@ const useDesignations = () => {
                 }
             });
 
-            console.log("Designation API Raw Response:", res.data);
-            console.log("Fetched designations:", res.data.data);
-
-            // Handle different response structures
             const designationData = res.data.data || res.data || [];
             setDesignations(Array.isArray(designationData) ? designationData : []);
         } catch (err) {
@@ -47,10 +42,9 @@ const useDesignations = () => {
     }, [user_id]);
 
     const addDesignation = async (name) => {
-        if (!name.trim()) return;
+        if (!name.trim()) return { success: false, message: "Designation name is required" };
 
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('name', name.trim());
             formData.append('user_id', user_id);
@@ -61,40 +55,53 @@ const useDesignations = () => {
                 }
             });
 
-            console.log("Designation created:", res.data);
+            // Check if the API response indicates success or failure
+            if (res.data && res.data.success === false) {
+                // API returned success: false - handle the error
+                const errorMessage = res.data.message || "Failed to add designation";
+                setError(errorMessage);
+                return { success: false, message: errorMessage };
+            }
 
-            // Refresh the designations list
+            // Check for other possible error indicators in the response
+            if (res.data && res.data.error) {
+                const errorMessage = res.data.error;
+                setError(errorMessage);
+                return { success: false, message: errorMessage };
+            }
+
+            // If we get here, assume success and refresh the designations list
             await fetchDesignations();
             return { success: true };
         } catch (err) {
             console.error("Error adding designation:", err);
-            setError("Failed to add designation");
-            return { success: false, error: err.message };
+
+            // Handle different types of errors
+            let errorMessage = "Failed to add designation";
+
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.data?.error) {
+                errorMessage = err.response.data.error;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            setError(errorMessage);
+            return { success: false, message: errorMessage };
         }
     };
 
     const deleteDesignation = async (id) => {
         if (!id) {
-            console.error("No ID provided for deletion");
             return { success: false, error: "No ID provided" };
         }
 
-        console.log("Attempting to delete designation with ID:", id);
-        console.log("User ID:", user_id);
-
         try {
-            // Create FormData for the request
             const formData = new FormData();
             formData.append('id', id);
             formData.append('user_id', user_id);
-
-            // Try different field names that your API might expect
             formData.append('designation_id', id);
-
-            console.log("Designation Delete FormData contents:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
 
             const res = await api.post("/designation_delete", formData, {
                 headers: {
@@ -102,22 +109,15 @@ const useDesignations = () => {
                 }
             });
 
-            console.log("Delete Designation API Response:", res.data);
-
-            // Check if the API returned success
             if (res.data && res.data.success === false) {
-                console.error("API returned failure:", res.data.message);
                 setError(`Delete failed: ${res.data.message}`);
                 return { success: false, error: res.data.message };
             }
 
-            // Refresh the designations list
             await fetchDesignations();
             return { success: true };
         } catch (err) {
             console.error("Error deleting designation:", err);
-            console.error("Error response:", err.response?.data);
-
             const errorMessage = err.response?.data?.message || err.message || "Unknown error";
             setError(`Failed to delete designation: ${errorMessage}`);
             return { success: false, error: errorMessage };
