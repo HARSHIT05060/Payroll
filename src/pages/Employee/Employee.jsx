@@ -200,15 +200,6 @@ export default function EmployeeManagement() {
             <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
     }, [sortConfig]);
 
-    // Format date
-    const formatDate = useCallback((dateString) => {
-        if (!dateString) return '-';
-        try {
-            return new Date(dateString).toLocaleDateString('en-GB');
-        } catch {
-            return '-';
-        }
-    }, []);
 
     // Redirect if not authenticated
     if (!isAuthenticated()) {
@@ -315,7 +306,7 @@ export default function EmployeeManagement() {
                                         </th>
                                     ))}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Date of Joining
+                                        Email
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Biometrics
@@ -364,7 +355,8 @@ export default function EmployeeManagement() {
                                                     {employee.designation_name || '-'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {formatDate(employee.date_of_joining)}
+                                                    {employee.email}
+                                                    
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {employee.biometrics_registered ? (
