@@ -1,155 +1,450 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import api from '../../api/axiosInstance';
+import { useAuth } from '../../context/AuthContext';
 
-const UserManagement = () => {
-    const navigate = useNavigate();
-    const [users, setUsers] = useState([]);
-
-    // Load users from localStorage on component mount
+// Toast Component
+const Toast = ({ message, type, onClose }) => {
     useEffect(() => {
-        const savedUsers = localStorage.getItem('users');
-        if (savedUsers) {
-            setUsers(JSON.parse(savedUsers));
-        }
-    }, []);
+        const timer = setTimeout(() => {
+            onClose();
+        }, 4000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
 
-    // Listen for storage changes to update users list
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const savedUsers = localStorage.getItem('users');
-            if (savedUsers) {
-                setUsers(JSON.parse(savedUsers));
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        // Also listen for custom event for same-tab updates
-        window.addEventListener('usersUpdated', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('usersUpdated', handleStorageChange);
-        };
-    }, []);
-
-    const handleCreateUser = () => {
-        navigate('/add-user');
-    };
-
-    const handleEditUser = (user) => {
-        localStorage.setItem('editingUser', JSON.stringify(user));
-        navigate('/add-user');
-    };
-
-    const handleDeleteUser = (userId) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            const updatedUsers = users.filter(user => user.id !== userId);
-            setUsers(updatedUsers);
-            localStorage.setItem('users', JSON.stringify(updatedUsers));
-            // Dispatch custom event to notify other components
-            window.dispatchEvent(new CustomEvent('usersUpdated'));
+    const getToastStyles = () => {
+        switch (type) {
+            case 'success':
+                return 'bg-green-50 border-green-200 text-green-800';
+            case 'error':
+                return 'bg-red-50 border-red-200 text-red-800';
+            case 'warning':
+                return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+            default:
+                return 'bg-blue-50 border-blue-200 text-blue-800';
         }
     };
 
-    const getPermissionSummary = (permissions) => {
-        if (!permissions || Object.keys(permissions).length === 0) {
-            return 'No permissions assigned';
+    const getIcon = () => {
+        switch (type) {
+            case 'success':
+                return <CheckCircle className="w-5 h-5 text-green-600" />;
+            case 'error':
+                return <XCircle className="w-5 h-5 text-red-600" />;
+            case 'warning':
+                return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+            default:
+                return <AlertCircle className="w-5 h-5 text-blue-600" />;
         }
-
-        const sections = Object.keys(permissions);
-        const totalPermissions = sections.reduce((total, section) => {
-            return total + Object.values(permissions[section]).reduce((sectionTotal, perms) => {
-                return sectionTotal + (Array.isArray(perms) ? perms.length : 0);
-            }, 0);
-        }, 0);
-
-        return `${sections.length} section(s), ${totalPermissions} permission(s)`;
     };
 
     return (
-        <div className="p-6 max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-                    <p className="text-gray-600 mt-1">Manage user roles and permissions</p>
-                </div>
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg border shadow-lg transition-all duration-300 ${getToastStyles()}`}>
+            <div className="flex items-center space-x-3">
+                {getIcon()}
+                <span className="font-medium">{message}</span>
                 <button
-                    onClick={handleCreateUser}
-                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                    onClick={onClose}
+                    className="ml-auto p-1 hover:bg-black hover:bg-opacity-10 rounded"
                 >
-                    <Plus className="w-4 h-4" />
-                    <span>Create User</span>
+                    <X className="w-4 h-4" />
                 </button>
             </div>
+        </div>
+    );
+};
 
-            {/* Users List */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">All Users</h3>
+// Confirmation Modal Component
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = "Confirm", cancelText = "Cancel", type = "danger" }) => {
+    if (!isOpen) return null;
+
+    const getButtonStyles = () => {
+        switch (type) {
+            case 'danger':
+                return 'bg-red-600 hover:bg-red-700 text-white';
+            case 'warning':
+                return 'bg-yellow-600 hover:bg-yellow-700 text-white';
+            default:
+                return 'bg-blue-600 hover:bg-blue-700 text-white';
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
+                
+                <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div className="sm:flex sm:items-start">
+                            <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${
+                                type === 'danger' ? 'bg-red-100' : type === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'
+                            }`}>
+                                {type === 'danger' ? (
+                                    <XCircle className="h-6 w-6 text-red-600" />
+                                ) : type === 'warning' ? (
+                                    <AlertCircle className="h-6 w-6 text-yellow-600" />
+                                ) : (
+                                    <AlertCircle className="h-6 w-6 text-blue-600" />
+                                )}
+                            </div>
+                            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <h3 className="text-base font-semibold leading-6 text-gray-900">
+                                    {title}
+                                </h3>
+                                <div className="mt-2">
+                                    <p className="text-sm text-gray-500">
+                                        {message}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button
+                            type="button"
+                            className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm sm:ml-3 sm:w-auto transition-colors ${getButtonStyles()}`}
+                            onClick={onConfirm}
+                        >
+                            {confirmText}
+                        </button>
+                        <button
+                            type="button"
+                            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-colors"
+                            onClick={onClose}
+                        >
+                            {cancelText}
+                        </button>
+                    </div>
                 </div>
-
-                {users.length === 0 ? (
-                    <div className="px-6 py-12 text-center">
-                        <p className="text-gray-500 text-lg">No users found</p>
-                        <p className="text-gray-400 text-sm mt-2">Create your first user to get started</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Role Name
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Permissions
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Created
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {users.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">{user.roleName}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-500">{getPermissionSummary(user.permissions)}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {new Date(user.createdAt).toLocaleDateString('en-GB')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => handleEditUser(user)}
-                                                    className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteUser(user.id)}
-                                                    className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
             </div>
         </div>
+    );
+};
+
+const UserManagement = () => {
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const [roles, setRoles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [deleting, setDeleting] = useState(null);
+    const [toast, setToast] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+
+    const showToast = (message, type) => {
+        setToast({ message, type });
+    };
+
+    const closeToast = () => {
+        setToast(null);
+    };
+
+    const fetchRoles = async () => {
+        if (!user?.user_id) {
+            setError('User not authenticated');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            const formData = new FormData();
+            formData.append('user_id', String(user.user_id));
+
+            const res = await api.post('/user_roles_list', formData);
+
+            if (res.data?.success) {
+                const rolesData = res.data.data || [];
+                setRoles(rolesData);
+            } else {
+                const errorMsg = res.data?.message || 'Failed to fetch roles';
+                setError(errorMsg);
+                showToast(errorMsg, 'error');
+            }
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || 'Error fetching roles';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (user?.user_id) {
+            fetchRoles();
+        } else {
+            setLoading(false);
+            setError('User not authenticated');
+        }
+    }, [user?.user_id]);
+
+    const handleCreateRole = () => {
+        try {
+            sessionStorage.removeItem('editingRole');
+            navigate('/add-user');
+        } catch (error) {
+            showToast('Error navigating to create role page', error);
+        }
+    };
+
+    const handleEditRole = (role) => {
+        setConfirmModal({
+            isOpen: true,
+            type: 'edit',
+            data: role
+        });
+    };
+
+    const confirmEditRole = () => {
+        try {
+            const role = confirmModal.data;
+            navigate('/add-user', {
+                state: {
+                    roleId: role.user_roles_id,
+                    roleName: role.name 
+                }
+            });
+            setConfirmModal({ isOpen: false, type: '', data: null });
+        } catch (error) {
+            showToast('Error preparing role for editing', error);
+            setConfirmModal({ isOpen: false, type: '', data: null });
+        }
+    };
+
+    const handleDeleteRole = (role) => {
+        setConfirmModal({
+            isOpen: true,
+            type: 'delete',
+            data: role
+        });
+    };
+
+    const confirmDeleteRole = async () => {
+        const role = confirmModal.data;
+        setDeleting(role.user_roles_id);
+        setConfirmModal({ isOpen: false, type: '', data: null });
+
+        try {
+            const formData = new FormData();
+            formData.append('user_id', String(user.user_id));
+            formData.append('user_roles_id', String(role.user_roles_id));
+
+            const res = await api.post('/user_roles_delete', formData);
+
+            if (res.data?.success) {
+                await fetchRoles();
+                showToast('Role deleted successfully', 'success');
+            } else {
+                showToast(res.data?.message || 'Failed to delete role', 'error');
+            }
+        } catch (err) {
+            showToast(err.response?.data?.message || 'Error deleting role', 'error');
+        } finally {
+            setDeleting(null);
+        }
+    };
+
+    const handleRefresh = () => {
+        fetchRoles();
+        showToast('Refreshing roles...', 'info');
+    };
+
+    const closeModal = () => {
+        setConfirmModal({ isOpen: false, type: '', data: null });
+    };
+
+    // Show authentication error
+    if (!user?.user_id && !loading) {
+        return (
+            <div className="p-6 max-w-6xl mx-auto">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                    <h2 className="text-xl font-semibold text-red-800 mb-2">Authentication Required</h2>
+                    <p className="text-red-600">Please log in to manage roles.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <div className="p-6 max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Role Management</h2>
+                        <p className="text-gray-600 mt-1">Manage user roles and assign permissions</p>
+                    </div>
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={handleRefresh}
+                            className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50"
+                            disabled={loading}
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                            <span>Refresh</span>
+                        </button>
+                        <button
+                            onClick={handleCreateRole}
+                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Create Role</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h3 className="text-lg font-medium text-gray-900">All Roles</h3>
+                    </div>
+
+                    {loading ? (
+                        <div className="px-6 py-12 text-center">
+                            <div className="inline-flex items-center space-x-2 text-gray-500">
+                                <RefreshCw className="w-5 h-5 animate-spin" />
+                                <span>Loading roles...</span>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <div className="px-6 py-12 text-center">
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Roles</p>
+                                <p className="text-red-600 mb-4">{error}</p>
+                                <button
+                                    onClick={handleRefresh}
+                                    className="inline-flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+                                >
+                                    <RefreshCw className="w-4 h-4" />
+                                    <span>Try Again</span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : roles.length === 0 ? (
+                        <div className="px-6 py-12 text-center">
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Plus className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <p className="text-gray-700 text-lg font-medium mb-2">No Roles Found</p>
+                                <p className="text-gray-500 text-sm mb-4">
+                                    You haven't created any roles yet. Create your first role to get started with role management.
+                                </p>
+                                <button
+                                    onClick={handleCreateRole}
+                                    className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Create First Role</span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Role Name
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Created Date
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {roles.map(role => (
+                                        <tr key={role.user_roles_id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {role.name || 'Unnamed Role'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${role.status === '2' || role.status === 2
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
+                                                    }`}>
+                                                    {role.status === '2' || role.status === 2 ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {role.created_at ? new Date(role.created_at).toLocaleDateString() : 'N/A'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => handleEditRole(role)}
+                                                        className="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50 transition-colors disabled:opacity-50"
+                                                        title="Edit Role"
+                                                        disabled={deleting === role.user_roles_id}
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteRole(role)}
+                                                        className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors"
+                                                        title="Delete Role"
+                                                        disabled={deleting === role.user_roles_id}
+                                                    >
+                                                        {deleting === role.user_roles_id ? (
+                                                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <Trash2 className="w-4 h-4" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
+
+            {/* Confirmation Modals */}
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
+                onClose={closeModal}
+                onConfirm={confirmDeleteRole}
+                title="Delete Role"
+                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this role'}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                type="danger"
+            />
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen && confirmModal.type === 'edit'}
+                onClose={closeModal}
+                onConfirm={confirmEditRole}
+                title="Edit Role"
+                message={`Do you want to edit the role "${confirmModal.data?.name || 'this role'}"?`}
+                confirmText="Edit"
+                cancelText="Cancel"
+                type="warning"
+            />
+        </>
     );
 };
 
