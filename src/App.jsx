@@ -48,12 +48,12 @@ const App = () => {
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/usermanage" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
-            <Route path="/employee" element={<Employee />} />
-            <Route path="/employee/add" element={<AddEmployee />} />
-            <Route path="/employee/:id" element={<EmployeeDetail />} />
-            <Route path="/departments" element={<DepartmentsPage />} />
-            <Route path="/branches" element={<BranchesPage />} />
-            <Route path="/designation" element={<DesignationPage />} />
+            <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
+            <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
+            <Route path="/employee/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
+            <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
+            <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
+            <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
             {/*<Route path="/leaveapplication" element={<LeaveApplication />} />
             <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/leavestatusPage" element={<LeaveStatusPage />} />

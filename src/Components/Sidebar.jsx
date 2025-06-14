@@ -33,7 +33,7 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/employee',
             submenu: [
-                { label: 'Add Employee', path: '/employee/add' },
+                { label: 'Add Employee', path: '/add-employee' },
                 { label: 'Department', path: '/departments' },
                 { label: 'Designation', path: '/designation' },
                 { label: 'Branch', path: '/branches' },

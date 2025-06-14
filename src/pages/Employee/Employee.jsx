@@ -167,7 +167,7 @@ export default function EmployeeManagement() {
                             Assign Branch
                         </button>
                         <button
-                            onClick={() => handleNavigation('/employee/add')}
+                            onClick={() => handleNavigation('/add-employee')}
                             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium"
                         >
                             Add Employee
