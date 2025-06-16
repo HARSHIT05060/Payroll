@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle, Shield, User } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 
@@ -74,13 +74,12 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
-                
+
                 <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                         <div className="sm:flex sm:items-start">
-                            <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${
-                                type === 'danger' ? 'bg-red-100' : type === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'
-                            }`}>
+                            <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${type === 'danger' ? 'bg-red-100' : type === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'
+                                }`}>
                                 {type === 'danger' ? (
                                     <XCircle className="h-6 w-6 text-red-600" />
                                 ) : type === 'warning' ? (
@@ -123,7 +122,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
     );
 };
 
-const UserManagement = () => {
+const Role = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -140,6 +139,16 @@ const UserManagement = () => {
 
     const closeToast = () => {
         setToast(null);
+    };
+
+    // Helper function to check if role is admin
+    const isAdminRole = (role) => {
+        return role.status === '1' || role.status === 1;
+    };
+
+    // Helper function to check if role can be modified
+    const canModifyRole = (role) => {
+        return !isAdminRole(role);
     };
 
     const fetchRoles = async () => {
@@ -186,14 +195,18 @@ const UserManagement = () => {
 
     const handleCreateRole = () => {
         try {
-            sessionStorage.removeItem('editingRole');
-            navigate('/add-user');
+            navigate('/add-role');
         } catch (error) {
             showToast('Error navigating to create role page', error);
         }
     };
 
     const handleEditRole = (role) => {
+        if (!canModifyRole(role)) {
+            showToast('Admin roles cannot be modified', 'warning');
+            return;
+        }
+
         setConfirmModal({
             isOpen: true,
             type: 'edit',
@@ -204,10 +217,10 @@ const UserManagement = () => {
     const confirmEditRole = () => {
         try {
             const role = confirmModal.data;
-            navigate('/add-user', {
+            navigate('/add-role', {
                 state: {
                     roleId: role.user_roles_id,
-                    roleName: role.name 
+                    roleName: role.name
                 }
             });
             setConfirmModal({ isOpen: false, type: '', data: null });
@@ -218,6 +231,11 @@ const UserManagement = () => {
     };
 
     const handleDeleteRole = (role) => {
+        if (!canModifyRole(role)) {
+            showToast('Admin roles cannot be deleted', 'warning');
+            return;
+        }
+
         setConfirmModal({
             isOpen: true,
             type: 'delete',
@@ -353,7 +371,7 @@ const UserManagement = () => {
                                             Role Name
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
+                                            Type
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Created Date
@@ -367,34 +385,57 @@ const UserManagement = () => {
                                     {roles.map(role => (
                                         <tr key={role.user_roles_id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {role.name || 'Unnamed Role'}
+                                                <div className="flex items-center space-x-2">
+                                                    {isAdminRole(role) ? (
+                                                        <Shield className="w-4 h-4 text-blue-600" />
+                                                    ) : (
+                                                        <User className="w-4 h-4 text-gray-500" />
+                                                    )}
+                                                    <span>{role.name || 'Unnamed Role'}</span>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${role.status === '2' || role.status === 2
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-red-100 text-red-800'
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminRole(role)
+                                                    ? 'bg-blue-100 text-blue-800'
+                                                    : 'bg-gray-100 text-gray-800'
                                                     }`}>
-                                                    {role.status === '2' || role.status === 2 ? 'Active' : 'Inactive'}
+                                                    {isAdminRole(role) ? (
+                                                        <>
+                                                            <Shield className="w-3 h-3 mr-1" />
+                                                            Admin
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <User className="w-3 h-3 mr-1" />
+                                                            User Role
+                                                        </>
+                                                    )}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                {role.created_at ? new Date(role.created_at).toLocaleDateString() : 'N/A'}
+                                                {role.created_date ? new Date(role.created_date).toLocaleDateString('en-GB') : 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <button
                                                         onClick={() => handleEditRole(role)}
-                                                        className="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50 transition-colors disabled:opacity-50"
-                                                        title="Edit Role"
-                                                        disabled={deleting === role.user_roles_id}
+                                                        className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
+                                                            : 'text-gray-400 cursor-not-allowed'
+                                                            }`}
+                                                        title={canModifyRole(role) ? "Edit Role" : "Admin roles cannot be edited"}
+                                                        disabled={deleting === role.user_roles_id || !canModifyRole(role)}
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteRole(role)}
-                                                        className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors"
-                                                        title="Delete Role"
-                                                        disabled={deleting === role.user_roles_id}
+                                                        className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                                            : 'text-gray-400 cursor-not-allowed'
+                                                            }`}
+                                                        title={canModifyRole(role) ? "Delete Role" : "Admin roles cannot be deleted"}
+                                                        disabled={deleting === role.user_roles_id || !canModifyRole(role)}
                                                     >
                                                         {deleting === role.user_roles_id ? (
                                                             <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
@@ -448,4 +489,4 @@ const UserManagement = () => {
     );
 };
 
-export default UserManagement;
+export default Role;

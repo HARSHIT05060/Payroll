@@ -11,11 +11,11 @@ import AddEmployee from './pages/Employee/AddEmployee';
 // import LeaveApplication from './pages/Leave/LeaveApplication';
 // import LeaveStatusPage from './pages/Leave/LeaveStatus';
 // import HolidayCalendar from './pages/Leave/HolidayCalendar';
-import UserManagement from './pages/Users/Usermanagement';
-import AddUser from './pages/Users/AddUser';
 import DepartmentsPage from './pages/Employee/Departments';
 import BranchesPage from './pages/Employee/Branches';
 import DesignationPage from './pages/Employee/Designations';
+import Role from './pages/Users/Role';
+import AddRole from './pages/Users/AddRole';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
@@ -46,8 +46,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/usermanage" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-            <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
+            <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
+            <Route path="/add-role" element={<ProtectedRoute><AddRole /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
             <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
             <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />

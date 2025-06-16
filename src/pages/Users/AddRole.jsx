@@ -110,7 +110,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
     );
 };
 
-const AddUser = () => {
+const AddRole = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { roleId } = useParams();
@@ -436,7 +436,7 @@ console.log(roleId)
                     'success'
                 );
                 setTimeout(() => {
-                    navigate('/usermanage');
+                    navigate('/role');
                 }, 1500);
             } else {
                 throw new Error(response.data.message || 'Failed to save role');
@@ -459,7 +459,7 @@ console.log(roleId)
 
     const confirmCancel = () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
-        navigate('/usermanage');
+        navigate('/role');
     };
 
     const formatPermissionName = (permissionTitle) => {
@@ -667,4 +667,4 @@ console.log(roleId)
     );
 };
 
-export default AddUser;
+export default AddRole;

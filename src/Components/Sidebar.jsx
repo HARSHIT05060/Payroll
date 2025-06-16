@@ -107,7 +107,7 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/usermanage',
             submenu: [
-                { label: 'Roles', path: '/usermanage' },
+                { label: 'Roles', path: '/role' },
                 { label: 'Permissions', path: '/user/permissions' },
                 { label: 'Activity Log', path: '/user/activity-log' }
             ]
