@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 const USER_KEY = 'auth_user';
 const TIMESTAMP_KEY = 'auth_timestamp';
-const SESSION_TIMEOUT = 604800 ;
+const SESSION_TIMEOUT =  24 * 60 * 60 * 1000 ;
 const SECRET_KEY = import.meta.env.AES_SECRET_KEY || 'shopno-ecommerce';
 
 // AES encryption helpers (in-file)

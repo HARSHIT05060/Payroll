@@ -12,9 +12,6 @@ const Toast = ({ message, type, onClose }) => {
         }, 4000);
         return () => clearTimeout(timer);
     }, [onClose]);
-    useEffect(() => {
-        console.log('editUserId from location:', location.state?.editUserId);
-    }, []);
 
     const getToastStyles = () => {
         switch (type) {
@@ -162,7 +159,8 @@ const AddUser = () => {
                     number: userData.number || userData.phone || userData.mobile || '',
                     email: userData.email || '',
                     password: '', // Don't populate password for security
-                    user_roles_id: String(userData.user_roles_id || userData.role_id || '')
+                    // Fixed: Use user_role_id from API response instead of user_roles_id
+                    user_roles_id: String(userData.user_role_id || userData.user_roles_id || '')
                 });
             } else {
                 showToast(res.data?.message || 'Failed to fetch user data', 'error');
@@ -174,7 +172,6 @@ const AddUser = () => {
             setUserDataLoading(false);
         }
     };
-
 
     // Initialize data on component mount
     useEffect(() => {
