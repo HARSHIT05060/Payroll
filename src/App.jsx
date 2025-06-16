@@ -16,6 +16,8 @@ import BranchesPage from './pages/Employee/Branches';
 import DesignationPage from './pages/Employee/Designations';
 import Role from './pages/Users/Role';
 import AddRole from './pages/Users/AddRole';
+import Usermanagement from './pages/Users/Usermanagement';
+import AddUser from './pages/Users/AddUser';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
@@ -46,6 +48,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+            <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
             <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
             <Route path="/add-role" element={<ProtectedRoute><AddRole /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
