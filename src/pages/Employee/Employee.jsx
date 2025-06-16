@@ -159,8 +159,8 @@ export default function EmployeeManagement() {
     }, [selectedEmployees]);
 
     // Action handlers
-    const handleViewDetails = useCallback((employeeCode) => {
-        navigate(`/employee/details/${employeeCode}`);
+    const handleViewDetails = useCallback((employee_id) => {
+        navigate(`/employee/details/${employee_id}`);
     }, [navigate]);
 
     const handleEditEmployee = useCallback((employee_id) => {
@@ -168,9 +168,9 @@ export default function EmployeeManagement() {
     }, [navigate]);
 
 
-    const handleDuplicate = useCallback((employeeCode) => {
-        navigate(`/employee/duplicate/${employeeCode}`);
-    }, [navigate]);
+    // const handleDuplicate = useCallback((employeeCode) => {
+    //     navigate(`/employee/duplicate/${employeeCode}`);
+    // }, [navigate]);
 
     // const handleAssignBranch = useCallback((employeeCode) => {
     //     navigate(`/employee/assign-branch/${employeeCode}`);
@@ -384,18 +384,11 @@ export default function EmployeeManagement() {
                                                             <Pencil className="h-4 w-4" />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleViewDetails(employeeId)}
+                                                            onClick={() => handleViewDetails(employee.employee_id)}
                                                             className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                                                             title="View Details"
                                                         >
                                                             <FileText className="h-4 w-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDuplicate(employeeId)}
-                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                                                            title="Duplicate Employee"
-                                                        >
-                                                            <ClipboardIcon className="h-4 w-4" />
                                                         </button>
                                                     </div>
                                                 </td>

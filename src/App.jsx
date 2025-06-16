@@ -50,7 +50,7 @@ const App = () => {
             <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
             <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
             <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
-            <Route path="/employee/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
+            <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
             <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
             <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
             <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
