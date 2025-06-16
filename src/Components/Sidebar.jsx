@@ -13,7 +13,8 @@ import {
     User,
     Settings,
     Phone,
-    ChevronRight
+    ChevronRight,
+    Star
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -22,9 +23,13 @@ const Sidebar = () => {
     const [expandedSubmenu, setExpandedSubmenu] = useState(null);
     const navigate = useNavigate();
 
-
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: Home, hasSubmenu: false, path: '/home' },
+        {
+            id: 'dashboard',
+            label: 'Dashboard',
+            icon: Home,
+            path: '/home',
+        },
 
         {
             id: 'employees',
@@ -33,6 +38,7 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/employee',
             submenu: [
+                { label: 'Employee List', path: '/employee' },
                 { label: 'Add Employee', path: '/add-employee' },
                 { label: 'Department', path: '/departments' },
                 { label: 'Designation', path: '/designation' },
@@ -67,7 +73,12 @@ const Sidebar = () => {
             ]
         },
 
-        { id: 'approval', label: 'Approval Requests', icon: CheckSquare, hasSubmenu: false },
+        {
+            id: 'approval',
+            label: 'Approval Requests',
+            icon: CheckSquare,
+            path: '/approval',
+        },
 
         {
             id: 'payroll',
@@ -84,21 +95,34 @@ const Sidebar = () => {
             ]
         },
 
-        { id: 'loans', label: 'Loans & Advances', icon: Briefcase, hasSubmenu: false },
+        {
+            id: 'loans',
+            label: 'Loans & Advances',
+            icon: Briefcase,
+            path: '/loans',
+        },
 
         {
             id: 'reports',
             label: 'Reports',
             icon: BarChart2,
             hasSubmenu: true,
+            path: '/reports',
             submenu: [
+                { label: 'All Reports', path: '/reports' },
                 { label: 'Attendance', path: '/reports/attendance' },
                 { label: 'Performance', path: '/reports/performance' },
                 { label: 'Financial', path: '/reports/financial' }
             ]
         },
 
-        { id: 'dynamic', label: 'Dynamic Reports', icon: FileText, hasSubmenu: false },
+        {
+            id: 'dynamic',
+            label: 'Dynamic Reports',
+            icon: FileText,
+            hasSubmenu: true,
+            path: '/dynamic-reports',
+        },
 
         {
             id: 'user',
@@ -107,9 +131,8 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/usermanage',
             submenu: [
+                { label: 'Users', path: '/usermanage' },
                 { label: 'Roles', path: '/role' },
-                { label: 'Permissions', path: '/user/permissions' },
-                { label: 'Activity Log', path: '/user/activity-log' }
             ]
         },
 
@@ -118,13 +141,16 @@ const Sidebar = () => {
             label: 'Configuration',
             icon: Settings,
             hasSubmenu: true,
+            path: '/configuration',
             submenu: [
+                { label: 'Master', path: '/configuration' },
                 { label: 'Company Profile', path: '/configuration/profile' },
                 { label: 'Notifications', path: '/configuration/notifications' },
                 { label: 'Integrations', path: '/configuration/integrations' }
             ]
         }
     ];
+
     const getActiveItemId = () => {
         for (const item of menuItems) {
             if (item.path && currentPath === item.path) return item.id;
@@ -137,18 +163,32 @@ const Sidebar = () => {
         return 'dashboard'; // default fallback
     };
 
+    const getActiveSubmenuPath = () => {
+        for (const item of menuItems) {
+            if (item.submenu) {
+                for (const sub of item.submenu) {
+                    if (currentPath === sub.path) return sub.path;
+                }
+            }
+        }
+        return null;
+    };
+
     const activeItem = getActiveItemId();
+    const activeSubmenuPath = getActiveSubmenuPath();
 
     const handleMenuClick = (item) => {
+        // Check if item has actual submenu
+        const hasActualSubmenu = item.hasSubmenu && item.submenu && item.submenu.length > 0;
 
-        if (item.hasSubmenu) {
+        if (hasActualSubmenu) {
             setExpandedSubmenu(expandedSubmenu === item.id ? null : item.id);
             // Navigate to main path if it exists
             if (item.path) {
                 navigate(item.path);
             }
         } else if (item.path) {
-            // Navigate to path for items without submenu
+            // Navigate to path for items without submenu or with empty submenu
             setExpandedSubmenu(null);
             navigate(item.path);
         } else {
@@ -159,7 +199,11 @@ const Sidebar = () => {
     const getSubmenuHeight = (itemId) => {
         const submenu = menuItems.find(item => item.id === itemId)?.submenu;
         if (!submenu) return 0;
-        return submenu.length * 40 + 60; // 36px per item + padding
+        return submenu.length * 40 + 60; // 40px per item + padding
+    };
+
+    const hasActualSubmenu = (item) => {
+        return item.hasSubmenu && item.submenu && item.submenu.length > 0;
     };
 
     return (
@@ -217,33 +261,84 @@ const Sidebar = () => {
                             const Icon = item.icon;
                             const isActive = activeItem === item.id;
                             const isExpanded = expandedSubmenu === item.id;
+                            const hasSubmenu = hasActualSubmenu(item);
 
                             return (
                                 <div key={item.id} className="mb-1">
-                                    <div
-                                        className={`
-                                            relative cursor-pointer rounded-xl transition-all duration-300 group
-                                            ${isActive
-                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-[1.02]'
-                                                : 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:transform hover:scale-[1.01]'
-                                            }
-                                        `}
-                                        onClick={() => handleMenuClick(item)}
-                                    >
-                                        <div className="py-3 px-4 flex items-center justify-between">
-                                            <div className="flex items-center space-x-3">
-                                                <div className={`
-                                                    p-2 rounded-lg transition-all duration-300
-                                                    ${isActive
-                                                        ? 'bg-white/20 text-white'
-                                                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-                                                    }
-                                                `}>
-                                                    <Icon size={16} />
+                                    {hasSubmenu ? (
+                                        // Menu item with submenu
+                                        <div
+                                            className={`
+                                                relative cursor-pointer rounded-xl transition-all duration-300 group
+                                                ${isActive
+                                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-[1.02]'
+                                                    : 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:transform hover:scale-[1.01]'
+                                                }
+                                            `}
+                                            onClick={() => handleMenuClick(item)}
+                                        >
+                                            <div className="py-3 px-4 flex items-center justify-between">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`
+                                                        p-2 rounded-lg transition-all duration-300
+                                                        ${isActive
+                                                            ? 'bg-white/20 text-white'
+                                                            : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        }
+                                                    `}>
+                                                        <Icon size={16} />
+                                                    </div>
+                                                    <span className="text-sm font-medium">{item.label}</span>
                                                 </div>
-                                                <span className="text-sm font-medium">{item.label}</span>
+                                                <div className="flex items-center space-x-2">
+                                                    {item.tag && (
+                                                        <span className={`
+                                                            text-xs px-2 py-1 rounded-full font-medium transition-all duration-300
+                                                            ${isActive
+                                                                ? 'bg-white/20 text-white'
+                                                                : 'bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700'
+                                                            }
+                                                        `}>
+                                                            {item.tag}
+                                                        </span>
+                                                    )}
+                                                    <ChevronRight
+                                                        size={16}
+                                                        className={`
+                                                            transform transition-all duration-300 ease-in-out
+                                                            ${isExpanded ? 'rotate-90' : 'rotate-0'}
+                                                            ${isActive ? 'text-white' : 'text-gray-400'}
+                                                        `}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
+                                        </div>
+                                    ) : (
+                                        // Menu item without submenu (using Link)
+                                        <Link
+                                            to={item.path}
+                                            className={`
+                                                relative block rounded-xl transition-all duration-300 group
+                                                ${isActive
+                                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-[1.02]'
+                                                    : 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:transform hover:scale-[1.01]'
+                                                }
+                                            `}
+                                            onClick={() => setExpandedSubmenu(null)}
+                                        >
+                                            <div className="py-3 px-4 flex items-center justify-between">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`
+                                                        p-2 rounded-lg transition-all duration-300
+                                                        ${isActive
+                                                            ? 'bg-white/20 text-white'
+                                                            : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        }
+                                                    `}>
+                                                        <Icon size={16} />
+                                                    </div>
+                                                    <span className="text-sm font-medium">{item.label}</span>
+                                                </div>
                                                 {item.tag && (
                                                     <span className={`
                                                         text-xs px-2 py-1 rounded-full font-medium transition-all duration-300
@@ -255,22 +350,12 @@ const Sidebar = () => {
                                                         {item.tag}
                                                     </span>
                                                 )}
-                                                {item.hasSubmenu && (
-                                                    <ChevronRight
-                                                        size={16}
-                                                        className={`
-                                                            transform transition-all duration-300 ease-in-out
-                                                            ${isExpanded ? 'rotate-90' : 'rotate-0'}
-                                                            ${isActive ? 'text-white' : 'text-gray-400'}
-                                                        `}
-                                                    />
-                                                )}
                                             </div>
-                                        </div>
-                                    </div>
+                                        </Link>
+                                    )}
 
                                     {/* Animated Submenu */}
-                                    {item.hasSubmenu && (
+                                    {hasSubmenu && (
                                         <div
                                             className="overflow-hidden transition-all duration-500 ease-in-out"
                                             style={{
@@ -279,24 +364,45 @@ const Sidebar = () => {
                                             }}
                                         >
                                             <div className="ml-6 mt-2 space-y-2">
-                                                {item.submenu.map((subItem, index) => (
-                                                    <Link
-                                                        key={index}
-                                                        to={subItem.path}
-                                                        className="
-                                                            flex items-center py-2 px-4 text-sm text-gray-600 
-                                                            rounded-lg transition-all duration-300 hover:bg-blue-50 
-                                                            hover:text-blue-600 hover:pl-6 hover:shadow-sm
-                                                            border-l-2 border-transparent hover:border-blue-300
-                                                        "
-                                                        style={{
-                                                            animationDelay: `${index * 50}ms`
-                                                        }}
-                                                    >
-                                                        <div className="w-2 h-2 bg-gray-300 rounded-full mr-3 transition-colors duration-300 hover:bg-blue-400"></div>
-                                                        {subItem.label}
-                                                    </Link>
-                                                ))}
+                                                {item.submenu.map((subItem, index) => {
+                                                    const isSubmenuActive = activeSubmenuPath === subItem.path;
+                                                    const isMaster = subItem.label === 'Master';
+
+                                                    return (
+                                                        <Link
+                                                            key={index}
+                                                            to={subItem.path}
+                                                            className={`
+                                                                flex items-center py-2 px-4 text-sm rounded-lg 
+                                                                transition-all duration-300 hover:shadow-sm
+                                                                border-l-2 hover:pl-6
+                                                                ${isSubmenuActive
+                                                                    ? 'bg-blue-100 text-blue-700 border-blue-400 font-medium shadow-sm'
+                                                                    : 'text-gray-600 border-transparent hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300'
+                                                                }
+                                                            `}
+                                                            style={{
+                                                                animationDelay: `${index * 50}ms`
+                                                            }}
+                                                        >
+                                                            <div className={`
+                                                                w-2 h-2 rounded-full mr-3 transition-colors duration-300
+                                                                ${isMaster
+                                                                    ? (isSubmenuActive ? 'bg-yellow-400' : 'bg-yellow-300 hover:bg-yellow-400')
+                                                                    : (isSubmenuActive ? 'bg-blue-400' : 'bg-gray-300 hover:bg-blue-400')
+                                                                }
+                                                            `}></div>
+                                                            <div className="flex items-center space-x-2">
+                                                                {isMaster && (
+                                                                    <Star size={12} className={`
+                                                                        ${isSubmenuActive ? 'text-yellow-500' : 'text-yellow-400'}
+                                                                    `} />
+                                                                )}
+                                                                <span>{subItem.label}</span>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}
@@ -326,7 +432,7 @@ const Sidebar = () => {
                 </div>
             </div>
         </>
-    );
+    )
 };
 
 export default Sidebar;
