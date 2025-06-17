@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Trash2, Briefcase, AlertTriangle } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Trash2, Briefcase, AlertTriangle, X, Search } from "lucide-react";
 
 // Confirmation Modal Component
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = "Confirm", cancelText = "Cancel", type = "danger", isLoading = false }) => {
@@ -55,11 +55,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
                             </p>
                         </div>
                     </div>
-                    
+
                     <p className="text-gray-700 mb-6">
                         {message}
                     </p>
-                    
+
                     <div className="flex space-x-3">
                         <button
                             onClick={onClose}
@@ -91,11 +91,26 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 
 const DesignationList = ({ designations, onDelete, loading = false, showToast }) => {
     const [deletingId, setDeletingId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         type: null,
         data: null
     });
+
+    // Real-time search filtering using useMemo for performance
+    const filteredDesignations = useMemo(() => {
+        if (!designations || !searchTerm.trim()) {
+            return designations || [];
+        }
+
+        return designations.filter(designation =>
+            designation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (designation.description && designation.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (designation.level && designation.level.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (designation.department && designation.department.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    }, [designations, searchTerm]);
 
     const handleDeleteClick = (designation) => {
         setConfirmModal({
@@ -134,6 +149,10 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
         }
     };
 
+    const clearSearch = () => {
+        setSearchTerm("");
+    };
+
     if (loading) {
         return (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -155,6 +174,9 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
         );
     }
 
+    const totalDesignations = designations ? designations.length : 0;
+    const filteredCount = filteredDesignations.length;
+
     return (
         <>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -166,7 +188,7 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900">
-                                    Designations ({designations ? designations.length : 0})
+                                    Designations ({totalDesignations})
                                 </h3>
                                 <p className="text-sm text-gray-600">
                                     Manage your organization's designations
@@ -176,8 +198,34 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                     </div>
                 </div>
 
+                {/* Search Bar */}
+                {totalDesignations > 0 && (
+                    <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100">
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search designations by name ..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 bg-white"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={clearSearch}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-6">
-                    {!designations || designations.length === 0 ? (
+                    {totalDesignations === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                 <Briefcase className="w-8 h-8 text-gray-400" />
@@ -192,9 +240,28 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                                 Use the form above to create a new designation
                             </p>
                         </div>
+                    ) : filteredCount === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <Search className="w-8 h-8 text-gray-400" />
+                            </div>
+                            <h4 className="text-lg font-medium text-gray-900 mb-2">
+                                No designations match your search
+                            </h4>
+                            <p className="text-gray-500 mb-4">
+                                Try adjusting your search terms or
+                            </p>
+                            <button
+                                onClick={clearSearch}
+                                className="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                            >
+                                <X className="w-4 h-4 mr-2" />
+                                Clear Search
+                            </button>
+                        </div>
                     ) : (
                         <div className="grid gap-4">
-                            {designations.map((designation) => {
+                            {filteredDesignations.map((designation) => {
                                 const designationId = designation.designation_id || designation.id;
                                 const isDeleting = deletingId === designationId;
 
@@ -210,25 +277,25 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                                                         {designation.name}
                                                     </h4>
                                                 </div>
-                                                
+
                                                 {designation.description && (
                                                     <p className="text-gray-600 mb-2 text-sm leading-relaxed">
                                                         {designation.description}
                                                     </p>
                                                 )}
-                                                
+
                                                 {designation.level && (
                                                     <p className="text-gray-600 mb-1 text-sm">
                                                         <span className="font-medium">Level:</span> {designation.level}
                                                     </p>
                                                 )}
-                                                
+
                                                 {designation.department && (
                                                     <p className="text-gray-600 mb-2 text-sm">
                                                         <span className="font-medium">Department:</span> {designation.department}
                                                     </p>
                                                 )}
-                                                
+
                                                 {designationId && (
                                                     <p className="text-xs text-gray-400 font-mono">
                                                         ID: {designationId}
