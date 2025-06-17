@@ -585,7 +585,7 @@ const AddEmployee = () => {
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                {isEditMode ? <Edit size={24} className="text-white" /> : <Plus size={24} className="text-white" />}
+                                {isEditMode ? <Edit size={24} className="text-white" /> : ""}
                                 <div>
                                     <h1 className="text-2xl font-bold text-white">
                                         {isEditMode ? 'Edit Employee' : 'Add New Employee'}

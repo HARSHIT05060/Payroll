@@ -10,6 +10,7 @@ import {
     AlertCircle,
     Users,
     Plus,
+    Search,
     Settings
 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -39,11 +40,13 @@ export default function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredEmployees, setFilteredEmployees] = useState(employees);
     const [sortConfig, setSortConfig] = useState({
         key: null,
         direction: SORT_DIRECTIONS.ASCENDING
     });
-    const [selectedEmployees, setSelectedEmployees] = useState([]);
+    // const [selectedEmployees, setSelectedEmployees] = useState([]);
 
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
@@ -92,6 +95,22 @@ export default function EmployeeManagement() {
         }
     }, [user, logout]);
 
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            const filtered = employees.filter(emp => {
+                return Object.values(emp).some(value =>
+                    String(value).toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            });
+            setFilteredEmployees(filtered);
+        }, 300); // Debounce delay
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchQuery, employees]);
+
+
+
     useEffect(() => {
         if (isAuthenticated() && user?.user_id) {
             fetchEmployees();
@@ -110,9 +129,11 @@ export default function EmployeeManagement() {
 
     // Memoized sorted employees
     const sortedEmployees = useMemo(() => {
-        if (!sortConfig.key) return employees;
+        const source = searchQuery ? filteredEmployees : employees;
 
-        return [...employees].sort((a, b) => {
+        if (!sortConfig.key) return source;
+
+        return [...source].sort((a, b) => {
             const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
             const aValue = a[actualKey] || '';
             const bValue = b[actualKey] || '';
@@ -125,38 +146,7 @@ export default function EmployeeManagement() {
             }
             return 0;
         });
-    }, [employees, sortConfig]);
-
-    // Master checkbox state
-    const masterCheckboxState = useMemo(() => {
-        if (!employees || employees.length === 0) return false;
-        return selectedEmployees.length === employees.length;
-    }, [selectedEmployees.length, employees]);
-
-    // Checkbox functionality
-    const handleSelectAll = useCallback(() => {
-        if (!employees || employees.length === 0) return;
-
-        if (masterCheckboxState) {
-            setSelectedEmployees([]);
-        } else {
-            setSelectedEmployees(employees.map(emp => emp.employee_code || emp.employee_id));
-        }
-    }, [masterCheckboxState, employees]);
-
-    const handleSelectEmployee = useCallback((employeeId) => {
-        setSelectedEmployees(prev => {
-            if (prev.includes(employeeId)) {
-                return prev.filter(id => id !== employeeId);
-            } else {
-                return [...prev, employeeId];
-            }
-        });
-    }, []);
-
-    const isSelected = useCallback((employeeId) => {
-        return selectedEmployees.includes(employeeId);
-    }, [selectedEmployees]);
+    }, [employees, filteredEmployees, sortConfig, searchQuery]);
 
     // Action handlers
     const handleViewDetails = useCallback((employee_id) => {
@@ -180,15 +170,15 @@ export default function EmployeeManagement() {
     //     navigate('/employee/mobile-permissions');
     // }, [navigate]);
 
-    const handleBulkAssignBranch = useCallback(() => {
-        if (selectedEmployees.length === 0) {
-            alert('Please select at least one employee');
-            return;
-        }
-        navigate('/employee/bulk-assign-branch', {
-            state: { selectedEmployees }
-        });
-    }, [selectedEmployees, navigate]);
+    // const handleBulkAssignBranch = useCallback(() => {
+    //     if (selectedEmployees.length === 0) {
+    //         alert('Please select at least one employee');
+    //         return;
+    //     }
+    //     navigate('/employee/bulk-assign-branch', {
+    //         state: { selectedEmployees }
+    //     });
+    // }, [selectedEmployees, navigate]);
 
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
@@ -223,30 +213,17 @@ export default function EmployeeManagement() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {/* <button
-                                onClick={handleManageMobilePermission}
-                                className="flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                            >
-                                <Settings className="h-4 w-4" />
-                                Mobile Permissions
-                            </button> */}
+                            <div className="relative w-full sm:w-64">
+                                <input
+                                    type="text"
+                                    placeholder="Search employees..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                />
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            </div>
 
-                            <button
-                                onClick={handleBulkAssignBranch}
-                                disabled={selectedEmployees.length === 0}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${selectedEmployees.length === 0
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
-                                    }`}
-                            >
-                                <Users className="h-4 w-4" />
-                                Assign Branch
-                                {selectedEmployees.length > 0 && (
-                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
-                                        {selectedEmployees.length}
-                                    </span>
-                                )}
-                            </button>
 
                             <button
                                 onClick={() => navigate('/add-employee')}
@@ -281,14 +258,6 @@ export default function EmployeeManagement() {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="w-12 px-6 py-3">
-                                        <input
-                                            type="checkbox"
-                                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                            checked={masterCheckboxState}
-                                            onChange={handleSelectAll}
-                                        />
-                                    </th>
                                     {[
                                         { key: COLUMN_KEYS.ID, label: 'Employee ID' },
                                         { key: COLUMN_KEYS.NAME, label: 'Name' },
@@ -331,18 +300,9 @@ export default function EmployeeManagement() {
                                         return (
                                             <tr
                                                 key={`emp-${employeeId}`}
-                                                className={`hover:bg-gray-50 transition-colors ${isSelected(employeeId) ? 'bg-blue-50' : ''
-                                                    }`}
+                                                className={`hover:bg-gray-50 transition-colors }`}
                                             >
-                                                <td className="px-6 py-4">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                                        checked={isSelected(employeeId)}
-                                                        onChange={() => handleSelectEmployee(employeeId)}
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <td className="pl-10 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {employee.employee_code || '-'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -356,7 +316,7 @@ export default function EmployeeManagement() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {employee.email}
-                                                    
+
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {employee.biometrics_registered ? (
@@ -370,12 +330,6 @@ export default function EmployeeManagement() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center gap-2">
-                                                        {/* <button
-                                                            onClick={() => handleAssignBranch(employeeId)}
-                                                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 transition-colors"
-                                                        >
-                                                            Assign Branch
-                                                        </button> */}
                                                         <button
                                                             onClick={() => handleEditEmployee(employee.employee_id)}
                                                             className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
