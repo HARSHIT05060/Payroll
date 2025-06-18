@@ -14,8 +14,6 @@ const AddEmployee = () => {
     const editEmployeeId = employeeId || queryParams.get('edit');
     const isEditMode = Boolean(editEmployeeId);
 
-    console.log('Employee ID:', editEmployeeId, 'Edit Mode:', isEditMode);
-
     const [formData, setFormData] = useState({
         // Basic Details
         employeeCode: '',

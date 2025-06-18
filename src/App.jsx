@@ -18,11 +18,12 @@ import Role from './pages/Users/Role';
 import AddRole from './pages/Users/AddRole';
 import Usermanagement from './pages/Users/Usermanagement';
 import AddUser from './pages/Users/AddUser';
+import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
+import CreateShift from './pages/ShiftManagement/Createshift';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
 // import FinalizePayroll from './pages/Payroll/FinalizePayroll';
-// import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
 
 const App = () => {
   const location = useLocation();
@@ -58,10 +59,11 @@ const App = () => {
             <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
             <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
             <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
+            <Route path="/shift-management" element={<ShiftManagement />} />
+            <Route path="/add-shift" element={<CreateShift />} />
             {/*<Route path="/leaveapplication" element={<LeaveApplication />} />
             <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/leavestatusPage" element={<LeaveStatusPage />} />
-            <Route path="/shift-management" element={<ShiftManagement />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
             <Route path="/hourly-payroll" element={<HourlyPayroll />} />
