@@ -12,7 +12,6 @@ dist
 dist-ssr
 *.local
 data.json
-.env
 .env.production
 
 # Editor directories and files
