@@ -4,8 +4,13 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 import api from '../api/axiosInstance';
-
 import { useAuth } from "../context/AuthContext";
+
+// import redux from;
+
+import { useDispatch } from 'react-redux';
+import { setPermissions } from '../../src/redux/permissionsSlice';
+
 
 const Login = () => {
     const { login } = useAuth();
@@ -16,6 +21,9 @@ const Login = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    const dispatch = useDispatch();
+    const flattenPermissions = (permissionsArray) =>
+        permissionsArray.reduce((acc, item) => ({ ...acc, ...item }), {});
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -52,8 +60,20 @@ const Login = () => {
                     user_role_id: user_data.user_role_id,
                 };
 
+
                 login(userData);
+
+                const permRes = await api.post("user_permissions", {
+                    user_role_id: user_data.user_role_id
+                });
+
+                if (permRes.data?.data) {
+                    const flatPermissions = flattenPermissions(permRes.data.data);
+                    dispatch(setPermissions(flatPermissions));
+                    console.log("Permissions set:", flatPermissions);
+                }
                 navigate("/home");
+
             } else {
                 setError(message || "Login failed. Please check your credentials.");
             }
@@ -70,6 +90,8 @@ const Login = () => {
             setIsLoading(false);
         }
     };
+
+
 
 
     return (
