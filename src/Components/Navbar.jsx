@@ -2,7 +2,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, ChevronDown, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
+import { useDispatch } from 'react-redux';
+import { clearPermissions } from '../redux/permissionsSlice';
 const Navbar = () => {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -23,6 +24,8 @@ const Navbar = () => {
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
             logout();
+            dispatch(clearPermissions());
+
         }
         setIsDropdownOpen(false);
     };

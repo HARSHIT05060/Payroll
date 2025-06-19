@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle, User, Shield } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -132,6 +133,7 @@ const UserManagement = () => {
     const [deleting, setDeleting] = useState(null);
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+    const permissions = useSelector(state => state.permissions);
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -307,7 +309,7 @@ const UserManagement = () => {
                             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Create User</span>
+                            {permissions['user_create'] && <span>Create User</span>}
                         </button>
                     </div>
                 </div>

@@ -62,9 +62,14 @@ const Login = () => {
 
 
                 login(userData);
+                const formData = new FormData();
+                formData.append("user_id", user_data.user_id);
+                formData.append("user_role_id", user_data.user_role_id);
 
-                const permRes = await api.post("user_permissions", {
-                    user_role_id: user_data.user_role_id
+                const permRes = await api.post("user_permissions", formData,{
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
                 });
 
                 if (permRes.data?.data) {

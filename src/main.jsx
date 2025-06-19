@@ -10,10 +10,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthProvider>
       <Provider store={store}>
-
-      <App />
+        <App />
       </Provider>
-
     </AuthProvider>
   </BrowserRouter>
 );
