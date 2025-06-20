@@ -57,14 +57,14 @@ const Login = () => {
                     email: user_data.email || '',
                     number: user_data.number,
                     type: user_data.type,
-                    user_role_id: user_data.user_role_id,
+                    user_roles_id: user_data.user_role_id,
                 };
 
 
                 login(userData);
                 const formData = new FormData();
                 formData.append("user_id", user_data.user_id);
-                formData.append("user_role_id", user_data.user_role_id);
+                formData.append("user_roles_id", user_data.user_role_id);
 
                 const permRes = await api.post("user_permissions", formData,{
                     headers: {
