@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Users, Edit, Trash2, Plus, X, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
@@ -216,18 +216,37 @@ const ShiftManagement = () => {
         navigate(`/add-shift?edit=${shiftId}`);
     };
 
-    // Handle delete shift
-    const handleDeleteShift = (shiftId, shiftName) => {
+    // Handle delete shift 
+    const handleDeleteShift = async (shiftId, shiftName) => {
         setConfirmDialog({
             isOpen: true,
             title: 'Delete Shift',
             message: `Are you sure you want to delete the shift "${shiftName}"? This action cannot be undone.`,
             confirmText: 'Delete',
             type: 'danger',
-            onConfirm: () => {
-                console.log('Delete shift:', shiftId);
-                showToast('Delete functionality will be implemented', 'info');
-                setConfirmDialog({ isOpen: false });
+            onConfirm: async () => {
+                try {
+                    // Show loading state
+                    setConfirmDialog({ isOpen: false });
+
+                    const formData = new FormData();
+                    formData.append('user_id', user.user_id);
+                    formData.append('shift_id', shiftId);
+
+                    const response = await api.post('shift_delete', formData);
+
+                    if (response.data.success) {
+                        showToast('Shift deleted successfully', 'success');
+
+                        // Refresh the shifts list
+                        fetchShifts();
+                    } else {
+                        showToast(response.data.message || 'Failed to delete shift', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting shift:', error);
+                    showToast('An error occurred while deleting the shift', 'error');
+                }
             }
         });
     };

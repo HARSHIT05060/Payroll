@@ -86,7 +86,6 @@ const CreateShift = () => {
     const [searchParams] = useSearchParams();
     const { user } = useAuth();
 
-
     // Get edit mode and shift ID from URL params
     const editShiftId = searchParams.get('edit');
     const isEditMode = !!editShiftId;
@@ -131,20 +130,59 @@ const CreateShift = () => {
 
             if (response.data.success) {
                 const data = response.data.data;
-                const daysWithDefaults = applyDefaultValues(data.day_list || []);
-                setDayList(daysWithDefaults);
-                setShiftTypes(data.shift_type || []);
-                setOccasionalDayList(data.day_occasional_list || []);
+                return {
+                    dayList: data.day_list || [],
+                    shiftTypes: data.shift_type || [],
+                    occasionalDayList: data.day_occasional_list || []
+                };
             } else {
                 showToast(response.data.message || 'Failed to fetch shift data', 'error');
+                return null;
             }
         } catch (err) {
             console.error('Error fetching shift data:', err);
             showToast('Failed to load shift data. Please try again.', 'error');
+            return null;
         }
     };
 
-    // Fetch existing shift data for editing
+    // Fetch existing shift details from shift_list API
+    const fetchShiftDetailsFromList = async (shiftId) => {
+        try {
+            if (!user?.user_id) {
+                showToast('Admin user ID is required.', 'error');
+                return null;
+            }
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+
+            const response = await api.post('shift_list', formData);
+
+            if (response.data.success && Array.isArray(response.data.data)) {
+                // Find the specific shift by ID
+                const shiftDetails = response.data.data.find(shift =>
+                    shift.shift_id === shiftId || shift.shift_id === parseInt(shiftId)
+                );
+
+                if (shiftDetails) {
+                    return shiftDetails;
+                } else {
+                    showToast('Shift not found in the list', 'error');
+                    return null;
+                }
+            } else {
+                showToast(response.data.message || 'Failed to fetch shift list', 'error');
+                return null;
+            }
+        } catch (err) {
+            console.error('Error fetching shift list:', err);
+            showToast('Failed to load shift details. Please try again.', 'error');
+            return null;
+        }
+    };
+
+    // Fetch existing shift data for editing using shift_list API
     const fetchExistingShiftData = async (shiftId) => {
         try {
             if (!user?.user_id) {
@@ -152,51 +190,76 @@ const CreateShift = () => {
                 return;
             }
 
-            await fetchShiftDayData();
+            // First get the base shift day data
+            const shiftDayData = await fetchShiftDayData();
+            if (!shiftDayData) return;
 
-            const formData = new FormData();
-            formData.append('user_id', user.user_id);
-            formData.append('shift_id', shiftId);
-            formData.append('action', 'fetch'); 
+            // Set the base data first
+            setShiftTypes(shiftDayData.shiftTypes);
+            setOccasionalDayList(shiftDayData.occasionalDayList);
 
-            const response = await api.post('shift_create', formData);
+            // Fetch the existing shift details from shift_list API
+            const shiftDetails = await fetchShiftDetailsFromList(shiftId);
 
-            const { success, data, message } = response.data;
-
-            if (!success) {
-                showToast(message || 'Failed to fetch shift details', 'error');
+            if (!shiftDetails) {
+                // Apply defaults if fetch fails
+                setDayList(applyDefaultValues(shiftDayData.dayList));
                 return;
             }
 
-            setShiftName(data.shift_name || '');
-            setRemark(data.remark || '');
+            // Set basic shift information
+            setShiftName(shiftDetails.shift_name || '');
+            setRemark(shiftDetails.remark || '');
 
-            if (Array.isArray(data.shift_days)) {
-                setDayList(prevDays =>
-                    prevDays.map(day => {
-                        const existingDay = data.shift_days.find(
-                            shiftDay => shiftDay.day_id === day.day_id
-                        );
-                        return existingDay
-                            ? {
-                                ...day,
-                                from_time: existingDay.from_time,
-                                to_time: existingDay.to_time,
-                                shift_type: existingDay.shift_type,
-                                occasional_days: existingDay.occasional_days
-                            }
-                            : day;
-                    })
-                );
+            // Merge existing shift data with base day list
+            if (Array.isArray(shiftDetails.shift_days) && shiftDetails.shift_days.length > 0) {
+                const mergedDayList = shiftDayData.dayList.map(day => {
+                    const existingDay = shiftDetails.shift_days.find(
+                        shiftDay => shiftDay.day_id === day.day_id ||
+                            shiftDay.day_id === parseInt(day.day_id)
+                    );
+
+                    if (existingDay) {
+                        return {
+                            ...day,
+                            from_time: existingDay.from_time || day.from_time || '09:00 PM',
+                            to_time: existingDay.to_time || day.to_time || '06:00 AM',
+                            shift_type: existingDay.shift_type || day.shift_type || '1',
+                            occasional_days: existingDay.occasional_days || day.occasional_days || ''
+                        };
+                    } else {
+                        // Apply defaults for days not in existing shift
+                        return {
+                            ...day,
+                            from_time: day.from_time || '09:00 PM',
+                            to_time: day.to_time || '06:00 AM',
+                            shift_type: day.shift_type || '1',
+                            occasional_days: day.occasional_days || ''
+                        };
+                    }
+                });
+                setDayList(mergedDayList);
+            } else {
+                // No existing shift days, apply defaults
+                setDayList(applyDefaultValues(shiftDayData.dayList));
             }
 
-            showToast('Shift data loaded successfully', 'success');
+            showToast('Shift details loaded successfully', 'success');
         } catch (err) {
             console.error('Error:', err);
             showToast('Failed to load shift details.', 'error');
+
+            // Try to load at least the base data on error
+            const shiftDayData = await fetchShiftDayData();
+            if (shiftDayData) {
+                setShiftTypes(shiftDayData.shiftTypes);
+                setOccasionalDayList(shiftDayData.occasionalDayList);
+                setDayList(applyDefaultValues(shiftDayData.dayList));
+            }
         }
     };
 
+    // Initialize data on component mount
     useEffect(() => {
         const initializeData = async () => {
             if (!user?.user_id) return; // prevent API call if user ID is not ready
@@ -206,7 +269,13 @@ const CreateShift = () => {
                 if (isEditMode && editShiftId) {
                     await fetchExistingShiftData(editShiftId);
                 } else {
-                    await fetchShiftDayData();
+                    // For new shift creation
+                    const shiftDayData = await fetchShiftDayData();
+                    if (shiftDayData) {
+                        setShiftTypes(shiftDayData.shiftTypes);
+                        setOccasionalDayList(shiftDayData.occasionalDayList);
+                        setDayList(applyDefaultValues(shiftDayData.dayList));
+                    }
                 }
             } finally {
                 setLoading(false);
@@ -214,8 +283,7 @@ const CreateShift = () => {
         };
 
         initializeData();
-    }, [isEditMode, editShiftId, user]);
-
+    }, [isEditMode, editShiftId, user?.user_id]);
 
     // Handle day data change
     const handleDayChange = (dayId, field, value) => {
@@ -321,7 +389,7 @@ const CreateShift = () => {
             // Add shift_id for edit mode
             if (isEditMode && editShiftId) {
                 formData.append('shift_id', editShiftId);
-                formData.append('action', 'update'); // or however your API expects to differentiate
+                formData.append('action', 'update');
             }
 
             const validDays = dayList.filter(day =>
@@ -595,7 +663,6 @@ const CreateShift = () => {
                                                             ))}
                                                         </select>
                                                     </div>
-
                                                     {/* Occasional Days */}
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700 mb-1">
