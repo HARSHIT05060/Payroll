@@ -19,7 +19,7 @@ import AddRole from './pages/Users/AddRole';
 import Usermanagement from './pages/Users/Usermanagement';
 import AddUser from './pages/Users/AddUser';
 import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
-import CreateShift from './pages/ShiftManagement/Createshift';
+import CreateShift from './pages/ShiftManagement/CreateShift';
 import AssignShift from './pages/ShiftManagement/AssignShift';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
