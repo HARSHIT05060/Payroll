@@ -75,7 +75,6 @@ const Login = () => {
                 if (permRes.data?.data) {
                     const flatPermissions = flattenPermissions(permRes.data.data);
                     dispatch(setPermissions(flatPermissions));
-                    console.log("Permissions set:", flatPermissions);
                 }
                 navigate("/home");
 

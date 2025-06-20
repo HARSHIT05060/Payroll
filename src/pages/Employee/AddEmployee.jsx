@@ -203,9 +203,9 @@ const AddEmployee = () => {
                     mobile: employee.mobile_number || '',
                     email: employee.email || '',
                     gender: employee.gender_id || '',
-                    branch: employee.branch_id  || '',
+                    branch: employee.branch_id || '',
                     department: employee.department_id || '',
-                    designation: employee.designation_id  || '',
+                    designation: employee.designation_id || '',
                     employmentType: employee.employment_type_id || '',
                     salaryType: employee.salary_type_id || '',
                     salary: employee.salary || '',
@@ -427,9 +427,18 @@ const AddEmployee = () => {
 
             fileFields.forEach((formField, index) => {
                 const apiField = apiFileFields[index];
-                if (formData[formField] && formData[formField] instanceof File) {
-                    formDataToSend.append(apiField, formData[formField]);
+                if (formData[formField] && formData[formField] instanceof File){
+                     formDataToSend.append(apiField, formData[formField]);
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            setFormData(prev => ({ ...prev, [name]: file })); // actual file stored here ✅
+                            setFilePreviews(prev => ({ ...prev, [name]: reader.result })); // preview only
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 }
+
             });
 
             // Choose the appropriate API endpoint

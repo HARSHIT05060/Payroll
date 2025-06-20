@@ -1,12 +1,25 @@
 // src/redux/slices/permissionsSlice.js
 import { createSlice } from '@reduxjs/toolkit';
+import {
+  savePermissions,
+  getPermissions,
+  clearPermissionsStorage,
+} from './sessionStorageUtils';
+
+const initialState = getPermissions() || {};
 
 const permissionsSlice = createSlice({
   name: 'permissions',
-  initialState: {},
+  initialState,
   reducers: {
-    setPermissions: (state, action) => action.payload,
-    clearPermissions: () => ({}),
+    setPermissions: (_, action) => {
+      savePermissions(action.payload);
+      return action.payload;
+    },
+    clearPermissions: () => {
+      clearPermissionsStorage();
+      return {};
+    },
   },
 });
 

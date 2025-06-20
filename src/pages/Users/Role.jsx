@@ -136,6 +136,7 @@ const Role = () => {
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
     const permissions = useSelector(state => state.permissions);
 
+    console.log('User Permissions:', permissions);
 
     const showToast = (message, type) => {
         setToast({ message, type });
