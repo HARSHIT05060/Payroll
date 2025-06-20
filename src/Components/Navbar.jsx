@@ -8,6 +8,7 @@ const Navbar = () => {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const dispatch = useDispatch();
 
     // Close dropdown on outside click
     useEffect(() => {
