@@ -423,23 +423,17 @@ const AddEmployee = () => {
 
             // Handle file uploads
             const fileFields = ['aadharCard', 'drivingLicence', 'panCard', 'photo'];
-            const apiFileFields = ['aadhar_card', 'driving_licence', 'pan_card', 'photo'];
+            const apiFileFields = ['aadharcard_img', 'dl_img', 'pan_card', 'passport_img'];
 
             fileFields.forEach((formField, index) => {
                 const apiField = apiFileFields[index];
-                if (formData[formField] && formData[formField] instanceof File){
-                     formDataToSend.append(apiField, formData[formField]);
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            setFormData(prev => ({ ...prev, [name]: file })); // actual file stored here ✅
-                            setFilePreviews(prev => ({ ...prev, [name]: reader.result })); // preview only
-                        };
-                        reader.readAsDataURL(file);
-                    }
+                const file = formData[formField];
+                if (file && file instanceof File) {
+                    formDataToSend.append(apiField, file);
                 }
-
             });
+
+
 
             // Choose the appropriate API endpoint
             const apiEndpoint = '/employee_create';
