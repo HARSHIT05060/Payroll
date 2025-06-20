@@ -135,7 +135,111 @@ const ShiftManagement = () => {
     const [toast, setToast] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
     const navigate = useNavigate();
+    const [employeeModal, setEmployeeModal] = useState({ isOpen: false, employees: [], loading: false, shiftName: '' });
+    const [employeeCounts, setEmployeeCounts] = useState({});
 
+
+    // Fetch assigned employees for a shift
+    // Fetch assigned employees for a shift
+    const fetchAssignedEmployees = async (shiftId, shiftName) => {
+        try {
+            setEmployeeModal({ isOpen: true, employees: [], loading: true, shiftName });
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+            formData.append('shift_id', shiftId);
+
+            const response = await api.post('assign_employee_list', formData);
+
+            if (response.data.success) {
+                const employees = response.data.data || [];
+                setEmployeeModal({
+                    isOpen: true,
+                    employees: employees,
+                    loading: false,
+                    shiftName
+                });
+
+                // Update the count as well
+                setEmployeeCounts(prev => ({
+                    ...prev,
+                    [shiftId]: employees.length
+                }));
+            } else {
+                showToast(response.data.message || 'Failed to fetch assigned employees', 'error');
+                setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' });
+            }
+        } catch (error) {
+            console.error('Error fetching assigned employees:', error);
+            showToast('Failed to load assigned employees. Please try again.', 'error');
+            setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' });
+        }
+    };
+    // Employee Modal Component
+    // Employee Modal Component
+    const EmployeeModal = ({ isOpen, onClose, employees, loading, shiftName }) => {
+        if (!isOpen) return null;
+
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-96">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Assigned Employees - {shiftName}
+                            </h3>
+                            <button
+                                onClick={onClose}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {loading ? (
+                            <div className="flex justify-center items-center h-32">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                        ) : employees.length > 0 ? (
+                            <div className="max-h-64 overflow-y-auto">
+                                <div className="space-y-2">
+                                    {employees.map((employee, index) => (
+                                        <div key={employee.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                                <span className="text-white text-sm font-medium">
+                                                    {employee.full_name?.charAt(0)?.toUpperCase() || 'E'}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">
+                                                    {employee.full_name || 'Unknown Employee'}
+                                                </p>
+                                                {employee.employee_id && (
+                                                    <p className="text-sm text-gray-600">
+                                                        ID: {employee.employee_id}
+                                                    </p>
+                                                )}
+                                                {employee.cdate && (
+                                                    <p className="text-sm text-gray-500">
+                                                        Assigned: {employee.cdate}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                                <p className="text-gray-600">No employees assigned to this shift</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
     // Show toast notification
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -179,6 +283,30 @@ const ShiftManagement = () => {
         }
     };
 
+    // Fetch employee count for a shift
+    const fetchEmployeeCount = async (shiftId) => {
+        try {
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+            formData.append('shift_id', shiftId);
+
+            const response = await api.post('assign_employee_list', formData);
+
+            if (response.data.success) {
+                const count = response.data.data ? response.data.data.length : 0;
+                setEmployeeCounts(prev => ({
+                    ...prev,
+                    [shiftId]: count
+                }));
+            }
+        } catch (error) {
+            console.error('Error fetching employee count:', error);
+            setEmployeeCounts(prev => ({
+                ...prev,
+                [shiftId]: 0
+            }));
+        }
+    };
     // Fetch shifts from API
     const fetchShifts = async () => {
         try {
@@ -194,7 +322,13 @@ const ShiftManagement = () => {
             const response = await api.post('shift_list', formData);
 
             if (response.data.success) {
-                setShifts(response.data.data || []);
+                const shiftsData = response.data.data || [];
+                setShifts(shiftsData);
+
+                // Fetch employee counts for each shift
+                shiftsData.forEach(shift => {
+                    fetchEmployeeCount(shift.shift_id);
+                });
             } else {
                 showToast(response.data.message || 'Failed to fetch shifts', 'error');
             }
@@ -253,9 +387,8 @@ const ShiftManagement = () => {
 
     // Handle assign shift
     const handleAssignShift = () => {
-        showToast('Assign shift functionality will be implemented', 'info');
+        navigate('/assign-shift');
     };
-
     // Handle create shift
     const handleCreateShift = () => {
         navigate('/add-shift');
@@ -371,7 +504,9 @@ const ShiftManagement = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-blue-600 font-medium text-lg">0</span>
+                                                    <span className="text-blue-600 font-medium text-lg">
+                                                        {employeeCounts[shift.shift_id] || 0}
+                                                    </span>
                                                     <Users className="w-4 h-4 text-gray-400" />
                                                 </div>
                                             </td>
@@ -390,9 +525,9 @@ const ShiftManagement = () => {
                                                         <Edit className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={handleAssignShift}
+                                                        onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
                                                         className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                        title="Assign"
+                                                        title="View Assigned Employees"
                                                     >
                                                         <Users className="w-4 h-4" />
                                                     </button>
@@ -412,6 +547,14 @@ const ShiftManagement = () => {
                         </div>
                     </div>
                 )}
+                {/* Employee Modal */}
+                <EmployeeModal
+                    isOpen={employeeModal.isOpen}
+                    onClose={() => setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' })}
+                    employees={employeeModal.employees}
+                    loading={employeeModal.loading}
+                    shiftName={employeeModal.shiftName}
+                />
 
                 {/* Toast Notification */}
                 {toast && (

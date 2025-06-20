@@ -20,6 +20,7 @@ import Usermanagement from './pages/Users/Usermanagement';
 import AddUser from './pages/Users/AddUser';
 import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
 import CreateShift from './pages/ShiftManagement/Createshift';
+import AssignShift from './pages/ShiftManagement/AssignShift';
 // import BulkAttendance from './pages/Payroll/BulkAttendance';
 // import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
@@ -59,8 +60,9 @@ const App = () => {
             <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
             <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
             <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
-            <Route path="/shift-management" element={<ShiftManagement />} />
-            <Route path="/add-shift" element={<CreateShift />} />
+            <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
+            <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
+            <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
             {/*<Route path="/leaveapplication" element={<LeaveApplication />} />
             <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/leavestatusPage" element={<LeaveStatusPage />} />
