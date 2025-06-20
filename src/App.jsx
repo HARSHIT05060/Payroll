@@ -8,8 +8,8 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import Employee from './pages/Employee/Employee';
 import EmployeeDetail from './pages/Employee/EmployeeDetail';
 import AddEmployee from './pages/Employee/AddEmployee';
-// import LeaveApplication from './pages/Leave/LeaveApplication';
-// import LeaveStatusPage from './pages/Leave/LeaveStatus';
+import LeaveApplication from './pages/Leave/LeaveApplication';
+import LeaveStatusPage from './pages/Leave/LeaveStatus';
 // import HolidayCalendar from './pages/Leave/HolidayCalendar';
 import DepartmentsPage from './pages/Employee/Departments';
 import BranchesPage from './pages/Employee/Branches';
@@ -63,9 +63,9 @@ const App = () => {
             <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
             <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
             <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
-            {/*<Route path="/leaveapplication" element={<LeaveApplication />} />
-            <Route path="/holidaycalender" element={<HolidayCalendar />} />
-            <Route path="/leavestatusPage" element={<LeaveStatusPage />} />
+            <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
+            <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
+            {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
             <Route path="/hourly-payroll" element={<HourlyPayroll />} />
