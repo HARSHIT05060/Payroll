@@ -28,7 +28,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setError("");
+        setError(""); 
 
         if (!number || !password) {
             setError("Please enter both phone number and password");

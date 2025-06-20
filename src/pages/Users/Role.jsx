@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle, Shield, User } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -132,6 +134,8 @@ const Role = () => {
     const [deleting, setDeleting] = useState(null);
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+    const permissions = useSelector(state => state.permissions);
+
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -306,13 +310,15 @@ const Role = () => {
                             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                             <span>Refresh</span>
                         </button>
-                        <button
-                            onClick={handleCreateRole}
-                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Create Role</span>
-                        </button>
+                        {permissions['user_roles_create'] &&
+                            <button
+                                onClick={handleCreateRole}
+                                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Create Role</span>
+                            </button>
+                        }
                     </div>
                 </div>
 
@@ -376,9 +382,11 @@ const Role = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Created Date
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
+                                        {permissions['user_roles_edit', 'user_roles_delete'] &&
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Actions
+                                            </th>
+                                        }
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -417,32 +425,36 @@ const Role = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => handleEditRole(role)}
-                                                        className={`p-2 rounded-md transition-colors ${canModifyRole(role)
-                                                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
-                                                            : 'text-gray-400 cursor-not-allowed'
-                                                            }`}
-                                                        title={canModifyRole(role) ? "Edit Role" : "Admin roles cannot be edited"}
-                                                        disabled={deleting === role.user_roles_id || !canModifyRole(role)}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteRole(role)}
-                                                        className={`p-2 rounded-md transition-colors ${canModifyRole(role)
-                                                            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                                            : 'text-gray-400 cursor-not-allowed'
-                                                            }`}
-                                                        title={canModifyRole(role) ? "Delete Role" : "Admin roles cannot be deleted"}
-                                                        disabled={deleting === role.user_roles_id || !canModifyRole(role)}
-                                                    >
-                                                        {deleting === role.user_roles_id ? (
-                                                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                                        ) : (
-                                                            <Trash2 className="w-4 h-4" />
-                                                        )}
-                                                    </button>
+                                                    {permissions['user_roles_edit'] &&
+                                                        <button
+                                                            onClick={() => handleEditRole(role)}
+                                                            className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                                ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
+                                                                : 'text-gray-400 cursor-not-allowed'
+                                                                }`}
+                                                            title={canModifyRole(role) ? "Edit Role" : "Admin roles cannot be edited"}
+                                                            disabled={deleting === role.user_roles_id || !canModifyRole(role)}
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    }
+                                                    {permissions['user_roles_delete'] &&
+                                                        <button
+                                                            onClick={() => handleDeleteRole(role)}
+                                                            className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                                ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                                                : 'text-gray-400 cursor-not-allowed'
+                                                                }`}
+                                                            title={canModifyRole(role) ? "Delete Role" : "Admin roles cannot be deleted"}
+                                                            disabled={deleting === role.user_roles_id || !canModifyRole(role)}
+                                                        >
+                                                            {deleting === role.user_roles_id ? (
+                                                                <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <Trash2 className="w-4 h-4" />
+                                                            )}
+                                                        </button>
+                                                    }
                                                 </div>
                                             </td>
                                         </tr>

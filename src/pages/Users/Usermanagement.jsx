@@ -304,12 +304,12 @@ const UserManagement = () => {
                             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                             <span>Refresh</span>
                         </button>
-                        {permissions['user_create'] &&<button
+                        {permissions['user_create'] && <button
                             onClick={handleCreateUser}
                             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                             <span>Create User</span>
+                            <span>Create User</span>
                         </button>}
                     </div>
                 </div>
@@ -377,9 +377,11 @@ const UserManagement = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Type
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
+                                        {permissions['user_edit','user_delete'] &&
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Actions
+                                            </th>
+                                        }
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -421,32 +423,36 @@ const UserManagement = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => handleEditUser(userData)}
-                                                        className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
-                                                            : 'text-gray-400 cursor-not-allowed'
-                                                            }`}
-                                                        title={canModifyUser(userData) ? "Edit User" : "Admin users cannot be edited"}
-                                                        disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteUser(userData)}
-                                                        className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                                            : 'text-gray-400 cursor-not-allowed'
-                                                            }`}
-                                                        title={canModifyUser(userData) ? "Delete User" : "Admin users cannot be deleted"}
-                                                        disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
-                                                    >
-                                                        {deleting === userData.edit_user_id ? (
-                                                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                                        ) : (
-                                                            <Trash2 className="w-4 h-4" />
-                                                        )}
-                                                    </button>
+                                                    {permissions['user_edit'] &&
+                                                        <button
+                                                            onClick={() => handleEditUser(userData)}
+                                                            className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
+                                                                ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
+                                                                : 'text-gray-400 cursor-not-allowed'
+                                                                }`}
+                                                            title={canModifyUser(userData) ? "Edit User" : "Admin users cannot be edited"}
+                                                            disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    }
+                                                    {permissions['user_delete'] &&
+                                                        <button
+                                                            onClick={() => handleDeleteUser(userData)}
+                                                            className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
+                                                                ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                                                : 'text-gray-400 cursor-not-allowed'
+                                                                }`}
+                                                            title={canModifyUser(userData) ? "Delete User" : "Admin users cannot be deleted"}
+                                                            disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
+                                                        >
+                                                            {deleting === userData.edit_user_id ? (
+                                                                <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <Trash2 className="w-4 h-4" />
+                                                            )}
+                                                        </button>
+                                                    }
                                                 </div>
                                             </td>
                                         </tr>
