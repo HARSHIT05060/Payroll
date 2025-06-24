@@ -53,9 +53,7 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: "/shift-management",
             submenu: [
-                { label: 'Schedules', path: '/shift-management' },
-                { label: 'Time Off', path: '/shift/time-off' },
-                { label: 'Rotation', path: '/shift/rotation' }
+                { label: 'Shifts', path: '/shift-management' },
             ]
         },
 
@@ -68,17 +66,17 @@ const Sidebar = () => {
             submenu: [
                 { label: 'Leave Application', path: '/leaveapplication' },
                 { label: 'Leave Requests', path: '/leavestatusPage' },
-                { label: 'Holiday Calendar', path: '/holidaycalender' },
-                { label: 'Policy', path: '/leaves/policy' }
+                // { label: 'Holiday Calendar', path: '/holidaycalender' },
+                // { label: 'Policy', path: '/leaves/policy' }
             ]
         },
 
-        {
-            id: 'approval',
-            label: 'Approval Requests',
-            icon: CheckSquare,
-            path: '/approval',
-        },
+        // {
+        //     id: 'approval',
+        //     label: 'Approval Requests',
+        //     icon: CheckSquare,
+        //     path: '/approval',
+        // },
 
         {
             id: 'payroll',
