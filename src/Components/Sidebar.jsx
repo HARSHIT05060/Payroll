@@ -80,7 +80,7 @@ const Sidebar = () => {
 
         {
             id: 'payroll',
-            label: 'Payroll',
+            label: 'Payroll Pending',
             icon: DollarSign,
             hasSubmenu: true,
             path: '/bulk-attendance',
@@ -95,14 +95,14 @@ const Sidebar = () => {
 
         {
             id: 'loans',
-            label: 'Loans & Advances',
+            label: 'Loans & Advances working',
             icon: Briefcase,
             path: '/loans',
         },
 
         {
             id: 'reports',
-            label: 'Reports',
+            label: 'Reports Pending',
             icon: BarChart2,
             hasSubmenu: true,
             path: '/reports',
@@ -112,14 +112,6 @@ const Sidebar = () => {
                 { label: 'Performance', path: '/reports/performance' },
                 { label: 'Financial', path: '/reports/financial' }
             ]
-        },
-
-        {
-            id: 'dynamic',
-            label: 'Dynamic Reports',
-            icon: FileText,
-            hasSubmenu: true,
-            path: '/dynamic-reports',
         },
 
         {
@@ -136,7 +128,7 @@ const Sidebar = () => {
 
         {
             id: 'configuration',
-            label: 'Configuration',
+            label: 'Configuration Pending',
             icon: Settings,
             hasSubmenu: true,
             path: '/configuration',

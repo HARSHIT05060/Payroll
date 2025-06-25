@@ -59,28 +59,37 @@ const Toast = ({ message, type, onClose }) => {
 
 const AddLoanAdvance = ({
     existingLoan = null,
-    onSave = () => { },
 }) => {
     const [formData, setFormData] = useState({
         employeeName: '',
         employeeId: '',
-        loanType: 'Loan',
+        loanType: '',
+        loanTypeId: '',
         amount: '',
         interestRate: '',
         tenure: '',
         reason: '',
-        approvalStatus: 'Pending',
+        approvalStatus: '',
+        approvalStatusId: '',
         disbursementDate: '',
         repaymentStartDate: '',
         installmentAmount: '',
         guarantorName: '',
         guarantorContact: '',
         documents: [],
-        priority: 'Normal'
+        priority: '',
+        priorityId: ''
     });
+
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    // State for dropdown data
     const [employees, setEmployees] = useState([]);
+    const [loanTypes, setLoanTypes] = useState([]);
+    const [priorities, setPriorities] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -97,10 +106,8 @@ const AddLoanAdvance = ({
     };
 
     // Fetch employee dropdown data
-    const fetchDropdownData = async () => {
+    const fetchEmployeeData = async () => {
         try {
-            setLoading(true);
-
             if (!user?.user_id) {
                 return;
             }
@@ -116,8 +123,50 @@ const AddLoanAdvance = ({
                 showToast(response.data.message || 'Failed to fetch employee data', 'error');
             }
         } catch (err) {
-            console.error('Error fetching dropdown data:', err);
+            console.error('Error fetching employee data:', err);
             showToast('Failed to load employee data. Please try again.', 'error');
+        }
+    };
+
+    // Fetch loan dropdown data
+    const fetchLoanDropdownData = async () => {
+        try {
+            if (!user?.user_id) {
+                return;
+            }
+
+            const formDataObj = new FormData();
+            formDataObj.append('user_id', user.user_id);
+
+            const response = await api.post('loan_drop_down_list', formDataObj);
+
+            if (response.data.success) {
+                const data = response.data.data;
+                setLoanTypes(data.loan_type_list || []);
+                setPriorities(data.loan_priority_list || []);
+                setStatuses(data.loan_status_list || []);
+
+                // Set default values
+
+            } else {
+                showToast(response.data.message || 'Failed to fetch loan dropdown data', 'error');
+            }
+        } catch (err) {
+            console.error('Error fetching loan dropdown data:', err);
+            showToast('Failed to load dropdown data. Please try again.', 'error');
+        }
+    };
+
+    // Fetch all dropdown data
+    const fetchDropdownData = async () => {
+        setLoading(true);
+        try {
+            await Promise.all([
+                fetchEmployeeData(),
+                fetchLoanDropdownData()
+            ]);
+        } catch (error) {
+            console.error('Error fetching dropdown data:', error);
         } finally {
             setLoading(false);
         }
@@ -129,25 +178,34 @@ const AddLoanAdvance = ({
         }
     }, [user, api]);
 
+
     // Pre-fill form if editing existing loan
     useEffect(() => {
-        if (existingLoan) {
+        if (existingLoan && loanTypes.length > 0 && priorities.length > 0 && statuses.length > 0) {
+            // Find matching dropdown items
+            const matchingLoanType = loanTypes.find(lt => lt.name === existingLoan.loanType);
+            const matchingPriority = priorities.find(p => p.name === existingLoan.priority);
+            const matchingStatus = statuses.find(s => s.name === existingLoan.approvalStatus);
+
             setFormData({
                 employeeName: existingLoan.employeeName || '',
                 employeeId: existingLoan.employeeId || '',
-                loanType: existingLoan.loanType || 'Loan',
+                loanType: existingLoan.loanType || '',
+                loanTypeId: matchingLoanType?.loan_type_id || '',
                 amount: existingLoan.totalAmount?.toString() || '',
                 interestRate: existingLoan.interestRate?.toString() || '',
                 tenure: existingLoan.tenure?.toString() || '',
                 reason: existingLoan.reason || '',
-                approvalStatus: existingLoan.approvalStatus || 'Pending',
+                approvalStatus: existingLoan.approvalStatus || '',
+                approvalStatusId: matchingStatus?.status_id || '',
                 disbursementDate: existingLoan.disbursementDate || '',
                 repaymentStartDate: existingLoan.repaymentStartDate || '',
                 installmentAmount: existingLoan.installmentAmount?.toString() || '',
                 guarantorName: existingLoan.guarantorName || '',
                 guarantorContact: existingLoan.guarantorContact || '',
                 documents: existingLoan.documents || [],
-                priority: existingLoan.priority || 'Normal'
+                priority: existingLoan.priority || '',
+                priorityId: matchingPriority?.loan_priority_id || ''
             });
 
             // Set selected employee if editing
@@ -155,7 +213,7 @@ const AddLoanAdvance = ({
                 setSelectedEmployee(existingLoan.employeeId);
             }
         }
-    }, [existingLoan]);
+    }, [existingLoan, loanTypes, priorities, statuses]);
 
     // Handle employee selection
     const handleEmployeeSelect = (e) => {
@@ -184,6 +242,66 @@ const AddLoanAdvance = ({
             setErrors(prev => ({
                 ...prev,
                 employeeName: ''
+            }));
+        }
+    };
+
+    // Handle loan type selection
+    const handleLoanTypeSelect = (e) => {
+        const loanTypeId = e.target.value;
+        const selectedLoanType = loanTypes.find(lt => lt.loan_type_id === loanTypeId);
+
+        if (selectedLoanType) {
+            setFormData(prev => ({
+                ...prev,
+                loanType: selectedLoanType.name,
+                loanTypeId: selectedLoanType.loan_type_id
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                loanType: '',
+                loanTypeId: ''
+            }));
+        }
+    };
+
+    // Handle priority selection
+    const handlePrioritySelect = (e) => {
+        const priorityId = e.target.value;
+        const selectedPriority = priorities.find(p => p.loan_priority_id === priorityId);
+
+        if (selectedPriority) {
+            setFormData(prev => ({
+                ...prev,
+                priority: selectedPriority.name,
+                priorityId: selectedPriority.loan_priority_id
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                priority: '',
+                priorityId: ''
+            }));
+        }
+    };
+
+    // Handle status selection
+    const handleStatusSelect = (e) => {
+        const statusId = e.target.value;
+        const selectedStatus = statuses.find(s => s.status_id === statusId);
+
+        if (selectedStatus) {
+            setFormData(prev => ({
+                ...prev,
+                approvalStatus: selectedStatus.name,
+                approvalStatusId: selectedStatus.status_id
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                approvalStatus: '',
+                approvalStatusId: ''
             }));
         }
     };
@@ -233,8 +351,12 @@ const AddLoanAdvance = ({
     const validateForm = () => {
         const newErrors = {};
 
-        if (!formData.employeeName.trim()) {
+        if (!formData.employeeName.trim() || !formData.employeeId) {
             newErrors.employeeName = 'Employee selection is required';
+        }
+
+        if (!formData.loanType.trim() || !formData.loanTypeId) {
+            newErrors.loanType = 'Loan type is required';
         }
 
         if (!formData.amount || parseFloat(formData.amount) <= 0) {
@@ -255,6 +377,14 @@ const AddLoanAdvance = ({
             newErrors.reason = 'Reason is required';
         }
 
+        if (!formData.priority.trim() || !formData.priorityId) {
+            newErrors.priority = 'Priority is required';
+        }
+
+        if (!formData.approvalStatus.trim() || !formData.approvalStatusId) {
+            newErrors.approvalStatus = 'Approval status is required';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -268,47 +398,94 @@ const AddLoanAdvance = ({
         setIsSubmitting(true);
 
         try {
-            const loanData = {
-                ...formData,
-                amount: parseFloat(formData.amount),
-                interestRate: parseFloat(formData.interestRate) || 0,
-                tenure: parseInt(formData.tenure) || 0,
-                installmentAmount: parseFloat(formData.installmentAmount) || 0,
-                id: existingLoan?.id || Date.now(),
-                createdDate: existingLoan?.createdDate || new Date().toISOString().split('T')[0],
-                updatedDate: new Date().toISOString().split('T')[0]
-            };
+            // Prepare FormData for API
+            const apiFormData = new FormData();
+            apiFormData.append('user_id', user.user_id);
+            apiFormData.append('employee_id', formData.employeeId);
+            apiFormData.append('loan_type_id', formData.loanTypeId);
+            apiFormData.append('loan_priority_id', formData.priorityId);
+            apiFormData.append('amount', formData.amount);
+            apiFormData.append('interest_rate', formData.interestRate || '0');
+            apiFormData.append('tenure', formData.tenure || '0');
+            apiFormData.append('installment_amount', formData.installmentAmount || '0');
+            apiFormData.append('status', formData.approvalStatusId);
 
-            await onSave(loanData);
-            showToast(
-                `Loan/Advance ${existingLoan ? 'updated' : 'created'} successfully!`,
-                'success'
-            );
+            // Format dates to DD-MM-YYYY if they exist
+            if (formData.disbursementDate) {
+                const disbursementFormatted = formatDateForAPI(formData.disbursementDate);
+                apiFormData.append('disbursement_date', disbursementFormatted);
+            }
+
+            if (formData.repaymentStartDate) {
+                const repaymentFormatted = formatDateForAPI(formData.repaymentStartDate);
+                apiFormData.append('repayment_start_date', repaymentFormatted);
+            }
+
+            apiFormData.append('guarantor_name', formData.guarantorName || '');
+            apiFormData.append('guarantor_contact', formData.guarantorContact || '');
+            apiFormData.append('reason', formData.reason);
+
+            // Call API
+            const response = await api.post('add_loan', apiFormData);
+
+            if (response.data.success) {
+                showToast('Loan/Advance created successfully!', 'success');
+
+                // Navigate back after a short delay
+                setTimeout(() => {
+                    navigate('/loans');
+                }, 1500);
+            } else {
+                showToast(response.data.message || 'Failed to create loan/advance', 'error');
+            }
+
         } catch (error) {
-            console.error('Error saving loan:', error);
-            showToast('Failed to save loan/advance. Please try again.', 'error');
+            console.error('Error creating loan:', error);
+            showToast('Failed to create loan/advance. Please try again.', 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    // Add this helper function near the top of your component (after the showToast function):
+
+    const formatDateForAPI = (dateString) => {
+        if (!dateString) return '';
+
+        // Convert YYYY-MM-DD to DD-MM-YYYY
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+    };
+
     const handleReset = () => {
+        // Reset form with default dropdown values
+        const defaultLoanType = loanTypes.length > 0 ? loanTypes[0] : null;
+        const normalPriority = priorities.find(p => p.name === 'Normal');
+        const pendingStatus = statuses.find(s => s.name === 'Pending');
+
         setFormData({
             employeeName: '',
             employeeId: '',
-            loanType: 'Loan',
+            loanType: defaultLoanType?.name || '',
+            loanTypeId: defaultLoanType?.loan_type_id || '',
             amount: '',
             interestRate: '',
             tenure: '',
             reason: '',
-            approvalStatus: 'Pending',
+            approvalStatus: pendingStatus?.name || '',
+            approvalStatusId: pendingStatus?.status_id || '',
             disbursementDate: '',
             repaymentStartDate: '',
             installmentAmount: '',
             guarantorName: '',
             guarantorContact: '',
             documents: [],
-            priority: 'Normal'
+            priority: normalPriority?.name || '',
+            priorityId: normalPriority?.loan_priority_id || ''
         });
         setSelectedEmployee('');
         setErrors({});
@@ -398,16 +575,24 @@ const AddLoanAdvance = ({
                                             Type *
                                         </label>
                                         <select
-                                            name="loanType"
-                                            value={formData.loanType}
-                                            onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={formData.loanTypeId}
+                                            onChange={handleLoanTypeSelect}
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.loanType ? 'border-red-500' : 'border-gray-300'
+                                                }`}
+                                            disabled={loading}
                                         >
-                                            <option value="Loan">Loan</option>
-                                            <option value="Advance">Advance</option>
-                                            <option value="Emergency Loan">Emergency Loan</option>
-                                            <option value="Personal Loan">Personal Loan</option>
+                                            <option value="">
+                                                {loading ? 'Loading...' : 'Select loan type'}
+                                            </option>
+                                            {loanTypes.map((loanType) => (
+                                                <option key={loanType.loan_type_id} value={loanType.loan_type_id}>
+                                                    {loanType.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {errors.loanType && (
+                                            <p className="text-red-500 text-xs mt-1">{errors.loanType}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -430,19 +615,27 @@ const AddLoanAdvance = ({
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Priority
+                                            Priority *
                                         </label>
                                         <select
-                                            name="priority"
-                                            value={formData.priority}
-                                            onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={formData.priorityId}
+                                            onChange={handlePrioritySelect}
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.priority ? 'border-red-500' : 'border-gray-300'
+                                                }`}
+                                            disabled={loading}
                                         >
-                                            <option value="Low">Low</option>
-                                            <option value="Normal">Normal</option>
-                                            <option value="High">High</option>
-                                            <option value="Urgent">Urgent</option>
+                                            <option value="">
+                                                {loading ? 'Loading...' : 'Select priority'}
+                                            </option>
+                                            {priorities.map((priority) => (
+                                                <option key={priority.loan_priority_id} value={priority.loan_priority_id}>
+                                                    {priority.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {errors.priority && (
+                                            <p className="text-red-500 text-xs mt-1">{errors.priority}</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -451,7 +644,7 @@ const AddLoanAdvance = ({
                                         <div>
                                             <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                                                 <Percent size={16} />
-                                                Interest Rate (%) *
+                                                Interest Rate (Monthly) *
                                             </label>
                                             <input
                                                 type="number"
@@ -513,19 +706,27 @@ const AddLoanAdvance = ({
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Approval Status
+                                            Approval Status *
                                         </label>
                                         <select
-                                            name="approvalStatus"
-                                            value={formData.approvalStatus}
-                                            onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={formData.approvalStatusId}
+                                            onChange={handleStatusSelect}
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.approvalStatus ? 'border-red-500' : 'border-gray-300'
+                                                }`}
+                                            disabled={loading}
                                         >
-                                            <option value="Pending">Pending</option>
-                                            <option value="Approved">Approved</option>
-                                            <option value="Rejected">Rejected</option>
-                                            <option value="Under Review">Under Review</option>
+                                            <option value="">
+                                                {loading ? 'Loading...' : 'Select status'}
+                                            </option>
+                                            {statuses.map((status) => (
+                                                <option key={status.status_id} value={status.status_id}>
+                                                    {status.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {errors.approvalStatus && (
+                                            <p className="text-red-500 text-xs mt-1">{errors.approvalStatus}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -584,30 +785,30 @@ const AddLoanAdvance = ({
                                             value={formData.guarantorContact}
                                             onChange={handleInputChange}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Enter contact number"
+                                            placeholder="Enter contact number/email"
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Reason */}
-                            <div className="bg-gray-50 p-4 rounded-lg">
+                            <div className="bg-yellow-50 p-4 rounded-lg">
                                 <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <FileText size={20} className="text-gray-600" />
-                                    Additional Details
+                                    <FileText size={20} className="text-yellow-600" />
+                                    Additional Information
                                 </h2>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Reason *
+                                        Reason/Purpose *
                                     </label>
                                     <textarea
                                         name="reason"
                                         value={formData.reason}
                                         onChange={handleInputChange}
-                                        rows="4"
+                                        rows={4}
                                         className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.reason ? 'border-red-500' : 'border-gray-300'
                                             }`}
-                                        placeholder="Enter detailed reason for loan/advance request"
+                                        placeholder="Explain the reason for this loan/advance request..."
                                     />
                                     {errors.reason && (
                                         <p className="text-red-500 text-xs mt-1">{errors.reason}</p>
@@ -617,23 +818,30 @@ const AddLoanAdvance = ({
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+                        <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
                             <button
-                                type="button"
                                 onClick={handleBack}
-                                className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 disabled={isSubmitting}
                             >
                                 Cancel
                             </button>
                             <button
-                                type="button"
                                 onClick={handleSubmit}
                                 disabled={isSubmitting || loading}
                                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                <Save size={16} />
-                                {isSubmitting ? 'Saving...' : (existingLoan ? 'Update' : 'Save')} Loan/Advance
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        {existingLoan ? 'Updating...' : 'Creating...'}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save size={16} />
+                                        {existingLoan ? 'Update Loan/Advance' : 'Create Loan/Advance'}
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
