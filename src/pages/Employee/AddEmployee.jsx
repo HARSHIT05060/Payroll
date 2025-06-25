@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Plus, Trash2, ArrowLeft, User, Building, CreditCard, FileText, Phone, Calendar, Users, Edit } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Trash2, ArrowLeft, User, Building, CreditCard, FileText, Phone, Calendar, Users, Edit, Lock } from 'lucide-react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
@@ -52,7 +52,12 @@ const AddEmployee = () => {
         dateOfJoining: '',
 
         // References
-        references: [{ name: '', contactNumber: '' }]
+        references: [{ name: '', contactNumber: '' }],
+
+        // credentials
+        loginMobileNo: '',
+        password: '',
+
     });
     const { user, isAuthenticated } = useAuth();
 
@@ -234,7 +239,9 @@ const AddEmployee = () => {
                     aadharCard: null,
                     drivingLicence: null,
                     panCard: null,
-                    photo: null
+                    photo: null,
+                    loginMobileNo: employee.login_mobile_number || '',
+                    password: employee.password ||'' ,
                 };
 
                 setFormData(mappedFormData);
@@ -332,6 +339,13 @@ const AddEmployee = () => {
         if (!formData.accountNo.trim()) errors.push('Account Number');
         if (!formData.ifscCode.trim()) errors.push('IFSC Code');
 
+        // Credentials validation
+        if (!isEditMode) {
+            if (!formData.loginMobileNo.trim()) errors.push('Login Mobile Number');
+            if (!formData.password.trim()) errors.push('Password');
+        }
+        // References validation
+
         if (!isEditMode) {
             if (!formData.aadharCard) errors.push('Aadhar Card');
             if (!formData.panCard) errors.push('PAN Card');
@@ -421,6 +435,10 @@ const AddEmployee = () => {
                 }
             });
 
+            // Credentials 
+            formDataToSend.append('login_mobile_number', formData.loginMobileNo ||'');
+            formDataToSend.append('password', formData.password ||'');
+
             // Handle file uploads
             const fileFields = ['aadharCard', 'drivingLicence', 'panCard', 'photo'];
             const apiFileFields = ['aadharcard_img', 'dl_img', 'pan_card', 'passport_img'];
@@ -479,7 +497,9 @@ const AddEmployee = () => {
                         emergencyAddress: '',
                         dateOfBirth: '',
                         dateOfJoining: '',
-                        references: [{ name: '', contactNumber: '' }]
+                        references: [{ name: '', contactNumber: '' }],
+                        loginMobileNo: '',
+                        password: ''
                     });
                     setFilePreviews({
                         aadharCard: null,
@@ -555,6 +575,12 @@ const AddEmployee = () => {
             title: 'References',
             icon: Users,
             color: 'pink'
+        },
+        {
+            key: 'credentials',
+            title: 'Credentials',
+            icon: Lock,
+            color: 'cyan'
         }
     ];
 
@@ -1093,6 +1119,30 @@ const AddEmployee = () => {
                                             </div>
                                         </div>
                                     )}
+                                    {section.key === 'credentials' && (
+                                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-semibold text-gray-700">Login Mobile No *</label>
+                                                <input
+                                                    type="tel"
+                                                    name="loginMobileNo"
+                                                    value={formData.loginMobileNo}
+                                                    onChange={handleInputChange}
+                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-semibold text-gray-700">Password *</label>
+                                                <input
+                                                    type="password"
+                                                    name="password"
+                                                    value={formData.password}
+                                                    onChange={handleInputChange}
+                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -1116,8 +1166,7 @@ const AddEmployee = () => {
                                 {isSubmitting && (
                                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                 )}
-                                {isSubmitting
-                                    ? (isEditMode ? 'Updating...' : 'Adding...')
+                                {isSubmitting ? (isEditMode ? 'Updating...' : 'Adding...')
                                     : (isEditMode ? 'Update Employee' : 'Add Employee')
                                 }
                             </button>
