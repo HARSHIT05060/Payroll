@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Eye, FileText, Trash2, CheckCircle, AlertCircle, Info, X } from 'lucide-react';
+import { Plus, Eye, FileText, Trash2, CheckCircle, AlertCircle, Info, X, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
 
@@ -81,14 +81,14 @@ const LoanDetailsModal = ({ isOpen, onClose, loanDetails, loading }) => {
 
     const getPaidInstallments = () => {
         if (!loanDetails) return 0;
-        return loanDetails.filter(installment => 
+        return loanDetails.filter(installment =>
             installment.payment_status?.toLowerCase() === 'paid'
         ).length;
     };
 
     const getPendingInstallments = () => {
         if (!loanDetails) return 0;
-        return loanDetails.filter(installment => 
+        return loanDetails.filter(installment =>
             installment.payment_status?.toLowerCase() === 'pending'
         ).length;
     };
@@ -217,7 +217,7 @@ const LoanAdvance = () => {
     const [filter, setFilter] = useState('All Loans/Advances');
     const [toast, setToast] = useState(null);
     const [loading, setLoading] = useState(false);
-    
+
     // New states for dynamic dropdown data
     const [dropdownData, setDropdownData] = useState({
         loan_type_list: [],
@@ -225,12 +225,12 @@ const LoanAdvance = () => {
         loan_status_list: []
     });
     const [dropdownLoading, setDropdownLoading] = useState(false);
-    
+
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loanDetails, setLoanDetails] = useState([]);
     const [modalLoading, setModalLoading] = useState(false);
-    
+
     const { user } = useAuth();
 
     // Dynamic filter options based on API data
@@ -330,17 +330,17 @@ const LoanAdvance = () => {
             const amount = parseFloat(loan.amount || 0);
             const installmentAmount = parseFloat(loan.installment_amount || 0);
             const tenure = parseInt(loan.tenure || 0);
-            
+
             // Calculate total payable amount (this is simplified - you might need to adjust based on your business logic)
             // eslint-disable-next-line no-unused-vars
             const totalPayable = installmentAmount * tenure;
-            
+
             // For now, assuming outstanding is the full amount if loan is pending/active
             // You might need to track payments separately
             if (loan.loan_status === 'Closed' || loan.status === '0') {
                 return 0;
             }
-            
+
             return amount; // Return original loan amount as outstanding for now
         } catch (error) {
             console.error('Error calculating outstanding amount:', error);
@@ -356,7 +356,7 @@ const LoanAdvance = () => {
     //             // formData.append('loan_id', loanId);
     //             // formData.append('user_id', user.user_id);
     //             // const response = await api.post('delete_loan', formData);
-                
+
     //             // For now, just remove from local state
     //             setLoans(prev => prev.filter(loan => loan.loan_id !== loanId));
     //             showToast('Loan/Advance deleted successfully', 'success');
@@ -402,6 +402,17 @@ const LoanAdvance = () => {
         }
     };
 
+    // New function to handle edit action
+    const handleEdit = (loanId) => {
+        try {
+            console.log('Edit loan with ID:', loanId);
+            // Redirect to add-loan-advance page with edit mode and loan ID
+            window.location.href = `/add-loan-advance?edit=true&loanId=${loanId}`;
+        } catch (error) {
+            console.error('Error handling edit:', error);
+            showToast('Failed to edit loan', 'error');
+        }
+    };
     const closeModal = () => {
         setIsModalOpen(false);
         setLoanDetails([]);
@@ -414,7 +425,7 @@ const LoanAdvance = () => {
             if (filter === 'All Loans/Advances') {
                 return loans;
             }
-            
+
             // Filter by loan status
             return loans.filter(loan => loan.loan_status === filter);
         } catch (error) {
@@ -532,11 +543,10 @@ const LoanAdvance = () => {
                                             {loan.employee_full_name || 'N/A'}
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-900">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                loan.loan_type_name === 'Loan' 
-                                                    ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-green-100 text-green-800'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${loan.loan_type_name === 'Loan'
+                                                ? 'bg-blue-100 text-blue-800'
+                                                : 'bg-green-100 text-green-800'
+                                                }`}>
                                                 {loan.loan_type_name || 'N/A'}
                                             </span>
                                         </td>
@@ -556,17 +566,16 @@ const LoanAdvance = () => {
                                             ₹{calculateOutstandingAmount(loan).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                         </td>
                                         <td className="px-6 py-4 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                loan.loan_status === 'Approved'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : loan.loan_status === 'Rejected'
-                                                        ? 'bg-red-100 text-red-800'
-                                                        : loan.loan_status === 'Pending'
-                                                            ? 'bg-yellow-100 text-yellow-800'
-                                                            : loan.loan_status === 'Under Review'
-                                                                ? 'bg-blue-100 text-blue-800'
-                                                                : 'bg-gray-100 text-gray-800'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${loan.loan_status === 'Approved'
+                                                ? 'bg-green-100 text-green-800'
+                                                : loan.loan_status === 'Rejected'
+                                                    ? 'bg-red-100 text-red-800'
+                                                    : loan.loan_status === 'Pending'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : loan.loan_status === 'Under Review'
+                                                            ? 'bg-blue-100 text-blue-800'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                }`}>
                                                 {loan.loan_status || 'Unknown'}
                                             </span>
                                         </td>
@@ -578,6 +587,13 @@ const LoanAdvance = () => {
                                                     title="View Details"
                                                 >
                                                     <Eye size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(loan.loan_id)}
+                                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                                    title="Edit Loan"
+                                                >
+                                                    <Edit size={16} />
                                                 </button>
                                                 {/* <button
                                                     onClick={() => handleDelete(loan.loan_id)}
