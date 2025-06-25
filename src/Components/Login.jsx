@@ -15,7 +15,7 @@ import { setPermissions } from '../../src/redux/permissionsSlice';
 const Login = () => {
     const { login } = useAuth();
     const [number, setNumber] = useState("");
-    const [password, setPassword] = useState("@123");
+    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
