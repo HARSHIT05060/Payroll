@@ -63,7 +63,7 @@ const App = () => {
             ) : (
               <Route path="/add-role" element={<Navigate to="/unauthorized" replace />} />
             )}
-
+{/* permission */}
             <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
             <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
             <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
