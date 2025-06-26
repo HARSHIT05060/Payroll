@@ -28,6 +28,8 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+
 
 const EmployeeDetail = () => {
     const [employee, setEmployee] = useState(null);
@@ -40,6 +42,8 @@ const EmployeeDetail = () => {
     const navigate = useNavigate();
     const { employee_id } = useParams();
     const { user } = useAuth();
+    const permissions = useSelector(state => state.permissions) || {};
+
 
     // Show toast notification
     const showToast = (message, type = 'info') => {
@@ -399,20 +403,24 @@ const EmployeeDetail = () => {
 
                         {/* Action Buttons */}
                         <div className="mt-6 space-y-3">
-                            <button
-                                onClick={handleEditClick}
-                                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                            >
-                                <Pencil size={18} className="mr-2" />
-                                Edit Employee
-                            </button>
-                            <button
-                                onClick={() => setShowDeleteModal(true)}
-                                className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-                            >
-                                <Trash2 size={18} className="mr-2" />
-                                Delete Employee
-                            </button>
+                            {permissions['employee_edit'] &&
+                                <button
+                                    onClick={handleEditClick}
+                                    className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                >
+                                    <Pencil size={18} className="mr-2" />
+                                    Edit Employee
+                                </button>
+                            }
+                            {permissions['employee_delete'] &&
+                                <button
+                                    onClick={() => setShowDeleteModal(true)}
+                                    className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                                >
+                                    <Trash2 size={18} className="mr-2" />
+                                    Delete Employee
+                                </button>
+                            }
                         </div>
                     </div>
 

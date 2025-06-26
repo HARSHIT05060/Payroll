@@ -3,6 +3,8 @@ import { RefreshCw, AlertCircle, CheckCircle, XCircle, X } from "lucide-react";
 import BranchForm from "./BranchForm";
 import BranchList from "./BranchList";
 import useBranches from "../../hooks/useBranches";
+import { useSelector } from 'react-redux';
+
 
 const Toast = ({ message, type, onClose }) => {
     const getToastStyles = () => {
@@ -54,6 +56,7 @@ const Branch = () => {
         addBranch,
         deleteBranch,
     } = useBranches();
+    const permissions = useSelector(state => state.permissions) || {};
 
     const [toast, setToast] = useState(null);
 
@@ -86,12 +89,13 @@ const Branch = () => {
 
                 {/* Main Content */}
                 <div className="space-y-8">
-                    <BranchForm
-                        onSubmit={handleAddBranch}
-                        loading={loading}
-                        showToast={showToast}
-                    />
-
+                    {permissions['branch_create'] &&
+                        <BranchForm
+                            onSubmit={handleAddBranch}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
                     <BranchList
                         branches={branches}
                         onDelete={handleDeleteBranch}

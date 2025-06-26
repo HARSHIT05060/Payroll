@@ -16,6 +16,7 @@ import {
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
+import { useSelector } from 'react-redux';
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -50,6 +51,8 @@ export default function EmployeeManagement() {
 
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
+    const permissions = useSelector(state => state.permissions) || {};
+
 
     // Fetch employees data
     const fetchEmployees = useCallback(async () => {
@@ -224,14 +227,15 @@ export default function EmployeeManagement() {
                                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                             </div>
 
-
-                            <button
-                                onClick={() => navigate('/add-employee')}
-                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add Employee
-                            </button>
+                            {permissions['employee_create'] &&
+                                <button
+                                    onClick={() => navigate('/add-employee')}
+                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Add Employee
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -280,9 +284,12 @@ export default function EmployeeManagement() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Biometrics
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
+                                    {(permissions?.employee_edit || permissions?.employee_view) && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    )}
+
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -330,20 +337,24 @@ export default function EmployeeManagement() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center gap-2">
-                                                        <button
-                                                            onClick={() => handleEditEmployee(employee.employee_id)}
-                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                                                            title="Edit Employee"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleViewDetails(employee.employee_id)}
-                                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                                                            title="View Details"
-                                                        >
-                                                            <FileText className="h-4 w-4" />
-                                                        </button>
+                                                        {permissions['employee_edit'] &&
+                                                            <button
+                                                                onClick={() => handleEditEmployee(employee.employee_id)}
+                                                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                                title="Edit Employee"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </button>
+                                                        }
+                                                        {permissions['employee_view'] &&
+                                                            <button
+                                                                onClick={() => handleViewDetails(employee.employee_id)}
+                                                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                                title="View Details"
+                                                            >
+                                                                <FileText className="h-4 w-4" />
+                                                            </button>
+                                                        }
                                                     </div>
                                                 </td>
                                             </tr>

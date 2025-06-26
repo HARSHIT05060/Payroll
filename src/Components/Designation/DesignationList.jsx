@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, Briefcase, AlertTriangle, X, Search } from "lucide-react";
+import { useSelector } from 'react-redux';
 
 // Confirmation Modal Component
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = "Confirm", cancelText = "Cancel", type = "danger", isLoading = false }) => {
@@ -97,6 +98,8 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
         type: null,
         data: null
     });
+    const permissions = useSelector(state => state.permissions) || {};
+
 
     // Real-time search filtering using useMemo for performance
     const filteredDesignations = useMemo(() => {
@@ -295,22 +298,17 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                                                         <span className="font-medium">Department:</span> {designation.department}
                                                     </p>
                                                 )}
-
-                                                {designationId && (
-                                                    <p className="text-xs text-gray-400 font-mono">
-                                                        ID: {designationId}
-                                                    </p>
-                                                )}
                                             </div>
-
-                                            <button
-                                                onClick={() => handleDeleteClick(designation)}
-                                                disabled={isDeleting}
-                                                className="ml-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
-                                                title="Delete designation"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            {permissions['designation_delete'] &&
+                                                <button
+                                                    onClick={() => handleDeleteClick(designation)}
+                                                    disabled={isDeleting}
+                                                    className="ml-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                                                    title="Delete designation"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            }
                                         </div>
                                     </div>
                                 );

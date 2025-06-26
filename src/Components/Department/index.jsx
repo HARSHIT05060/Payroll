@@ -3,6 +3,8 @@ import { RefreshCw, AlertCircle, CheckCircle, XCircle, X } from "lucide-react";
 import DepartmentForm from "./DepartmentForm";
 import DepartmentList from "./DepartmentList";
 import useDepartments from "../../hooks/useDepartments";
+import { useSelector } from 'react-redux';
+
 
 const Toast = ({ message, type, onClose }) => {
     const getToastStyles = () => {
@@ -54,6 +56,8 @@ const Department = () => {
         addDepartment,
         deleteDepartment,
     } = useDepartments();
+    const permissions = useSelector(state => state.permissions) || {};
+
 
     const [toast, setToast] = useState(null);
 
@@ -86,12 +90,13 @@ const Department = () => {
 
                 {/* Main Content */}
                 <div className="space-y-8">
-                    <DepartmentForm
-                        onSubmit={handleAddDepartment}
-                        loading={loading}
-                        showToast={showToast}
-                    />
-
+                    {permissions['department_create'] &&
+                        <DepartmentForm
+                            onSubmit={handleAddDepartment}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
                     <DepartmentList
                         departments={departments}
                         onDelete={handleDeleteDepartment}

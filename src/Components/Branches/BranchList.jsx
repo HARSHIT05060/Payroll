@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, MapPin, Building2, AlertTriangle, X, Search } from "lucide-react";
+import { useSelector } from 'react-redux';
+
 
 // Confirmation Modal Component
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = "Confirm", cancelText = "Cancel", type = "danger", isLoading = false }) => {
@@ -97,6 +99,8 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
         type: null,
         data: null
     });
+    const permissions = useSelector(state => state.permissions) || {};
+
 
     // Real-time search filtering using useMemo for performance
     const filteredBranches = useMemo(() => {
@@ -289,22 +293,17 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
                                                         {branch.location}
                                                     </div>
                                                 )}
-
-                                                {branchId && (
-                                                    <p className="text-xs text-gray-400 font-mono">
-                                                        ID: {branchId}
-                                                    </p>
-                                                )}
                                             </div>
-
-                                            <button
-                                                onClick={() => handleDeleteClick(branch)}
-                                                disabled={isDeleting}
-                                                className="ml-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
-                                                title="Delete branch"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            {permissions['branch_delete'] &&
+                                                <button
+                                                    onClick={() => handleDeleteClick(branch)}
+                                                    disabled={isDeleting}
+                                                    className="ml-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                                                    title="Delete branch"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            }
                                         </div>
                                     </div>
                                 );

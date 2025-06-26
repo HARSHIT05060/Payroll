@@ -3,6 +3,7 @@ import { RefreshCw, AlertCircle, CheckCircle, XCircle, X } from "lucide-react";
 import DesignationForm from "./DesignationForm";
 import DesignationList from "./DesignationList";
 import useDesignations from "../../hooks/useDesignations";
+import { useSelector } from 'react-redux';
 
 const Toast = ({ message, type, onClose }) => {
     const getToastStyles = () => {
@@ -51,9 +52,10 @@ const Designation = () => {
     const {
         designations,
         loading,
-        addDesignation, 
+        addDesignation,
         deleteDesignation,
     } = useDesignations();
+    const permissions = useSelector(state => state.permissions) || {};
 
     const [toast, setToast] = useState(null);
 
@@ -86,12 +88,13 @@ const Designation = () => {
 
                 {/* Main Content */}
                 <div className="space-y-8">
-                    <DesignationForm
-                        onSubmit={handleAddDesignation}
-                        loading={loading}
-                        showToast={showToast}
-                    />
-
+                    {permissions['designation_create'] &&
+                        <DesignationForm
+                            onSubmit={handleAddDesignation}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
                     <DesignationList
                         designations={designations}
                         onDelete={handleDeleteDesignation}
