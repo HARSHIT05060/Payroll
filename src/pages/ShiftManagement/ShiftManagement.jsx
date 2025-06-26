@@ -3,6 +3,7 @@ import { Calendar, Users, Edit, Trash2, Plus, X, CheckCircle, AlertCircle, Info 
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -137,6 +138,8 @@ const ShiftManagement = () => {
     const navigate = useNavigate();
     const [employeeModal, setEmployeeModal] = useState({ isOpen: false, employees: [], loading: false, shiftName: '' });
     const [employeeCounts, setEmployeeCounts] = useState({});
+    const permissions = useSelector(state => state.permissions) || {};
+
 
 
     // Fetch assigned employees for a shift
@@ -214,11 +217,6 @@ const ShiftManagement = () => {
                                                 <p className="font-medium text-gray-900">
                                                     {employee.full_name || 'Unknown Employee'}
                                                 </p>
-                                                {employee.employee_id && (
-                                                    <p className="text-sm text-gray-600">
-                                                        ID: {employee.employee_id}
-                                                    </p>
-                                                )}
                                                 {employee.cdate && (
                                                     <p className="text-sm text-gray-500">
                                                         Assigned: {employee.cdate}
@@ -345,9 +343,9 @@ const ShiftManagement = () => {
     }, [user]);
 
     // Handle edit shift
+
     const handleEditShift = (shiftId) => {
-        console.log(shiftId)
-        navigate(`/add-shift?edit=${shiftId}`);
+        permissions['shift_edit'] && navigate(`/add-shift?edit=${shiftId}`);
     };
 
     // Handle delete shift 
@@ -428,13 +426,15 @@ const ShiftManagement = () => {
                             <Users className="w-4 h-4" />
                             Assign Shift
                         </button>
-                        <button
-                            onClick={handleCreateShift}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Create Shift
-                        </button>
+                        {permissions['shift_create'] &&
+                            <button
+                                onClick={handleCreateShift}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create Shift
+                            </button>
+                        }
                     </div>
                 </div>
 
@@ -517,13 +517,15 @@ const ShiftManagement = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button
-                                                        onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
-                                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
+                                                    {permissions['shift_edit'] &&
+                                                        <button
+                                                            onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
+                                                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    }
                                                     <button
                                                         onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
                                                         className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -531,13 +533,15 @@ const ShiftManagement = () => {
                                                     >
                                                         <Users className="w-4 h-4" />
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
-                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    {permissions['shift_delete'] &&
+                                                        <button
+                                                            onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
+                                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    }
                                                 </div>
                                             </td>
                                         </tr>

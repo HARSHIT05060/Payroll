@@ -48,7 +48,7 @@ const Sidebar = () => {
             ].filter(Boolean) // remove false values from submenu
         },
 
-        {
+        (permissions?.shift_view) && {
             id: 'shift',
             label: 'Shift Management',
             icon: Clock,
@@ -56,6 +56,7 @@ const Sidebar = () => {
             path: "/shift-management",
             submenu: [
                 { label: 'Shifts', path: '/shift-management' },
+                permissions?.shift_create &&{ label: 'Create Shifts', path: '/add-shift' },
             ]
         },
 
