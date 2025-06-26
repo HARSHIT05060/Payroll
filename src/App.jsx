@@ -10,7 +10,6 @@ import EmployeeDetail from './pages/Employee/EmployeeDetail';
 import AddEmployee from './pages/Employee/AddEmployee';
 import LeaveApplication from './pages/Leave/LeaveApplication';
 import LeaveStatusPage from './pages/Leave/LeaveStatus';
-// import HolidayCalendar from './pages/Leave/HolidayCalendar';   
 import DepartmentsPage from './pages/Employee/Departments';
 import BranchesPage from './pages/Employee/Branches';
 import DesignationPage from './pages/Employee/Designations';
