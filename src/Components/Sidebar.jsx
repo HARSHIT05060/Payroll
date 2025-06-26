@@ -128,10 +128,10 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/configuration',
             submenu: [
-                { label: 'Master', path: '/configuration' },
-                { label: 'Company Profile', path: '/configuration/profile' },
-                { label: 'Notifications', path: '/configuration/notifications' },
-                { label: 'Integrations', path: '/configuration/integrations' }
+                // { label: 'Master', path: '/configuration' },
+                // { label: 'Company Profile', path: '/configuration/profile' },
+                // { label: 'Notifications', path: '/configuration/notifications' },
+                // { label: 'Integrations', path: '/configuration/integrations' }
             ]
         }
     ].filter(Boolean); // Remove any false menu items

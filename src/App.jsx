@@ -28,6 +28,7 @@ import Unauthorized from './Components/Unauthorized';
 import { useSelector } from 'react-redux';
 import LoanAdvance from './pages/Loan/LoanAdvance';
 import AddLoanAdvance from './pages/Loan/AddLoanAdvance';
+import Configuration from './pages/Configuration/Configuration';
 
 
 const App = () => {
@@ -124,7 +125,6 @@ const App = () => {
             {/* ---------------- Loan section ----------------- */}
             <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
             <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
-
             {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
