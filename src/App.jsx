@@ -38,16 +38,6 @@ const App = () => {
   const shouldHideNavigation = isLoginPage || isUnauthorizedPage;
   const permissions = useSelector(state => state.permissions) || {};
 
-  // useEffect(() => {
-  //   api.get("/api/data")
-  //     .then((res) => {
-  //       console.log("Data:", res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error:", err);
-  //     });
-  // }, []);
-
   return (
     <div className="flex flex-col h-screen">
       {!shouldHideNavigation && <Navbar />}
