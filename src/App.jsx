@@ -115,7 +115,7 @@ const App = () => {
             ) : (
               <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
             )}
-            
+
             <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
 
             {/* ---------------- Leave section ----------------- */}
@@ -125,6 +125,10 @@ const App = () => {
             {/* ---------------- Loan section ----------------- */}
             <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
             <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
+
+            {/* ---------------- Loan section ----------------- */}
+            <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
+
             {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
