@@ -142,6 +142,26 @@ const AddRole = () => {
         setToast(null);
     };
 
+    // Helper function to check if a permission requires view access
+    // const requiresViewPermission = (permissionKey) => {
+    //     const triggerWords = ['edit', 'delete', 'create', 'update', 'add', 'remove'];
+    //     const keyLower = permissionKey.toLowerCase();
+    //     return triggerWords.some(word => keyLower.includes(word));
+    // };
+
+    // Helper function to find view permission in the same subsection
+    const findViewPermission = (sectionKey, subsectionKey) => {
+        const subsection = permissionConfig[sectionKey]?.subsections[subsectionKey];
+        if (!subsection) return null;
+
+        return subsection.permissions.find(perm =>
+            perm.key.toLowerCase().includes('view') ||
+            perm.key.toLowerCase().includes('list') ||
+            perm.title.toLowerCase().includes('view') ||
+            perm.title.toLowerCase().includes('list')
+        );
+    };
+
     // Fetch permissions from API
     const fetchPermissions = async () => {
         try {
@@ -369,7 +389,17 @@ const AddRole = () => {
                 });
                 subsectionPerms[permission] = allSelected;
             } else {
-                subsectionPerms[permission] = !subsectionPerms[permission];
+                const isCurrentlySelected = subsectionPerms[permission];
+                subsectionPerms[permission] = !isCurrentlySelected;
+
+                // Auto-select view permission if selecting edit/delete/create
+                if (!isCurrentlySelected) {
+                    const viewPermission = findViewPermission(section, subsection);
+                    if (viewPermission && !subsectionPerms[viewPermission.key]) {
+                        subsectionPerms[viewPermission.key] = true;
+                    }
+                }
+
                 const allPermissions = permissionConfig[section].subsections[subsection].permissions.map(p => p.key);
                 subsectionPerms.selectAll = allPermissions.every(p => subsectionPerms[p]);
             }

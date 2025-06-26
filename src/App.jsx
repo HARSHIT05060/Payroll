@@ -49,6 +49,7 @@ const App = () => {
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
+            {/* ---------------- User ----------------- */}
             <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
             {permissions['user_create'] ? (
               <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
@@ -63,20 +64,68 @@ const App = () => {
             ) : (
               <Route path="/add-role" element={<Navigate to="/unauthorized" replace />} />
             )}
-{/* permission */}
-            <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
-            <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
-            <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
-            <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
-            <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
-            <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
-            <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
-            <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
+
+            {/* ---------------- Employee ----------------- */}
+            {permissions['employee_view'] ? (
+              <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
+            ) : (
+              <Route path="/employee" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {permissions['employee_create'] ? (
+              <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
+            ) : (
+              <Route path="/add-employee" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {permissions['employee_view'] ? (
+              <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
+            ) : (
+              <Route path="/employee/details/:employee_id" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {/* ---------------- Department / Branch / Designation ----------------- */}
+            {permissions['department_view'] ? (
+              <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
+            ) : (
+              <Route path="/departments" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {permissions['branch_view'] ? (
+              <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
+            ) : (
+              <Route path="/branches" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {permissions['designation_view'] ? (
+              <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
+            ) : (
+              <Route path="/designation" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {/* ---------------- Shift Management ----------------- */}
+            {permissions['shift_view'] ? (
+              <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
+            ) : (
+              <Route path="/shift-management" element={<Navigate to="/unauthorized" replace />} />
+            )}
+
+            {permissions['shift_create'] ? (
+              <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
+            ) : (
+              <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
+            )}
+            
             <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
+
+            {/* ---------------- Leave section ----------------- */}
             <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
             <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
+
+            {/* ---------------- Loan section ----------------- */}
             <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
             <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
+
             {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />

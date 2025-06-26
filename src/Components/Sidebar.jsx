@@ -16,12 +16,14 @@ import {
     ChevronRight,
     Star
 } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const Sidebar = () => {
     const location = useLocation();
     const currentPath = location.pathname;
     const [expandedSubmenu, setExpandedSubmenu] = useState(null);
     const navigate = useNavigate();
+    const permissions = useSelector(state => state.permissions) || {};
 
     const menuItems = [
         {
@@ -31,19 +33,19 @@ const Sidebar = () => {
             path: '/home',
         },
 
-        {
+        (permissions?.employee_view) && {
             id: 'employees',
             label: 'Employees',
             icon: Users,
             hasSubmenu: true,
             path: '/employee',
             submenu: [
-                { label: 'Employee List', path: '/employee' },
-                { label: 'Add Employee', path: '/add-employee' },
-                { label: 'Department', path: '/departments' },
-                { label: 'Designation', path: '/designation' },
-                { label: 'Branch', path: '/branches' },
-            ]
+                permissions?.employee_view && { label: 'Employee List', path: '/employee' },
+                (permissions?.employee_create|| permissions?.employee_view )&& { label: 'Add Employee', path: '/add-employee' },
+                permissions?.department_view && { label: 'Department', path: '/departments' },
+                permissions?.designation_view && { label: 'Designation', path: '/designation' },
+                permissions?.branch_view && { label: 'Branch', path: '/branches' },
+            ].filter(Boolean) // remove false values from submenu
         },
 
         {
@@ -70,13 +72,6 @@ const Sidebar = () => {
                 // { label: 'Policy', path: '/leaves/policy' }
             ]
         },
-
-        // {
-        //     id: 'approval',
-        //     label: 'Approval Requests',
-        //     icon: CheckSquare,
-        //     path: '/approval',
-        // },
 
         {
             id: 'payroll',
@@ -139,7 +134,7 @@ const Sidebar = () => {
                 { label: 'Integrations', path: '/configuration/integrations' }
             ]
         }
-    ];
+    ].filter(Boolean); // Remove any false menu items
 
     const getActiveItemId = () => {
         for (const item of menuItems) {
@@ -248,6 +243,8 @@ const Sidebar = () => {
                     {/* Scrollable content */}
                     <div className="h-full overflow-y-auto custom-scrollbar py-4 px-3 pb-6">
                         {menuItems.map((item) => {
+                            if (!item) return null; // Skip false/null items
+
                             const Icon = item.icon;
                             const isActive = activeItem === item.id;
                             const isExpanded = expandedSubmenu === item.id;
@@ -354,7 +351,9 @@ const Sidebar = () => {
                                             }}
                                         >
                                             <div className="ml-6 mt-2 space-y-2">
-                                                {item.submenu.map((subItem, index) => {
+                                                {item.submenu?.map((subItem, index) => {
+                                                    if (!subItem) return null; // Skip false/null subitems
+
                                                     const isSubmenuActive = activeSubmenuPath === subItem.path;
                                                     const isMaster = subItem.label === 'Master';
 
@@ -422,7 +421,7 @@ const Sidebar = () => {
                 </div>
             </div>
         </>
-    )
+    );
 };
 
 export default Sidebar;
