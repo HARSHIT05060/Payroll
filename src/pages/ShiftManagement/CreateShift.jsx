@@ -220,8 +220,6 @@ const CreateShift = () => {
                 setShiftName(shiftDetails.shift_name || '');
                 setRemark(shiftDetails.remark || ''); // This might still be empty if API doesn't provide it
             }
-
-            showToast('Shift details loaded successfully', 'success');
         } catch (err) {
             console.error('Error:', err);
             showToast('Failed to load shift details.', 'error');
