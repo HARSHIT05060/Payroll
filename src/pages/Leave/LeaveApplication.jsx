@@ -280,7 +280,6 @@ const LeaveApplication = () => {
                                                 className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                                             >
                                                 <div className="font-medium text-gray-900">{employee.full_name}</div>
-                                                <div className="text-sm text-gray-500">ID: {employee.employee_id}</div>
                                             </div>
                                         ))
                                     ) : (

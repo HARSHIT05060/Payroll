@@ -115,12 +115,23 @@ const App = () => {
             ) : (
               <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
             )}
-
-            <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
+            {permissions['shift_assign'] ? (
+              <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
+            ) : (
+              <Route path="/assign-shift" element={<Navigate to="/unauthorized" replace />} />
+            )}
 
             {/* ---------------- Leave section ----------------- */}
-            <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
-            <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
+            {permissions['leave_create'] ? (
+              <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
+            ) : (
+              <Route path="/leaveapplication" element={<Navigate to="/unauthorized" replace />} />
+            )}
+            {permissions['leave_view'] ? (
+              <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
+            ) : (
+              <Route path="/leavestatusPage" element={<Navigate to="/unauthorized" replace />} />
+            )}
 
             {/* ---------------- Loan section ----------------- */}
             <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
