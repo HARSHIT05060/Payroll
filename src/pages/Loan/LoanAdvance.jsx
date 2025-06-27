@@ -266,7 +266,6 @@ const LoanAdvance = () => {
                     loan_priority_list: data.loan_priority_list || [],
                     loan_status_list: data.loan_status_list || []
                 });
-                showToast('Dropdown data loaded successfully', 'success');
             } else {
                 showToast(response.data.message || 'Failed to fetch dropdown data', 'error');
             }
@@ -294,7 +293,6 @@ const LoanAdvance = () => {
             if (response.data.success) {
                 const loanData = response.data.data || response.data.loans || [];
                 setLoans(Array.isArray(loanData) ? loanData : []);
-                showToast(`Successfully loaded ${loanData.length} loans`, 'success');
             } else {
                 showToast(response.data.message || 'Failed to fetch loan data', 'error');
                 setLoans([]);
@@ -352,24 +350,6 @@ const LoanAdvance = () => {
             return 0;
         }
     };
-
-    // const handleDelete = async (loanId) => {
-    //     try {
-    //         if (window.confirm('Are you sure you want to delete this loan/advance?')) {
-    //             // If you have a delete API endpoint, uncomment and use this:
-    //             // const formData = new FormData();
-    //             // formData.append('loan_id', loanId);
-    //             // formData.append('user_id', user.user_id);
-    //             // const response = await api.post('delete_loan', formData);
-
-    //             // For now, just remove from local state
-    //             setLoans(prev => prev.filter(loan => loan.loan_id !== loanId));
-    //             showToast('Loan/Advance deleted successfully', 'success');
-    //         }
-    //     } catch (error) {
-    //         showToast('Failed to delete loan/advance', 'error');
-    //     }
-    // };
 
     // Updated handleViewDetails function
     const handleViewDetails = async (loanId) => {
