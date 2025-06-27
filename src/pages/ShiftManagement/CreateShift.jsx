@@ -124,9 +124,17 @@ const CreateShift = () => {
     };
 
     // Fetch shift day data (for creating new shifts)
-    const fetchShiftDayData = async () => {
+    // Fetch shift day data (for creating new shifts or editing existing ones)
+    const fetchShiftDayData = async (shiftId = null) => {
         try {
-            const response = await api.post('shift_day_fetch');
+            const formData = new FormData();
+
+            // If shiftId is provided, add it to fetch existing shift data
+            if (shiftId) {
+                formData.append('shift_id', shiftId);
+            }
+
+            const response = await api.post('shift_day_fetch', formData);
 
             if (response.data.success) {
                 const data = response.data.data;
@@ -146,7 +154,7 @@ const CreateShift = () => {
         }
     };
 
-    // Fetch existing shift details from shift_list API
+    // Fetch existing shift details from shift_list API (for basic info like shift_name)
     const fetchShiftDetailsFromList = async (shiftId) => {
         try {
             if (!user?.user_id) {
@@ -182,7 +190,7 @@ const CreateShift = () => {
         }
     };
 
-    // Fetch existing shift data for editing using shift_list API
+    // Fetch existing shift data for editing
     const fetchExistingShiftData = async (shiftId) => {
         try {
             if (!user?.user_id) {
@@ -190,58 +198,27 @@ const CreateShift = () => {
                 return;
             }
 
-            // First get the base shift day data
-            const shiftDayData = await fetchShiftDayData();
+            // Fetch shift day data with the specific shift_id
+            const shiftDayData = await fetchShiftDayData(shiftId);
             if (!shiftDayData) return;
 
-            // Set the base data first
+            // Set the fetched data
             setShiftTypes(shiftDayData.shiftTypes);
             setOccasionalDayList(shiftDayData.occasionalDayList);
 
-            // Fetch the existing shift details from shift_list API
+            // Process the day list - map occasional_day to occasional_days for consistency
+            const processedDayList = shiftDayData.dayList.map(day => ({
+                ...day,
+                occasional_days: day.occasional_day || '' // Map occasional_day to occasional_days
+            }));
+
+            setDayList(processedDayList);
+
+            // Fetch basic shift info (shift_name, remark) from shift_list API
             const shiftDetails = await fetchShiftDetailsFromList(shiftId);
-
-            if (!shiftDetails) {
-                // Apply defaults if fetch fails
-                setDayList(applyDefaultValues(shiftDayData.dayList));
-                return;
-            }
-
-            // Set basic shift information
-            setShiftName(shiftDetails.shift_name || '');
-            setRemark(shiftDetails.remark || '');
-
-            // Merge existing shift data with base day list
-            if (Array.isArray(shiftDetails.shift_days) && shiftDetails.shift_days.length > 0) {
-                const mergedDayList = shiftDayData.dayList.map(day => {
-                    const existingDay = shiftDetails.shift_days.find(
-                        shiftDay => shiftDay.day_id === day.day_id ||
-                            shiftDay.day_id === parseInt(day.day_id)
-                    );
-
-                    if (existingDay) {
-                        return {
-                            ...day,
-                            from_time: existingDay.from_time || day.from_time || '09:00 PM',
-                            to_time: existingDay.to_time || day.to_time || '06:00 AM',
-                            shift_type: existingDay.shift_type || day.shift_type || '1',
-                            occasional_days: existingDay.occasional_days || day.occasional_days || ''
-                        };
-                    } else {
-                        // Apply defaults for days not in existing shift
-                        return {
-                            ...day,
-                            from_time: day.from_time || '09:00 PM',
-                            to_time: day.to_time || '06:00 AM',
-                            shift_type: day.shift_type || '1',
-                            occasional_days: day.occasional_days || ''
-                        };
-                    }
-                });
-                setDayList(mergedDayList);
-            } else {
-                // No existing shift days, apply defaults
-                setDayList(applyDefaultValues(shiftDayData.dayList));
+            if (shiftDetails) {
+                setShiftName(shiftDetails.shift_name || '');
+                setRemark(shiftDetails.remark || ''); // This might still be empty if API doesn't provide it
             }
 
             showToast('Shift details loaded successfully', 'success');
@@ -349,21 +326,135 @@ const CreateShift = () => {
         return true;
     };
 
-    // Generate time options
-    const generateTimeOptions = () => {
-        const times = [];
-        for (let hour = 0; hour < 24; hour++) {
-            for (let minute = 0; minute < 60; minute += 30) {
-                const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-                const ampm = hour < 12 ? 'AM' : 'PM';
-                const time12 = `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`;
-                times.push({ value: time12, label: time12 });
-            }
-        }
-        return times;
-    };
+    // Enhanced Time Selector Component with separate Hour and Minute dropdowns
+    const TimeSelector = ({ value, onChange, label, required = false, disabled = false }) => {
+        // Parse the current time value (e.g., "09:30 AM" or "")
+        const parseTimeValue = (timeStr) => {
+            if (!timeStr) return { hour: '', minute: '', period: '' };
 
-    const timeOptions = generateTimeOptions();
+            const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+            if (match) {
+                return {
+                    hour: match[1].padStart(2, '0'),
+                    minute: match[2],
+                    period: match[3].toUpperCase()
+                };
+            }
+            return { hour: '', minute: '', period: '' };
+        };
+
+        const { hour, minute, period } = parseTimeValue(value);
+
+        // Generate hour options (1-12 for 12-hour format)
+        const generateHourOptions = () => {
+            const hours = [];
+            for (let i = 1; i <= 12; i++) {
+                hours.push({
+                    value: i.toString().padStart(2, '0'),
+                    label: i.toString()
+                });
+            }
+            return hours;
+        };
+
+        // Generate minute options (0-59)
+        const generateMinuteOptions = () => {
+            const minutes = [];
+            for (let i = 0; i < 60; i++) {
+                minutes.push({
+                    value: i.toString().padStart(2, '0'),
+                    label: i.toString().padStart(2, '0')
+                });
+            }
+            return minutes;
+        };
+
+        const hourOptions = generateHourOptions();
+        const minuteOptions = generateMinuteOptions();
+        const periodOptions = [
+            { value: 'AM', label: 'AM' },
+            { value: 'PM', label: 'PM' }
+        ];
+
+        // Handle individual field changes
+        const handleFieldChange = (field, fieldValue) => {
+            const currentParsed = parseTimeValue(value);
+
+            const newTime = {
+                hour: field === 'hour' ? fieldValue : currentParsed.hour,
+                minute: field === 'minute' ? fieldValue : currentParsed.minute,
+                period: field === 'period' ? fieldValue : currentParsed.period
+            };
+
+            // Only call onChange if all fields have values
+            if (newTime.hour && newTime.minute && newTime.period) {
+                const formattedTime = `${parseInt(newTime.hour).toString().padStart(2, '0')}:${newTime.minute} ${newTime.period}`;
+                onChange(formattedTime);
+            } else if (!newTime.hour && !newTime.minute && !newTime.period) {
+                // If all fields are empty, pass empty string
+                onChange('');
+            }
+        };
+
+        return (
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {label} {required && <span className="text-red-500">*</span>}
+                </label>
+                <div className="flex gap-1">
+                    {/* Hour Dropdown */}
+                    <select
+                        value={hour}
+                        onChange={(e) => handleFieldChange('hour', e.target.value)}
+                        className="flex-1 px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        required={required}
+                        disabled={disabled}
+                    >
+                        <option value="">Hr</option>
+                        {hourOptions.map(h => (
+                            <option key={h.value} value={h.value}>
+                                {h.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    <span className="flex items-center px-1 text-gray-500">:</span>
+
+                    {/* Minute Dropdown */}
+                    <select
+                        value={minute}
+                        onChange={(e) => handleFieldChange('minute', e.target.value)}
+                        className="flex-1 px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        required={required}
+                        disabled={disabled}
+                    >
+                        <option value="">Min</option>
+                        {minuteOptions.map(m => (
+                            <option key={m.value} value={m.value}>
+                                {m.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* AM/PM Dropdown */}
+                    <select
+                        value={period}
+                        onChange={(e) => handleFieldChange('period', e.target.value)}
+                        className="px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        required={required}
+                        disabled={disabled}
+                    >
+                        <option value="">--</option>
+                        {periodOptions.map(p => (
+                            <option key={p.value} value={p.value}>
+                                {p.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+        );
+    };
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -564,8 +655,20 @@ const CreateShift = () => {
                                     <Clock className="w-5 h-5 text-gray-500" />
                                     <h2 className="text-lg font-medium text-gray-900">Weekly Schedule</h2>
                                 </div>
-                                <div className="text-sm text-gray-500">
-                                    Default: 9:00 PM - 6:00 AM
+                                <div className="flex items-center gap-4">
+                                    <div className="text-sm text-gray-500">
+                                        Default: 9:00 PM - 6:00 AM
+                                    </div>
+                                    {!previewMode && (
+                                        <button
+                                            type="button"
+                                            onClick={resetAllToDefaults}
+                                            className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors flex items-center gap-1"
+                                        >
+                                            <RotateCcw className="w-3 h-3" />
+                                            Reset All
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -573,8 +676,11 @@ const CreateShift = () => {
                             <div className="space-y-6">
                                 {dayList.map((day) => {
                                     const isConfigured = day.from_time && day.to_time && day.shift_type;
+                                    const isOccasionalDay = day.shift_type === "3";
+                                    const hasOccasionalDaysSelected = isOccasionalDay && day.occasional_days && day.occasional_days.trim() !== '';
+
                                     return (
-                                        <div key={day.day_id} className="border border-gray-200 rounded-lg">
+                                        <div key={day.day_id} className="border border-gray-200 rounded-lg overflow-hidden">
                                             {/* Day Header */}
                                             <div className={`px-4 py-3 border-b border-gray-200 ${isConfigured ? 'bg-green-50' : 'bg-gray-50'}`}>
                                                 <div className="flex items-center justify-between">
@@ -584,65 +690,57 @@ const CreateShift = () => {
                                                         </div>
                                                         <div>
                                                             <h3 className="font-medium text-gray-900">{day.day_name}</h3>
-                                                            <p className="text-sm text-gray-500">
-                                                                {isConfigured ? 'Configured' : 'Not configured'}
-                                                            </p>
+                                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                                <span>{isConfigured ? 'Configured' : 'Not configured'}</span>
+                                                                {isOccasionalDay && hasOccasionalDaysSelected && (
+                                                                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                                                                        Occasional
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    {!previewMode && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => resetDayToDefaults(day.day_id)}
-                                                            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                                                        >
-                                                            <RotateCcw className="w-4 h-4" />
-                                                        </button>
-                                                    )}
+                                                    <div className="flex items-center gap-2">
+                                                        {/* Quick Time Display */}
+                                                        {isConfigured && (
+                                                            <div className="text-sm text-gray-600 bg-white px-2 py-1 rounded border">
+                                                                {day.from_time} - {day.to_time}
+                                                            </div>
+                                                        )}
+                                                        {!previewMode && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => resetDayToDefaults(day.day_id)}
+                                                                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white rounded transition-colors"
+                                                                title="Reset to defaults"
+                                                            >
+                                                                <RotateCcw className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {/* Day Configuration */}
-                                            <div className="p-4">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                            <div className="p-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                                     {/* Start Time */}
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Start Time <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <select
-                                                            value={day.from_time}
-                                                            onChange={(e) => handleDayChange(day.day_id, 'from_time', e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                                                            required
-                                                            disabled={previewMode}
-                                                        >
-                                                            {timeOptions.map(time => (
-                                                                <option key={time.value} value={time.value}>
-                                                                    {time.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
+                                                    <TimeSelector
+                                                        value={day.from_time}
+                                                        onChange={(value) => handleDayChange(day.day_id, 'from_time', value)}
+                                                        label="Start Time"
+                                                        required={true}
+                                                        disabled={previewMode}
+                                                    />
 
                                                     {/* End Time */}
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            End Time <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <select
-                                                            value={day.to_time}
-                                                            onChange={(e) => handleDayChange(day.day_id, 'to_time', e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                                                            required
-                                                            disabled={previewMode}
-                                                        >
-                                                            {timeOptions.map(time => (
-                                                                <option key={time.value} value={time.value}>
-                                                                    {time.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
+                                                    <TimeSelector
+                                                        value={day.to_time}
+                                                        onChange={(value) => handleDayChange(day.day_id, 'to_time', value)}
+                                                        label="End Time"
+                                                        required={true}
+                                                        disabled={previewMode}
+                                                    />
 
                                                     {/* Shift Type */}
                                                     <div>
@@ -650,12 +748,13 @@ const CreateShift = () => {
                                                             Shift Type <span className="text-red-500">*</span>
                                                         </label>
                                                         <select
-                                                            value={day.shift_type}
+                                                            value={day.shift_type || ''}
                                                             onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
                                                             required
                                                             disabled={previewMode}
                                                         >
+                                                            <option value="" disabled>Select shift type</option>
                                                             {shiftTypes.map(type => (
                                                                 <option key={type.id} value={type.id}>
                                                                     {type.name}
@@ -663,30 +762,42 @@ const CreateShift = () => {
                                                             ))}
                                                         </select>
                                                     </div>
+
                                                     {/* Occasional Days */}
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Occasional Days {day.shift_type === "3" && <span className="text-red-500">*</span>}
+                                                            Occasional Days {isOccasionalDay && <span className="text-red-500">*</span>}
                                                         </label>
-                                                        {day.shift_type === "3" ? (
-                                                            <div className="border border-gray-300 rounded-md p-2 bg-white max-h-20 overflow-y-auto">
-                                                                <div className="space-y-1">
-                                                                    {occasionalDayList.map(occasional => (
-                                                                        <label key={occasional.id} className="flex items-center gap-2 cursor-pointer text-sm">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                checked={(day.occasional_days || '').split(',').includes(occasional.id)}
-                                                                                onChange={(e) => handleOccasionalDayChange(day.day_id, occasional.id, e.target.checked)}
-                                                                                className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                                                disabled={previewMode}
-                                                                            />
-                                                                            <span className="text-gray-700">{occasional.name}</span>
-                                                                        </label>
-                                                                    ))}
+                                                        {isOccasionalDay ? (
+                                                            <div className="border border-gray-300 rounded-md bg-white">
+                                                                <div className="p-3 max-h-24 overflow-y-auto">
+                                                                    <div className="space-y-2">
+                                                                        {occasionalDayList.map(occasional => {
+                                                                            const isChecked = (day.occasional_days || '').split(',').filter(id => id).includes(occasional.id);
+                                                                            return (
+                                                                                <label key={occasional.id} className="flex items-center gap-2 cursor-pointer text-sm hover:bg-gray-50 p-1 rounded">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={isChecked}
+                                                                                        onChange={(e) => handleOccasionalDayChange(day.day_id, occasional.id, e.target.checked)}
+                                                                                        className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                                                        disabled={previewMode}
+                                                                                    />
+                                                                                    <span className="text-gray-700">{occasional.name}</span>
+                                                                                </label>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
+                                                                {/* Selected count indicator */}
+                                                                {hasOccasionalDaysSelected && (
+                                                                    <div className="px-3 py-1 bg-blue-50 border-t text-xs text-blue-600">
+                                                                        {day.occasional_days.split(',').filter(id => id).length} day(s) selected
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         ) : (
-                                                            <div className="border border-gray-200 rounded-md p-2 bg-gray-50 text-center">
+                                                            <div className="border border-gray-200 rounded-md p-3 bg-gray-50 text-center">
                                                                 <p className="text-xs text-gray-500">
                                                                     Select "Occasional Working Day" to configure
                                                                 </p>
