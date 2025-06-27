@@ -3,73 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Calendar, Clock, ArrowLeft, Save, X, CheckCircle, AlertCircle, Info, RotateCcw, Settings, Eye, EyeOff, Users, Timer, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
-
-// Toast Component with Professional Design
-const Toast = ({ message, type, onClose }) => {
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        setIsVisible(true);
-        const timer = setTimeout(() => {
-            setIsVisible(false);
-            setTimeout(onClose, 300);
-        }, 4000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-
-    const getToastStyles = () => {
-        const baseStyles = "transform transition-all duration-300 ease-out";
-        const visibilityStyles = isVisible
-            ? "translate-x-0 opacity-100 scale-100"
-            : "translate-x-full opacity-0 scale-95";
-
-        switch (type) {
-            case 'success':
-                return `${baseStyles} ${visibilityStyles} bg-white border border-emerald-200 text-emerald-800 shadow-lg`;
-            case 'error':
-                return `${baseStyles} ${visibilityStyles} bg-white border border-red-200 text-red-800 shadow-lg`;
-            case 'info':
-                return `${baseStyles} ${visibilityStyles} bg-white border border-blue-200 text-blue-800 shadow-lg`;
-            default:
-                return `${baseStyles} ${visibilityStyles} bg-white border border-gray-200 text-gray-800 shadow-lg`;
-        }
-    };
-
-    const getIcon = () => {
-        switch (type) {
-            case 'success':
-                return <CheckCircle className="w-5 h-5 text-emerald-500" />;
-            case 'error':
-                return <AlertCircle className="w-5 h-5 text-red-500" />;
-            case 'info':
-                return <Info className="w-5 h-5 text-blue-500" />;
-            default:
-                return <Info className="w-5 h-5 text-gray-500" />;
-        }
-    };
-
-    return (
-        <div className={`fixed top-6 right-6 z-50 p-4 rounded-lg max-w-md ${getToastStyles()}`}>
-            <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
-                    {getIcon()}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{message}</p>
-                </div>
-                <button
-                    onClick={() => {
-                        setIsVisible(false);
-                        setTimeout(onClose, 300);
-                    }}
-                    className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                >
-                    <X className="w-4 h-4" />
-                </button>
-            </div>
-        </div>
-    );
-};
+import { Toast } from '../../Components/ui/Toast';
 
 // Professional Loading Component
 const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
