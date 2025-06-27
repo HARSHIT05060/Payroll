@@ -41,7 +41,7 @@ const Sidebar = () => {
             path: '/employee',
             submenu: [
                 permissions?.employee_view && { label: 'Employee List', path: '/employee' },
-                (permissions?.employee_create|| permissions?.employee_view )&& { label: 'Add Employee', path: '/add-employee' },
+                (permissions?.employee_create || permissions?.employee_view) && { label: 'Add Employee', path: '/add-employee' },
                 permissions?.department_view && { label: 'Department', path: '/departments' },
                 permissions?.designation_view && { label: 'Designation', path: '/designation' },
                 permissions?.branch_view && { label: 'Branch', path: '/branches' },
@@ -55,9 +55,15 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: "/shift-management",
             submenu: [
+<<<<<<< HEAD
                 { label: 'Shifts', path: '/shift-management' },
                 permissions?.shift_create &&{ label: 'Create Shifts', path: '/add-shift' },
             ]
+=======
+                permissions?.employee_view && { label: 'Shifts', path: '/shift-management' },
+                (permissions?.shift_create) && { label: 'Add Shift', path: '/add-shift' },
+            ].filter(Boolean)
+>>>>>>> e0b97d7df411c7f6d68d8c1271d3bcafbcd48a98
         },
 
         {

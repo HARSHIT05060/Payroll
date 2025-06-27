@@ -4,6 +4,10 @@ import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+<<<<<<< HEAD
+=======
+
+>>>>>>> e0b97d7df411c7f6d68d8c1271d3bcafbcd48a98
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -139,8 +143,11 @@ const ShiftManagement = () => {
     const [employeeModal, setEmployeeModal] = useState({ isOpen: false, employees: [], loading: false, shiftName: '' });
     const [employeeCounts, setEmployeeCounts] = useState({});
     const permissions = useSelector(state => state.permissions) || {};
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> e0b97d7df411c7f6d68d8c1271d3bcafbcd48a98
 
     // Fetch assigned employees for a shift
     // Fetch assigned employees for a shift
@@ -345,7 +352,11 @@ const ShiftManagement = () => {
     // Handle edit shift
 
     const handleEditShift = (shiftId) => {
+<<<<<<< HEAD
         permissions['shift_edit'] && navigate(`/add-shift?edit=${shiftId}`);
+=======
+        navigate(`/add-shift?edit=${shiftId}`);
+>>>>>>> e0b97d7df411c7f6d68d8c1271d3bcafbcd48a98
     };
 
     // Handle delete shift 
@@ -419,6 +430,7 @@ const ShiftManagement = () => {
                         </div>
                     </div>
                     <div className="flex gap-3">
+<<<<<<< HEAD
                         <button
                             onClick={handleAssignShift}
                             className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
@@ -426,6 +438,17 @@ const ShiftManagement = () => {
                             <Users className="w-4 h-4" />
                             Assign Shift
                         </button>
+=======
+                        {permissions['shift_assign'] &&
+                            <button
+                                onClick={handleAssignShift}
+                                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+                            >
+                                <Users className="w-4 h-4" />
+                                Assign Shift
+                            </button>
+                        }
+>>>>>>> e0b97d7df411c7f6d68d8c1271d3bcafbcd48a98
                         {permissions['shift_create'] &&
                             <button
                                 onClick={handleCreateShift}
@@ -447,12 +470,14 @@ const ShiftManagement = () => {
                         <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No shifts found</h3>
                         <p className="text-gray-600 mb-4">Create your first shift to get started.</p>
-                        <button
-                            onClick={handleCreateShift}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Create Shift
-                        </button>
+                        {permissions['shift_create'] &&
+                            <button
+                                onClick={handleCreateShift}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Create Shift
+                            </button>
+                        }
                     </div>
                 ) : (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
