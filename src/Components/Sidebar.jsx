@@ -71,7 +71,7 @@ const Sidebar = () => {
                 (permissions?.leave_create) && { label: 'Leave Application', path: '/leaveapplication' },
                 // { label: 'Holiday Calendar', path: '/holidaycalender' },
                 // { label: 'Policy', path: '/leaves/policy' }
-            ]
+            ].filter(Boolean)
         },
 
         {
@@ -89,11 +89,16 @@ const Sidebar = () => {
             ]
         },
 
-        {
+        (permissions?.loan_view) && {
             id: 'loans',
-            label: 'Loans & Advances working',
+            label: 'Loans & Advances (edit work pending)',
             icon: Briefcase,
+            hasSubmenu: true,
             path: '/loans',
+            submenu: [
+                (permissions?.loan_view) && { label: 'Loans & Advances', path: '/loans' },
+                (permissions?.loan_create) && { label: 'Add Loan/Advance', path: '/add-loan-advance' },
+            ]
         },
 
         {
@@ -110,15 +115,15 @@ const Sidebar = () => {
             ]
         },
 
-        {
+        (permissions?.user_view || permissions?.user_roles_view) &&{
             id: 'user',
             label: 'User Management',
             icon: User,
             hasSubmenu: true,
             path: '/usermanage',
             submenu: [
-                { label: 'Users', path: '/usermanage' },
-                { label: 'Roles', path: '/role' },
+                (permissions?.user_view) && { label: 'Users', path: '/usermanage' },
+                (permissions?.user_roles_view) && { label: 'Roles', path: '/role' },
             ]
         },
 
