@@ -60,15 +60,15 @@ const Sidebar = () => {
             ].filter(Boolean)
         },
 
-        {
+        (permissions?.leave_view) && {
             id: 'leaves',
             label: 'Leaves & Holidays',
             icon: Calendar,
             hasSubmenu: true,
-            path: '/leaveapplication',
+            path: '/leavestatusPage',
             submenu: [
-                { label: 'Leave Application', path: '/leaveapplication' },
-                { label: 'Leave Requests', path: '/leavestatusPage' },
+                (permissions?.leave_view) && { label: 'Leave Requests', path: '/leavestatusPage' },
+                (permissions?.leave_create) && { label: 'Leave Application', path: '/leaveapplication' },
                 // { label: 'Holiday Calendar', path: '/holidaycalender' },
                 // { label: 'Policy', path: '/leaves/policy' }
             ]

@@ -9,6 +9,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 // Additional icons for toast (you can replace with your preferred icon library)
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-react';
+import { useSelector } from 'react-redux';
+
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {
@@ -97,6 +99,7 @@ const LeaveStatusPage = () => {
         type: 'success'
     });
 
+    const permissions = useSelector(state => state.permissions) || {};
     // Status mappings
     const statusMapping = {
         0: { value: '1', name: 'Pending', displayName: 'Pending' },
@@ -353,7 +356,6 @@ const LeaveStatusPage = () => {
                             </div>
                         </div>
                     )}
-
                     <div className="flex flex-wrap gap-2 mt-auto">
                         <button
                             onClick={() => handleView(leave)}
@@ -365,20 +367,24 @@ const LeaveStatusPage = () => {
 
                         {leave.status === '1' && (
                             <>
-                                <button
-                                    onClick={() => handleReject(leave)}
-                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                                >
-                                    <CancelIcon className="h-4 w-4 mr-2" />
-                                    Reject
-                                </button>
-                                <button
-                                    onClick={() => handleApprove(leave.leave_id)}
-                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                                >
-                                    <CheckCircleIcon className="h-4 w-4 mr-2" />
-                                    Approve
-                                </button>
+                                {permissions['leave_rejected'] &&
+                                    <button
+                                        onClick={() => handleReject(leave)}
+                                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                                    >
+                                        <CancelIcon className="h-4 w-4 mr-2" />
+                                        Reject
+                                    </button>
+                                }
+                                {permissions['leave_approved'] &&
+                                    <button
+                                        onClick={() => handleApprove(leave.leave_id)}
+                                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                                    >
+                                        <CheckCircleIcon className="h-4 w-4 mr-2" />
+                                        Approve
+                                    </button>
+                                }
                             </>
                         )}
                     </div>
