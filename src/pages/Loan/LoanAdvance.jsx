@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Eye, FileText, Trash2, CheckCircle, AlertCircle, Info, X, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
+import { useSelector } from 'react-redux';
+
 
 const Toast = ({ message, type, onClose }) => {
     useEffect(() => {
@@ -218,6 +220,7 @@ const LoanAdvance = () => {
     const [toast, setToast] = useState(null);
     const [loading, setLoading] = useState(false);
 
+
     // New states for dynamic dropdown data
     const [dropdownData, setDropdownData] = useState({
         loan_type_list: [],
@@ -225,6 +228,8 @@ const LoanAdvance = () => {
         loan_status_list: []
     });
     const [dropdownLoading, setDropdownLoading] = useState(false);
+
+    const permissions = useSelector(state => state.permissions) || {};
 
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -493,14 +498,16 @@ const LoanAdvance = () => {
                                 ))}
                             </select>
                         </div>
-                        <button
-                            onClick={handleAddLoanRedirect}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                            disabled={loading}
-                        >
-                            <Plus size={16} />
-                            Add Loan/Advance
-                        </button>
+                        {permissions['loan_create'] &&
+                            <button
+                                onClick={handleAddLoanRedirect}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                                disabled={loading}
+                            >
+                                <Plus size={16} />
+                                Add Loan/Advance
+                            </button>
+                        }
                     </div>
                 </div>
 
@@ -517,7 +524,9 @@ const LoanAdvance = () => {
                                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Installment Amount</th>
                                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Outstanding Amount</th>
                                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Action</th>
+                                {(permissions['loan_view'] || permissions['loan_edit']) &&
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Action</th>
+                                }
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -581,20 +590,24 @@ const LoanAdvance = () => {
                                         </td>
                                         <td className="px-6 py-4 text-sm">
                                             <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => handleViewDetails(loan.loan_id)}
-                                                    className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                                                    title="View Details"
-                                                >
-                                                    <Eye size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleEdit(loan.loan_id)}
-                                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
-                                                    title="Edit Loan"
-                                                >
-                                                    <Edit size={16} />
-                                                </button>
+                                                {permissions['loan_view'] &&
+                                                    <button
+                                                        onClick={() => handleViewDetails(loan.loan_id)}
+                                                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                                                        title="View Details"
+                                                    >
+                                                        <Eye size={16} />
+                                                    </button>
+                                                }
+                                                {permissions['loan_edit'] &&
+                                                    <button
+                                                        onClick={() => handleEdit(loan.loan_id)}
+                                                        className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                                        title="Edit Loan"
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
+                                                }
                                                 {/* <button
                                                     onClick={() => handleDelete(loan.loan_id)}
                                                     className="p-1 text-red-600 hover:bg-red-50 rounded"

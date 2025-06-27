@@ -50,7 +50,11 @@ const App = () => {
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* ---------------- User ----------------- */}
-            <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+            {permissions['user_view'] ? (
+              <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+            ) : (
+              <Route path="/usermanage" element={<Navigate to="/unauthorized" replace />} />
+            )}
             {permissions['user_create'] ? (
               <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
             ) : (
@@ -134,8 +138,16 @@ const App = () => {
             )}
 
             {/* ---------------- Loan section ----------------- */}
-            <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
-            <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
+            {permissions['loan_view'] ? (
+              <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
+            ) : (
+              <Route path="/loans" element={<Navigate to="/unauthorized" replace />} />
+            )}
+            {permissions['loan_view'] ? (
+              <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
+            ) : (
+              <Route path="/add-loan-advance" element={<Navigate to="/unauthorized" replace />} />
+            )}
 
             {/* ---------------- Loan section ----------------- */}
             <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
