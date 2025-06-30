@@ -10,7 +10,6 @@ import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
 const Role = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,8 +17,6 @@ const Role = () => {
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
     const permissions = useSelector(state => state.permissions);
-
-    console.log('User Permissions:', permissions);
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -38,6 +35,8 @@ const Role = () => {
     const canModifyRole = (role) => {
         return !isAdminRole(role);
     };
+
+    // Get roles from API
 
     const fetchRoles = async () => {
         if (!user?.user_id) {
@@ -82,11 +81,9 @@ const Role = () => {
     }, [user?.user_id]);
 
     const handleCreateRole = () => {
-        try {
-            navigate('/add-role');
-        } catch (error) {
-            showToast('Error navigating to create role page', error);
-        }
+
+        navigate('/add-role');
+
     };
 
     const handleEditRole = (role) => {
@@ -102,22 +99,21 @@ const Role = () => {
         });
     };
 
+    // Edit role 
+
     const confirmEditRole = () => {
-        try {
-            const role = confirmModal.data;
-            navigate('/add-role', {
-                state: {
-                    roleId: role.user_roles_id,
-                    roleName: role.name
-                }
-            });
-            setConfirmModal({ isOpen: false, type: '', data: null });
-        } catch (error) {
-            showToast('Error preparing role for editing', error);
-            setConfirmModal({ isOpen: false, type: '', data: null });
-        }
+
+        navigate('/add-role', {
+            state: {
+                roleId: roles.user_roles_id,
+                roleName: roles.name
+            }
+        });
+        setConfirmModal({ isOpen: false, type: '', data: null });
+
     };
 
+    // Delete role handler
     const handleDeleteRole = (role) => {
         if (!canModifyRole(role)) {
             showToast('Admin roles cannot be deleted', 'warning');
@@ -156,10 +152,7 @@ const Role = () => {
         }
     };
 
-    const handleRefresh = () => {
-        fetchRoles();
-        showToast('Refreshing roles...', 'info');
-    };
+
 
     const closeModal = () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
@@ -183,17 +176,10 @@ const Role = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Role Management</h2>
-                        <p className="text-gray-600 mt-1">Manage user roles and assign permissions</p>
+                        {/* <p className="text-gray-600 mt-1">Manage user roles and assign permissions</p> */}
                     </div>
                     <div className="flex space-x-2">
-                        <button
-                            onClick={handleRefresh}
-                            className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50"
-                            disabled={loading}
-                        >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                            <span>Refresh</span>
-                        </button>
+
                         {permissions['user_roles_create'] &&
                             <button
                                 onClick={handleCreateRole}
@@ -206,9 +192,9 @@ const Role = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                        <h3 className="text-lg font-medium text-gray-900">All Roles</h3>
+                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                        <h3 className="text-lg font-medium text-white">All Roles</h3>
                     </div>
 
                     {loading ? (
@@ -255,7 +241,7 @@ const Role = () => {
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-blue-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Role Name

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronUp, ArrowLeft, X, Check, AlertTriangle } from 'lucide-react';
+import { Save, ChevronDown, ChevronUp, ArrowLeft, X, Check, AlertTriangle } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { useRef } from 'react';
 
 const AddRole = () => {
     const navigate = useNavigate();
@@ -24,11 +25,13 @@ const AddRole = () => {
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+    const submitInProgressRef = useRef(false);
 
     // Determine if we're in edit mode and get the current role ID
     const isEditMode = Boolean(roleId) || Boolean(roleIdFromState);
     const currentRoleId = roleId || roleIdFromState;
     console.log(roleId)
+
     // Toast helper functions
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -37,15 +40,8 @@ const AddRole = () => {
     const closeToast = () => {
         setToast(null);
     };
-
-    // Helper function to check if a permission requires view access
-    // const requiresViewPermission = (permissionKey) => {
-    //     const triggerWords = ['edit', 'delete', 'create', 'update', 'add', 'remove'];
-    //     const keyLower = permissionKey.toLowerCase();
-    //     return triggerWords.some(word => keyLower.includes(word));
-    // };
-
-    // Helper function to find view permission in the same subsection
+    
+    // Find view permission in a subsection
     const findViewPermission = (sectionKey, subsectionKey) => {
         const subsection = permissionConfig[sectionKey]?.subsections[subsectionKey];
         if (!subsection) return null;
@@ -305,6 +301,8 @@ const AddRole = () => {
     };
 
     const handleSaveChanges = () => {
+        if (submitInProgressRef.current) return;
+
         if (!name.trim()) {
             showToast('Please enter a role name', 'warning');
             return;
@@ -322,8 +320,13 @@ const AddRole = () => {
         });
     };
 
+
+
+
     const confirmSave = async () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
+        if (submitInProgressRef.current) return;
+        submitInProgressRef.current = true; // mark start of submit
 
         try {
             const permissionItemsIds = [];
@@ -373,6 +376,14 @@ const AddRole = () => {
                 'error'
             );
         }
+        finally {
+            // ✅ Mark as done
+            setTimeout(() => {
+                submitInProgressRef.current = false;
+                setLoading(false);
+            }, 1500);
+
+        }
     };
 
     const handleCancel = () => {
@@ -390,88 +401,6 @@ const AddRole = () => {
 
     const formatPermissionName = (permissionTitle) => {
         return permissionTitle;
-    };
-
-    const renderSection = (sectionKey, config) => {
-        const isExpanded = expandedSections[sectionKey];
-        const { activeCount, totalCount } = getActiveCheckboxCount(sectionKey);
-
-        return (
-            <div key={sectionKey} className="mb-6 bg-gray-50 rounded-lg overflow-hidden">
-                <div
-                    onClick={() => toggleSection(sectionKey)}
-                    className="flex items-center justify-between py-4 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-200"
-                >
-                    <div>
-                        <h3 className="text-sm font-medium text-gray-900">{config.title}</h3>
-                        <p className="text-xs text-gray-500 mt-1">{config.subtitle}</p>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-2">
-                            <span className={`text-xs font-medium px-2 py-1 rounded-full ${activeCount > 0
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {activeCount}/{totalCount} Permissions
-                            </span>
-                            {activeCount > 0 && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
-                        </div>
-
-                        <div className="p-2 rounded-full hover:bg-gray-200 transition-all duration-200">
-                            {isExpanded ? (
-                                <ChevronUp className="w-5 h-5 text-blue-600 transition-transform duration-200" />
-                            ) : (
-                                <ChevronDown className="w-5 h-5 text-blue-600 transition-transform duration-200" />
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-                    } overflow-hidden`}>
-                    <div className="p-6 space-y-6 bg-white">
-                        {Object.entries(config.subsections).map(([subsectionKey, subsection]) => {
-                            const subsectionPerms = permissions[sectionKey]?.[subsectionKey] || {};
-
-                            return (
-                                <div key={subsectionKey} className="border-l-4 border-blue-100 pl-4">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h4 className="text-sm font-medium text-gray-700">{subsection.title}</h4>
-                                        <button
-                                            onClick={() => handlePermissionChange(sectionKey, subsectionKey, 'selectAll')}
-                                            className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 px-2 py-1 rounded hover:bg-blue-50"
-                                        >
-                                            {subsectionPerms.selectAll ? 'Deselect all' : 'Select all'}
-                                        </button>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {subsection.permissions.map(permission => (
-                                            <label
-                                                key={permission.key}
-                                                className="flex items-center space-x-3 cursor-pointer group p-2 rounded-md hover:bg-gray-50 transition-colors duration-150"
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={subsectionPerms[permission.key] || false}
-                                                    onChange={() => handlePermissionChange(sectionKey, subsectionKey, permission.key)}
-                                                    className="w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-150"
-                                                />
-                                                <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
-                                                    {formatPermissionName(permission.title)}
-                                                </span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        );
     };
 
     if (loading) {
@@ -529,48 +458,30 @@ const AddRole = () => {
                 confirmText={confirmModal.type === 'save' ? 'Save' : 'Discard'}
                 cancelText="Cancel"
             />
-
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white sticky top-0 z-10">
-                <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between mb-6 mt-6">
+                <div className="flex items-center space-x-3">
                     <button
                         onClick={handleCancel}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                        <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div>
-                        <h1 className="text-xl font-semibold text-gray-900">
+                        <h2 className="text-2xl font-bold text-gray-900">
                             {isEditMode ? 'Edit Role' : 'Add New Role'}
-                        </h1>
-                        <p className="text-sm text-gray-500 mt-1">
-                            {isEditMode ? 'Modify existing role permissions' : 'Create a new role with custom permissions'}
-                        </p>
+
+                        </h2>
+
                     </div>
-                </div>
-                <div className="flex space-x-3">
-                    <button
-                        onClick={handleCancel}
-                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-200 hover:shadow-sm"
-                    >
-                        Discard
-                    </button>
-                    <button
-                        onClick={handleSaveChanges}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200 hover:shadow-md"
-                    >
-                        Save Changes
-                    </button>
                 </div>
             </div>
 
-            <div className="p-6 bg-gray-50 min-h-screen">
-                <div className="mb-8 bg-white rounded-lg p-6 shadow-sm">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-2">Role Details</h2>
-                    <p className="text-sm text-gray-500 mb-6">Define the role name for better organization</p>
 
+            <div className="p-6 bg-blue-50 min-h-screen rounded-lg">
+                <div className="mb-8 bg-white rounded-lg p-6 shadow-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Role Name *</label>
+                            <label className="block text-lg font-semibold text-gray-900 mb-2">Role Name <span className='text-red-500'>*</span></label>
                             <input
                                 type="text"
                                 value={name}
@@ -584,9 +495,104 @@ const AddRole = () => {
 
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">Permissions</h2>
-                    {Object.entries(permissionConfig).map(([sectionKey, config]) =>
-                        renderSection(sectionKey, config)
-                    )}
+
+                    {Object.entries(permissionConfig).map(([sectionKey, config]) => {
+                        const isExpanded = expandedSections[sectionKey];
+                        const { activeCount, totalCount } = getActiveCheckboxCount(sectionKey);
+
+                        return (
+                            <div key={sectionKey} className="mb-6 bg-gray-50 rounded-lg overflow-hidden">
+                                <div
+                                    onClick={() => toggleSection(sectionKey)}
+                                    className="flex items-center justify-between py-4 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-200"
+                                >
+                                    <div>
+                                        <h3 className="text-sm font-medium text-gray-900">{config.title}</h3>
+                                        <p className="text-xs text-gray-500 mt-1">{config.subtitle}</p>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <div className="flex items-center space-x-2">
+                                            <span className={`text-xs font-medium px-2 py-1 rounded-full ${activeCount > 0
+                                                ? 'bg-blue-100 text-blue-800'
+                                                : 'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {activeCount}/{totalCount} Permissions
+                                            </span>
+                                            {activeCount > 0 && (
+                                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                            )}
+                                        </div>
+                                        <div className="p-2 rounded-full hover:bg-gray-200 transition-all duration-200">
+                                            {isExpanded ? (
+                                                <ChevronUp className="w-5 h-5 text-blue-600 transition-transform duration-200" />
+                                            ) : (
+                                                <ChevronDown className="w-5 h-5 text-blue-600 transition-transform duration-200" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                    <div className="p-6 space-y-6 bg-white">
+                                        {Object.entries(config.subsections).map(([subsectionKey, subsection]) => {
+                                            const subsectionPerms = permissions[sectionKey]?.[subsectionKey] || {};
+
+                                            return (
+                                                <div key={subsectionKey} className="border-l-4 border-blue-100 pl-4">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-sm font-medium text-gray-700">{subsection.title}</h4>
+                                                        <button
+                                                            onClick={() => handlePermissionChange(sectionKey, subsectionKey, 'selectAll')}
+                                                            className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 px-2 py-1 rounded hover:bg-blue-50"
+                                                        >
+                                                            {subsectionPerms.selectAll ? 'Deselect all' : 'Select all'}
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        {subsection.permissions.map(permission => (
+                                                            <label
+                                                                key={permission.key}
+                                                                className="flex items-center space-x-3 cursor-pointer group p-2 rounded-md hover:bg-gray-50 transition-colors duration-150"
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={subsectionPerms[permission.key] || false}
+                                                                    onChange={() => handlePermissionChange(sectionKey, subsectionKey, permission.key)}
+                                                                    className="w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-150"
+                                                                />
+                                                                <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150">
+                                                                    {formatPermissionName(permission.title)}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                        >
+                            Discard
+                        </button>
+                        <button
+                            onClick={handleSaveChanges}
+
+                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save Changes
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
