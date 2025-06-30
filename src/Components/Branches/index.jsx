@@ -5,7 +5,6 @@ import BranchList from "./BranchList";
 import useBranches from "../../hooks/useBranches";
 import { useSelector } from 'react-redux';
 
-
 const Toast = ({ message, type, onClose }) => {
     const getToastStyles = () => {
         switch (type) {
@@ -77,14 +76,14 @@ const Branch = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30">
-            <div className="max-w-6xl mx-auto p-6">
-                {/* Header */}
+            <div className="max-w-6xl mx-auto ">
                 <div className="mb-8">
-                    <div className="text-center">
-                        <h1 className="text-4xl font-bold text-gray-900 pb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                            Branch Management
-                        </h1>
-                    </div>
+                        <div className="text-grey-100 text-center rounded-lg px-6 py-4 -mx-2 -mt-2 mb-4">
+                            <h1 className="text-3xl font-bold text-gray-700">
+                                Branch Management
+                            </h1>
+                        </div>
+                    
                 </div>
 
                 {/* Main Content */}
