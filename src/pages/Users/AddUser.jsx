@@ -4,6 +4,7 @@ import { Save, X, RefreshCw, CheckCircle, AlertCircle, XCircle, ArrowLeft, User,
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
+import { useRef } from 'react';
 
 const AddUser = () => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const AddUser = () => {
     const { user } = useAuth();
     const searchParams = new URLSearchParams(location.search);
     const editUserId = searchParams.get('edit');
+
     // Check if we're editing (passed via navigation state)
     const isEditing = !!editUserId;
 
@@ -25,11 +27,14 @@ const AddUser = () => {
 
     // Component state
     const [roles, setRoles] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [rolesLoading, setRolesLoading] = useState(true);
     const [userDataLoading, setUserDataLoading] = useState(false);
     const [toast, setToast] = useState(null);
     const [errors, setErrors] = useState({});
+
+    const [loading, setLoading] = useState(false);
+
+    const submitInProgressRef = useRef(false);
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -155,8 +160,14 @@ const AddUser = () => {
     };
 
     // Validate form
-    const validateForm = () => {
+    const validateForm = (e) => {
+        e.preventDefault(); // ✅ prevents default form submission
+        // ✅ PREVENT double click before validation completes
+        if (submitInProgressRef.current) return;
         const newErrors = {};
+        if (!user?.user_id) {
+            newErrors.user_id = ('User not authenticated');
+        }
 
         if (!formData.full_name.trim()) {
             newErrors.full_name = 'Full name is required';
@@ -164,6 +175,7 @@ const AddUser = () => {
 
         if (!formData.number.trim()) {
             newErrors.number = 'Phone number is required';
+
         } else if (!/^\d{10}$/.test(formData.number.trim())) {
             newErrors.number = 'Phone number must be 10 digits';
         }
@@ -174,35 +186,34 @@ const AddUser = () => {
             newErrors.email = 'Please enter a valid email address';
         }
 
-        if (!isEditing && !formData.password.trim()) {
+        const trimmedPassword = formData.password.trim();
+        if (!isEditing && !trimmedPassword) {
             newErrors.password = 'Password is required';
-        } else if (!isEditing && formData.password.trim() && formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        } else if (isEditing && formData.password.trim() && formData.password.length < 6) {
+        } else if (trimmedPassword && trimmedPassword.length < 6) {
             newErrors.password = 'Password must be at least 6 characters';
         }
 
         if (!formData.user_roles_id) {
             newErrors.user_roles_id = 'Please select a role';
         }
-
+        console.log('Form is valid, submitting...');
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        console.log(errors, 'Form is valid, submitting...');
+
+        if (Object.keys(newErrors).length === 0) {
+            handleSubmit(); // Let handleSubmit decide when to set the flag
+        }
+
+
     };
 
     // Handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        // ✅ Prevent duplicate call here (only here!)
+        if (submitInProgressRef.current) return;
 
-        if (!validateForm()) {
-            showToast('Please fix the errors in the form', 'error');
-            return;
-        }
-
-        if (!user?.user_id) {
-            showToast('User not authenticated', 'error');
-            return;
-        }
+        submitInProgressRef.current = true; // mark start of submit
+        setLoading(true);
 
         try {
             setLoading(true);
@@ -234,13 +245,19 @@ const AddUser = () => {
                 setTimeout(() => {
                     navigate('/usermanage');
                 }, 1500);
+
             } else {
                 showToast(res.data?.message || 'Failed to save user', 'error');
             }
         } catch (err) {
             showToast(err.response?.data?.message || 'Error saving user', 'error');
         } finally {
-            setLoading(false);
+            // ✅ Mark as done
+            setTimeout(() => {
+                submitInProgressRef.current = false;
+                setLoading(false);
+            }, 1500);
+
         }
     };
 
@@ -279,9 +296,7 @@ const AddUser = () => {
                             <h2 className="text-2xl font-bold text-gray-900">
                                 {isEditing ? 'Edit User' : 'Create New User'}
                             </h2>
-                            <p className="text-gray-600 mt-1">
-                                {isEditing ? 'Update user information and role' : 'Add a new user to the system'}
-                            </p>
+
                             {userDataLoading && (
                                 <p className="text-blue-600 text-sm mt-1 flex items-center">
                                     <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
@@ -292,16 +307,16 @@ const AddUser = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                        <h3 className="text-lg font-medium text-gray-900">User Information</h3>
+                <div className="bg-white rounded-lg border border-blue-200 shadow-sm">
+                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600 rounded-t-lg">
+                        <h3 className="text-lg font-medium text-white">User Information</h3>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    <form onSubmit={validateForm} className="p-6 space-y-6">
                         {/* Full Name */}
                         <div>
                             <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-                                Full Name *
+                                Full Name <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -322,7 +337,7 @@ const AddUser = () => {
                         {/* Phone Number */}
                         <div>
                             <label htmlFor="number" className="block text-sm font-medium text-gray-700 mb-2">
-                                Phone Number *
+                                Phone Number <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="tel"
@@ -343,7 +358,7 @@ const AddUser = () => {
                         {/* Email */}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                                Email Address *
+                                Email Address <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="email"
@@ -364,7 +379,7 @@ const AddUser = () => {
                         {/* Password */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                                Password {!isEditing && '*'}
+                                Password {!isEditing && <span className="text-red-500">*</span>}
                                 {isEditing && <span className="text-gray-500 text-xs ml-1">(Leave blank to keep current password)</span>}
                             </label>
                             <input
@@ -386,7 +401,7 @@ const AddUser = () => {
                         {/* Role Selection */}
                         <div>
                             <label htmlFor="user_roles_id" className="block text-sm font-medium text-gray-700 mb-2">
-                                User Role *
+                                User Role <span className="text-red-500">*</span>
                             </label>
                             <select
                                 id="user_roles_id"

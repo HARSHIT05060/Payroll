@@ -11,7 +11,6 @@ import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
 const UserManagement = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -37,6 +36,8 @@ const UserManagement = () => {
     const canModifyUser = (userData) => {
         return !isAdminUser(userData);
     };
+
+    // fetch users from the API
 
     const fetchUsers = async () => {
         if (!user?.user_id) {
@@ -80,13 +81,7 @@ const UserManagement = () => {
         }
     }, [user?.user_id]);
 
-    const handleCreateUser = () => {
-        try {
-            navigate('/add-user');
-        } catch (error) {
-            showToast('Error navigating to create user page', error);
-        }
-    };
+
 
     const handleEditUser = (userData) => {
         if (!canModifyUser(userData)) {
@@ -151,11 +146,6 @@ const UserManagement = () => {
         }
     };
 
-    const handleRefresh = () => {
-        fetchUsers();
-        showToast('Refreshing users...', 'info');
-    };
-
     const closeModal = () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
     };
@@ -178,19 +168,11 @@ const UserManagement = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-                        <p className="text-gray-600 mt-1">Manage users and their information</p>
                     </div>
                     <div className="flex space-x-2">
-                        <button
-                            onClick={handleRefresh}
-                            className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50"
-                            disabled={loading}
-                        >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                            <span>Refresh</span>
-                        </button>
+
                         {permissions['user_create'] && <button
-                            onClick={handleCreateUser}
+                            onClick={() => navigate('/add-user')}
                             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
@@ -199,9 +181,9 @@ const UserManagement = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                        <h3 className="text-lg font-medium text-gray-900">All Users</h3>
+                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                        <h3 className="text-lg font-medium text-white">All Users</h3>
                     </div>
 
                     {loading ? (
@@ -237,7 +219,7 @@ const UserManagement = () => {
                                     You haven't created any users yet. Create your first user to get started with user management.
                                 </p>
                                 <button
-                                    onClick={handleCreateUser}
+                                    onClick={() => navigate('/add-user')}
                                     className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
@@ -370,6 +352,7 @@ const UserManagement = () => {
                 type="danger"
             />
 
+            {/* Confirmation Modals */}
             <ConfirmationModal
                 isOpen={confirmModal.isOpen && confirmModal.type === 'edit'}
                 onClose={closeModal}
