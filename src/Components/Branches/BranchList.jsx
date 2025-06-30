@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, MapPin, Building2, AlertTriangle, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 
 const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
