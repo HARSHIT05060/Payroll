@@ -29,18 +29,9 @@ const AddRole = () => {
 
     // Determine if we're in edit mode and get the current role ID
     const isEditMode = Boolean(roleId) || Boolean(roleIdFromState);
-    const currentRoleId = roleId || roleIdFromState;
-    console.log(roleId)
+    const currentRoleId = roleId || roleIdFromState; 
 
-    // Toast helper functions
-    const showToast = (message, type = 'info') => {
-        setToast({ message, type });
-    };
 
-    const closeToast = () => {
-        setToast(null);
-    };
-    
     // Find view permission in a subsection
     const findViewPermission = (sectionKey, subsectionKey) => {
         const subsection = permissionConfig[sectionKey]?.subsections[subsectionKey];
@@ -70,7 +61,9 @@ const AddRole = () => {
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message);
-            showToast('Failed to load permissions', 'error');
+
+            setToast({ message: 'Failed to load permissions', type: 'error' });
+
             return null;
         }
     };
@@ -100,7 +93,9 @@ const AddRole = () => {
 
             throw new Error('Could not fetch role permissions');
         } catch (error) {
-            showToast('Failed to load role permissions', error);
+
+            setToast({ message: 'Failed to load permissions', type: 'error' });
+
             return [];
         }
     };
@@ -132,7 +127,9 @@ const AddRole = () => {
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message);
-            showToast('Failed to load role data', 'error');
+
+            setToast({ message: 'Failed to load role data', type: 'error' });
+
             return null;
         }
     };
@@ -236,7 +233,9 @@ const AddRole = () => {
                 }
             } catch (error) {
                 setError('Failed to load data');
-                showToast('Failed to load data', error);
+
+                setToast({ message: 'Failed to load data', type: 'error' });
+
             } finally {
                 setLoading(false);
             }
@@ -304,12 +303,15 @@ const AddRole = () => {
         if (submitInProgressRef.current) return;
 
         if (!name.trim()) {
-            showToast('Please enter a role name', 'warning');
+          
+            setToast({ message: 'Please enter a role name', type: 'warning' });
+
             return;
         }
 
         if (!user || !user.user_id) {
-            showToast('Admin user ID is required. Please log in again.', 'error');
+            setToast({ message: 'Admin user ID is required. Please log in again.', type: 'error' });
+
             return;
         }
 
@@ -319,9 +321,6 @@ const AddRole = () => {
             data: null
         });
     };
-
-
-
 
     const confirmSave = async () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
@@ -360,10 +359,8 @@ const AddRole = () => {
             });
 
             if (response.data.success) {
-                showToast(
-                    isEditMode ? 'Role updated successfully!' : 'Role created successfully!',
-                    'success'
-                );
+              
+                setToast({ message: isEditMode ? 'Role updated successfully!' : 'Role created successfully!', type: 'success' });
                 setTimeout(() => {
                     navigate('/role');
                 }, 1500);
@@ -371,10 +368,8 @@ const AddRole = () => {
                 throw new Error(response.data.message || 'Failed to save role');
             }
         } catch (err) {
-            showToast(
-                'Error saving role: ' + (err.response?.data?.message || err.message),
-                'error'
-            );
+           
+            setToast({ message: 'Error saving role: ' + (err.response?.data?.message || err.message), type: 'error' });
         }
         finally {
             // ✅ Mark as done
@@ -440,7 +435,7 @@ const AddRole = () => {
                 <Toast
                     message={toast.message}
                     type={toast.type}
-                    onClose={closeToast}
+                    onClose={() => setToast(null)}
                 />
             )}
 
