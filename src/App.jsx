@@ -150,9 +150,9 @@ const App = () => {
             {/* ---------------- Loan section ----------------- */}
             <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
 
-            <Route path="/bulk-attendance" element={<BulkAttendance />} />
-            <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
-            <Route path="/finalize-payroll" element={<FinalizePayroll />} />
+            <Route path="/bulk-attendance" element={<ProtectedRoute><BulkAttendance /></ProtectedRoute>} />
+            <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
+            <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
 
             <Route path="*" element={<Navigate to="/unauthorized" replace />} />
           </Routes>
