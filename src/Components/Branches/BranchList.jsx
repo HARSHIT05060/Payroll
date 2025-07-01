@@ -2,9 +2,10 @@ import React, { useState, useMemo } from "react";
 import { Trash2, MapPin, Building2, AlertTriangle, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
+import BranchForm from "./BranchForm";
+import useBranches from "../../hooks/useBranches";
 
-
-const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
+const BranchList = () => {
     const [deletingId, setDeletingId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [confirmModal, setConfirmModal] = useState({
@@ -13,6 +14,36 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
         data: null
     });
     const permissions = useSelector(state => state.permissions) || {};
+
+    const {
+        branches,
+        loading,
+        addBranch,
+        deleteBranch,
+    } = useBranches();
+
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 5000);
+    };
+
+    const handleAddBranch = async (name) => {
+        const result = await addBranch(name);
+        return result;
+    };
+
+    const handleDeleteBranch = async (id) => {
+        const result = await deleteBranch(id);
+        if (result && result.success) {
+            showToast("Branch deleted successfully!", "success");
+        } else {
+            showToast("Failed to delete branch. Please try again.", "error");
+        }
+    };
+
+
 
     // Real-time search filtering using useMemo for performance
     const filteredBranches = useMemo(() => {
@@ -37,27 +68,20 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
 
     // eslint-disable-next-line no-unused-vars
     const confirmDeleteBranch = async () => {
-        const branch = confirmModal.data;
-        if (!branch) return;
+    const branch = confirmModal.data;
+    if (!branch) return;
+    const branchId = branch.branch_id || branch.id;
+    setDeletingId(branchId);
+    try {
+        await handleDeleteBranch(branchId);
+    } catch (error) {
+        showToast("An error occurred while deleting the branch.", "error");
+    } finally {
+        setDeletingId(null);
+        closeModal();
+    }
+};
 
-        const branchId = branch.branch_id || branch.id;
-        setDeletingId(branchId);
-
-        try {
-            const result = await onDelete(branchId);
-
-            if (result && !result.success) {
-                showToast("Failed to delete branch. Please try again.", "error");
-            } else {
-                showToast("Branch deleted successfully!", "success");
-            }
-        } catch (error) {
-            showToast("An error occurred while deleting the branch.", error);
-        } finally {
-            setDeletingId(null);
-            closeModal();
-        }
-    };
 
     const closeModal = () => {
         if (!deletingId) {
@@ -116,38 +140,14 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
                     </div>
                 </div>
 
-                {/* Search Bar */}
-                {totalBranches > 0 && (
-                    <div className="px-6 py-4 bg-blue-50/30 border-b border-gray-100">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search branches by name, description, or location..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={clearSearch}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
-                            )}
-                        </div>
-                        {searchTerm && (
-                            <p className="text-sm text-blue-600 mt-2">
-                                Showing {filteredCount} of {totalBranches} branches
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white">
+                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white flex flex-col gap-4">
+                    {permissions['branch_create'] &&
+                        <BranchForm
+                            onSubmit={handleAddBranch}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
                     {totalBranches === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -234,6 +234,7 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
                         </div>
                     )}
                 </div>
+
             </div>
 
             <ConfirmationModal
@@ -241,7 +242,7 @@ const BranchList = ({ branches, onDelete, loading = false, showToast }) => {
                 onClose={closeModal}
                 onConfirm={confirmDeleteBranch}
                 title="Delete User"
-                message={`Are you sure you want to delete "${confirmModal.data?.full_name || 'this user'}"? This action cannot be undone.`}
+                message={`Are you sure you want to delete "${confirmModal.data?.full_name || 'this Branch'}"? This action cannot be undone.`}
                 confirmText="Delete"
                 cancelText="Cancel"
                 type="danger"
