@@ -1,477 +1,501 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Calendar, Users, AlertCircle, Loader2, RotateCcw, Filter } from 'lucide-react';
+import {
+  Users,
+  Calendar,
+  IndianRupee,
+  Search,
+  RefreshCw,
+  XCircle,
+  FileText,
+  Mail,
+  CreditCard,
+  ChevronDown,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  TrendingUp
+} from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axiosInstance';
 
-
-const API_BASE_URL =
-  import.meta.env.MODE === "development"
-    ? import.meta.env.VITE_API_URL_LOCAL
-    : import.meta.env.VITE_API_URL_PROD;
-// API service layer with enhanced error handling
-const payrollService = {
-  async fetchMonthlyPayroll(year, month) {
-    try {
-      // Convert month to string with leading zero if needed (e.g., "01", "02")
-      const monthStr = month.toString().padStart(2, '0');
-      const yearStr = year.toString();
-
-      const response = await fetch(`${API_BASE_URL}/api/payroll/monthly/all?year=${yearStr}&month=${monthStr}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        try {
-          const errorData = await response.text();
-          if (errorData.startsWith('{')) {
-            const jsonError = JSON.parse(errorData);
-            errorMessage = jsonError.message || jsonError.error || errorMessage;
-          }
-        } catch (error) {
-          console.error('Failed to parse error response:', error);
-          // If 
-        }
-        throw new Error(errorMessage);
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const responseText = await response.text();
-        console.error('Non-JSON response received:', responseText.substring(0, 200));
-        throw new Error('Server returned non-JSON response. Please check your API endpoint.');
-      }
-
-      const data = await response.json();
-
-      return data;
-    } catch (error) {
-      console.error('Payroll fetch error:', error);
-
-      if (error.message.includes('Failed to fetch')) {
-        throw new Error('Cannot connect to server. Please check if your API server is running on http://localhost:5000');
-      } else if (error.message.includes('Unexpected token')) {
-        throw new Error('Server returned invalid JSON. The API might be returning an HTML error page.');
-      } else if (error.name === 'TypeError') {
-        throw new Error('Network error. Please check your internet connection and API server.');
-      }
-
-      throw new Error(error.message || 'Failed to fetch payroll data');
-    }
-  }
-};
-
-// Constants for better maintainability
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
-const CURRENT_YEAR = new Date().getFullYear();
-const CURRENT_MONTH = new Date().getMonth() + 1;
-
-// Custom hook for payroll data management
-const usePayrollData = () => {
-  const [year, setYear] = useState(CURRENT_YEAR);
-  const [month, setMonth] = useState(CURRENT_MONTH);
-  const [payrollData, setPayrollData] = useState([]);
-  const [loading, setLoading] = useState(false);
+const MonthlyPayroll = () => {
+  const [employees, setEmployees] = useState([]);
+  const [payrollData, setPayrollData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const fetchPayrollData = useCallback(async (selectedYear, selectedMonth) => {
-    setLoading(true);
-    setError(null);
+  const { user, isAuthenticated, logout } = useAuth();
 
+  // Constants
+  const months = [
+    { value: '01', label: 'January' }, { value: '02', label: 'February' },
+    { value: '03', label: 'March' }, { value: '04', label: 'April' },
+    { value: '05', label: 'May' }, { value: '06', label: 'June' },
+    { value: '07', label: 'July' }, { value: '08', label: 'August' },
+    { value: '09', label: 'September' }, { value: '10', label: 'October' },
+    { value: '11', label: 'November' }, { value: '12', label: 'December' }
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+  // Fetch employees data
+  const fetchEmployees = useCallback(async () => {
     try {
-      const data = await payrollService.fetchMonthlyPayroll(selectedYear, selectedMonth);
+      setLoading(true);
+      setError(null);
 
-      let processedData = [];
-      if (Array.isArray(data)) {
-        processedData = data;
-      } else if (data && data.data && Array.isArray(data.data)) {
-        processedData = data.data;
-      } else if (data && data.payroll && Array.isArray(data.payroll)) {
-        processedData = data.payroll;
-      } else if (data && typeof data === 'object') {
-        processedData = [data];
+      if (!user?.user_id) {
+        throw new Error('User ID is required');
       }
-      setPayrollData(processedData);
 
-    } catch (err) {
-      setError(err.message);
-      setPayrollData([]);
+      const formData = new FormData();
+      formData.append('user_id', user.user_id);
+
+      const response = await api.post('assign_shift_list_drop_down', formData);
+
+      if (response.data?.success) {
+        setEmployees(response.data.data?.employee_list || []);
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch employees');
+      }
+
+    } catch (error) {
+      console.error("Fetch employees error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+      if (error.response?.status === 401) {
+        setError("Your session has expired. Please login again.");
+        setTimeout(() => logout?.(), 2000);
+      } else if (error.response?.status === 403) {
+        setError("You don't have permission to access payroll data.");
+      } else if (error.response?.status >= 500) {
+        setError("Server error. Please try again later.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
+  }, [user, logout]);
+
+  // Generate payroll data
+  const handleGeneratePayroll = useCallback(async () => {
+    if (!selectedEmployee || !selectedMonth || !selectedYear) {
+      setError('Please select employee, month, and year');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const formData = new FormData();
+      formData.append('user_id', user.user_id);
+      formData.append('employee_id', selectedEmployee);
+      formData.append('month_year', `${selectedYear}-${selectedMonth}`);
+
+      const response = await api.post('employee_wise_search_salary', formData);
+
+      if (response.data?.success) {
+        setPayrollData(response.data.data);
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch payroll data');
+      }
+    } catch (error) {
+      console.error('Error fetching payroll data:', error);
+      setError(error.response?.data?.message || error.message || 'Failed to load payroll data');
+      setPayrollData(null);
+    } finally {
+      setSubmitting(false);
+    }
+  }, [selectedEmployee, selectedMonth, selectedYear, user]);
+
+  // Filter employees based on search term
+  const filteredEmployees = useMemo(() => {
+    return employees.filter(employee =>
+      employee.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.employee_id?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [employees, searchTerm]);
+
+  // Handle employee selection
+  const handleEmployeeSelect = useCallback((employee) => {
+    setSelectedEmployee(employee.employee_id);
+    setSearchTerm(employee.full_name);
+    setIsDropdownOpen(false);
+    setPayrollData(null);
+    setError(null);
   }, []);
 
-  useEffect(() => {
-    fetchPayrollData(year, month);
-  }, [year, month, fetchPayrollData]);
-
-  return {
-    year,
-    month,
-    payrollData,
-    loading,
-    error,
-    setYear,
-    setMonth,
-    refetch: () => fetchPayrollData(year, month)
-  };
-};
-
-// Utility function to format currency in Indian Rupees
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 2
-  }).format(amount || 0);
-};
-
-// FIXED: Enhanced utility function to safely get salary value from different possible field names
-const getSalaryValue = (record) => {
-  const possibleFields = [
-    'payableSalary',
-    'salary',
-    'amount',
-    'totalSalary',
-    'netSalary',
-    'grossSalary',
-    'finalSalary',
-    'payableAmount',
-    'netAmount',
-    'totalAmount'
-  ];
-
-  for (const field of possibleFields) {
-    if (record[field] !== undefined && record[field] !== null && record[field] !== '') {
-      // Handle both string and number values
-      let value;
-      if (typeof record[field] === 'string') {
-        // Remove any currency symbols, commas, and whitespace
-        const cleanedValue = record[field].replace(/[₹$,\s]/g, '');
-        value = parseFloat(cleanedValue);
-      } else {
-        value = parseFloat(record[field]);
-      }
-
-      if (!isNaN(value) && isFinite(value)) {
-        return value;
-      }
+  // Get status badge color
+  const getStatusBadgeColor = useCallback((statusId) => {
+    switch (statusId) {
+      case '3': return 'bg-green-100 text-green-800';
+      case '2': return 'bg-yellow-100 text-yellow-800';
+      case '1': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
+  }, []);
+
+  // Calculate overtime summary from week_of_salary (which includes both overtime and week off pay)
+  const calculateOvertimeSummary = useCallback(() => {
+    if (!payrollData?.main_attendance_arr) return { totalOvertime: 0, overtimeAndWeekOffPay: 0 };
+
+    let totalOvertime = 0;
+    let overtimeAndWeekOffPay = parseFloat(payrollData.week_of_salary || 0);
+
+    // Calculate total overtime hours from attendance
+    payrollData.main_attendance_arr.forEach(shiftData => {
+      shiftData.attendance_arr?.forEach(attendance => {
+        const overtime = parseFloat(attendance.overtime || 0);
+        totalOvertime += overtime;
+      });
+    });
+
+    return { totalOvertime, overtimeAndWeekOffPay };
+  }, [payrollData]);
+
+  // Initialize component
+  useEffect(() => {
+    if (isAuthenticated() && user?.user_id) {
+      fetchEmployees();
+
+      // Set default month and year to current
+      const now = new Date();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+      setSelectedMonth(currentMonth);
+      setSelectedYear(currentYear.toString());
+    }
+  }, [isAuthenticated, fetchEmployees, user?.user_id, currentYear]);
+
+  // Clear error when selections change
+  useEffect(() => {
+    if (error && (selectedEmployee || selectedMonth || selectedYear)) {
+      setError(null);
+    }
+  }, [selectedEmployee, selectedMonth, selectedYear, error]);
+
+  // Redirect if not authenticated
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
   }
 
-  console.warn('No valid salary field found in record:', record);
-  return 0;
-};
-
-// Loading skeleton component
-const LoadingSkeleton = () => (
-  <div className="animate-pulse">
-    <div className="h-8 bg-gray-200 rounded mb-4"></div>
-    {[...Array(5)].map((_, i) => (
-      <div key={i} className="flex space-x-4 mb-3">
-        <div className="h-4 bg-gray-200 rounded flex-1"></div>
-        <div className="h-4 bg-gray-200 rounded flex-1"></div>
-        <div className="h-4 bg-gray-200 rounded flex-1"></div>
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-      </div>
-    ))}
-  </div>
-);
-
-// Error display component
-const ErrorMessage = ({ error, onRetry }) => (
-  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
-    <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-    <div className="flex-1">
-      <h3 className="text-sm font-medium text-red-800">Error Loading Data</h3>
-      <p className="text-sm text-red-600 mt-1">{error}</p>
-      <button
-        onClick={onRetry}
-        className="mt-2 text-sm text-red-600 hover:text-red-800 underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-      >
-        Try again
-      </button>
-    </div>
-  </div>
-);
-
-// Empty state component
-const EmptyState = () => (
-  <div className="text-center py-12">
-    <Users className="mx-auto h-12 w-12 text-gray-400" />
-    <h3 className="mt-4 text-lg font-medium text-gray-900">No payroll data found</h3>
-    <p className="mt-2 text-sm text-gray-500">
-      No payroll records exist for the selected month and year.
-    </p>
-  </div>
-);
-
-
-// Main component
-const MonthlyPayroll = () => {
-  const {
-    year,
-    month,
-    payrollData,
-    loading,
-    error,
-    setYear,
-    setMonth,
-    refetch
-  } = usePayrollData();
-
-  // Year options for better UX
-  const yearOptions = useMemo(() => {
-    const years = [];
-    for (let i = CURRENT_YEAR - 5; i <= CURRENT_YEAR + 1; i++) {
-      years.push(i);
-    }
-    return years;
-  }, []);
-
-  // Event handlers with validation
-  const handleYearChange = useCallback((e) => {
-    const newYear = parseInt(e.target.value, 10);
-    if (!isNaN(newYear) && newYear >= 2000 && newYear <= 2100) {
-      setYear(newYear);
-    }
-  }, [setYear]);
-
-  const handleMonthChange = useCallback((e) => {
-    const newMonth = parseInt(e.target.value, 10);
-    if (!isNaN(newMonth) && newMonth >= 1 && newMonth <= 12) {
-      setMonth(newMonth);
-    }
-  }, [setMonth]);
+  const overtimeSummary = calculateOvertimeSummary();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <Calendar className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Monthly Payroll</h1>
-              <p className="text-sm text-gray-600">
-                {MONTHS[month - 1]} {year} • {payrollData.length} employees
-              </p>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Monthly Payroll</h2>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+        {/* Header section */}
+        <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+          <div className="flex items-center">
+            <IndianRupee className="h-6 w-6 text-white mr-2" />
+            <h3 className="text-lg font-medium text-white">Payroll Generation</h3>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Filter className="h-5 w-5 text-gray-500" />
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+        {/* Filter Section */}
+        <div className="p-6 border-b border-gray-200 bg-gray-50">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Employee Search Dropdown */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Users className="w-4 h-4 inline mr-2" />
+                Select Employee
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search employee by name or ID..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsDropdownOpen(true);
+                    if (!e.target.value) {
+                      setSelectedEmployee('');
+                      setPayrollData(null);
+                    }
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={loading}
+                />
+
+                {isDropdownOpen && filteredEmployees.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                    {filteredEmployees.map((employee) => (
+                      <div
+                        key={employee.employee_id}
+                        className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                        onClick={() => handleEmployeeSelect(employee)}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{employee.full_name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {isDropdownOpen && searchTerm && filteredEmployees.length === 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1">
+                    <div className="p-3 text-gray-500 text-center">No employees found</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Month Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="w-4 h-4 inline mr-2" />
+                Select Month
+              </label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => {
+                  setSelectedMonth(e.target.value);
+                  setPayrollData(null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={loading}
+              >
+                <option value="">Choose Month</option>
+                {months.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Year Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Year
+              </label>
+              <select
+                value={selectedYear}
+                onChange={(e) => {
+                  setSelectedYear(e.target.value);
+                  setPayrollData(null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={loading}
+              >
+                <option value="">Choose Year</option>
+                {years.map((year) => (
+                  <option key={year} value={year.toString()}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label htmlFor="year-select" className="block text-sm font-medium text-gray-700 mb-2">
-                Year
-              </label>
-              <select
-                id="year-select"
-                value={year}
-                onChange={handleYearChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                aria-label="Select year"
-              >
-                {yearOptions.map((yearOption) => (
-                  <option key={yearOption} value={yearOption}>
-                    {yearOption}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Generate Button */}
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleGeneratePayroll}
+              disabled={submitting || !selectedEmployee || !selectedMonth || !selectedYear}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2"
+            >
+              <IndianRupee className="w-4 h-4" />
+              {submitting ? 'Generating...' : 'Generate Payroll'}
+            </button>
+          </div>
+        </div>
 
-            <div>
-              <label htmlFor="month-select" className="block text-sm font-medium text-gray-700 mb-2">
-                Month
-              </label>
-              <select
-                id="month-select"
-                value={month}
-                onChange={handleMonthChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                aria-label="Select month"
-              >
-                {MONTHS.map((monthName, index) => (
-                  <option key={index + 1} value={index + 1}>
-                    {monthName}
-                  </option>
-                ))}
-              </select>
+        {/* Content section */}
+        {loading ? (
+          <div className="px-6 py-12 text-center">
+            <div className="inline-flex items-center space-x-2 text-gray-500">
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              <span>Loading employees...</span>
             </div>
-
-            <div className="sm:col-span-2 lg:col-span-2 flex items-end">
+          </div>
+        ) : error ? (
+          <div className="px-6 py-12 text-center">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+              <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <p className="text-red-700 text-lg font-medium mb-2">Error Loading Data</p>
+              <p className="text-red-600 mb-4">{error}</p>
               <button
-                onClick={refetch}
-                disabled={loading}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-                aria-label="Refresh payroll data"
+                onClick={fetchEmployees}
+                className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
               >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RotateCcw className="h-4 w-4" />
-                )}
-                <span>{loading ? 'Loading...' : 'Refresh'}</span>
+                <RefreshCw className="w-4 h-4" />
+                <span>Try Again</span>
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          {error ? (
-            <div className="p-6">
-              <ErrorMessage error={error} onRetry={refetch} />
+        ) : employees.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-700 text-lg font-medium mb-2">No Employees Found</p>
+              <p className="text-gray-500 text-sm">
+                No employees available for payroll generation. Please add employees first.
+              </p>
             </div>
-          ) : loading ? (
-            <div className="p-6">
-              <LoadingSkeleton />
-            </div>
-          ) : payrollData.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="overflow-hidden">
-              {/* Table for larger screens */}
-              <div className="hidden lg:block">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Employee
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Period
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Working Days
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Paid Days
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payable Salary
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {payrollData.map((record, index) => {
-                        const salaryValue = getSalaryValue(record);
-                        const isZeroSalary = salaryValue === 0;
-
-                        return (
-                          <tr
-                            key={record._id || index}
-                            className={`hover:bg-gray-50 transition-colors ${isZeroSalary ? 'bg-red-50' : ''}`}
-                          >
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">
-                                  {record.employeeName || 'Naa/A'}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  ID: {record.employeeCode || 'N/A'}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {MONTHS[(parseInt(record.month) || month) - 1]} {record.year || year}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {record.totalWorkingDays || 0}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <span className={record.totalPaidDays === 0 ? 'text-red-600 font-medium' : ''}>
-                                {record.totalPaidDays || 0}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                              <div>
-                                <div className={`font-medium ${isZeroSalary ? 'text-red-600' : 'text-gray-900'}`}>
-                                  {formatCurrency(salaryValue)}
-                                </div>
-                                {isZeroSalary && (
-                                  <div className="text-xs text-red-500 flex items-center justify-end mt-1">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    Zero salary detected
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+          </div>
+        ) : payrollData ? (
+          <div className="p-6">
+            {/* Salary Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {/* Base Salary */}
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <IndianRupee className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-blue-600">Base Salary</p>
+                    <p className="text-lg font-bold text-blue-900">₹{parseFloat(payrollData.total_salary || 0).toLocaleString()}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Card layout for smaller screens */}
-              <div className="lg:hidden p-4 space-y-4">
-                {payrollData.map((record, index) => {
-                  const salaryValue = getSalaryValue(record);
-                  const isZeroSalary = salaryValue === 0;
+              {/* Overtime & Week Off Pay Combined */}
+              <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                <div className="flex items-center">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <Clock className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-green-600">Overtime & Week Off Pay</p>
+                    <p className="text-lg font-bold text-green-900">₹{overtimeSummary.overtimeAndWeekOffPay.toLocaleString()}</p>
+                    <p className="text-xs text-green-600">{overtimeSummary.totalOvertime}h overtime total</p>
+                  </div>
+                </div>
+              </div>
 
-                  return (
-                    <div
-                      key={record._id || index}
-                      className={`rounded-lg p-4 border border-gray-200 ${isZeroSalary ? 'bg-red-50 border-red-200' : 'bg-gray-50'}`}
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900">
-                            {record.employeeName || 'N/aaA'}
-                          </h3>
-                          <p className="text-xs text-gray-500">ID: {record.employeeCode || 'N/A'}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className={`text-sm font-bold ${isZeroSalary ? 'text-red-600' : 'text-gray-900'}`}>
-                            {formatCurrency(salaryValue)}
-                          </p>
-                          {isZeroSalary && (
-                            <div className="text-xs text-red-500 flex items-center justify-end mt-1">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Zero salary
-                            </div>
-                          )}
-                          <div className="text-xs text-gray-500">
-                            {MONTHS[(parseInt(record.month) || month) - 1]} {record.year || year}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Working Days:</span>
-                          <span className="ml-1 font-medium">{record.totalWorkingDays || 0}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Paid Days:</span>
-                          <span className={`ml-1 font-medium ${record.totalPaidDays === 0 ? 'text-red-600' : ''}`}>
-                            {record.totalPaidDays || 0}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Total Payable */}
+              <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                <div className="flex items-center">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-purple-600">Total Payable</p>
+                    <p className="text-lg font-bold text-purple-900">₹{parseFloat(payrollData.pay_salary || 0).toLocaleString()}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Payroll Data Display */}
+            <div className="space-y-6">
+              {payrollData.main_attendance_arr?.map((shiftData, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200">
+                  {/* Shift Header */}
+                  <div className="p-6 border-b border-gray-200 bg-blue-50">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">{shiftData.shift_name} Shift</h3>
+                        <p className="text-gray-600">Working Days: {shiftData.total_working_days}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">Shift Total Salary</p>
+                        <p className="text-lg font-bold text-blue-600">₹{parseFloat(shiftData.total_salary || 0).toLocaleString()}</p>
+                        <p className="text-sm text-gray-600">Shift Overtime & Week Off: ₹{parseFloat(shiftData.shift_week_of_salary || 0).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Attendance Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overtime</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hourly Rate</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Salary</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {shiftData.attendance_arr?.map((attendance, attendanceIndex) => (
+                          <tr key={attendanceIndex} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(attendance.attendance_date).toLocaleDateString('en-GB')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(attendance.status_id)}`}>
+                                {attendance.status_name}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {attendance.actual_hours}h
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {attendance.overtime > 0 ? (
+                                <span className="text-orange-600 font-medium">{attendance.overtime}h</span>
+                              ) : (
+                                <span className="text-gray-400">0h</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              ₹{parseFloat(attendance.hourly_salary_for_day).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              ₹{parseFloat(attendance.daily_salary_for_day).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 justify-end pt-6">
+                <button className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                  <CreditCard className="w-4 h-4" />
+                  Process Payment
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="px-6 py-12 text-center">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <IndianRupee className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-700 text-lg font-medium mb-2">Ready to Generate Payroll</p>
+              <p className="text-gray-500 text-sm">
+                Select an employee, month, and year above to generate their monthly payroll report.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Click outside to close dropdown */}
+        {isDropdownOpen && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsDropdownOpen(false)}
+          />
+        )}
       </div>
     </div>
   );
