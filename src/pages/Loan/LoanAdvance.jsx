@@ -1,19 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Eye, FileText, Trash2, CheckCircle, AlertCircle, Info, X, Edit } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
-import api from '../../api/axiosInstance'; // Adjust path as needed
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+    Plus,
+    Eye,
+    Edit,
+    Search,
+    RefreshCw,
+    XCircle,
+    CreditCard,
+    ChevronDown,
+    ChevronUp,
+    Users,
+    DollarSign
+} from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axiosInstance';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { LoanDetailsModal } from '../../Components/ui/LoanDetailsModal';
 
+const SORT_DIRECTIONS = {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending'
+};
+
+const COLUMN_KEYS = {
+    EMPLOYEE_NAME: 'employee_name',
+    LOAN_TYPE: 'loan_type',
+    AMOUNT: 'amount',
+    INTEREST_RATE: 'interest_rate',
+    TENURE: 'tenure',
+    INSTALLMENT: 'installment_amount',
+    OUTSTANDING: 'outstanding',
+    STATUS: 'loan_status'
+};
+
+const KEY_MAPPING = {
+    [COLUMN_KEYS.EMPLOYEE_NAME]: 'employee_full_name',
+    [COLUMN_KEYS.LOAN_TYPE]: 'loan_type_name',
+    [COLUMN_KEYS.AMOUNT]: 'amount',
+    [COLUMN_KEYS.INTEREST_RATE]: 'interest_rate',
+    [COLUMN_KEYS.TENURE]: 'tenure',
+    [COLUMN_KEYS.INSTALLMENT]: 'installment_amount',
+    [COLUMN_KEYS.STATUS]: 'loan_status'
+};
+
 const LoanAdvance = () => {
     const [loans, setLoans] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredLoans, setFilteredLoans] = useState([]);
     const [filter, setFilter] = useState('All Loans/Advances');
     const [toast, setToast] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: SORT_DIRECTIONS.ASCENDING
+    });
 
-
-    // New states for dynamic dropdown data
+    // Dropdown data states
     const [dropdownData, setDropdownData] = useState({
         loan_type_list: [],
         loan_priority_list: [],
@@ -21,32 +66,49 @@ const LoanAdvance = () => {
     });
     const [dropdownLoading, setDropdownLoading] = useState(false);
 
-    const permissions = useSelector(state => state.permissions) || {};
-
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loanDetails, setLoanDetails] = useState([]);
     const [modalLoading, setModalLoading] = useState(false);
 
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuth();
+    const permissions = useSelector(state => state.permissions) || {};
+
+    // Toast functions
+    const showToast = useCallback((message, type = 'info') => {
+        setToast({ message, type });
+    }, []);
+
+    const hideToast = useCallback(() => {
+        setToast(null);
+    }, []);
 
     // Dynamic filter options based on API data
-    const getFilterOptions = () => {
+    const getFilterOptions = useMemo(() => {
         const baseOptions = ['All Loans/Advances'];
         const statusOptions = dropdownData.loan_status_list.map(status => status.name);
         return [...baseOptions, ...statusOptions];
-    };
+    }, [dropdownData.loan_status_list]);
 
-    const showToast = (message, type = 'info') => {
-        setToast({ message, type });
-    };
+    // Calculate outstanding amount
+    const calculateOutstandingAmount = useCallback((loan) => {
+        try {
+            const amount = parseFloat(loan.amount || 0);
 
-    const hideToast = () => {
-        setToast(null);
-    };
+            if (loan.loan_status === 'Closed' || loan.status === '0') {
+                return 0;
+            }
+
+            return amount; // Return original loan amount as outstanding for now
+        } catch (error) {
+            console.error('Error calculating outstanding amount:', error);
+            return 0;
+        }
+    }, []);
 
     // Fetch dropdown data from API
-    const fetchDropdownData = async () => {
+    const fetchDropdownData = useCallback(async () => {
         try {
             setDropdownLoading(true);
             const response = await api.post('loan_drop_down_list');
@@ -63,95 +125,142 @@ const LoanAdvance = () => {
             }
         } catch (err) {
             console.error('Error fetching dropdown data:', err);
-            showToast('Failed to load dropdown data. Using default options.', 'error');
+            showToast('Failed to load dropdown data', 'error');
         } finally {
             setDropdownLoading(false);
         }
-    };
+    }, [showToast]);
 
     // Fetch loans from API
-    const fetchLoanData = async () => {
+    const fetchLoanData = useCallback(async () => {
         try {
+            setLoading(true);
+            setError(null);
+
             if (!user?.user_id) {
-                return;
+                throw new Error('User ID is required');
             }
 
-            setLoading(true);
             const formData = new FormData();
             formData.append('user_id', user.user_id);
 
             const response = await api.post('loan_list', formData);
 
-            if (response.data.success) {
+            if (response.data?.success) {
                 const loanData = response.data.data || response.data.loans || [];
                 setLoans(Array.isArray(loanData) ? loanData : []);
+            } else if (Array.isArray(response.data)) {
+                setLoans(response.data);
             } else {
-                showToast(response.data.message || 'Failed to fetch loan data', 'error');
-                setLoans([]);
+                throw new Error(response.data?.message || 'Failed to fetch loan data');
             }
-        } catch (err) {
-            console.error('Error fetching loan data:', err);
-            showToast('Failed to load loan data. Please try again.', 'error');
+
+        } catch (error) {
+            console.error("Fetch loans error:", error);
+            const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+            if (error.response?.status === 401) {
+                setError("Your session has expired. Please login again.");
+                setTimeout(() => logout?.(), 2000);
+            } else if (error.response?.status === 403) {
+                setError("You don't have permission to view loans.");
+            } else if (error.response?.status >= 500) {
+                setError("Server error. Please try again later.");
+            } else {
+                setError(errorMessage);
+            }
             setLoans([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, logout]);
+
+    // Search and filter effect
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            let filtered = loans;
+
+            // Apply status filter
+            if (filter !== 'All Loans/Advances') {
+                filtered = filtered.filter(loan => loan.loan_status === filter);
+            }
+
+            // Apply search filter
+            if (searchQuery) {
+                filtered = filtered.filter(loan => {
+                    return Object.values(loan).some(value =>
+                        String(value).toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                });
+            }
+
+            setFilteredLoans(filtered);
+        }, 300);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchQuery, loans, filter]);
 
     // Load dropdown data when component mounts
     useEffect(() => {
         fetchDropdownData();
-    }, []);
+    }, [fetchDropdownData]);
 
     // Load loan data when component mounts or user changes
     useEffect(() => {
-        if (user?.user_id) {
+        if (isAuthenticated() && user?.user_id) {
             fetchLoanData();
         }
-    }, [user?.user_id]);
+    }, [isAuthenticated, fetchLoanData, user?.user_id]);
 
-    const handleAddLoanRedirect = () => {
-        try {
-            // Redirect to add-loan-advance route
-            window.location.href = '/add-loan-advance';
-        } catch (error) {
-            showToast('Failed to navigate to add loan page', error);
-        }
-    };
+    // Sorting functionality
+    const requestSort = useCallback((key) => {
+        setSortConfig(prevConfig => {
+            const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
+                ? SORT_DIRECTIONS.DESCENDING
+                : SORT_DIRECTIONS.ASCENDING;
+            return { key, direction };
+        });
+    }, []);
 
-    const calculateOutstandingAmount = (loan) => {
-        try {
-            // Based on API response structure
-            const amount = parseFloat(loan.amount || 0);
-            const installmentAmount = parseFloat(loan.installment_amount || 0);
-            const tenure = parseInt(loan.tenure || 0);
+    // Memoized sorted loans
+    const sortedLoans = useMemo(() => {
+        const source = filteredLoans;
 
-            // Calculate total payable amount (this is simplified - you might need to adjust based on your business logic)
-            // eslint-disable-next-line no-unused-vars
-            const totalPayable = installmentAmount * tenure;
+        if (!sortConfig.key) return source;
 
-            // For now, assuming outstanding is the full amount if loan is pending/active
-            // You might need to track payments separately
-            if (loan.loan_status === 'Closed' || loan.status === '0') {
-                return 0;
+        return [...source].sort((a, b) => {
+            const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
+            let aValue = a[actualKey] || '';
+            let bValue = b[actualKey] || '';
+
+            // Handle numeric sorting for amount, interest rate, tenure, installment
+            if (['amount', 'interest_rate', 'tenure', 'installment_amount'].includes(actualKey)) {
+                aValue = parseFloat(aValue) || 0;
+                bValue = parseFloat(bValue) || 0;
             }
 
-            return amount; // Return original loan amount as outstanding for now
-        } catch (error) {
-            console.error('Error calculating outstanding amount:', error);
+            if (aValue < bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
+            }
             return 0;
-        }
-    };
+        });
+    }, [filteredLoans, sortConfig]);
 
-    // Updated handleViewDetails function
-    const handleViewDetails = async (loanId) => {
+    // Action handlers
+    const handleAddLoanRedirect = useCallback(() => {
+        navigate('/add-loan-advance');
+    }, [navigate]);
+
+    const handleViewDetails = useCallback(async (loanId) => {
         try {
             if (!user?.user_id) {
                 showToast('User information not available', 'error');
                 return;
             }
 
-            console.log('Viewing loan details for ID:', loanId);
             setIsModalOpen(true);
             setModalLoading(true);
             setLoanDetails([]);
@@ -171,60 +280,80 @@ const LoanAdvance = () => {
             }
         } catch (error) {
             console.error('Error fetching loan details:', error);
-            showToast('Failed to load loan details. Please try again.', 'error');
+            showToast('Failed to load loan details', 'error');
             setLoanDetails([]);
         } finally {
             setModalLoading(false);
         }
-    };
+    }, [user, showToast]);
 
-    // New function to handle edit action
-    const handleEdit = (loanId) => {
-        try {
-            console.log('Edit loan with ID:', loanId);
-            // Redirect to add-loan-advance page with edit mode and loan ID
-            window.location.href = `/add-loan-advance?edit=true&loanId=${loanId}`;
-        } catch (error) {
-            console.error('Error handling edit:', error);
-            showToast('Failed to edit loan', 'error');
-        }
-    };
-    const closeModal = () => {
+    const handleEdit = useCallback((loanId) => {
+        navigate(`/add-loan-advance?edit=true&loanId=${loanId}`);
+    }, [navigate]);
+
+    const handleFilterChange = useCallback((newFilter) => {
+        setFilter(newFilter);
+        showToast(`Filter changed to: ${newFilter}`, 'info');
+    }, [showToast]);
+
+    const closeModal = useCallback(() => {
         setIsModalOpen(false);
         setLoanDetails([]);
         setModalLoading(false);
-    };
+    }, []);
 
-    // Updated filtering logic to work with dynamic status list
-    const getFilteredLoans = () => {
-        try {
-            if (filter === 'All Loans/Advances') {
-                return loans;
-            }
-
-            // Filter by loan status
-            return loans.filter(loan => loan.loan_status === filter);
-        } catch (error) {
-            showToast('Error filtering loans', error);
-            return [];
+    // Render sort icon
+    const renderSortIcon = useCallback((key) => {
+        if (sortConfig.key !== key) {
+            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
         }
-    };
+        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
+            <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+    }, [sortConfig]);
 
-    const handleFilterChange = (newFilter) => {
-        try {
-            setFilter(newFilter);
-            showToast(`Filter changed to: ${newFilter}`, 'info');
-        } catch (error) {
-            showToast('Failed to change filter', error);
-        }
-    };
+    // Render status badge
+    const renderStatusBadge = useCallback((status) => {
+        const statusColors = {
+            'Approved': 'bg-green-100 text-green-800',
+            'Rejected': 'bg-red-100 text-red-800',
+            'Pending': 'bg-yellow-100 text-yellow-800',
+            'Under Review': 'bg-blue-100 text-blue-800',
+            'Closed': 'bg-gray-100 text-gray-800'
+        };
 
-    const filteredLoans = getFilteredLoans();
-    const totalLoans = filteredLoans.length;
-    const filterOptions = getFilterOptions();
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'
+                }`}>
+                {status || 'Unknown'}
+            </span>
+        );
+    }, []);
+
+    // Render loan type badge
+    const renderLoanTypeBadge = useCallback((loanType) => {
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${loanType === 'Loan'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-green-100 text-green-800'
+                }`}>
+                {loanType || 'N/A'}
+            </span>
+        );
+    }, []);
+
+    // Format currency
+    const formatCurrency = useCallback((amount) => {
+        return `₹${parseFloat(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    }, []);
+
+    // Redirect if not authenticated
+    if (!isAuthenticated()) {
+        return <Navigate to="/login" replace />;
+    }
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="min-h-screen bg-gray-50 p-6 max-w-7xl mx-auto">
             {/* Toast Notification */}
             {toast && (
                 <Toast
@@ -242,158 +371,220 @@ const LoanAdvance = () => {
                 loading={modalLoading}
             />
 
-            <div className="bg-white rounded-lg shadow-sm">
-                {/* Header */}
-                <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Loan & Advance Management</h2>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                {/* Header section */}
+                <div className="px-6 py-3 border-b border-blue-200 bg-blue-600">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <h1 className="text-xl font-semibold text-gray-900">
-                                Total Loans/Advances Registered ({totalLoans})
-                            </h1>
+                        <div className="flex items-center">
+                            <CreditCard className="h-6 w-6 text-white mr-2" />
+                            <h3 className="text-lg font-medium text-white">
+                                Total Loans/Advances ({sortedLoans.length})
+                            </h3>
                             {(loading || dropdownLoading) && (
-                                <div className="flex items-center gap-2 text-blue-600">
-                                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="flex items-center gap-2 text-white ml-4">
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
                                     <span className="text-sm">
                                         {dropdownLoading ? 'Loading filters...' : 'Loading...'}
                                     </span>
                                 </div>
                             )}
+                        </div>
+
+                        <div className="flex items-center gap-3">
                             <select
                                 value={filter}
                                 onChange={(e) => handleFilterChange(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
                                 disabled={loading || dropdownLoading}
                             >
-                                {filterOptions.map(option => (
+                                {getFilterOptions.map(option => (
                                     <option key={option} value={option}>{option}</option>
                                 ))}
                             </select>
+
+                            <div className="relative w-full sm:w-64">
+                                <input
+                                    type="text"
+                                    placeholder="Search loans..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                />
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            </div>
+
+                            {permissions['loan_create'] && (
+                                <button
+                                    onClick={handleAddLoanRedirect}
+                                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                    disabled={loading}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Add Loan/Advance
+                                </button>
+                            )}
                         </div>
-                        {permissions['loan_create'] &&
-                            <button
-                                onClick={handleAddLoanRedirect}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                                disabled={loading}
-                            >
-                                <Plus size={16} />
-                                Add Loan/Advance
-                            </button>
-                        }
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-blue-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Employee Name</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Loan Type</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Interest Rate</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tenure (Months)</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Installment Amount</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Outstanding Amount</th>
-                                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                                {(permissions['loan_view'] || permissions['loan_edit']) &&
-                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Action</th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="9" className="px-6 py-8 text-center text-gray-500">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                                            Loading loans...
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : filteredLoans.length === 0 ? (
-                                <tr>
-                                    <td colSpan="9" className="px-6 py-8 text-center text-gray-500">
-                                        No loans/advances found for the selected filter.
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredLoans.map((loan) => (
-                                    <tr key={loan.loan_id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            {loan.employee_full_name || 'N/A'}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${loan.loan_type_name === 'Loan'
-                                                ? 'bg-blue-100 text-blue-800'
-                                                : 'bg-green-100 text-green-800'
-                                                }`}>
-                                                {loan.loan_type_name || 'N/A'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            ₹{parseFloat(loan.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            {loan.interest_rate}%
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            {loan.tenure} months
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            ₹{parseFloat(loan.installment_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">
-                                            ₹{calculateOutstandingAmount(loan).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${loan.loan_status === 'Approved'
-                                                ? 'bg-green-100 text-green-800'
-                                                : loan.loan_status === 'Rejected'
-                                                    ? 'bg-red-100 text-red-800'
-                                                    : loan.loan_status === 'Pending'
-                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                        : loan.loan_status === 'Under Review'
-                                                            ? 'bg-blue-100 text-blue-800'
-                                                            : 'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                {loan.loan_status || 'Unknown'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                {permissions['loan_view'] &&
-                                                    <button
-                                                        onClick={() => handleViewDetails(loan.loan_id)}
-                                                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                                                        title="View Details"
-                                                    >
-                                                        <Eye size={16} />
-                                                    </button>
-                                                }
-                                                {permissions['loan_edit'] &&
-                                                    <button
-                                                        onClick={() => handleEdit(loan.loan_id)}
-                                                        className="p-1 text-green-600 hover:bg-green-50 rounded"
-                                                        title="Edit Loan"
-                                                    >
-                                                        <Edit size={16} />
-                                                    </button>
-                                                }
-                                                {/* <button
-                                                    onClick={() => handleDelete(loan.loan_id)}
-                                                    className="p-1 text-red-600 hover:bg-red-50 rounded"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button> */}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                {/* Content section */}
+                {loading ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <RefreshCw className="w-5 h-5 animate-spin" />
+                            <span>Loading loans...</span>
+                        </div>
+                    </div>
+                ) : error ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                            <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                            <p className="text-red-700 text-lg font-medium mb-2">Error Loading Loans</p>
+                            <p className="text-red-600 mb-4">{error}</p>
+                            <button
+                                onClick={fetchLoanData}
+                                className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                            >
+                                <RefreshCw className="w-4 h-4" />
+                                <span>Try Again</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : loans.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <DollarSign className="w-8 h-8 text-gray-400" />
+                            </div>
+                            <p className="text-gray-700 text-lg font-medium mb-2">No Loans Found</p>
+                            <p className="text-gray-500 text-sm mb-4">
+                                You haven't added any loans or advances yet. Create your first loan to get started.
+                            </p>
+                            {permissions['loan_create'] && (
+                                <button
+                                    onClick={handleAddLoanRedirect}
+                                    className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Create First Loan</span>
+                                </button>
                             )}
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+                    </div>
+                ) : sortedLoans.length === 0 ? (
+                    <div className="px-6 py-8 text-center text-gray-500">
+                        <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-lg font-medium">No loans found for the selected filter</p>
+                        <p className="text-sm">Try adjusting your search or filter criteria</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-blue-50">
+                                <tr>
+                                    {[
+                                        { key: COLUMN_KEYS.EMPLOYEE_NAME, label: 'Employee Name' },
+                                        { key: COLUMN_KEYS.LOAN_TYPE, label: 'Loan Type' },
+                                        { key: COLUMN_KEYS.AMOUNT, label: 'Amount' },
+                                        { key: COLUMN_KEYS.INTEREST_RATE, label: 'Interest Rate' },
+                                        { key: COLUMN_KEYS.TENURE, label: 'Tenure (Months)' },
+                                        { key: COLUMN_KEYS.INSTALLMENT, label: 'Installment Amount' },
+                                        { key: COLUMN_KEYS.OUTSTANDING, label: 'Outstanding Amount' },
+                                        { key: COLUMN_KEYS.STATUS, label: 'Status' }
+                                    ].map(({ key, label }) => (
+                                        <th key={`header-${key}`} className="px-5 py-3 text-left">
+                                            <button
+                                                className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                onClick={() => requestSort(key)}
+                                            >
+                                                {label}
+                                                {renderSortIcon(key)}
+                                            </button>
+                                        </th>
+                                    ))}
+                                    {(permissions?.loan_edit || permissions?.loan_view) && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    )}
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {sortedLoans.map((loan, index) => {
+                                    const loanId = loan.loan_id || `loan-${index}`;
+                                    const outstandingAmount = calculateOutstandingAmount(loan);
+
+                                    return (
+                                        <tr
+                                            key={`loan-${loanId}`}
+                                            className="hover:bg-gray-50 transition-colors"
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <Users className="w-4 h-4 text-blue-600" />
+                                                    </div>
+                                                    <span>{loan.employee_full_name || 'N/A'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {renderLoanTypeBadge(loan.loan_type_name)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {formatCurrency(loan.amount)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {loan.interest_rate}%
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {loan.tenure} months
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {formatCurrency(loan.installment_amount)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {formatCurrency(outstandingAmount)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                {renderStatusBadge(loan.loan_status)}
+                                            </td>
+                                            {(permissions?.loan_edit || permissions?.loan_view) && (
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        {permissions['loan_view'] && (
+                                                            <button
+                                                                onClick={() => handleViewDetails(loan.loan_id)}
+                                                                className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                                                                title="View Details"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                        {permissions['loan_edit'] && (
+                                                            <button
+                                                                onClick={() => handleEdit(loan.loan_id)}
+                                                                className="p-2 rounded-md transition-colors text-green-600 hover:text-green-900 hover:bg-green-50"
+                                                                title="Edit Loan"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );
