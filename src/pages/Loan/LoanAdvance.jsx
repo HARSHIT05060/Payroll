@@ -293,7 +293,6 @@ const LoanAdvance = () => {
 
     const handleFilterChange = useCallback((newFilter) => {
         setFilter(newFilter);
-        showToast(`Filter changed to: ${newFilter}`, 'info');
     }, [showToast]);
 
     const closeModal = useCallback(() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import api from '../../api/axiosInstance';
@@ -19,7 +19,13 @@ import {
     ChevronUp,
     FileText,
     AlertCircle,
-    Plus
+    Plus,
+    X,
+    User,
+    CalendarDays,
+    Timer,
+    MessageSquare,
+    AlertTriangle
 } from 'lucide-react';
 
 const SORT_DIRECTIONS = {
@@ -51,27 +57,57 @@ const STATUS_CONFIG = {
         icon: Clock,
         bgColor: 'bg-yellow-100',
         textColor: 'text-yellow-800',
-        tabColor: 'text-yellow-600'
+        tabColor: 'text-yellow-600',
+        borderColor: 'border-yellow-200'
     },
     '2': {
         name: 'Approved',
         icon: CheckCircle,
         bgColor: 'bg-green-100',
         textColor: 'text-green-800',
-        tabColor: 'text-green-600'
+        tabColor: 'text-green-600',
+        borderColor: 'border-green-200'
     },
     '3': {
         name: 'Rejected',
         icon: XCircle,
         bgColor: 'bg-red-100',
         textColor: 'text-red-800',
-        tabColor: 'text-red-600'
+        tabColor: 'text-red-600',
+        borderColor: 'border-red-200'
     }
 };
+const DetailCard = ({ icon, label, value, bg }) => (
+    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="flex items-center space-x-3 mb-2">
+            <div className={`w-8 h-8 bg-${bg}-100 rounded-full flex items-center justify-center`}>
+                {icon}
+            </div>
+            <h4 className="text-sm font-medium text-gray-700">{label}</h4>
+        </div>
+        <p className="text-lg font-semibold text-gray-900 ml-11">{value}</p>
+    </div>
+);
+
+const NoteCard = ({ icon, title, content, color }) => (
+    <div className={`bg-${color}-50 border border-${color}-200 rounded-lg p-4 mb-6`}>
+        <div className="flex items-start space-x-3">
+            <div className={`w-8 h-8 bg-${color}-100 rounded-full flex items-center justify-center mt-0.5`}>
+                {icon}
+            </div>
+            <div className="flex-1">
+                <h4 className={`text-sm font-medium text-${color}-800 mb-2`}>{title}</h4>
+                <p className={`text-sm text-${color}-700 leading-relaxed`}>{content}</p>
+            </div>
+        </div>
+    </div>
+);
+
 
 const LeaveManagement = () => {
     const { user, isAuthenticated, logout } = useAuth();
     const permissions = useSelector(state => state.permissions) || {};
+    const navigate = useNavigate();
 
     // State management
     const [leaveRequests, setLeaveRequests] = useState([]);
@@ -347,6 +383,7 @@ const LeaveManagement = () => {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Leave Management</h2>
+                    <p className="text-gray-600">Track and manage employee leave requests</p>
                 </div>
             </div>
 
@@ -370,6 +407,16 @@ const LeaveManagement = () => {
                                 />
                                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                             </div>
+
+                            {permissions['leave_create'] && (
+                                <button
+                                    onClick={() => navigate('/add-leave')}
+                                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Add Leave
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -381,8 +428,8 @@ const LeaveManagement = () => {
                                 <button
                                     key={statusValue}
                                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${selectedStatus === statusValue
-                                            ? 'bg-white text-blue-600'
-                                            : 'text-white hover:bg-blue-700'
+                                        ? 'bg-white text-blue-600'
+                                        : 'text-white hover:bg-blue-700'
                                         }`}
                                     onClick={() => handleTabChange(statusValue)}
                                 >
@@ -580,73 +627,150 @@ const LeaveManagement = () => {
                 </div>
             )}
 
-            {/* View Modal */}
+            {/* Enhanced View Modal */}
             {viewModal.isOpen && viewModal.leaveData && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b">
-                            <h2 className="text-lg font-medium">Leave Request Details</h2>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex custom-scrollbar items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                        <User className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-white">Leave Request Details</h2>
+                                        <p className="text-sm text-blue-100">Employee Information</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setViewModal({ isOpen: false, leaveData: null })}
+                                    className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition"
+                                >
+                                    <X className="w-5 h-5 text-white" />
+                                </button>
+                            </div>
                         </div>
-                        <div className="p-6 overflow-y-auto max-h-[70vh]">
-                            <h3 className="text-lg font-medium mb-4">{viewModal.leaveData.full_name}</h3>
 
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500">Leave Type</h4>
-                                    <p>{viewModal.leaveData.leave_type}</p>
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500">Status</h4>
-                                    <div className="mt-1">
-                                        <StatusChip status={viewModal.leaveData.status} />
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto flex-1">
+                            {/* Employee Info */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                        <User className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            {viewModal.leaveData.full_name}
+                                        </h3>
+                                        <div className="mt-1">
+                                            <StatusChip status={viewModal.leaveData.status} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <hr className="my-4" />
-
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500">Start Date</h4>
-                                    <p>{formatDate(viewModal.leaveData.start_date)}</p>
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500">End Date</h4>
-                                    <p>{formatDate(viewModal.leaveData.end_date)}</p>
-                                </div>
-                                <div className="col-span-2">
-                                    <h4 className="text-sm font-medium text-gray-500">Total Days</h4>
-                                    <p>{viewModal.leaveData.total_days}</p>
-                                </div>
+                            {/* Leave Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <DetailCard
+                                    icon={<FileText className="w-4 h-4 text-indigo-600" />}
+                                    label="Leave Type"
+                                    value={viewModal.leaveData.leave_type}
+                                    bg="indigo"
+                                />
+                                <DetailCard
+                                    icon={<Timer className="w-4 h-4 text-purple-600" />}
+                                    label="Total Duration"
+                                    value={`${viewModal.leaveData.totalDays} ${viewModal.leaveData.totalDays === 1 ? 'Day' : 'Days'}`}
+                                    bg="purple"
+                                />
+                                <DetailCard
+                                    icon={<CalendarDays className="w-4 h-4 text-green-600" />}
+                                    label="Start Date"
+                                    value={formatDate(viewModal.leaveData.start_date)}
+                                    bg="green"
+                                />
+                                <DetailCard
+                                    icon={<CalendarDays className="w-4 h-4 text-red-600" />}
+                                    label="End Date"
+                                    value={formatDate(viewModal.leaveData.end_date)}
+                                    bg="red"
+                                />
                             </div>
 
-                            <hr className="my-4" />
+                            {/* Reason */}
+                            {viewModal.leaveData.reason && (
+                                <NoteCard
+                                    icon={<MessageSquare className="w-4 h-4 text-amber-600" />}
+                                    title="Leave Reason"
+                                    color="amber"
+                                    content={viewModal.leaveData.reason}
+                                />
+                            )}
 
-                            <h4 className="text-sm font-medium text-gray-500 mb-2">Reason for Leave</h4>
-                            <div className="bg-gray-100 p-4 rounded-md mb-4">
-                                <p className="break-words">{viewModal.leaveData.reason || "No reason provided."}</p>
-                            </div>
-
+                            {/* Rejection Reason */}
                             {viewModal.leaveData.status === '3' && viewModal.leaveData.reject_reason && (
-                                <>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-2">Rejection Reason</h4>
-                                    <div className="bg-red-50 p-4 rounded-md">
-                                        <p className="break-words">{viewModal.leaveData.reject_reason}</p>
-                                    </div>
-                                </>
+                                <NoteCard
+                                    icon={<AlertTriangle className="w-4 h-4 text-red-600" />}
+                                    title="Rejection Reason"
+                                    color="red"
+                                    content={viewModal.leaveData.reject_reason}
+                                />
+                            )}
+
+                            {/* Application Date */}
+                            {viewModal.leaveData.applied_date && (
+                                <div className="border-t pt-4 mt-4 text-sm text-gray-600 flex justify-between">
+                                    <span>Application submitted on:</span>
+                                    <span className="font-medium">{formatDate(viewModal.leaveData.applied_date)}</span>
+                                </div>
                             )}
                         </div>
-                        <div className="p-4 bg-gray-50 flex justify-end rounded-b-lg">
-                            <button
-                                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-                                onClick={() => setViewModal({ isOpen: false, leaveData: null })}
-                            >
-                                Close
-                            </button>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-6 py-4 border-t flex justify-between items-center rounded-b-2xl">
+                            <div className="flex space-x-3">
+                                {viewModal.leaveData.status === '1' && (
+                                    <>
+                                        {permissions['leave_approved'] && (
+                                            <button
+                                                onClick={() => {
+                                                    handleApprove(viewModal.leaveData.leave_id);
+                                                    setViewModal({ isOpen: false, leaveData: null });
+                                                }}
+                                                className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md shadow hover:bg-green-700 transition"
+                                            >
+                                                <CheckCircle className="w-4 h-4 mr-2 inline" />
+                                                Approve
+                                            </button>
+                                        )}
+                                        {permissions['leave_rejected'] && (
+                                            <button
+                                                onClick={() => {
+                                                    setViewModal({ isOpen: false, leaveData: null });
+                                                    handleReject(viewModal.leaveData);
+                                                }}
+                                                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 transition"
+                                            >
+                                                <XCircle className="w-4 h-4 mr-2 inline" />
+                                                Reject
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                                <button
+                                    onClick={() => setViewModal({ isOpen: false, leaveData: null })}
+                                    className="px-4 py-2 text-sm font-medium bg-white text-gray-700 border border-gray-300 rounded-md shadow hover:bg-gray-100 transition"
+                                >
+                                    Close
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
+
 
             {/* Toast Component */}
             {toast.show && (

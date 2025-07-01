@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin: 8px 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #3b82f6, #6366f1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #2563eb, #4f46e5);
+    width: 6px;
+}
+
+/* Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #3b82f6 #f1f5f9;
+}
+
+.scrollbar-fade-top {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.scrollbar-fade-bottom {
+    background: linear-gradient(0deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
+    pointer-events: none;
+}
