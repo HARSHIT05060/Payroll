@@ -4,7 +4,6 @@ import Sidebar from './Components/Sidebar';
 import Login from "./Components/Login";
 import Home from './Components/Home';
 import ProtectedRoute from './Components/ProtectedRoute';
-// import api from "./api";
 import Employee from './pages/Employee/Employee';
 import EmployeeDetail from './pages/Employee/EmployeeDetail';
 import AddEmployee from './pages/Employee/AddEmployee';
@@ -23,8 +22,7 @@ import AssignShift from './pages/ShiftManagement/AssignShift';
 import Unauthorized from './Components/Unauthorized';
 import BulkAttendance from './pages/Payroll/BulkAttendance';
 import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
-// import HourlyPayroll from './pages/Payroll/HourlyPayroll';
-// import FinalizePayroll from './pages/Payroll/FinalizePayroll';
+import FinalizePayroll from './pages/Payroll/FinalizePayroll';
 import { useSelector } from 'react-redux';
 import LoanAdvance from './pages/Loan/LoanAdvance';
 import AddLoanAdvance from './pages/Loan/AddLoanAdvance';
@@ -154,9 +152,7 @@ const App = () => {
 
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
-            {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
-            <Route path="/hourly-payroll" element={<HourlyPayroll />} />
-            <Route path="/finalize-payroll" element={<FinalizePayroll />} /> */}
+            <Route path="/finalize-payroll" element={<FinalizePayroll />} />
 
             <Route path="*" element={<Navigate to="/unauthorized" replace />} />
           </Routes>
