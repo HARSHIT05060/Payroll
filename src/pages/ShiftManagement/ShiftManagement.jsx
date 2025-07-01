@@ -1,31 +1,32 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Users, Edit, Trash2, Plus, X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Calendar, Users, Edit, Trash2, Plus, X, CheckCircle, AlertCircle, Info, Search, RefreshCw, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; 
+import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
+
 // Day Status Legend Component
 const DayStatusLegend = () => {
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Day Status Legend</h3>
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-medium text-gray-700 mb-4">Day Status Legend</h3>
             <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span className="text-xs text-gray-600">W</span>
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span className="text-sm text-gray-600 font-medium">W</span>
                     </div>
                     <span className="text-sm text-gray-600">Week Off</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-blue-500">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white border-2 border-blue-500">
                     </div>
                     <span className="text-sm text-gray-600">Occasional Working</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
-                        <span className="text-xs text-white font-medium">D</span>
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                        <span className="text-sm text-white font-medium">D</span>
                     </div>
                     <span className="text-sm text-gray-600">Working Day</span>
                 </div>
@@ -38,6 +39,9 @@ const ShiftManagement = () => {
     const { user } = useAuth();
     const [shifts, setShifts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredShifts, setFilteredShifts] = useState([]);
     const [toast, setToast] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
     const navigate = useNavigate();
@@ -45,7 +49,25 @@ const ShiftManagement = () => {
     const [employeeCounts, setEmployeeCounts] = useState({});
     const permissions = useSelector(state => state.permissions) || {};
 
-    // Fetch assigned employees for a shift
+    // Search functionality
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            const filtered = shifts.filter(shift => {
+                return Object.values(shift).some(value =>
+                    String(value).toLowerCase().includes(searchQuery.toLowerCase())
+                ) || shift.shift_days?.some(day =>
+                    day.sort_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            });
+            setFilteredShifts(filtered);
+        }, 300);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchQuery, shifts]);
+
+    // Get displayed shifts based on search
+    const displayedShifts = searchQuery ? filteredShifts : shifts;
+
     // Fetch assigned employees for a shift
     const fetchAssignedEmployees = async (shiftId, shiftName) => {
         try {
@@ -81,7 +103,7 @@ const ShiftManagement = () => {
             setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' });
         }
     };
-    // Employee Modal Component
+
     // Employee Modal Component
     const EmployeeModal = ({ isOpen, onClose, employees, loading, shiftName }) => {
         if (!isOpen) return null;
@@ -146,6 +168,7 @@ const ShiftManagement = () => {
             </div>
         );
     };
+
     // Show toast notification
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -213,13 +236,15 @@ const ShiftManagement = () => {
             }));
         }
     };
+
     // Fetch shifts from API
     const fetchShifts = async () => {
         try {
             setLoading(true);
+            setError(null);
 
             if (!user?.user_id) {
-                return;
+                throw new Error('User ID is required');
             }
 
             const formData = new FormData();
@@ -236,11 +261,21 @@ const ShiftManagement = () => {
                     fetchEmployeeCount(shift.shift_id);
                 });
             } else {
-                showToast(response.data.message || 'Failed to fetch shifts', 'error');
+                throw new Error(response.data.message || 'Failed to fetch shifts');
             }
-        } catch (err) {
-            console.error('Error fetching shifts:', err);
-            showToast('Failed to load shifts. Please try again.', 'error');
+        } catch (error) {
+            console.error('Error fetching shifts:', error);
+            const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+            if (error.response?.status === 401) {
+                setError("Your session has expired. Please login again.");
+            } else if (error.response?.status === 403) {
+                setError("You don't have permission to view shifts.");
+            } else if (error.response?.status >= 500) {
+                setError("Server error. Please try again later.");
+            } else {
+                setError(errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -294,106 +329,158 @@ const ShiftManagement = () => {
     const handleAssignShift = () => {
         navigate('/assign-shift');
     };
+
     // Handle create shift
     const handleCreateShift = () => {
         navigate('/add-shift');
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                    </div>
+    return (
+        <div className="min-h-screen bg-gray-50 p-6 max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Shift Management</h2>
                 </div>
             </div>
-        );
-    }
 
-    return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-3">
-                        <Calendar className="w-8 h-8 text-blue-600" />
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
+            <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                {/* Header section */}
+                <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                            <Calendar className="h-6 w-6 text-white mr-2" />
+                            <h3 className="text-lg font-medium text-white">
                                 Available Shifts ({shifts.length})
-                            </h1>
-                            <p className="text-gray-600">Manage your shift schedules</p>
+                            </h3>
                         </div>
-                    </div>
-                    <div className="flex gap-3">
-                        {permissions['shift_assign'] &&
-                            <button
-                                onClick={handleAssignShift}
-                                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
-                            >
-                                <Users className="w-4 h-4" />
-                                Assign Shift
-                            </button>
-                        }
-                        {permissions['shift_create'] &&
-                            <button
-                                onClick={handleCreateShift}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Create Shift
-                            </button>
-                        }
+
+                        <div className="flex items-center gap-3">
+                            <div className="relative w-full sm:w-64">
+                                <input
+                                    type="text"
+                                    placeholder="Search shifts..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                />
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            </div>
+
+                            {permissions['shift_assign'] &&
+                                <button
+                                    onClick={handleAssignShift}
+                                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    <Users className="h-4 w-4" />
+                                    Assign Shift
+                                </button>
+                            }
+                            {permissions['shift_create'] &&
+                                <button
+                                    onClick={handleCreateShift}
+                                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Create Shift
+                                </button>
+                            }
+                        </div>
                     </div>
                 </div>
 
                 {/* Day Status Legend */}
-                <DayStatusLegend />
+                <div className="p-6 pb-0">
+                    <DayStatusLegend />
+                </div>
 
-                {/* Shifts Table */}
-                {shifts.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                        <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No shifts found</h3>
-                        <p className="text-gray-600 mb-4">Create your first shift to get started.</p>
-                        {permissions['shift_create'] &&
+                {/* Content section */}
+                {loading ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <RefreshCw className="w-5 h-5 animate-spin" />
+                            <span>Loading shifts...</span>
+                        </div>
+                    </div>
+                ) : error ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                            <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                            <p className="text-red-700 text-lg font-medium mb-2">Error Loading Shifts</p>
+                            <p className="text-red-600 mb-4">{error}</p>
                             <button
-                                onClick={handleCreateShift}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                onClick={fetchShifts}
+                                className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                             >
-                                Create Shift
+                                <RefreshCw className="w-4 h-4" />
+                                <span>Try Again</span>
                             </button>
-                        }
+                        </div>
+                    </div>
+                ) : shifts.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Calendar className="w-8 h-8 text-gray-400" />
+                            </div>
+                            <p className="text-gray-700 text-lg font-medium mb-2">No Shifts Found</p>
+                            <p className="text-gray-500 text-sm mb-4">
+                                You haven't created any shifts yet. Create your first shift to get started with shift management.
+                            </p>
+                            {permissions['shift_create'] && (
+                                <button
+                                    onClick={handleCreateShift}
+                                    className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Create First Shift</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-blue-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Shift Name
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Shift Days
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Assigned Employees
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Created On
+                                    </th>
+                                    {(permissions?.shift_edit || permissions?.shift_delete) && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    )}
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {!displayedShifts || displayedShifts.length === 0 ? (
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                                            Shift Name
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                                            Shift Days
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                                            Assigned Employees
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                                            Created On
-                                        </th>
-                                        <th className="px-6 py-4 text-center text-sm font-medium text-gray-700">
-                                            Action
-                                        </th>
+                                        <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                                            <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                            <p className="text-lg font-medium">No shifts found</p>
+                                            <p className="text-sm">
+                                                {searchQuery ? 'Try adjusting your search terms' : 'Start by creating your first shift'}
+                                            </p>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {shifts.map((shift) => (
+                                ) : (
+                                    displayedShifts.map((shift) => (
                                         <tr key={shift.shift_id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-medium text-gray-900">
-                                                    {shift.shift_name}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <Calendar className="w-4 h-4 text-blue-600" />
+                                                    </div>
+                                                    <span>{shift.shift_name}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -413,84 +500,81 @@ const ShiftManagement = () => {
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-blue-600 font-medium text-lg">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <button
+                                                    onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
+                                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                                                >
+                                                    <span className="font-medium text-lg">
                                                         {employeeCounts[shift.shift_id] || 0}
                                                     </span>
-                                                    <Users className="w-4 h-4 text-gray-400" />
-                                                </div>
+                                                    <Users className="w-4 h-4" />
+                                                </button>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-gray-600 text-sm">
-                                                    {shift.created_date}
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {shift.created_date}
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center justify-center gap-2">
-                                                    {permissions['shift_edit'] &&
-                                                        <button
-                                                            onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
-                                                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                    }
-                                                    <button
-                                                        onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
-                                                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                        title="View Assigned Employees"
-                                                    >
-                                                        <Users className="w-4 h-4" />
-                                                    </button>
-                                                    {permissions['shift_delete'] &&
-                                                        <button
-                                                            onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
-                                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </td>
+                                            {(permissions?.shift_edit || permissions?.shift_delete) && (
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        {permissions['shift_edit'] && (
+                                                            <button
+                                                                onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
+                                                                className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                                                                title="Edit Shift"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                        {permissions['shift_delete'] && (
+                                                            <button
+                                                                onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
+                                                                className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                title="Delete Shift"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 )}
-                {/* Employee Modal */}
-                <EmployeeModal
-                    isOpen={employeeModal.isOpen}
-                    onClose={() => setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' })}
-                    employees={employeeModal.employees}
-                    loading={employeeModal.loading}
-                    shiftName={employeeModal.shiftName}
-                />
-
-                {/* Toast Notification */}
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={closeToast}
-                    />
-                )}
-
-                {/* Confirm Dialog */}
-                <ConfirmDialog
-                    isOpen={confirmDialog.isOpen}
-                    onClose={() => setConfirmDialog({ isOpen: false })}
-                    onConfirm={confirmDialog.onConfirm}
-                    title={confirmDialog.title}
-                    message={confirmDialog.message}
-                    confirmText={confirmDialog.confirmText}
-                    type={confirmDialog.type}
-                />
             </div>
+
+            {/* Employee Modal */}
+            <EmployeeModal
+                isOpen={employeeModal.isOpen}
+                onClose={() => setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' })}
+                employees={employeeModal.employees}
+                loading={employeeModal.loading}
+                shiftName={employeeModal.shiftName}
+            />
+
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false })}
+                onConfirm={confirmDialog.onConfirm}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                confirmText={confirmDialog.confirmText}
+                type={confirmDialog.type}
+            />
         </div>
     );
 };

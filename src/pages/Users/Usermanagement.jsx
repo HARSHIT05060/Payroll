@@ -199,13 +199,6 @@ const UserManagement = () => {
                                 <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
                                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Users</p>
                                 <p className="text-red-600 mb-4">{error}</p>
-                                <button
-                                    onClick={handleRefresh}
-                                    className="inline-flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                    <span>Try Again</span>
-                                </button>
                             </div>
                         </div>
                     ) : users.length === 0 ? (
