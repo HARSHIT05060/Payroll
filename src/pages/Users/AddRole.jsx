@@ -29,9 +29,18 @@ const AddRole = () => {
 
     // Determine if we're in edit mode and get the current role ID
     const isEditMode = Boolean(roleId) || Boolean(roleIdFromState);
-    const currentRoleId = roleId || roleIdFromState; 
+    const currentRoleId = roleId || roleIdFromState;
+    console.log(roleId)
 
+    // Toast helper functions
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
 
+    const closeToast = () => {
+        setToast(null);
+    };
+    
     // Find view permission in a subsection
     const findViewPermission = (sectionKey, subsectionKey) => {
         const subsection = permissionConfig[sectionKey]?.subsections[subsectionKey];
@@ -61,9 +70,7 @@ const AddRole = () => {
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message);
-
-            setToast({ message: 'Failed to load permissions', type: 'error' });
-
+            showToast('Failed to load permissions', 'error');
             return null;
         }
     };
@@ -93,9 +100,7 @@ const AddRole = () => {
 
             throw new Error('Could not fetch role permissions');
         } catch (error) {
-
-            setToast({ message: 'Failed to load permissions', type: 'error' });
-
+            showToast('Failed to load role permissions', error);
             return [];
         }
     };
@@ -127,9 +132,7 @@ const AddRole = () => {
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message);
-
-            setToast({ message: 'Failed to load role data', type: 'error' });
-
+            showToast('Failed to load role data', 'error');
             return null;
         }
     };
@@ -233,9 +236,7 @@ const AddRole = () => {
                 }
             } catch (error) {
                 setError('Failed to load data');
-
-                setToast({ message: 'Failed to load data', type: 'error' });
-
+                showToast('Failed to load data', error);
             } finally {
                 setLoading(false);
             }
@@ -268,50 +269,66 @@ const AddRole = () => {
         setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
     };
 
-    const handlePermissionChange = (section, subsection, permission) => {
-        setPermissions(prev => {
-            const newPermissions = { ...prev };
-            const subsectionPerms = newPermissions[section][subsection];
+  const handlePermissionChange = (section, subsection, permission) => {
+    setPermissions(prev => {
+        const newPermissions = { ...prev };
+        const subsectionPerms = newPermissions[section][subsection];
 
-            if (permission === 'selectAll') {
-                const allSelected = !subsectionPerms[permission];
-                permissionConfig[section].subsections[subsection].permissions.forEach(p => {
-                    subsectionPerms[p.key] = allSelected;
-                });
-                subsectionPerms[permission] = allSelected;
-            } else {
-                const isCurrentlySelected = subsectionPerms[permission];
-                subsectionPerms[permission] = !isCurrentlySelected;
+        if (permission === 'selectAll') {
+            const allSelected = !subsectionPerms[permission];
+            permissionConfig[section].subsections[subsection].permissions.forEach(p => {
+                subsectionPerms[p.key] = allSelected;
+            });
+            subsectionPerms[permission] = allSelected;
+        } else {
+            const isCurrentlySelected = subsectionPerms[permission];
 
-                // Auto-select view permission if selecting edit/delete/create
-                if (!isCurrentlySelected) {
-                    const viewPermission = findViewPermission(section, subsection);
-                    if (viewPermission && !subsectionPerms[viewPermission.key]) {
-                        subsectionPerms[viewPermission.key] = true;
-                    }
+            // 🛡️ Prevent unchecking "view" if other permissions are selected
+            const viewPermission = findViewPermission(section, subsection);
+            if (
+                viewPermission &&
+                permission === viewPermission.key &&
+                isCurrentlySelected
+            ) {
+                // check if any other permission is still true
+                const otherSelected = permissionConfig[section].subsections[subsection].permissions.some(p =>
+                    p.key !== permission && subsectionPerms[p.key]
+                );
+                if (otherSelected) {
+                    showToast('Cannot deselect view while other permissions are active', 'warning');
+                    return prev;
                 }
-
-                const allPermissions = permissionConfig[section].subsections[subsection].permissions.map(p => p.key);
-                subsectionPerms.selectAll = allPermissions.every(p => subsectionPerms[p]);
             }
 
-            return newPermissions;
-        });
-    };
+            subsectionPerms[permission] = !isCurrentlySelected;
+
+            // ✅ Auto-select view if selecting another permission
+            if (!isCurrentlySelected) {
+                if (viewPermission && !subsectionPerms[viewPermission.key]) {
+                    subsectionPerms[viewPermission.key] = true;
+                }
+            }
+
+            // ✅ Update selectAll status
+            const allPermissions = permissionConfig[section].subsections[subsection].permissions.map(p => p.key);
+            subsectionPerms.selectAll = allPermissions.every(p => subsectionPerms[p]);
+        }
+
+        return newPermissions;
+    });
+};
+
 
     const handleSaveChanges = () => {
         if (submitInProgressRef.current) return;
 
         if (!name.trim()) {
-          
-            setToast({ message: 'Please enter a role name', type: 'warning' });
-
+            showToast('Please enter a role name', 'warning');
             return;
         }
 
         if (!user || !user.user_id) {
-            setToast({ message: 'Admin user ID is required. Please log in again.', type: 'error' });
-
+            showToast('Admin user ID is required. Please log in again.', 'error');
             return;
         }
 
@@ -321,6 +338,9 @@ const AddRole = () => {
             data: null
         });
     };
+
+
+
 
     const confirmSave = async () => {
         setConfirmModal({ isOpen: false, type: '', data: null });
@@ -359,8 +379,10 @@ const AddRole = () => {
             });
 
             if (response.data.success) {
-              
-                setToast({ message: isEditMode ? 'Role updated successfully!' : 'Role created successfully!', type: 'success' });
+                showToast(
+                    isEditMode ? 'Role updated successfully!' : 'Role created successfully!',
+                    'success'
+                );
                 setTimeout(() => {
                     navigate('/role');
                 }, 1500);
@@ -368,8 +390,10 @@ const AddRole = () => {
                 throw new Error(response.data.message || 'Failed to save role');
             }
         } catch (err) {
-           
-            setToast({ message: 'Error saving role: ' + (err.response?.data?.message || err.message), type: 'error' });
+            showToast(
+                'Error saving role: ' + (err.response?.data?.message || err.message),
+                'error'
+            );
         }
         finally {
             // ✅ Mark as done
@@ -435,7 +459,7 @@ const AddRole = () => {
                 <Toast
                     message={toast.message}
                     type={toast.type}
-                    onClose={() => setToast(null)}
+                    onClose={()=> closeToast()}
                 />
             )}
 
