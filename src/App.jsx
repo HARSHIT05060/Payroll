@@ -21,8 +21,8 @@ import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
 import CreateShift from './pages/ShiftManagement/CreateShift';
 import AssignShift from './pages/ShiftManagement/AssignShift';
 import Unauthorized from './Components/Unauthorized';
-// import BulkAttendance from './pages/Payroll/BulkAttendance';
-// import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
+import BulkAttendance from './pages/Payroll/BulkAttendance';
+import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 // import HourlyPayroll from './pages/Payroll/HourlyPayroll';
 // import FinalizePayroll from './pages/Payroll/FinalizePayroll';
 import { useSelector } from 'react-redux';
@@ -152,9 +152,9 @@ const App = () => {
             {/* ---------------- Loan section ----------------- */}
             <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
 
-            {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/bulk-attendance" element={<BulkAttendance />} />
             <Route path="/monthly-payroll" element={<MonthlyPayroll />} />
+            {/* <Route path="/holidaycalender" element={<HolidayCalendar />} />
             <Route path="/hourly-payroll" element={<HourlyPayroll />} />
             <Route path="/finalize-payroll" element={<FinalizePayroll />} /> */}
 
