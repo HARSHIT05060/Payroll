@@ -19,12 +19,11 @@ const Role = () => {
     const permissions = useSelector(state => state.permissions);
 
     const showToast = (message, type) => {
+    
         setToast({ message, type });
     };
 
-    const closeToast = () => {
-        setToast(null);
-    };
+
 
     // Helper function to check if role is admin
     const isAdminRole = (role) => {
@@ -60,7 +59,7 @@ const Role = () => {
             } else {
                 const errorMsg = res.data?.message || 'Failed to fetch roles';
                 setError(errorMsg);
-                showToast(errorMsg, 'error');
+                setToast(errorMsg, 'error');
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Error fetching roles';
@@ -341,7 +340,7 @@ const Role = () => {
                 <Toast
                     message={toast.message}
                     type={toast.type}
-                    onClose={closeToast}
+                    onClose={()=>{setToast(null)}}
                 />
             )}
 
