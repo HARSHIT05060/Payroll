@@ -623,8 +623,6 @@ const CreateShift = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-5xl mx-auto px-4 py-8">
-
-
                 {/* Enhanced Header */}
                 <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
@@ -658,7 +656,7 @@ const CreateShift = () => {
                         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                             <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                                         <Settings className="w-5 h-5 text-white" />
                                     </div>
                                     <div>

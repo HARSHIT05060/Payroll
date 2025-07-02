@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Save, X, RefreshCw, CheckCircle, AlertCircle, XCircle, ArrowLeft, User, Shield } from 'lucide-react';
+import { ArrowLeft, Edit, UserPlus, RefreshCw, Save, User, Phone, Mail, Lock, Shield, ChevronDown, AlertCircle, X } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
@@ -282,179 +282,233 @@ const AddUser = () => {
 
     return (
         <>
-            <div className="p-6 max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-3">
-                        <button
-                            onClick={handleCancel}
-                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                            disabled={isFormDisabled}
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900">
-                                {isEditing ? 'Edit User' : 'Create New User'}
-                            </h2>
-
-                            {userDataLoading && (
-                                <p className="text-blue-600 text-sm mt-1 flex items-center">
-                                    <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
-                                    Loading user data...
-                                </p>
-                            )}
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+                <div className="max-w-5xl mx-auto px-4 py-8">
+                    <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center space-x-3">
+                                    <button
+                                        onClick={handleCancel}
+                                        disabled={isFormDisabled}
+                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                    >
+                                        <ArrowLeft size={18} />
+                                        Back
+                                    </button>
+                                    <div className="flex items-center gap-3">
+                                        {isEditing ? <Edit size={24} className="text-white" /> : <UserPlus size={24} className="text-white" />}
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-white">
+                                                {isEditing ? 'Edit User' : 'Create New User'}
+                                            </h2>
+                                            {userDataLoading && (
+                                                <p className="text-blue-100 text-sm mt-1 flex items-center">
+                                                    <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                                                    Loading user data...
+                                                </p>
+                                            )}
+                                            {!userDataLoading && (
+                                                <p className="text-blue-100 text-sm mt-1">
+                                                    {isEditing ? 'Update user details below' : 'Fill in the user details below'}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="bg-white rounded-lg border border-blue-200 shadow-sm">
-                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600 rounded-t-lg">
-                        <h3 className="text-lg font-medium text-white">User Information</h3>
-                    </div>
-
-                    <form onSubmit={validateForm} className="p-6 space-y-6">
-                        {/* Full Name */}
-                        <div>
-                            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
-                                Full Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="full_name"
-                                name="full_name"
-                                value={formData.full_name}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.full_name ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                placeholder="Enter full name"
-                                disabled={isFormDisabled}
-                            />
-                            {errors.full_name && (
-                                <p className="mt-1 text-sm text-red-600">{errors.full_name}</p>
-                            )}
+                    <div className="bg-white rounded-2xl border border-blue-200 shadow-xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-blue-700">
+                            <div className="flex items-center gap-3">
+                                <UserPlus className="w-5 h-5 text-white" />
+                                <h3 className="text-lg font-semibold text-white">User Information</h3>
+                            </div>
                         </div>
 
-                        {/* Phone Number */}
-                        <div>
-                            <label htmlFor="number" className="block text-sm font-medium text-gray-700 mb-2">
-                                Phone Number <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="tel"
-                                id="number"
-                                name="number"
-                                value={formData.number}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.number ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                placeholder="Enter 10-digit phone number"
-                                disabled={isFormDisabled}
-                            />
-                            {errors.number && (
-                                <p className="mt-1 text-sm text-red-600">{errors.number}</p>
-                            )}
-                        </div>
-
-                        {/* Email */}
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                                Email Address <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                placeholder="Enter email address"
-                                disabled={isFormDisabled}
-                            />
-                            {errors.email && (
-                                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                            )}
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                                Password {!isEditing && <span className="text-red-500">*</span>}
-                                {isEditing && <span className="text-gray-500 text-xs ml-1">(Leave blank to keep current password)</span>}
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.password ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                placeholder={isEditing ? "Enter new password (optional)" : "Enter password"}
-                                disabled={isFormDisabled}
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                            )}
-                        </div>
-
-                        {/* Role Selection */}
-                        <div>
-                            <label htmlFor="user_roles_id" className="block text-sm font-medium text-gray-700 mb-2">
-                                User Role <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                id="user_roles_id"
-                                name="user_roles_id"
-                                value={formData.user_roles_id}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.user_roles_id ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                disabled={isFormDisabled}
-                            >
-                                <option value="">
-                                    {rolesLoading ? 'Loading roles...' : 'Select a role'}
-                                </option>
-                                {roles.map(role => (
-                                    <option key={role.user_roles_id} value={role.user_roles_id}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.user_roles_id && (
-                                <p className="mt-1 text-sm text-red-600">{errors.user_roles_id}</p>
-                            )}
-                        </div>
-
-                        {/* Form Actions */}
-                        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-                            <button
-                                type="button"
-                                onClick={handleCancel}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                                disabled={isFormDisabled}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
-                                disabled={isFormDisabled}
-                            >
-                                {loading ? (
-                                    <>
-                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                                        {isEditing ? 'Updating...' : 'Creating...'}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4 mr-2" />
-                                        {isEditing ? 'Update User' : 'Create User'}
-                                    </>
+                        <form onSubmit={validateForm} className="p-8 space-y-8">
+                            {/* Full Name */}
+                            <div className="space-y-2">
+                                <label htmlFor="full_name" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <User className="w-4 h-4 text-blue-600" />
+                                    Full Name <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        id="full_name"
+                                        name="full_name"
+                                        value={formData.full_name}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                            }`}
+                                        placeholder="Enter your full name"
+                                        disabled={isFormDisabled}
+                                    />
+                                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                </div>
+                                {errors.full_name && (
+                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errors.full_name}
+                                    </p>
                                 )}
-                            </button>
-                        </div>
-                    </form>
+                            </div>
+
+                            {/* Phone Number */}
+                            <div className="space-y-2">
+                                <label htmlFor="number" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <Phone className="w-4 h-4 text-blue-600" />
+                                    Phone Number <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="tel"
+                                        id="number"
+                                        name="number"
+                                        value={formData.number}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.number ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                            }`}
+                                        placeholder="Enter 10-digit phone number"
+                                        disabled={isFormDisabled}
+                                    />
+                                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                </div>
+                                {errors.number && (
+                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errors.number}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Email */}
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <Mail className="w-4 h-4 text-blue-600" />
+                                    Email Address <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.email ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                            }`}
+                                        placeholder="Enter your email address"
+                                        disabled={isFormDisabled}
+                                    />
+                                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                </div>
+                                {errors.email && (
+                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errors.email}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Password */}
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <Lock className="w-4 h-4 text-blue-600" />
+                                    Password {!isEditing && <span className="text-red-500">*</span>}
+                                    {isEditing && <span className="text-gray-500 text-xs ml-2 bg-gray-100 px-2 py-1 rounded-full">(Leave blank to keep current password)</span>}
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.password ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                            }`}
+                                        placeholder={isEditing ? "Enter new password (optional)" : "Enter your password"}
+                                        disabled={isFormDisabled}
+                                    />
+                                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                </div>
+                                {errors.password && (
+                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errors.password}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Role Selection */}
+                            <div className="space-y-2">
+                                <label htmlFor="user_roles_id" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <Shield className="w-4 h-4 text-blue-600" />
+                                    User Role <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        id="user_roles_id"
+                                        name="user_roles_id"
+                                        value={formData.user_roles_id}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none bg-white ${errors.user_roles_id ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                            }`}
+                                        disabled={isFormDisabled}
+                                    >
+                                        <option value="">
+                                            {rolesLoading ? 'Loading roles...' : 'Select a role'}
+                                        </option>
+                                        {roles.map(role => (
+                                            <option key={role.user_roles_id} value={role.user_roles_id}>
+                                                {role.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                </div>
+                                {errors.user_roles_id && (
+                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {errors.user_roles_id}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Form Actions */}
+                            <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-3 focus:ring-gray-500/20 transition-all duration-200"
+                                    disabled={isFormDisabled}
+                                >
+                                    <X className="w-4 h-4" />
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-3 focus:ring-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                                    disabled={isFormDisabled}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <RefreshCw className="w-4 h-4 animate-spin" />
+                                            {isEditing ? 'Updating User...' : 'Creating User...'}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            {isEditing ? 'Update User' : 'Create User'}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
