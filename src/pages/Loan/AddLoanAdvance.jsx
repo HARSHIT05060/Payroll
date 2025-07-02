@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, X, Calendar, User, DollarSign, Percent, Clock, FileText, CheckCircle, Users, AlertCircle, Info } from 'lucide-react';
+import { ArrowLeft, Save, X, Calendar, User, IndianRupee, Percent, Clock, FileText, CheckCircle, Users, AlertCircle, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
@@ -439,59 +439,70 @@ const AddLoanAdvance = ({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-lg shadow-sm">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="max-w-5xl mx-auto px-4 py-8">
+                {/* Enhanced Header */}
+                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleBack}
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
                                 title="Go Back"
                             >
-                                <ArrowLeft size={20} />
+                                <ArrowLeft size={18} />
+                                Back
                             </button>
-                            <div>
-                                <h1 className="text-xl font-semibold text-gray-900">
-                                    {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
-                                </h1>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    {existingLoan ? 'Update existing loan/advance details' : 'Fill in the details to create a new loan/advance'}
-                                </p>
+                            <div className="flex items-center gap-3">
+                                <IndianRupee size={24} className="text-white" />
+                                <div>
+                                    <h1 className="text-2xl font-bold text-white">
+                                        {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
+                                    </h1>
+                                    <p className="text-blue-100 text-sm mt-1">
+                                        {existingLoan ? 'Update existing loan/advance details' : 'Fill in the details to create a new loan/advance'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="ml-auto">
+                                <button
+                                    onClick={handleReset}
+                                    className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                >
+                                    <X size={16} />
+                                    Reset
+                                </button>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={handleReset}
-                                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                                <X size={16} className="inline mr-1" />
-                                Reset
-                            </button>
-                        </div>
                     </div>
+                </div>
 
-                    {/* Form */}
-                    <div className="p-6">
-                        <div className="space-y-8">
-                            {/* Employee Information */}
-                            <div className="bg-blue-50 p-4 rounded-lg">
-                                <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <User size={20} className="text-blue-600" />
-                                    Employee Information
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="space-y-8">
+                        {/* Enhanced Employee Information */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                        <User className="w-5 h-5 text-white" />
+                                    </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <h2 className="text-xl font-bold text-slate-900">Employee Information</h2>
+                                        <p className="text-sm text-slate-600">Select the employee for this loan/advance</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
                                             <Users className="w-4 h-4 inline mr-2" />
-                                            Select Employee *
+                                            Select Employee <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             value={selectedEmployee}
                                             onChange={handleEmployeeSelect}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.employeeName ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.employeeName ? 'border-red-500' : ''}`}
                                             disabled={loading}
                                         >
                                             <option value="">
@@ -504,28 +515,39 @@ const AddLoanAdvance = ({
                                             ))}
                                         </select>
                                         {errors.employeeName && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.employeeName}</p>
+                                            <p className="text-red-500 text-xs mt-2">{errors.employeeName}</p>
                                         )}
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Select the employee who will receive this loan/advance
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Loan Details */}
-                            <div className="bg-green-50 p-4 rounded-lg">
-                                <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <DollarSign size={20} className="text-green-600" />
-                                    Loan/Advance Details
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Enhanced Loan Details */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                        <IndianRupee className="w-5 h-5 text-white" />
+                                    </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Type *
+                                        <h2 className="text-xl font-bold text-slate-900">Loan/Advance Details</h2>
+                                        <p className="text-sm text-slate-600">Configure the loan or advance parameters</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Type <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             value={formData.loanTypeId}
                                             onChange={handleLoanTypeSelect}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.loanType ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.loanType ? 'border-red-500' : ''}`}
                                             disabled={loading}
                                         >
                                             <option value="">
@@ -538,37 +560,35 @@ const AddLoanAdvance = ({
                                             ))}
                                         </select>
                                         {errors.loanType && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.loanType}</p>
+                                            <p className="text-red-500 text-xs mt-2">{errors.loanType}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Amount *
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Amount <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="number"
                                             name="amount"
                                             value={formData.amount}
                                             onChange={handleInputChange}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.amount ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.amount ? 'border-red-500' : ''}`}
                                             min="0"
                                             step="0.01"
                                             placeholder="Enter amount"
                                         />
                                         {errors.amount && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
+                                            <p className="text-red-500 text-xs mt-2">{errors.amount}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Priority *
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Priority <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             value={formData.priorityId}
                                             onChange={handlePrioritySelect}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.priority ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.priority ? 'border-red-500' : ''}`}
                                             disabled={loading}
                                         >
                                             <option value="">
@@ -581,85 +601,93 @@ const AddLoanAdvance = ({
                                             ))}
                                         </select>
                                         {errors.priority && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.priority}</p>
+                                            <p className="text-red-500 text-xs mt-2">{errors.priority}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 {formData.loanType === 'Loan' && (
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                        <div>
-                                            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                                                <Percent size={16} />
-                                                Interest Rate (Monthly) *
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="interestRate"
-                                                value={formData.interestRate}
-                                                onChange={handleInputChange}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.interestRate ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                min="0"
-                                                step="0.01"
-                                                placeholder="Enter interest rate"
-                                            />
-                                            {errors.interestRate && (
-                                                <p className="text-red-500 text-xs mt-1">{errors.interestRate}</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                                                <Clock size={16} />
-                                                Tenure (Months) *
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="tenure"
-                                                value={formData.tenure}
-                                                onChange={handleInputChange}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tenure ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                min="1"
-                                                placeholder="Enter tenure"
-                                            />
-                                            {errors.tenure && (
-                                                <p className="text-red-500 text-xs mt-1">{errors.tenure}</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Monthly Installment
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="installmentAmount"
-                                                value={formData.installmentAmount}
-                                                onChange={handleInputChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                                readOnly
-                                            />
+                                    <div className="mt-8 pt-6 border-t border-slate-200">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                                                    <Percent size={16} className="text-blue-600" />
+                                                    Interest Rate (Monthly) <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="interestRate"
+                                                    value={formData.interestRate}
+                                                    onChange={handleInputChange}
+                                                    className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.interestRate ? 'border-red-500' : ''}`}
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="Enter interest rate"
+                                                />
+                                                {errors.interestRate && (
+                                                    <p className="text-red-500 text-xs mt-2">{errors.interestRate}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                                                    <Clock size={16} className="text-blue-600" />
+                                                    Tenure (Months) <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="tenure"
+                                                    value={formData.tenure}
+                                                    onChange={handleInputChange}
+                                                    className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.tenure ? 'border-red-500' : ''}`}
+                                                    min="1"
+                                                    placeholder="Enter tenure"
+                                                />
+                                                {errors.tenure && (
+                                                    <p className="text-red-500 text-xs mt-2">{errors.tenure}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                                    Monthly Installment
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="installmentAmount"
+                                                    value={formData.installmentAmount}
+                                                    onChange={handleInputChange}
+                                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-600 shadow-sm"
+                                                    readOnly
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )}
                             </div>
+                        </div>
 
-                            {/* Dates and Status */}
-                            <div className="bg-purple-50 p-4 rounded-lg">
-                                <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <Calendar size={20} className="text-purple-600" />
-                                    Dates & Status
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Enhanced Dates and Status */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-violet-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                        <Calendar className="w-5 h-5 text-white" />
+                                    </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Approval Status *
+                                        <h2 className="text-xl font-bold text-slate-900">Dates & Status</h2>
+                                        <p className="text-sm text-slate-600">Configure approval status and important dates</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Approval Status <span className="text-red-500">*</span>
                                         </label>
                                         <select
                                             value={formData.approvalStatusId}
                                             onChange={handleStatusSelect}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.approvalStatus ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white ${errors.approvalStatus ? 'border-red-500' : ''}`}
                                             disabled={loading}
                                         >
                                             <option value="">
@@ -672,11 +700,11 @@ const AddLoanAdvance = ({
                                             ))}
                                         </select>
                                         {errors.approvalStatus && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.approvalStatus}</p>
+                                            <p className="text-red-500 text-xs mt-2">{errors.approvalStatus}</p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
                                             Disbursement Date
                                         </label>
                                         <input
@@ -684,11 +712,11 @@ const AddLoanAdvance = ({
                                             name="disbursementDate"
                                             value={formData.disbursementDate}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
                                             Repayment Start Date
                                         </label>
                                         <input
@@ -696,21 +724,30 @@ const AddLoanAdvance = ({
                                             name="repaymentStartDate"
                                             value={formData.repaymentStartDate}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
                                         />
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Guarantor Information */}
-                            <div className="bg-orange-50 p-4 rounded-lg">
-                                <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <CheckCircle size={20} className="text-orange-600" />
-                                    Guarantor Information (Optional)
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Enhanced Guarantor Information */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-amber-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                        <CheckCircle className="w-5 h-5 text-white" />
+                                    </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <h2 className="text-xl font-bold text-slate-900">Guarantor Information</h2>
+                                        <p className="text-sm text-slate-600">Optional guarantor details for added security</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
                                             Guarantor Name
                                         </label>
                                         <input
@@ -718,12 +755,15 @@ const AddLoanAdvance = ({
                                             name="guarantorName"
                                             value={formData.guarantorName}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
                                             placeholder="Enter guarantor name"
                                         />
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Full name of the person guaranteeing this loan
+                                        </p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
                                             Guarantor Contact
                                         </label>
                                         <input
@@ -731,78 +771,107 @@ const AddLoanAdvance = ({
                                             name="guarantorContact"
                                             value={formData.guarantorContact}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
                                             placeholder="Enter contact number/email"
                                         />
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Phone number or email address of the guarantor
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Reason */}
-                            <div className="bg-yellow-50 p-4 rounded-lg">
-                                <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <FileText size={20} className="text-yellow-600" />
-                                    Additional Information
-                                </h2>
+                        {/* Enhanced Additional Information */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                                        <FileText className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-slate-900">Additional Information</h2>
+                                        <p className="text-sm text-slate-600">Provide context and justification for this request</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Reason/Purpose *
+                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                        Reason/Purpose <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         name="reason"
                                         value={formData.reason}
                                         onChange={handleInputChange}
                                         rows={4}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.reason ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                        className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white resize-none ${errors.reason ? 'border-red-500' : ''}`}
                                         placeholder="Explain the reason for this loan/advance request..."
                                     />
                                     {errors.reason && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.reason}</p>
+                                        <p className="text-red-500 text-xs mt-2">{errors.reason}</p>
                                     )}
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Provide detailed information about why this loan/advance is needed
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
-                            <button
-                                onClick={handleBack}
-                                className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                disabled={isSubmitting}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={isSubmitting || loading}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        {existingLoan ? 'Updating...' : 'Creating...'}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save size={16} />
-                                        {existingLoan ? 'Update Loan/Advance' : 'Create Loan/Advance'}
-                                    </>
-                                )}
-                            </button>
+                        {/* Enhanced Action Buttons */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="p-8">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            onClick={handleBack}
+                                            className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                            disabled={isSubmitting}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <X className="w-4 h-4" />
+                                                Cancel
+                                            </div>
+                                        </button>
+
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={isSubmitting || loading}
+                                            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
+                                                        {existingLoan ? 'Updating...' : 'Creating...'}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4" />
+                                                        {existingLoan ? 'Update Loan/Advance' : 'Create Loan/Advance'}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Toast Notification */}
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={hideToast}
-                />
-            )}
+                {/* Toast Notification */}
+                {toast && (
+                    <Toast
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={hideToast}
+                    />
+                )}
+            </div>
         </div>
     );
 };
