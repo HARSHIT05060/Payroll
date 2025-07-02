@@ -133,10 +133,15 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/configuration',
             submenu: [
-                // { label: 'Master', path: '/configuration' },
-                // { label: 'Company Profile', path: '/configuration/profile' },
-                // { label: 'Notifications', path: '/configuration/notifications' },
-                // { label: 'Integrations', path: '/configuration/integrations' }
+            ]
+        },
+        {
+            id: 'planspricing',
+            label: 'Plans & Pricing',
+            icon: Settings,
+            hasSubmenu: true,
+            path: '/planspricing',
+            submenu: [
             ]
         }
     ].filter(Boolean); // Remove any false menu items
