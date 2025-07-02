@@ -45,7 +45,7 @@ const Branch = () => {
 
                 {/* Main Content */}
                 <div className="space-y-8">
-                 
+
                     <BranchList
                         branches={branches}
                         onDelete={handleDeleteBranch}

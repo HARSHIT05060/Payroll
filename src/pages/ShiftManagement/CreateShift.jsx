@@ -1,19 +1,126 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Calendar, Clock, ArrowLeft, Save, X, CheckCircle, AlertCircle, Info, RotateCcw, Settings, Eye, EyeOff, Users, Timer, Edit } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Save, X, CheckCircle, AlertCircle, Info, Settings, Users, Timer, Edit, Copy, ChevronDown, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
 
 // Professional Loading Component
 const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-            <div className="w-12 h-12 border-3 border-gray-200 rounded-full animate-spin border-t-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 font-medium">{message}</p>
+            <div className="w-16 h-16 border-4 border-slate-200 rounded-full animate-spin border-t-blue-600 mx-auto"></div>
+            <p className="mt-6 text-slate-600 font-medium text-lg">{message}</p>
         </div>
     </div>
 );
+
+// Enhanced Copy Dropdown Component
+const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const sourceConfig = dayList.find(day => day.day_name.toLowerCase() === sourceDay.toLowerCase());
+    const isSourceConfigured = sourceConfig && sourceConfig.from_time && sourceConfig.to_time && sourceConfig.shift_type;
+
+    const availableDays = dayList.filter(day =>
+        day.day_name.toLowerCase() !== sourceDay.toLowerCase()
+    );
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleCopyToDay = (targetDay) => {
+        onCopy(sourceDay, [targetDay]);
+        setIsOpen(false);
+    };
+
+    const handleCopyToAll = () => {
+        const allTargetDays = availableDays.map(day => day.day_name.toLowerCase());
+        onCopy(sourceDay, allTargetDays);
+        setIsOpen(false);
+    };
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                disabled={!isSourceConfigured}
+                className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${isSourceConfigured
+                    ? 'text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                    : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'
+                    }`}
+            >
+                <Copy className="w-4 h-4" />
+                Copy {sourceDay.charAt(0).toUpperCase() + sourceDay.slice(1)}
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isOpen && isSourceConfigured && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+                        <h3 className="text-sm font-semibold text-gray-900">Copy Configuration</h3>
+                        <p className="text-xs text-gray-600 mt-1">
+                            From: {sourceConfig.from_time} - {sourceConfig.to_time}
+                        </p>
+                    </div>
+
+                    <div className="py-2">
+                        <button
+                            onClick={handleCopyToAll}
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center gap-3"
+                        >
+                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Copy className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div>
+                                <div className="font-medium">Copy to All Days</div>
+                                <div className="text-xs text-gray-500">Apply to all other days</div>
+                            </div>
+                        </button>
+
+                        <div className="my-2 border-t border-gray-100"></div>
+
+                        <div className="px-4 py-2">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Copy to Individual Days</p>
+                        </div>
+
+                        {availableDays.map(day => {
+                            const isConfigured = day.from_time && day.to_time && day.shift_type;
+                            return (
+                                <button
+                                    key={day.day_id}
+                                    onClick={() => handleCopyToDay(day.day_name.toLowerCase())}
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center justify-between"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${isConfigured ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                            }`}>
+                                            {day.day_name.charAt(0)}
+                                        </div>
+                                        <span className="text-gray-700">{day.day_name}</span>
+                                    </div>
+                                    {isConfigured && (
+                                        <Check className="w-4 h-4 text-green-500" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const CreateShift = () => {
     const navigate = useNavigate();
@@ -27,7 +134,6 @@ const CreateShift = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [toast, setToast] = useState(null);
-    const [previewMode, setPreviewMode] = useState(false);
 
     // Form data
     const [shiftName, setShiftName] = useState('');
@@ -53,11 +159,56 @@ const CreateShift = () => {
             from_time: day.from_time || '09:00 PM',
             to_time: day.to_time || '06:00 AM',
             shift_type: day.shift_type || '1',
-            occasional_days: day.occasional_days || ''
+            occasional_days: day.occasional_day || '' // Map occasional_day to occasional_days
         }));
     };
 
-    // Fetch shift day data (for creating new shifts)
+    // Reorder days to put Sunday at the end
+    const reorderDays = (days) => {
+        const sundayDay = days.find(day => day.day_name.toLowerCase() === 'sunday');
+        const otherDays = days.filter(day => day.day_name.toLowerCase() !== 'sunday');
+
+        if (sundayDay) {
+            return [...otherDays, sundayDay];
+        }
+        return days;
+    };
+
+    // Enhanced copy function with selective copying
+    const handleCopyConfiguration = (sourceDay, targetDays) => {
+        const sourceDayData = dayList.find(day => day.day_name.toLowerCase() === sourceDay.toLowerCase());
+
+        if (!sourceDayData || !sourceDayData.from_time || !sourceDayData.to_time || !sourceDayData.shift_type) {
+            showToast(`Please configure ${sourceDay} shift first before copying`, 'error');
+            return;
+        }
+
+        setDayList(prevDays =>
+            prevDays.map(day => {
+                // Don't copy to the source day itself
+                if (day.day_name.toLowerCase() === sourceDay.toLowerCase()) {
+                    return day;
+                }
+
+                // Check if this day should be updated
+                if (targetDays.includes(day.day_name.toLowerCase())) {
+                    return {
+                        ...day,
+                        from_time: sourceDayData.from_time,
+                        to_time: sourceDayData.to_time,
+                        shift_type: sourceDayData.shift_type,
+                        occasional_days: sourceDayData.occasional_days
+                    };
+                }
+
+                return day;
+            })
+        );
+
+        const targetDayNames = targetDays.map(day => day.charAt(0).toUpperCase() + day.slice(1)).join(', ');
+        showToast(`${sourceDay.charAt(0).toUpperCase() + sourceDay.slice(1)} configuration copied to ${targetDayNames}`, 'success');
+    };
+
     // Fetch shift day data (for creating new shifts or editing existing ones)
     const fetchShiftDayData = async (shiftId = null) => {
         try {
@@ -72,10 +223,18 @@ const CreateShift = () => {
 
             if (response.data.success) {
                 const data = response.data.data;
+
+                // Process the data according to the actual API response structure
                 return {
                     dayList: data.day_list || [],
-                    shiftTypes: data.shift_type || [],
-                    occasionalDayList: data.day_occasional_list || []
+                    shiftTypes: (data.shift_type || []).map(type => ({
+                        shift_type_id: type.id,
+                        shift_type_name: type.name
+                    })),
+                    occasionalDayList: (data.day_occasional_list || []).map(day => ({
+                        occasional_day_id: day.id,
+                        occasional_day_name: day.name
+                    }))
                 };
             } else {
                 showToast(response.data.message || 'Failed to fetch shift data', 'error');
@@ -146,7 +305,8 @@ const CreateShift = () => {
                 occasional_days: day.occasional_day || '' // Map occasional_day to occasional_days
             }));
 
-            setDayList(processedDayList);
+            // Reorder days to put Sunday at the end
+            setDayList(reorderDays(processedDayList));
 
             // Fetch basic shift info (shift_name, remark) from shift_list API
             const shiftDetails = await fetchShiftDetailsFromList(shiftId);
@@ -163,7 +323,7 @@ const CreateShift = () => {
             if (shiftDayData) {
                 setShiftTypes(shiftDayData.shiftTypes);
                 setOccasionalDayList(shiftDayData.occasionalDayList);
-                setDayList(applyDefaultValues(shiftDayData.dayList));
+                setDayList(reorderDays(applyDefaultValues(shiftDayData.dayList)));
             }
         }
     };
@@ -183,7 +343,7 @@ const CreateShift = () => {
                     if (shiftDayData) {
                         setShiftTypes(shiftDayData.shiftTypes);
                         setOccasionalDayList(shiftDayData.occasionalDayList);
-                        setDayList(applyDefaultValues(shiftDayData.dayList));
+                        setDayList(reorderDays(applyDefaultValues(shiftDayData.dayList)));
                     }
                 }
             } finally {
@@ -330,7 +490,7 @@ const CreateShift = () => {
 
         return (
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                     {label} {required && <span className="text-red-500">*</span>}
                 </label>
                 <div className="flex gap-1">
@@ -338,7 +498,7 @@ const CreateShift = () => {
                     <select
                         value={hour}
                         onChange={(e) => handleFieldChange('hour', e.target.value)}
-                        className="flex-1 px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -350,13 +510,13 @@ const CreateShift = () => {
                         ))}
                     </select>
 
-                    <span className="flex items-center px-1 text-gray-500">:</span>
+                    <span className="flex items-center px-1 text-slate-500 font-medium">:</span>
 
                     {/* Minute Dropdown */}
                     <select
                         value={minute}
                         onChange={(e) => handleFieldChange('minute', e.target.value)}
-                        className="flex-1 px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -372,7 +532,7 @@ const CreateShift = () => {
                     <select
                         value={period}
                         onChange={(e) => handleFieldChange('period', e.target.value)}
-                        className="px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                        className="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -453,23 +613,6 @@ const CreateShift = () => {
         }
     };
 
-    // Reset day to defaults
-    const resetDayToDefaults = (dayId) => {
-        handleDayChange(dayId, 'from_time', '09:00 PM');
-        handleDayChange(dayId, 'to_time', '06:00 AM');
-        handleDayChange(dayId, 'shift_type', '1');
-        handleDayChange(dayId, 'occasional_days', '');
-        showToast('Day reset to default values', 'info');
-    };
-
-    // Reset all days to defaults
-    const resetAllToDefaults = () => {
-        dayList.forEach(day => {
-            resetDayToDefaults(day.day_id);
-        });
-        showToast('All days reset to default configuration', 'info');
-    };
-
     if (loading) {
         const loadingMessage = isEditMode
             ? "Loading shift details for editing..."
@@ -478,307 +621,311 @@ const CreateShift = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="max-w-5xl mx-auto px-4 py-8">
+
+
+                {/* Enhanced Header */}
+                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate('/shift-management')}
-                                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft size={18} />
+                                Back
                             </button>
                             <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isEditMode ? 'bg-orange-600' : 'bg-blue-600'}`}>
-                                    {isEditMode ? <Edit className="w-5 h-5 text-white" /> : <Calendar className="w-5 h-5 text-white" />}
-                                </div>
+                                {isEditMode ? <Edit size={24} className="text-white" /> : <Calendar size={24} className="text-white" />}
                                 <div>
-                                    <h1 className="text-xl font-semibold text-gray-900">
-                                        {isEditMode ? 'Edit Shift' : 'Create New Shift'}
+                                    <h1 className="text-2xl font-bold text-white">
+                                        {isEditMode ? 'Edit Shift Configuration' : 'Create New Shift'}
                                     </h1>
-                                    <p className="text-sm text-gray-500">
-                                        {isEditMode
-                                            ? 'Modify existing work schedule and shift parameters'
-                                            : 'Configure work schedule and shift parameters'
-                                        }
+                                    <p className="text-blue-100 text-sm mt-1">
+                                        {isEditMode ? 'Update shift details below' : 'Fill in the shift details below'}
                                     </p>
                                 </div>
                             </div>
                         </div>
-
-                        <div className="flex items-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setPreviewMode(!previewMode)}
-                                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                {previewMode ? 'Edit' : 'Preview'}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={resetAllToDefaults}
-                                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-md hover:bg-orange-100 transition-colors"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                Reset All
-                            </button>
-                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <form onSubmit={handleSubmit} className="space-y-8">
 
-                    {/* Basic Information */}
-                    <div className="bg-white rounded-lg border border-gray-200">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <div className="flex items-center gap-2">
-                                <Settings className="w-5 h-5 text-gray-500" />
-                                <h2 className="text-lg font-medium text-gray-900">Basic Information</h2>
-                                {isEditMode && (
-                                    <span className="ml-2 px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
-                                        Editing
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                        <div className="p-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Shift Name <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={shiftName}
-                                        onChange={(e) => setShiftName(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                        placeholder="Enter shift name"
-                                        required
-                                        disabled={previewMode}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Remark
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={remark}
-                                        onChange={(e) => setRemark(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                        placeholder="Optional notes"
-                                        disabled={previewMode}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Weekly Schedule */}
-                    <div className="bg-white rounded-lg border border-gray-200">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Clock className="w-5 h-5 text-gray-500" />
-                                    <h2 className="text-lg font-medium text-gray-900">Weekly Schedule</h2>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-sm text-gray-500">
-                                        Default: 9:00 PM - 6:00 AM
+                        {/* Enhanced Basic Information */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center">
+                                        <Settings className="w-5 h-5 text-white" />
                                     </div>
-                                    {!previewMode && (
-                                        <button
-                                            type="button"
-                                            onClick={resetAllToDefaults}
-                                            className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors flex items-center gap-1"
-                                        >
-                                            <RotateCcw className="w-3 h-3" />
-                                            Reset All
-                                        </button>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-slate-900">Basic Information</h2>
+                                        <p className="text-sm text-slate-600">Define the fundamental details of your shift</p>
+                                    </div>
+                                    {isEditMode && (
+                                        <span className="ml-auto px-3 py-1.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full border border-orange-200">
+                                            Editing Mode
+                                        </span>
                                     )}
                                 </div>
                             </div>
-                        </div>
-                        <div className="p-6">
-                            <div className="space-y-6">
-                                {dayList.map((day) => {
-                                    const isConfigured = day.from_time && day.to_time && day.shift_type;
-                                    const isOccasionalDay = day.shift_type === "3";
-                                    const hasOccasionalDaysSelected = isOccasionalDay && day.occasional_days && day.occasional_days.trim() !== '';
-
-                                    return (
-                                        <div key={day.day_id} className="border border-gray-200 rounded-lg overflow-hidden">
-                                            {/* Day Header */}
-                                            <div className={`px-4 py-3 border-b border-gray-200 ${isConfigured ? 'bg-green-50' : 'bg-gray-50'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white ${isConfigured ? 'bg-green-500' : 'bg-gray-400'}`}>
-                                                            {day.day_name.charAt(0)}
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="font-medium text-gray-900">{day.day_name}</h3>
-                                                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                                <span>{isConfigured ? 'Configured' : 'Not configured'}</span>
-                                                                {isOccasionalDay && hasOccasionalDaysSelected && (
-                                                                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                                                                        Occasional
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        {/* Quick Time Display */}
-                                                        {isConfigured && (
-                                                            <div className="text-sm text-gray-600 bg-white px-2 py-1 rounded border">
-                                                                {day.from_time} - {day.to_time}
-                                                            </div>
-                                                        )}
-                                                        {!previewMode && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => resetDayToDefaults(day.day_id)}
-                                                                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white rounded transition-colors"
-                                                                title="Reset to defaults"
-                                                            >
-                                                                <RotateCcw className="w-4 h-4" />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Day Configuration */}
-                                            <div className="p-6">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                                    {/* Start Time */}
-                                                    <TimeSelector
-                                                        value={day.from_time}
-                                                        onChange={(value) => handleDayChange(day.day_id, 'from_time', value)}
-                                                        label="Start Time"
-                                                        required={true}
-                                                        disabled={previewMode}
-                                                    />
-
-                                                    {/* End Time */}
-                                                    <TimeSelector
-                                                        value={day.to_time}
-                                                        onChange={(value) => handleDayChange(day.day_id, 'to_time', value)}
-                                                        label="End Time"
-                                                        required={true}
-                                                        disabled={previewMode}
-                                                    />
-
-                                                    {/* Shift Type */}
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Shift Type <span className="text-red-500">*</span>
-                                                        </label>
-                                                        <select
-                                                            value={day.shift_type || ''}
-                                                            onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                                                            required
-                                                            disabled={previewMode}
-                                                        >
-                                                            <option value="" disabled>Select shift type</option>
-                                                            {shiftTypes.map(type => (
-                                                                <option key={type.id} value={type.id}>
-                                                                    {type.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-
-                                                    {/* Occasional Days */}
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Occasional Days {isOccasionalDay && <span className="text-red-500">*</span>}
-                                                        </label>
-                                                        {isOccasionalDay ? (
-                                                            <div className="border border-gray-300 rounded-md bg-white">
-                                                                <div className="p-3 max-h-24 overflow-y-auto">
-                                                                    <div className="space-y-2">
-                                                                        {occasionalDayList.map(occasional => {
-                                                                            const isChecked = (day.occasional_days || '').split(',').filter(id => id).includes(occasional.id);
-                                                                            return (
-                                                                                <label key={occasional.id} className="flex items-center gap-2 cursor-pointer text-sm hover:bg-gray-50 p-1 rounded">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        checked={isChecked}
-                                                                                        onChange={(e) => handleOccasionalDayChange(day.day_id, occasional.id, e.target.checked)}
-                                                                                        className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                                                        disabled={previewMode}
-                                                                                    />
-                                                                                    <span className="text-gray-700">{occasional.name}</span>
-                                                                                </label>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                </div>
-                                                                {/* Selected count indicator */}
-                                                                {hasOccasionalDaysSelected && (
-                                                                    <div className="px-3 py-1 bg-blue-50 border-t text-xs text-blue-600">
-                                                                        {day.occasional_days.split(',').filter(id => id).length} day(s) selected
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="border border-gray-200 rounded-md p-3 bg-gray-50 text-center">
-                                                                <p className="text-xs text-gray-500">
-                                                                    Select "Occasional Working Day" to configure
-                                                                </p>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Shift Name <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={shiftName}
+                                            onChange={(e) => setShiftName(e.target.value)}
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
+                                            placeholder="Enter a descriptive shift name"
+                                            required
+                                        />
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Choose a clear, identifiable name for this shift pattern
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                            Remarks
+                                        </label>
+                                        <textarea
+                                            value={remark}
+                                            onChange={(e) => setRemark(e.target.value)}
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white resize-none"
+                                            rows={4}
+                                            placeholder="Add any additional notes or remarks about this shift"
+                                        />
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Optional notes about special requirements or conditions
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    {!previewMode && (
-                        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-                            <button
-                                type="button"
-                                onClick={() => navigate('/shift-management')}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                                disabled={submitting}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={submitting}
-                                className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:ring-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${isEditMode
-                                    ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
-                                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-                                    }`}
-                            >
-                                {submitting ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        {isEditMode ? 'Updating...' : 'Creating...'}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4" />
-                                        {isEditMode ? 'Update Shift' : 'Create Shift'}
-                                    </>
-                                )}
-                            </button>
+                        {/* Enhanced Weekly Schedule Configuration */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                        <Calendar className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-slate-900">Weekly Schedule Configuration</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                <div className="space-y-4">
+                                    {dayList.map((day) => {
+                                        const isOccasionalType = day.shift_type === "3";
+                                        const selectedOccasionalDays = day.occasional_days ? day.occasional_days.split(',').filter(id => id) : [];
+
+                                        return (
+                                            <div key={day.day_id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
+                                                {/* Header Section */}
+                                                <div className="px-6 py-4 border-b border-slate-100">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${day.day_name.toLowerCase() === 'sunday' ? 'bg-gradient-to-br from-red-500 to-red-600' :
+                                                                day.day_name.toLowerCase() === 'saturday' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
+                                                                    'bg-gradient-to-br from-blue-500 to-blue-600'
+                                                                }`}>
+                                                                {day.day_name.charAt(0)}
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="text-xl font-bold text-slate-900">{day.day_name}</h3>
+                                                                <p className="text-sm text-slate-500 mt-0.5">Configure shift timing</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <CopyDropdown
+                                                                dayList={dayList}
+                                                                onCopy={handleCopyConfiguration}
+                                                                sourceDay={day.day_name}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Content Section */}
+                                                <div className="p-6">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                        {/* From Time */}
+                                                        <div className="space-y-2">
+                                                            <label className="block text-sm font-semibold text-slate-700">
+                                                                From Time
+                                                            </label>
+                                                            <div className="relative">
+                                                                <TimeSelector
+                                                                    value={day.from_time}
+                                                                    onChange={(value) => handleDayChange(day.day_id, 'from_time', value)}
+                                                                    label=""
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* To Time */}
+                                                        <div className="space-y-2">
+                                                            <label className="block text-sm font-semibold text-slate-700">
+                                                                To Time
+                                                            </label>
+                                                            <div className="relative">
+                                                                <TimeSelector
+                                                                    value={day.to_time}
+                                                                    onChange={(value) => handleDayChange(day.day_id, 'to_time', value)}
+                                                                    label=""
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Shift Type */}
+                                                        <div className="space-y-2">
+                                                            <label className="block text-sm font-semibold text-slate-700">
+                                                                Shift Type
+                                                            </label>
+                                                            <div className="relative">
+                                                                <select
+                                                                    value={day.shift_type}
+                                                                    onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
+                                                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm hover:border-slate-400"
+                                                                >
+                                                                    <option value="">Select Type</option>
+                                                                    {shiftTypes.map(type => (
+                                                                        <option key={type.shift_type_id} value={type.shift_type_id}>
+                                                                            {type.shift_type_name}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Occasional Days Section */}
+                                                    {isOccasionalType && (
+                                                        <div className="mt-6 pt-6 border-t border-slate-100">
+                                                            <div className="space-y-3">
+                                                                <label className="block text-sm font-semibold text-slate-700">
+                                                                    Occasional Days <span className="text-red-500">*</span>
+                                                                </label>
+                                                                <div className="bg-slate-50 rounded-xl p-4">
+                                                                    <div className="max-h-40 overflow-y-auto">
+                                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                                                            {occasionalDayList.map(occasionalDay => {
+                                                                                const isSelected = selectedOccasionalDays.includes(occasionalDay.occasional_day_id);
+                                                                                return (
+                                                                                    <label
+                                                                                        key={occasionalDay.occasional_day_id}
+                                                                                        className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
+                                                                                            ? 'bg-blue-100 border-2 border-blue-300 text-blue-800'
+                                                                                            : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                                                                            }`}
+                                                                                    >
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            checked={isSelected}
+                                                                                            onChange={(e) => handleOccasionalDayChange(
+                                                                                                day.day_id,
+                                                                                                occasionalDay.occasional_day_id,
+                                                                                                e.target.checked
+                                                                                            )}
+                                                                                            className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+                                                                                        />
+                                                                                        <span className="ml-2 text-sm font-medium">
+                                                                                            {occasionalDay.occasional_day_name}
+                                                                                        </span>
+                                                                                    </label>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                    {selectedOccasionalDays.length > 0 && (
+                                                                        <div className="mt-3 pt-3 border-t border-slate-200">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                                                <span className="text-sm font-medium text-green-700">
+                                                                                    {selectedOccasionalDays.length} day(s) selected
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Warning Message */}
+                                                    {isOccasionalType && selectedOccasionalDays.length === 0 && (
+                                                        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="flex-shrink-0">
+                                                                    <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="text-sm font-semibold text-amber-800">Selection Required</h4>
+                                                                    <p className="text-sm text-amber-700 mt-1">Please select at least one occasional day for this shift type.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </form>
+
+                        {/* Enhanced Action Buttons */}
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                            <div className="p-8">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/shift-management')}
+                                            className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <X className="w-4 h-4" />
+                                                Cancel
+                                            </div>
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            disabled={submitting}
+                                            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {submitting ? (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
+                                                        {isEditMode ? 'Updating...' : 'Creating...'}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4" />
+                                                        {isEditMode ? 'Update Shift' : 'Create Shift'}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
                 {/* Toast Notification */}
                 {toast && (

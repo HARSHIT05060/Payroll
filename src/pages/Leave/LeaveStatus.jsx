@@ -383,7 +383,6 @@ const LeaveManagement = () => {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Leave Management</h2>
-                    <p className="text-gray-600">Track and manage employee leave requests</p>
                 </div>
             </div>
 
