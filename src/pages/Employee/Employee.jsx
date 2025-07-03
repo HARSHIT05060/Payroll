@@ -1,179 +1,180 @@
-    import { useEffect, useState, useCallback, useMemo } from 'react';
-    import {
-        Pencil,
-        FileText,
-        ClipboardIcon,
-        ChevronDown,
-        ChevronUp,
-        UserCheck,
-        Loader2,
-        AlertCircle,
-        Users,
-        Plus,
-        Search,
-        Settings,
-        RefreshCw,
-        XCircle
-    } from 'lucide-react';
-    import { Navigate, useNavigate } from 'react-router-dom';
-    import { useAuth } from '../../context/AuthContext';
-    import api from '../../api/axiosInstance';
-    import { useSelector } from 'react-redux';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+    Pencil,
+    FileText,
+    ClipboardIcon,
+    ChevronDown,
+    ChevronUp,
+    UserCheck,
+    Loader2,
+    AlertCircle,
+    Users,
+    Plus,
+    Search,
+    Settings,
+    RefreshCw,
+    XCircle
+} from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axiosInstance';
+import { useSelector } from 'react-redux';
 
-    const SORT_DIRECTIONS = {
-        ASCENDING: 'ascending',
-        DESCENDING: 'descending'
-    };
+const SORT_DIRECTIONS = {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending'
+};
 
-    const COLUMN_KEYS = {
-        ID: 'id',
-        NAME: 'name',
-        DEPARTMENT: 'department',
-        DESIGNATION: 'designation'
-    };
+const COLUMN_KEYS = {
+    ID: 'id',
+    NAME: 'name',
+    DEPARTMENT: 'department',
+    DESIGNATION: 'designation'
+};
 
-    const KEY_MAPPING = {
-        [COLUMN_KEYS.ID]: 'employee_code',
-        [COLUMN_KEYS.NAME]: 'full_name',
-        [COLUMN_KEYS.DEPARTMENT]: 'department_name',
-        [COLUMN_KEYS.DESIGNATION]: 'designation_name'
-    };
+const KEY_MAPPING = {
+    [COLUMN_KEYS.ID]: 'employee_code',
+    [COLUMN_KEYS.NAME]: 'full_name',
+    [COLUMN_KEYS.DEPARTMENT]: 'department_name',
+    [COLUMN_KEYS.DESIGNATION]: 'designation_name'
+};
 
-    export default function EmployeeManagement() {
-        const [employees, setEmployees] = useState([]);
-        const [loading, setLoading] = useState(true);
-        const [error, setError] = useState(null);
-        const [searchQuery, setSearchQuery] = useState('');
-        const [filteredEmployees, setFilteredEmployees] = useState(employees);
-        const [sortConfig, setSortConfig] = useState({
-            key: null,
-            direction: SORT_DIRECTIONS.ASCENDING
-        });
+export default function EmployeeManagement() {
+    const [employees, setEmployees] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredEmployees, setFilteredEmployees] = useState(employees);
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: SORT_DIRECTIONS.ASCENDING
+    });
 
-        const navigate = useNavigate();
-        const { user, isAuthenticated, logout } = useAuth();
-        const permissions = useSelector(state => state.permissions) || {};
+    const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuth();
+    const permissions = useSelector(state => state.permissions) || {};
 
-        // Fetch employees data
-        const fetchEmployees = useCallback(async () => {
-            try {
-                setLoading(true);
-                setError(null);
+    // Fetch employees data
+    const fetchEmployees = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                if (!user?.user_id) {
-                    throw new Error('User ID is required');
-                }
-
-                const formData = new FormData();
-                formData.append('user_id', user.user_id);
-
-                const response = await api.post('employee_list', formData);
-
-                if (response.data?.success && response.data.data) {
-                    setEmployees(response.data.data);
-                } else if (response.data?.success && response.data.employees) {
-                    setEmployees(response.data.employees);
-                } else if (Array.isArray(response.data)) {
-                    setEmployees(response.data);
-                } else {
-                    throw new Error(response.data?.message || 'Failed to fetch employees');
-                }
-
-            } catch (error) {
-                console.error("Fetch employees error:", error);
-                const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
-
-                if (error.response?.status === 401) {
-                    setError("Your session has expired. Please login again.");
-                    setTimeout(() => logout?.(), 2000);
-                } else if (error.response?.status === 403) {
-                    setError("You don't have permission to view employees.");
-                } else if (error.response?.status >= 500) {
-                    setError("Server error. Please try again later.");
-                } else {
-                    setError(errorMessage);
-                }
-            } finally {
-                setLoading(false);
+            if (!user?.user_id) {
+                throw new Error('User ID is required');
             }
-        }, [user, logout]);
 
-        useEffect(() => {
-            const delayDebounce = setTimeout(() => {
-                const filtered = employees.filter(emp => {
-                    return Object.values(emp).some(value =>
-                        String(value).toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                });
-                setFilteredEmployees(filtered);
-            }, 300);
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
 
-            return () => clearTimeout(delayDebounce);
-        }, [searchQuery, employees]);
+            const response = await api.post('employee_list', formData);
 
-        useEffect(() => {
-            if (isAuthenticated() && user?.user_id) {
-                fetchEmployees();
+            if (response.data?.success && response.data.data) {
+                setEmployees(response.data.data);
+            } else if (response.data?.success && response.data.employees) {
+                setEmployees(response.data.employees);
+            } else if (Array.isArray(response.data)) {
+                setEmployees(response.data);
+            } else {
+                throw new Error(response.data?.message || 'Failed to fetch employees');
             }
-        }, [isAuthenticated, fetchEmployees, user?.user_id]);
 
-        // Sorting functionality
-        const requestSort = useCallback((key) => {
-            setSortConfig(prevConfig => {
-                const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
-                    ? SORT_DIRECTIONS.DESCENDING
-                    : SORT_DIRECTIONS.ASCENDING;
-                return { key, direction };
-            });
-        }, []);
+        } catch (error) {
+            console.error("Fetch employees error:", error);
+            const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
 
-        // Memoized sorted employees
-        const sortedEmployees = useMemo(() => {
-            const source = searchQuery ? filteredEmployees : employees;
-
-            if (!sortConfig.key) return source;
-
-            return [...source].sort((a, b) => {
-                const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
-                const aValue = a[actualKey] || '';
-                const bValue = b[actualKey] || '';
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
-                }
-                return 0;
-            });
-        }, [employees, filteredEmployees, sortConfig, searchQuery]);
-
-        // Action handlers
-        const handleViewDetails = useCallback((employee_id) => {
-            navigate(`/employee/details/${employee_id}`);
-        }, [navigate]);
-
-        const handleEditEmployee = useCallback((employee_id) => {
-            navigate(`/add-employee?edit=${employee_id}`);
-        }, [navigate]);
-
-        // Render sort icon
-        const renderSortIcon = useCallback((key) => {
-            if (sortConfig.key !== key) {
-                return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+            if (error.response?.status === 401) {
+                setError("Your session has expired. Please login again.");
+                setTimeout(() => logout?.(), 2000);
+            } else if (error.response?.status === 403) {
+                setError("You don't have permission to view employees.");
+            } else if (error.response?.status >= 500) {
+                setError("Server error. Please try again later.");
+            } else {
+                setError(errorMessage);
             }
-            return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-                <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
-                <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
-        }, [sortConfig]);
-
-        // Redirect if not authenticated
-        if (!isAuthenticated()) {
-            return <Navigate to="/login" replace />;
+        } finally {
+            setLoading(false);
         }
+    }, [user, logout]);
 
-        return (
-            <div className="min-h-screen bg-gray-50 p-6 max-w-7xl mx-auto">
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            const filtered = employees.filter(emp => {
+                return Object.values(emp).some(value =>
+                    String(value).toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            });
+            setFilteredEmployees(filtered);
+        }, 300);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchQuery, employees]);
+
+    useEffect(() => {
+        if (isAuthenticated() && user?.user_id) {
+            fetchEmployees();
+        }
+    }, [isAuthenticated, fetchEmployees, user?.user_id]);
+
+    // Sorting functionality
+    const requestSort = useCallback((key) => {
+        setSortConfig(prevConfig => {
+            const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
+                ? SORT_DIRECTIONS.DESCENDING
+                : SORT_DIRECTIONS.ASCENDING;
+            return { key, direction };
+        });
+    }, []);
+
+    // Memoized sorted employees
+    const sortedEmployees = useMemo(() => {
+        const source = searchQuery ? filteredEmployees : employees;
+
+        if (!sortConfig.key) return source;
+
+        return [...source].sort((a, b) => {
+            const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
+            const aValue = a[actualKey] || '';
+            const bValue = b[actualKey] || '';
+
+            if (aValue < bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [employees, filteredEmployees, sortConfig, searchQuery]);
+
+    // Action handlers
+    const handleViewDetails = useCallback((employee_id) => {
+        navigate(`/employee/details/${employee_id}`);
+    }, [navigate]);
+
+    const handleEditEmployee = useCallback((employee_id) => {
+        navigate(`/add-employee?edit=${employee_id}`);
+    }, [navigate]);
+
+    // Render sort icon
+    const renderSortIcon = useCallback((key) => {
+        if (sortConfig.key !== key) {
+            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+        }
+        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
+            <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+    }, [sortConfig]);
+
+    // Redirect if not authenticated
+    if (!isAuthenticated()) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <div className="p-6 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Employee Management</h2>
@@ -377,5 +378,6 @@
                     )}
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
+}

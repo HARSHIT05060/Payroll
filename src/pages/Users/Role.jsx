@@ -19,7 +19,7 @@ const Role = () => {
     const permissions = useSelector(state => state.permissions);
 
     const showToast = (message, type) => {
-    
+
         setToast({ message, type });
     };
 
@@ -171,167 +171,169 @@ const Role = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50 p-6 max-w-7xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Role Management</h2>
-                        {/* <p className="text-gray-600 mt-1">Manage user roles and assign permissions</p> */}
-                    </div>
-                    <div className="flex space-x-2">
-
-                        {permissions['user_roles_create'] &&
-                            <button
-                                onClick={handleCreateRole}
-                                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>Create Role</span>
-                            </button>
-                        }
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
-                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
-                        <h3 className="text-lg font-medium text-white">All Roles</h3>
-                    </div>
-
-                    {loading ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-gray-500">
-                                <RefreshCw className="w-5 h-5 animate-spin" />
-                                <span>Loading roles...</span>
-                            </div>
+            <div className="min-h-screen bg-gray-50">
+                <div className="p-6 max-w-7xl mx-auto">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900">Role Management</h2>
+                            {/* <p className="text-gray-600 mt-1">Manage user roles and assign permissions</p> */}
                         </div>
-                    ) : error ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Roles</p>
-                                <p className="text-red-600 mb-4">{error}</p>
-                                <button
-                                    onClick={handleRefresh}
-                                    className="inline-flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                    <span>Try Again</span>
-                                </button>
-                            </div>
-                        </div>
-                    ) : roles.length === 0 ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Plus className="w-8 h-8 text-gray-400" />
-                                </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">No Roles Found</p>
-                                <p className="text-gray-500 text-sm mb-4">
-                                    You haven't created any roles yet. Create your first role to get started with role management.
-                                </p>
+                        <div className="flex space-x-2">
+
+                            {permissions['user_roles_create'] &&
                                 <button
                                     onClick={handleCreateRole}
-                                    className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span>Create First Role</span>
+                                    <span>Create Role</span>
                                 </button>
+                            }
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                        <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                            <h3 className="text-lg font-medium text-white">All Roles</h3>
+                        </div>
+
+                        {loading ? (
+                            <div className="px-6 py-12 text-center">
+                                <div className="inline-flex items-center space-x-2 text-gray-500">
+                                    <RefreshCw className="w-5 h-5 animate-spin" />
+                                    <span>Loading roles...</span>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-blue-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Role Name
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Type
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Created Date
-                                        </th>
-                                        {permissions['user_roles_edit', 'user_roles_delete'] &&
+                        ) : error ? (
+                            <div className="px-6 py-12 text-center">
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                                    <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                                    <p className="text-red-700 text-lg font-medium mb-2">Error Loading Roles</p>
+                                    <p className="text-red-600 mb-4">{error}</p>
+                                    <button
+                                        onClick={handleRefresh}
+                                        className="inline-flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+                                    >
+                                        <RefreshCw className="w-4 h-4" />
+                                        <span>Try Again</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ) : roles.length === 0 ? (
+                            <div className="px-6 py-12 text-center">
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Plus className="w-8 h-8 text-gray-400" />
+                                    </div>
+                                    <p className="text-gray-700 text-lg font-medium mb-2">No Roles Found</p>
+                                    <p className="text-gray-500 text-sm mb-4">
+                                        You haven't created any roles yet. Create your first role to get started with role management.
+                                    </p>
+                                    <button
+                                        onClick={handleCreateRole}
+                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        <span>Create First Role</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-blue-50">
+                                        <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Actions
+                                                Role Name
                                             </th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {roles.map(role => (
-                                        <tr key={role.user_roles_id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                <div className="flex items-center space-x-2">
-                                                    {isAdminRole(role) ? (
-                                                        <Shield className="w-4 h-4 text-blue-600" />
-                                                    ) : (
-                                                        <User className="w-4 h-4 text-gray-500" />
-                                                    )}
-                                                    <span>{role.name || 'Unnamed Role'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminRole(role)
-                                                    ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {isAdminRole(role) ? (
-                                                        <>
-                                                            <Shield className="w-3 h-3 mr-1" />
-                                                            Admin
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <User className="w-3 h-3 mr-1" />
-                                                            User
-                                                        </>
-                                                    )}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                {role.created_date ? new Date(role.created_date).toLocaleDateString('en-GB') : 'N/A'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-2">
-                                                    {permissions['user_roles_edit'] &&
-                                                        <button
-                                                            onClick={() => handleEditRole(role)}
-                                                            className={`p-2 rounded-md transition-colors ${canModifyRole(role)
-                                                                ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
-                                                                : 'text-gray-400 cursor-not-allowed'
-                                                                }`}
-                                                            title={canModifyRole(role) ? "Edit Role" : "Admin roles cannot be edited"}
-                                                            disabled={deleting === role.user_roles_id || !canModifyRole(role)}
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                    }
-                                                    {permissions['user_roles_delete'] &&
-                                                        <button
-                                                            onClick={() => handleDeleteRole(role)}
-                                                            className={`p-2 rounded-md transition-colors ${canModifyRole(role)
-                                                                ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                                                : 'text-gray-400 cursor-not-allowed'
-                                                                }`}
-                                                            title={canModifyRole(role) ? "Delete Role" : "Admin roles cannot be deleted"}
-                                                            disabled={deleting === role.user_roles_id || !canModifyRole(role)}
-                                                        >
-                                                            {deleting === role.user_roles_id ? (
-                                                                <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                                            ) : (
-                                                                <Trash2 className="w-4 h-4" />
-                                                            )}
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </td>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Type
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Created Date
+                                            </th>
+                                            {permissions['user_roles_edit', 'user_roles_delete'] &&
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            }
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {roles.map(role => (
+                                            <tr key={role.user_roles_id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    <div className="flex items-center space-x-2">
+                                                        {isAdminRole(role) ? (
+                                                            <Shield className="w-4 h-4 text-blue-600" />
+                                                        ) : (
+                                                            <User className="w-4 h-4 text-gray-500" />
+                                                        )}
+                                                        <span>{role.name || 'Unnamed Role'}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminRole(role)
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {isAdminRole(role) ? (
+                                                            <>
+                                                                <Shield className="w-3 h-3 mr-1" />
+                                                                Admin
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <User className="w-3 h-3 mr-1" />
+                                                                User
+                                                            </>
+                                                        )}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    {role.created_date ? new Date(role.created_date).toLocaleDateString('en-GB') : 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        {permissions['user_roles_edit'] &&
+                                                            <button
+                                                                onClick={() => handleEditRole(role)}
+                                                                className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                                    ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
+                                                                    : 'text-gray-400 cursor-not-allowed'
+                                                                    }`}
+                                                                title={canModifyRole(role) ? "Edit Role" : "Admin roles cannot be edited"}
+                                                                disabled={deleting === role.user_roles_id || !canModifyRole(role)}
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        }
+                                                        {permissions['user_roles_delete'] &&
+                                                            <button
+                                                                onClick={() => handleDeleteRole(role)}
+                                                                className={`p-2 rounded-md transition-colors ${canModifyRole(role)
+                                                                    ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                                                    : 'text-gray-400 cursor-not-allowed'
+                                                                    }`}
+                                                                title={canModifyRole(role) ? "Delete Role" : "Admin roles cannot be deleted"}
+                                                                disabled={deleting === role.user_roles_id || !canModifyRole(role)}
+                                                            >
+                                                                {deleting === role.user_roles_id ? (
+                                                                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                                                ) : (
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                )}
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -340,7 +342,7 @@ const Role = () => {
                 <Toast
                     message={toast.message}
                     type={toast.type}
-                    onClose={()=>{setToast(null)}}
+                    onClose={() => { setToast(null) }}
                 />
             )}
 
