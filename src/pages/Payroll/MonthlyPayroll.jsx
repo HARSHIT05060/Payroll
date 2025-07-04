@@ -11,14 +11,14 @@ import {
   CreditCard,
   ChevronDown,
   CheckCircle,
-  AlertCircle,
+  ArrowLeft,
   Clock,
   TrendingUp,
   Edit,
   Save,
   X
 } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
@@ -41,6 +41,7 @@ const MonthlyPayroll = () => {
   const [editablePayable, setEditablePayable] = useState('');
   const [toast, setToast] = useState(null);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+  const navigate = useNavigate();
 
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -297,7 +298,6 @@ const MonthlyPayroll = () => {
 
     return { totalOvertime, overtimeAndWeekOffPay };
   }, [payrollData]);
-
   // Initialize component
   useEffect(() => {
     if (isAuthenticated() && user?.user_id) {
@@ -329,9 +329,24 @@ const MonthlyPayroll = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         <div className="p-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Monthly Payroll</h2>
+          <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                >
+                  <ArrowLeft size={18} />
+                  Back
+                </button>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <h1 className="text-2xl font-bold text-white">
+                      Monthly Payroll
+                    </h1>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

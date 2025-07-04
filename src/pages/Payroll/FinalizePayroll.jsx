@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   IndianRupee,
-  FileText,
+  ArrowLeft,
   ChevronDown,
   ChevronUp,
   XCircle,
@@ -10,7 +10,7 @@ import {
   RefreshCw,
   Search
 } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 
@@ -35,6 +35,7 @@ export default function FinalizePayroll() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const navigate = useNavigate();
 
   // Set default to current month and year
   const currentDate = new Date();
@@ -263,9 +264,24 @@ export default function FinalizePayroll() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Finalize Payroll</h2>
+        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+              >
+                <ArrowLeft size={18} />
+                Back
+              </button>
+              <div className="flex items-center gap-3">
+                <div>
+                  <h1 className="text-2xl font-bold text-white">
+                    Finalize Payroll
+                  </h1>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -452,17 +468,6 @@ export default function FinalizePayroll() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                             {record.mobile_number || 'N/A'}
                           </td>
-                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleViewDetails(record.employee_salary_id)}
-                              className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
-                              title="View Details"
-                            >
-                              <FileText className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td> */}
                         </tr>
                       );
                     })

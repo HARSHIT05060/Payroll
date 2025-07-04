@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, AlertCircle, XCircle, User, Shield } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, ArrowLeft, XCircle, User, Shield } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
@@ -166,19 +166,35 @@ const UserManagement = () => {
         <>
             <div className="min-h-screen bg-gray-50">
                 <div className="p-6 max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-                        </div>
-                        <div className="flex space-x-2">
-
-                            {permissions['user_create'] && <button
-                                onClick={() => navigate('/add-user')}
-                                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>Create User</span>
-                            </button>}
+                    <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => navigate(-1)}
+                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                    >
+                                        <ArrowLeft size={18} />
+                                        Back
+                                    </button>
+                                    <div className="flex items-center gap-3">
+                                        <div>
+                                            <h1 className="text-2xl font-bold text-white">
+                                                User Management
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                {permissions['user_create'] && (
+                                    <button
+                                        onClick={() => navigate('/add-user')}
+                                        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        <span>Create User</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
