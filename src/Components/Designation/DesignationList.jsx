@@ -1,9 +1,11 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Trash2, Briefcase, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
+import DesignationForm from "./DesignationForm";
+import useDesignations from "../../hooks/useDesignations";
 
-const DesignationList = ({ designations, onDelete, loading = false, showToast }) => {
+const DesignationList = () => {
     const [deletingId, setDeletingId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [confirmModal, setConfirmModal] = useState({
@@ -12,6 +14,35 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
         data: null
     });
     const permissions = useSelector(state => state.permissions) || {};
+
+    const {
+        designations,
+        loading,
+        addDesignation,
+        deleteDesignation,
+    } = useDesignations();
+
+    // eslint-disable-next-line no-unused-vars
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 5000);
+    };
+
+    const handleAddDesignation = async (name) => {
+        const result = await addDesignation(name);
+        return result;
+    };
+
+    const handleDeleteDesignation = async (id) => {
+        const result = await deleteDesignation(id);
+        if (result && result.success) {
+            showToast("Designation deleted successfully!", "success");
+        } else {
+            showToast("Failed to delete designation. Please try again.", "error");
+        }
+    };
 
     // Real-time search filtering using useMemo for performance
     const filteredDesignations = useMemo(() => {
@@ -38,18 +69,10 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
     const confirmDeleteDesignation = async () => {
         const designation = confirmModal.data;
         if (!designation) return;
-
         const designationId = designation.designation_id || designation.id;
         setDeletingId(designationId);
-
         try {
-            const result = await onDelete(designationId);
-
-            if (result && !result.success) {
-                showToast("Failed to delete designation. Please try again.", "error");
-            } else {
-                showToast("Designation deleted successfully!", "success");
-            }
+            await handleDeleteDesignation(designationId);
         } catch (error) {
             showToast("An error occurred while deleting the designation.", error);
         } finally {
@@ -115,38 +138,46 @@ const DesignationList = ({ designations, onDelete, loading = false, showToast })
                     </div>
                 </div>
 
-                {/* Search Bar */}
-                {totalDesignations > 0 && (
-                    <div className="px-6 py-4 bg-blue-50/30 border-b border-gray-100">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-gray-400" />
+                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white flex flex-col gap-4">
+                    {permissions['designation_create'] &&
+                        <DesignationForm
+                            onSubmit={handleAddDesignation}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
+
+                    {/* Search Bar */}
+                    {totalDesignations > 0 && (
+                        <div className="bg-blue-50/30 border border-gray-100 rounded-lg p-4">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search className="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search designations by name, description, level, or department..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
+                                />
+                                {searchTerm && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+                                )}
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Search designations by name, description, level, or department..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
-                            />
                             {searchTerm && (
-                                <button
-                                    onClick={clearSearch}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
+                                <p className="text-sm text-blue-600 mt-2">
+                                    Showing {filteredCount} of {totalDesignations} designations
+                                </p>
                             )}
                         </div>
-                        {searchTerm && (
-                            <p className="text-sm text-blue-600 mt-2">
-                                Showing {filteredCount} of {totalDesignations} designations
-                            </p>
-                        )}
-                    </div>
-                )}
+                    )}
 
-                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white">
                     {totalDesignations === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">

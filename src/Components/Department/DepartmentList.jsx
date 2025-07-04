@@ -2,8 +2,10 @@ import React, { useState, useMemo } from "react";
 import { Trash2, Users, AlertTriangle, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
+import DepartmentForm from "./DepartmentForm";
+import useDepartments from "../../hooks/useDepartments";
 
-const DepartmentList = ({ departments, onDelete, loading = false, showToast }) => {
+const DepartmentList = () => {
     const [deletingId, setDeletingId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [confirmModal, setConfirmModal] = useState({
@@ -12,6 +14,35 @@ const DepartmentList = ({ departments, onDelete, loading = false, showToast }) =
         data: null
     });
     const permissions = useSelector(state => state.permissions) || {};
+
+    const {
+        departments,
+        loading,
+        addDepartment,
+        deleteDepartment,
+    } = useDepartments();
+
+    // eslint-disable-next-line no-unused-vars
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 5000);
+    };
+
+    const handleAddDepartment = async (name) => {
+        const result = await addDepartment(name);
+        return result;
+    };
+
+    const handleDeleteDepartment = async (id) => {
+        const result = await deleteDepartment(id);
+        if (result && result.success) {
+            showToast("Department deleted successfully!", "success");
+        } else {
+            showToast("Failed to delete department. Please try again.", "error");
+        }
+    };
 
     // Real-time search filtering using useMemo for performance
     const filteredDepartments = useMemo(() => {
@@ -36,18 +67,10 @@ const DepartmentList = ({ departments, onDelete, loading = false, showToast }) =
     const confirmDeleteDepartment = async () => {
         const department = confirmModal.data;
         if (!department) return;
-
         const departmentId = department.department_id || department.id;
         setDeletingId(departmentId);
-
         try {
-            const result = await onDelete(departmentId);
-
-            if (result && !result.success) {
-                showToast("Failed to delete department. Please try again.", "error");
-            } else {
-                showToast("Department deleted successfully!", "success");
-            }
+            await handleDeleteDepartment(departmentId);
         } catch (error) {
             showToast("An error occurred while deleting the department.", error);
         } finally {
@@ -113,38 +136,14 @@ const DepartmentList = ({ departments, onDelete, loading = false, showToast }) =
                     </div>
                 </div>
 
-                {/* Search Bar */}
-                {totalDepartments > 0 && (
-                    <div className="px-6 py-4 bg-blue-50/30 border-b border-gray-100">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search departments by name or description..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={clearSearch}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
-                            )}
-                        </div>
-                        {searchTerm && (
-                            <p className="text-sm text-blue-600 mt-2">
-                                Showing {filteredCount} of {totalDepartments} departments
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white">
+                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white flex flex-col gap-4">
+                    {permissions['department_create'] &&
+                        <DepartmentForm
+                            onSubmit={handleAddDepartment}
+                            loading={loading}
+                            showToast={showToast}
+                        />
+                    }
                     {totalDepartments === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -231,7 +230,7 @@ const DepartmentList = ({ departments, onDelete, loading = false, showToast }) =
                 onClose={closeModal}
                 onConfirm={confirmDeleteDepartment}
                 title="Delete Department"
-                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this department'}"? This action cannot be undone.`}
+                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Department'}"? This action cannot be undone.`}
                 confirmText="Delete"
                 cancelText="Cancel"
                 type="danger"

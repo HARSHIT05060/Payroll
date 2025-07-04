@@ -44,26 +44,11 @@ const DepartmentForm = ({ onSubmit, loading = false, showToast }) => {
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-blue-600 overflow-hidden">
-            <div className="relative">
-                <div className="bg-blue-600 px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-white/20 rounded-lg">
-                            <Users className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-white">
-                                Add New Department
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div className="p-6 bg-gradient-to-br from-blue-50/20 to-white">
-                <div className="space-y-4">
+                <div className="flex w-full flex-row items-center justify-between mb-4">
                     <div>
-                        <label htmlFor="departmentName" className="block text-sm font-medium text-gray-700 mb-2">
-                            Department Name <span className="text-red-500">*</span>
+                        <label htmlFor="departmentName" className="text-sm font-medium text-gray-700 mb-2">
+                            Add New Department <span className="text-red-500">*</span>
                         </label>
                         <input
                             id="departmentName"
@@ -73,7 +58,7 @@ const DepartmentForm = ({ onSubmit, loading = false, showToast }) => {
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
                             disabled={isSubmitting || loading}
-                            onKeyPress={(e) => {
+                            onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSubmit(e);
                                 }

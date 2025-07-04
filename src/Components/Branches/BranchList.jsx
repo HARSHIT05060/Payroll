@@ -22,6 +22,7 @@ const BranchList = () => {
         deleteBranch,
     } = useBranches();
 
+    // eslint-disable-next-line no-unused-vars
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type) => {
@@ -66,21 +67,20 @@ const BranchList = () => {
         });
     };
 
-    // eslint-disable-next-line no-unused-vars
     const confirmDeleteBranch = async () => {
-    const branch = confirmModal.data;
-    if (!branch) return;
-    const branchId = branch.branch_id || branch.id;
-    setDeletingId(branchId);
-    try {
-        await handleDeleteBranch(branchId);
-    } catch (error) {
-        showToast("An error occurred while deleting the branch.", "error");
-    } finally {
-        setDeletingId(null);
-        closeModal();
-    }
-};
+        const branch = confirmModal.data;
+        if (!branch) return;
+        const branchId = branch.branch_id || branch.id;
+        setDeletingId(branchId);
+        try {
+            await handleDeleteBranch(branchId);
+        } catch (error) {
+            showToast("An error occurred while deleting the branch.", error);
+        } finally {
+            setDeletingId(null);
+            closeModal();
+        }
+    };
 
 
     const closeModal = () => {
