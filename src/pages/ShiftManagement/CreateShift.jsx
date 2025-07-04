@@ -649,281 +649,284 @@ const CreateShift = () => {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <form onSubmit={handleSubmit} className="space-y-8">
-
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Enhanced Weekly Schedule Configuration */}
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         {/* Enhanced Basic Information */}
-                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                        <Settings className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-bold text-slate-900">Basic Information</h2>
-                                        <p className="text-sm text-slate-600">Define the fundamental details of your shift</p>
-                                    </div>
-                                    {isEditMode && (
-                                        <span className="ml-auto px-3 py-1.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full border border-orange-200">
-                                            Editing Mode
-                                        </span>
-                                    )}
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                    <Settings className="w-5 h-5 text-white" />
                                 </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900">Basic Information</h2>
+                                    <p className="text-sm text-slate-600">Define the fundamental details of your shift</p>
+                                </div>
+                                {isEditMode && (
+                                    <span className="ml-auto px-3 py-1.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full border border-orange-200">
+                                        Editing Mode
+                                    </span>
+                                )}
                             </div>
-                            <div className="p-8">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
-                                            Shift Name <span className="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={shiftName}
-                                            onChange={(e) => setShiftName(e.target.value)}
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
-                                            placeholder="Enter a descriptive shift name"
-                                            required
-                                        />
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            Choose a clear, identifiable name for this shift pattern
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-3">
-                                            Remarks
-                                        </label>
-                                        <textarea
-                                            value={remark}
-                                            onChange={(e) => setRemark(e.target.value)}
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white resize-none"
-                                            rows={4}
-                                            placeholder="Add any additional notes or remarks about this shift"
-                                        />
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            Optional notes about special requirements or conditions
-                                        </p>
-                                    </div>
+                        </div>
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                        Shift Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={shiftName}
+                                        onChange={(e) => setShiftName(e.target.value)}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
+                                        placeholder="Enter a descriptive shift name"
+                                        required
+                                    />
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Choose a clear, identifiable name for this shift pattern
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                        Remarks
+                                    </label>
+                                    <textarea
+                                        value={remark}
+                                        onChange={(e) => setRemark(e.target.value)}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white resize-none"
+                                        rows={2}
+                                        placeholder="Add any additional notes or remarks about this shift"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-2">
+                                        Optional notes about special requirements or conditions
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Enhanced Weekly Schedule Configuration */}
-                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                            <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                        <Calendar className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-bold text-slate-900">Weekly Schedule Configuration</h2>
-                                    </div>
+                        {/* Weekly Schedule Header */}
+                        <div className="px-8 py-6 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                    <Calendar className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900">Weekly Schedule Configuration</h2>
                                 </div>
                             </div>
-                            <div className="p-6">
-                                <div className="space-y-4">
-                                    {dayList.map((day) => {
-                                        const isOccasionalType = day.shift_type === "3";
-                                        const selectedOccasionalDays = day.occasional_days ? day.occasional_days.split(',').filter(id => id) : [];
+                        </div>
 
-                                        return (
-                                            <div key={day.day_id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
-                                                {/* Header Section */}
-                                                <div className="px-6 py-4 border-b border-slate-100">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${day.day_name.toLowerCase() === 'sunday' ? 'bg-gradient-to-br from-red-500 to-red-600' :
-                                                                day.day_name.toLowerCase() === 'saturday' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
-                                                                    'bg-gradient-to-br from-blue-500 to-blue-600'
-                                                                }`}>
-                                                                {day.day_name.charAt(0)}
-                                                            </div>
-                                                            <div>
-                                                                <h3 className="text-xl font-bold text-slate-900">{day.day_name}</h3>
-                                                                <p className="text-sm text-slate-500 mt-0.5">Configure shift timing</p>
-                                                            </div>
+                        {/* Weekly Schedule Content */}
+                        <div className="p-8">
+                            <div className="space-y-6">
+                                {dayList.map((day) => {
+                                    const isOccasionalType = day.shift_type === "3";
+                                    const selectedOccasionalDays = day.occasional_days ? day.occasional_days.split(',').filter(id => id) : [];
+
+                                    return (
+                                        <div key={day.day_id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
+                                            {/* Day Header */}
+                                            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/50 rounded-t-2xl">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${day.day_name.toLowerCase() === 'sunday' ? 'bg-gradient-to-br from-red-500 to-red-600' :
+                                                            day.day_name.toLowerCase() === 'saturday' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
+                                                                'bg-gradient-to-br from-blue-500 to-blue-600'
+                                                            }`}>
+                                                            {day.day_name.charAt(0)}{day.day_name.charAt(1)}
                                                         </div>
-                                                        <div className="flex items-center gap-3">
-                                                            <CopyDropdown
-                                                                dayList={dayList}
-                                                                onCopy={handleCopyConfiguration}
-                                                                sourceDay={day.day_name}
+                                                        <div>
+                                                            <h3 className="text-lg font-bold text-slate-900">{day.day_name}</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <CopyDropdown
+                                                            dayList={dayList}
+                                                            onCopy={handleCopyConfiguration}
+                                                            sourceDay={day.day_name}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Day Content */}
+                                            <div className="p-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    {/* From Time */}
+                                                    <div className="space-y-2">
+                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                            From Time
+                                                        </label>
+                                                        <div className="relative">
+                                                            <TimeSelector
+                                                                value={day.from_time}
+                                                                onChange={(value) => handleDayChange(day.day_id, 'from_time', value)}
+                                                                label=""
                                                             />
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                {/* Content Section */}
-                                                <div className="p-6">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                        {/* From Time */}
-                                                        <div className="space-y-2">
-                                                            <label className="block text-sm font-semibold text-slate-700">
-                                                                From Time
-                                                            </label>
-                                                            <div className="relative">
-                                                                <TimeSelector
-                                                                    value={day.from_time}
-                                                                    onChange={(value) => handleDayChange(day.day_id, 'from_time', value)}
-                                                                    label=""
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* To Time */}
-                                                        <div className="space-y-2">
-                                                            <label className="block text-sm font-semibold text-slate-700">
-                                                                To Time
-                                                            </label>
-                                                            <div className="relative">
-                                                                <TimeSelector
-                                                                    value={day.to_time}
-                                                                    onChange={(value) => handleDayChange(day.day_id, 'to_time', value)}
-                                                                    label=""
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Shift Type */}
-                                                        <div className="space-y-2">
-                                                            <label className="block text-sm font-semibold text-slate-700">
-                                                                Shift Type
-                                                            </label>
-                                                            <div className="relative">
-                                                                <select
-                                                                    value={day.shift_type}
-                                                                    onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
-                                                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm hover:border-slate-400"
-                                                                >
-                                                                    <option value="">Select Type</option>
-                                                                    {shiftTypes.map(type => (
-                                                                        <option key={type.shift_type_id} value={type.shift_type_id}>
-                                                                            {type.shift_type_name}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
+                                                    {/* To Time */}
+                                                    <div className="space-y-2">
+                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                            To Time
+                                                        </label>
+                                                        <div className="relative">
+                                                            <TimeSelector
+                                                                value={day.to_time}
+                                                                onChange={(value) => handleDayChange(day.day_id, 'to_time', value)}
+                                                                label=""
+                                                            />
                                                         </div>
                                                     </div>
 
-                                                    {/* Occasional Days Section */}
-                                                    {isOccasionalType && (
-                                                        <div className="mt-6 pt-6 border-t border-slate-100">
-                                                            <div className="space-y-3">
-                                                                <label className="block text-sm font-semibold text-slate-700">
+                                                    {/* Shift Type */}
+                                                    <div className="space-y-2">
+                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                            Shift Type
+                                                        </label>
+                                                        <div className="relative">
+                                                            <select
+                                                                value={day.shift_type}
+                                                                onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
+                                                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm hover:border-slate-400"
+                                                            >
+                                                                <option value="">Select Type</option>
+                                                                {shiftTypes.map(type => (
+                                                                    <option key={type.shift_type_id} value={type.shift_type_id}>
+                                                                        {type.shift_type_name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Occasional Days Section */}
+                                                {isOccasionalType && (
+                                                    <div className="mt-6 pt-6 border-t border-slate-200">
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                                <label className="text-sm font-semibold text-slate-700">
                                                                     Occasional Days <span className="text-red-500">*</span>
                                                                 </label>
-                                                                <div className="bg-slate-50 rounded-xl p-4">
-                                                                    <div className="max-h-40 overflow-y-auto">
-                                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                                                                            {occasionalDayList.map(occasionalDay => {
-                                                                                const isSelected = selectedOccasionalDays.includes(occasionalDay.occasional_day_id);
-                                                                                return (
-                                                                                    <label
-                                                                                        key={occasionalDay.occasional_day_id}
-                                                                                        className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
-                                                                                            ? 'bg-blue-100 border-2 border-blue-300 text-blue-800'
-                                                                                            : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                                                                                            }`}
-                                                                                    >
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            checked={isSelected}
-                                                                                            onChange={(e) => handleOccasionalDayChange(
-                                                                                                day.day_id,
-                                                                                                occasionalDay.occasional_day_id,
-                                                                                                e.target.checked
-                                                                                            )}
-                                                                                            className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
-                                                                                        />
-                                                                                        <span className="ml-2 text-sm font-medium">
-                                                                                            {occasionalDay.occasional_day_name}
-                                                                                        </span>
-                                                                                    </label>
-                                                                                );
-                                                                            })}
+                                                            </div>
+                                                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                                                <div className="max-h-40 overflow-y-auto">
+                                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                                        {occasionalDayList.map(occasionalDay => {
+                                                                            const isSelected = selectedOccasionalDays.includes(occasionalDay.occasional_day_id);
+                                                                            return (
+                                                                                <label
+                                                                                    key={occasionalDay.occasional_day_id}
+                                                                                    className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm ${isSelected
+                                                                                        ? 'bg-blue-100 border-2 border-blue-300 text-blue-800 shadow-sm'
+                                                                                        : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                                                                        }`}
+                                                                                >
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={isSelected}
+                                                                                        onChange={(e) => handleOccasionalDayChange(
+                                                                                            day.day_id,
+                                                                                            occasionalDay.occasional_day_id,
+                                                                                            e.target.checked
+                                                                                        )}
+                                                                                        className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 focus:ring-2 mr-2"
+                                                                                    />
+                                                                                    <span className="font-medium truncate">
+                                                                                        {occasionalDay.occasional_day_name}
+                                                                                    </span>
+                                                                                </label>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Selection Counter */}
+                                                                {selectedOccasionalDays.length > 0 && (
+                                                                    <div className="mt-4 pt-3 border-t border-slate-200">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                                                            <span className="text-sm font-medium text-green-700">
+                                                                                {selectedOccasionalDays.length} day{selectedOccasionalDays.length > 1 ? 's' : ''} selected
+                                                                            </span>
                                                                         </div>
                                                                     </div>
-                                                                    {selectedOccasionalDays.length > 0 && (
-                                                                        <div className="mt-3 pt-3 border-t border-slate-200">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                                                                <span className="text-sm font-medium text-green-700">
-                                                                                    {selectedOccasionalDays.length} day(s) selected
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
+                                                                )}
                                                             </div>
                                                         </div>
-                                                    )}
+                                                    </div>
+                                                )}
 
-                                                    {/* Warning Message */}
-                                                    {isOccasionalType && selectedOccasionalDays.length === 0 && (
-                                                        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                                            <div className="flex items-start gap-3">
-                                                                <div className="flex-shrink-0">
-                                                                    <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
-                                                                </div>
-                                                                <div>
-                                                                    <h4 className="text-sm font-semibold text-amber-800">Selection Required</h4>
-                                                                    <p className="text-sm text-amber-700 mt-1">Please select at least one occasional day for this shift type.</p>
-                                                                </div>
+                                                {/* Warning Message for Occasional Days */}
+                                                {isOccasionalType && selectedOccasionalDays.length === 0 && (
+                                                    <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="flex-shrink-0">
+                                                                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="text-sm font-semibold text-blue-800">Selection Required</h4>
+                                                                <p className="text-sm text-blue-700 mt-1">Please select at least one occasional day for this shift type.</p>
                                                             </div>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Enhanced Action Buttons */}
-                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                            <div className="p-8">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => navigate('/shift-management')}
-                                            className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <X className="w-4 h-4" />
-                                                Cancel
-                                            </div>
-                                        </button>
-
-                                        <button
-                                            type="submit"
-                                            disabled={submitting}
-                                            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                {submitting ? (
-                                                    <>
-                                                        <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
-                                                        {isEditMode ? 'Updating...' : 'Creating...'}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Save className="w-4 h-4" />
-                                                        {isEditMode ? 'Update Shift' : 'Create Shift'}
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
-                                        </button>
-                                    </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Action Buttons */}
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                        <div className="p-8">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/shift-management')}
+                                        className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <X className="w-4 h-4" />
+                                            Cancel
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        disabled={submitting}
+                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            {submitting ? (
+                                                <>
+                                                    <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
+                                                    {isEditMode ? 'Updating...' : 'Creating...'}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Save className="w-4 h-4" />
+                                                    {isEditMode ? 'Update Shift' : 'Create Shift'}
+                                                </>
+                                            )}
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+
 
                 {/* Toast Notification */}
                 {toast && (
