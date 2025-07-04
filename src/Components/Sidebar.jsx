@@ -79,10 +79,10 @@ const Sidebar = () => {
             label: 'Payroll Pending',
             icon: DollarSign,
             hasSubmenu: true,
-            path: '/bulk-attendance',
+            path: '/monthly-payroll',
             tag: 'New',
             submenu: [
-                { label: 'Bulk Attendance', path: '/bulk-attendance' },
+                // { label: 'Bulk Attendance', path: '/bulk-attendance' },
                 { label: 'Monthly Payroll', path: '/monthly-payroll' },
                 { label: 'Finalize Payroll', path: '/Finalize-payroll' },
             ]

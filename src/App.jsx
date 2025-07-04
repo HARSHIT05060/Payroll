@@ -20,7 +20,7 @@ import ShiftManagement from './pages/ShiftManagement/ShiftManagement';
 import CreateShift from './pages/ShiftManagement/CreateShift';
 import AssignShift from './pages/ShiftManagement/AssignShift';
 import Unauthorized from './Components/Unauthorized';
-import BulkAttendance from './pages/Payroll/BulkAttendance';
+// import BulkAttendance from './pages/Payroll/BulkAttendance';
 import MonthlyPayroll from './pages/Payroll/MonthlyPayroll';
 import FinalizePayroll from './pages/Payroll/FinalizePayroll';
 import { useSelector } from 'react-redux';
@@ -151,7 +151,7 @@ const App = () => {
             {/* ---------------- Loan section ----------------- */}
             <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
 
-            <Route path="/bulk-attendance" element={<ProtectedRoute><BulkAttendance /></ProtectedRoute>} />
+            {/* <Route path="/bulk-attendance" element={<ProtectedRoute><BulkAttendance /></ProtectedRoute>} /> */}
             <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
             <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
