@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Edit,
   Save,
-  X
+  X,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -210,6 +211,7 @@ const MonthlyPayroll = () => {
       formData.append('month_year', `${selectedYear}-${selectedMonth}`);
       formData.append('total_salary', payrollData.total_salary || '0');
       formData.append('week_of_salary', payrollData.week_of_salary || '0');
+      formData.append('overtime_salary', payrollData.overtime_salary || '0');
       formData.append('pay_salary', payrollData.pay_salary || '0');
       formData.append('total_pay_salary', editablePayable);
       formData.append('main_attendance_arr', JSON.stringify(payrollData.main_attendance_arr || []));
@@ -281,23 +283,54 @@ const MonthlyPayroll = () => {
     }
   }, []);
 
-  // Calculate overtime summary from week_of_salary (which includes both overtime and week off pay)
-  const calculateOvertimeSummary = useCallback(() => {
-    if (!payrollData?.main_attendance_arr) return { totalOvertime: 0, overtimeAndWeekOffPay: 0 };
+  // Calculate overtime and week-off separately
+  const calculateOvertimeAndWeekoffSummary = useCallback(() => {
+    if (!payrollData?.main_attendance_arr) return {
+      totalOvertime: 0,
+      overtimePay: 0,
+      weekoffPay: 0,
+      totalOvertimeAndWeekoff: 0
+    };
 
     let totalOvertime = 0;
-    let overtimeAndWeekOffPay = parseFloat(payrollData.week_of_salary || 0);
+    let overtimePay = parseFloat(payrollData.overtime_salary || 0);
+    let weekoffPay = parseFloat(payrollData.week_of_salary || 0) - overtimePay;
 
-    // Calculate total overtime hours from attendance
-    payrollData.main_attendance_arr.forEach(shiftData => {
-      shiftData.attendance_arr?.forEach(attendance => {
-        const overtime = parseFloat(attendance.overtime || 0);
-        totalOvertime += overtime;
+    // If week_of_salary doesn't include overtime_salary separately, use the combined value
+    if (!payrollData.overtime_salary) {
+      // Calculate overtime pay based on attendance data
+      let calculatedOvertimePay = 0;
+      payrollData.main_attendance_arr.forEach(shiftData => {
+        shiftData.attendance_arr?.forEach(attendance => {
+          const overtime = parseFloat(attendance.overtime || 0);
+          const hourlyRate = parseFloat(attendance.hourly_salary_for_day || 0);
+          totalOvertime += overtime;
+          calculatedOvertimePay += overtime * hourlyRate;
+        });
       });
-    });
 
-    return { totalOvertime, overtimeAndWeekOffPay };
+      overtimePay = calculatedOvertimePay;
+      weekoffPay = parseFloat(payrollData.week_of_salary || 0) - overtimePay;
+    } else {
+      // Calculate total overtime hours from attendance
+      payrollData.main_attendance_arr.forEach(shiftData => {
+        shiftData.attendance_arr?.forEach(attendance => {
+          const overtime = parseFloat(attendance.overtime || 0);
+          totalOvertime += overtime;
+        });
+      });
+    }
+
+    const totalOvertimeAndWeekoff = overtimePay + weekoffPay;
+
+    return {
+      totalOvertime: Math.max(0, totalOvertime),
+      overtimePay: Math.max(0, overtimePay),
+      weekoffPay: Math.max(0, weekoffPay),
+      totalOvertimeAndWeekoff: Math.max(0, totalOvertimeAndWeekoff)
+    };
   }, [payrollData]);
+
   // Initialize component
   useEffect(() => {
     if (isAuthenticated() && user?.user_id) {
@@ -323,7 +356,7 @@ const MonthlyPayroll = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const overtimeSummary = calculateOvertimeSummary();
+  const overtimeAndWeekoffSummary = calculateOvertimeAndWeekoffSummary();
 
   return (
     <>
@@ -514,8 +547,8 @@ const MonthlyPayroll = () => {
               </div>
             ) : payrollData ? (
               <div className="p-6">
-                {/* Salary Summary Cards - Non-editable */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {/* Salary Summary Cards - Separated Overtime and Week-off */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                   {/* Base Salary */}
                   <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                     <div className="flex items-center">
@@ -529,16 +562,30 @@ const MonthlyPayroll = () => {
                     </div>
                   </div>
 
-                  {/* Overtime & Week Off Pay Combined */}
+                  {/* Overtime Pay */}
+                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <Clock className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-orange-600">Overtime Pay</p>
+                        <p className="text-lg font-bold text-orange-900">₹{overtimeAndWeekoffSummary.overtimePay.toLocaleString()}</p>
+                        <p className="text-xs text-orange-600">{overtimeAndWeekoffSummary.totalOvertime}h overtime</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Week-off Pay */}
                   <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                     <div className="flex items-center">
                       <div className="p-2 bg-green-100 rounded-lg">
-                        <Clock className="w-5 h-5 text-green-600" />
+                        <CalendarIcon className="w-5 h-5 text-green-600" />
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-green-600">Overtime & Week Off Pay</p>
-                        <p className="text-lg font-bold text-green-900">₹{overtimeSummary.overtimeAndWeekOffPay.toLocaleString()}</p>
-                        <p className="text-xs text-green-600">{overtimeSummary.totalOvertime}h overtime total</p>
+                        <p className="text-sm font-medium text-green-600">Week-off Pay</p>
+                        <p className="text-lg font-bold text-green-900">₹{overtimeAndWeekoffSummary.weekoffPay.toLocaleString()}</p>
+                        <p className="text-xs text-green-600">Holiday compensation</p>
                       </div>
                     </div>
                   </div>
@@ -571,7 +618,8 @@ const MonthlyPayroll = () => {
                           <div className="text-right">
                             <p className="text-sm text-gray-600">Shift Total Salary</p>
                             <p className="text-lg font-bold text-blue-600">₹{parseFloat(shiftData.total_salary || 0).toLocaleString()}</p>
-                            <p className="text-sm text-gray-600">Shift Overtime & Week Off: ₹{parseFloat(shiftData.shift_week_of_salary || 0).toLocaleString()}</p>
+                            <p className="text-sm text-gray-600">Shift Overtime: ₹{parseFloat(shiftData.shift_overtime_salary || shiftData.overtime_total_salary || 0).toLocaleString()}</p>
+                            <p className="text-sm text-gray-600">Shift Week-off: ₹{(parseFloat(shiftData.shift_week_of_salary || 0) - parseFloat(shiftData.shift_overtime_salary || shiftData.overtime_total_salary || 0)).toLocaleString()}</p>
                           </div>
                         </div>
                       </div>
@@ -604,17 +652,13 @@ const MonthlyPayroll = () => {
                                   {attendance.actual_hours}h
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  {attendance.overtime > 0 ? (
-                                    <span className="text-orange-600 font-medium">{attendance.overtime}h</span>
-                                  ) : (
-                                    <span className="text-gray-400">0h</span>
-                                  )}
+                                  {attendance.overtime || 0}h
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  ₹{parseFloat(attendance.hourly_salary_for_day).toFixed(2)}
+                                  ₹{parseFloat(attendance.hourly_salary_for_day || 0).toLocaleString()}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                  ₹{parseFloat(attendance.daily_salary_for_day).toFixed(2)}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  ₹{parseFloat(attendance.daily_salary || 0).toLocaleString()}
                                 </td>
                               </tr>
                             ))}
@@ -623,53 +667,43 @@ const MonthlyPayroll = () => {
                       </div>
                     </div>
                   ))}
+                </div>
 
-                  {/* Final Total Payable Section - Editable */}
-                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">Final Payroll Summary</h3>
-                        <p className="text-gray-600">Review and adjust the final amount before submission</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-blue-600 mb-2">Total Payable Amount</p>
+                {/* Payable Amount Section */}
+                <div className="mt-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Total Payable Amount</h3>
+                      <div className="flex items-center gap-4">
                         {isEditingPayable ? (
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg font-bold text-gray-900">₹</span>
-                              <input
-                                type="number"
-                                value={editablePayable}
-                                onChange={(e) => setEditablePayable(e.target.value)}
-                                className="w-32 px-3 py-2 text-lg font-bold border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-blue-500"
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={handleSavePayable}
-                                className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                title="Save Amount"
-                              >
-                                <Save className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={handleCancelEdit}
-                                className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                                title="Cancel Edit"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={editablePayable}
+                              onChange={(e) => setEditablePayable(e.target.value)}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-32"
+                              min="0"
+                              step="0.01"
+                            />
+                            <button
+                              onClick={handleSavePayable}
+                              className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              <Save className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-3">
-                            <p className="text-2xl font-bold text-purple-900">₹{parseFloat(editablePayable || 0).toLocaleString()}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-blue-900">₹{parseFloat(editablePayable || payrollData.pay_salary || 0).toLocaleString()}</span>
                             <button
                               onClick={handleEditPayable}
-                              className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                              title="Edit Amount"
+                              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
@@ -677,18 +711,16 @@ const MonthlyPayroll = () => {
                         )}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Submit Payroll Button */}
-                  <div className="flex justify-end mt-6">
-                    <button
-                      onClick={handleSubmitPayroll}
-                      disabled={submitting || !payrollData}
-                      className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2 text-lg font-medium"
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      {submitting ? 'Submitting...' : 'Submit Payroll'}
-                    </button>
+                    <div className="text-right">
+                      <button
+                        onClick={handleSubmitPayroll}
+                        disabled={submitting || isEditingPayable}
+                        className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2 font-medium"
+                      >
+                        <CheckCircle className="w-5 h-5" />
+                        {submitting ? 'Submitting...' : 'Submit Payroll'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -696,22 +728,14 @@ const MonthlyPayroll = () => {
               <div className="px-6 py-12 text-center">
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <IndianRupee className="w-8 h-8 text-gray-400" />
+                    <FileText className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-700 text-lg font-medium mb-2">No Payroll Data</p>
                   <p className="text-gray-500 text-sm">
-                    Please select an employee, month, and year, then click "Generate Payroll" to view salary details.
+                    Select employee, month, and year to generate payroll data.
                   </p>
                 </div>
               </div>
-            )}
-
-            {/* Click outside to close dropdown */}
-            {isDropdownOpen && (
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setIsDropdownOpen(false)}
-              />
             )}
           </div>
         </div>
@@ -733,17 +757,7 @@ const MonthlyPayroll = () => {
           onClose={closeModal}
           onConfirm={confirmSubmitPayroll}
           title="Confirm Payroll Submission"
-          message={
-            <div className="space-y-2">
-              <p>Are you sure you want to submit the payroll for:</p>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p><strong>Employee:</strong> {confirmModal.data?.employeeName}</p>
-                <p><strong>Period:</strong> {confirmModal.data?.month} {confirmModal.data?.year}</p>
-                <p><strong>Amount:</strong> ₹{parseFloat(confirmModal.data?.amount || 0).toLocaleString()}</p>
-              </div>
-              <p className="text-sm text-gray-600">This action cannot be undone.</p>
-            </div>
-          }
+          message={`Are you sure you want to submit payroll for ${confirmModal.data?.employeeName} for ${confirmModal.data?.month} ${confirmModal.data?.year}? The payable amount is ₹${parseFloat(confirmModal.data?.amount || 0).toLocaleString()}.`}
           confirmText="Submit Payroll"
           cancelText="Cancel"
           type="warning"
