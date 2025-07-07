@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Clock, Save, RotateCcw, Settings } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
-import { Toast } from '../../components/ui/Toast'; // Adjust path as needed
+import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
 
 const TimeConfigurationComponent = () => {
   const { user, logout } = useAuth();
