@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import { Clock, Save, RotateCcw, Settings, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Clock, Save, RotateCcw, Settings } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axiosInstance';
+import { Toast } from '../../components/ui/Toast'; // Adjust path as needed
 
 const TimeConfigurationComponent = () => {
+  const { user, logout } = useAuth();
+
   const [config, setConfig] = useState({
     earlyTimeMin: 15,
     lateTimeMin: 15,
@@ -9,16 +14,142 @@ const TimeConfigurationComponent = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Show toast function
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type });
+  };
+
+  // Close toast function
+  const closeToast = () => {
+    setToast(null);
+  };
+
+  // Fetch software settings
+  const fetchSoftwareSettings = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      if (!user?.user_id) {
+        throw new Error('User ID is required');
+      }
+
+      const formData = new FormData();
+      formData.append('user_id', user.user_id);
+
+      const response = await api.post('software_setting_list', formData);
+
+      if (response.data?.success) {
+        const settingsData = response.data.data || response.data.settings || {};
+
+        // Map API response to component state
+        setConfig({
+          earlyTimeMin: parseInt(settingsData.early_clock_in) || 15,
+          lateTimeMin: parseInt(settingsData.late_arrival) || 15,
+          overtimeMin: parseInt(settingsData.overtime) || 30
+        });
+      } else if (response.data) {
+        // Handle direct data response
+        setConfig({
+          earlyTimeMin: parseInt(response.data.early_clock_in) || 15,
+          lateTimeMin: parseInt(response.data.late_arrival) || 15,
+          overtimeMin: parseInt(response.data.overtime) || 30
+        });
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch software settings');
+      }
+
+    } catch (error) {
+      console.error("Fetch software settings error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+      if (error.response?.status === 401) {
+        showToast("Your session has expired. Please login again.", 'error');
+        setTimeout(() => logout?.(), 2000);
+      } else if (error.response?.status === 403) {
+        showToast("You don't have permission to view settings.", 'error');
+      } else if (error.response?.status >= 500) {
+        showToast("Server error. Please try again later.", 'error');
+      } else {
+        showToast(errorMessage, 'error');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [user, logout]);
+
+  // Update software settings
+  const updateSoftwareSettings = useCallback(async () => {
+    try {
+      setUpdateLoading(true);
+
+      if (!user?.user_id) {
+        throw new Error('User ID is required');
+      }
+
+      const formData = new FormData();
+      formData.append('user_id', user.user_id);
+      formData.append('early_clock_in', config.earlyTimeMin.toString());
+      formData.append('late_arrival', config.lateTimeMin.toString());
+      formData.append('overtime', config.overtimeMin.toString());
+
+      const response = await api.post('software_setting_update', formData);
+
+      if (response.data?.success) {
+        showToast('Configuration saved successfully!', 'success');
+      } else {
+        throw new Error(response.data?.message || 'Failed to update software settings');
+      }
+
+    } catch (error) {
+      console.error("Update software settings error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+
+      if (error.response?.status === 401) {
+        showToast("Your session has expired. Please login again.", 'error');
+        setTimeout(() => logout?.(), 2000);
+      } else if (error.response?.status === 403) {
+        showToast("You don't have permission to update settings.", 'error');
+      } else if (error.response?.status >= 500) {
+        showToast("Server error. Please try again later.", 'error');
+      } else {
+        showToast(errorMessage, 'error');
+      }
+    } finally {
+      setUpdateLoading(false);
+    }
+  }, [user, logout, config]);
+
+  // Fetch settings on component mount
+  useEffect(() => {
+    fetchSoftwareSettings();
+  }, [fetchSoftwareSettings]);
 
   const handleInputChange = (field, value) => {
-    const numValue = parseInt(value) || 0;
+    // Handle empty string or invalid input
+    if (value === '' || value === null || value === undefined) {
+      setConfig(prev => ({
+        ...prev,
+        [field]: 0
+      }));
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+      return;
+    }
+
+    // Parse the value and ensure it's not negative
+    let numValue = parseInt(value);
+    if (isNaN(numValue) || numValue < 0) {
+      numValue = 0;
+    }
 
     // Validation
     const newErrors = { ...errors };
-    if (numValue < 0) {
-      newErrors[field] = 'Value cannot be negative';
-    } else if (numValue > 480) { // 8 hours max
+    if (numValue > 480) { // 8 hours max
       newErrors[field] = 'Value cannot exceed 480 minutes (8 hours)';
     } else {
       delete newErrors[field];
@@ -29,26 +160,12 @@ const TimeConfigurationComponent = () => {
       ...prev,
       [field]: numValue
     }));
-    setIsSaved(false);
   };
 
   const handleSave = () => {
     if (Object.keys(errors).length === 0) {
-      // Here you would typically save to your backend/database
-      console.log('Saving configuration:', config);
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 3000);
+      updateSoftwareSettings();
     }
-  };
-
-  const handleReset = () => {
-    setConfig({
-      earlyTimeMin: 15,
-      lateTimeMin: 15,
-      overtimeMin: 30
-    });
-    setErrors({});
-    setIsSaved(false);
   };
 
   const formatTime = (minutes) => {
@@ -60,8 +177,28 @@ const TimeConfigurationComponent = () => {
     return `${mins}m`;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast Component */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
+
       <div className="p-6 max-w-7xl mx-auto">
         {/* Header */}
         <div className="border-b border-gray-200 pb-6 mb-8">
@@ -73,16 +210,6 @@ const TimeConfigurationComponent = () => {
           </div>
           <p className="text-gray-600">Manage attendance policies and overtime settings for your organization</p>
         </div>
-
-        {/* Success Message */}
-        {isSaved && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-              <span className="text-green-800 font-medium">Configuration saved successfully!</span>
-            </div>
-          </div>
-        )}
 
         {/* Configuration Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -110,15 +237,19 @@ const TimeConfigurationComponent = () => {
                   type="number"
                   min="0"
                   max="480"
-                  value={config.earlyTimeMin}
+                  value={config.earlyTimeMin === 0 ? '' : config.earlyTimeMin}
                   onChange={(e) => handleInputChange('earlyTimeMin', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                      e.preventDefault();
+                    }
+                  }}
                   className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.earlyTimeMin ? 'border-red-500' : 'border-gray-300'
                     }`}
                 />
                 {errors.earlyTimeMin && (
-                  <div className="flex items-center gap-1 mt-2 text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-sm">{errors.earlyTimeMin}</span>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.earlyTimeMin}
                   </div>
                 )}
               </div>
@@ -151,15 +282,19 @@ const TimeConfigurationComponent = () => {
                   type="number"
                   min="0"
                   max="480"
-                  value={config.lateTimeMin}
+                  value={config.lateTimeMin === 0 ? '' : config.lateTimeMin}
                   onChange={(e) => handleInputChange('lateTimeMin', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                      e.preventDefault();
+                    }
+                  }}
                   className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.lateTimeMin ? 'border-red-500' : 'border-gray-300'
                     }`}
                 />
                 {errors.lateTimeMin && (
-                  <div className="flex items-center gap-1 mt-2 text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-sm">{errors.lateTimeMin}</span>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.lateTimeMin}
                   </div>
                 )}
               </div>
@@ -192,15 +327,19 @@ const TimeConfigurationComponent = () => {
                   type="number"
                   min="0"
                   max="480"
-                  value={config.overtimeMin}
+                  value={config.overtimeMin === 0 ? '' : config.overtimeMin}
                   onChange={(e) => handleInputChange('overtimeMin', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                      e.preventDefault();
+                    }
+                  }}
                   className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.overtimeMin ? 'border-red-500' : 'border-gray-300'
                     }`}
                 />
                 {errors.overtimeMin && (
-                  <div className="flex items-center gap-1 mt-2 text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-sm">{errors.overtimeMin}</span>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.overtimeMin}
                   </div>
                 )}
               </div>
@@ -213,25 +352,24 @@ const TimeConfigurationComponent = () => {
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-200">
           <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset to Default
-          </button>
-
-          <button
             onClick={handleSave}
-            disabled={Object.keys(errors).length > 0}
-            className={`flex items-center gap-2 px-6 py-2 rounded-md font-medium transition-colors ${Object.keys(errors).length > 0
+            disabled={Object.keys(errors).length > 0 || updateLoading}
+            className={`flex items-center gap-2 px-6 py-2 rounded-md font-medium transition-colors ${Object.keys(errors).length > 0 || updateLoading
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : isSaved
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
           >
-            <Save className="w-4 h-4" />
-            {isSaved ? 'Saved!' : 'Save Configuration'}
+            {updateLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                Save Configuration
+              </>
+            )}
           </button>
         </div>
 
