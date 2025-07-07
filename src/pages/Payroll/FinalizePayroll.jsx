@@ -20,7 +20,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
-
+import Pagination from '../../Components/Pagination';
 
 const SORT_DIRECTIONS = {
   ASCENDING: 'ascending',
@@ -53,9 +53,10 @@ const PAYMENT_MODES = {
 export default function FinalizePayroll() {
   const [salaryRecords, setSalaryRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [paginationLoading, setPaginationLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredRecords, setFilteredRecords] = useState([]);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -66,9 +67,14 @@ export default function FinalizePayroll() {
     payment_mode: '1',
     remark: ''
   });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
-
 
   // Set default to current month and year
   const currentDate = new Date();
@@ -113,12 +119,48 @@ export default function FinalizePayroll() {
     }
     return years;
   }, []);
+  const isCurrentOrFutureMonth = useCallback((selectedYear, selectedMonth) => {
+    if (!selectedYear || !selectedMonth) return false;
 
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
 
-  // Fetch salary records
-  const fetchSalaryRecords = useCallback(async () => {
+    const selectedYearNum = parseInt(selectedYear);
+    const selectedMonthNum = parseInt(selectedMonth);
+
+    // Check if selected year is future
+    if (selectedYearNum > currentYear) return true;
+
+    // Check if selected year is current and month is current or future
+    if (selectedYearNum === currentYear && selectedMonthNum >= currentMonth) return true;
+
+    return false;
+  }, []);
+
+  // Fetch salary records with backend search and pagination
+  const fetchSalaryRecords = useCallback(async (page = 1, search = '', resetData = false) => {
     try {
-      setLoading(true);
+      if (isCurrentOrFutureMonth(selectedYear, selectedMonth)) {
+        setSalaryRecords([]);
+        setTotalPages(1);
+        setTotalRecords(0);
+        setCurrentPage(1);
+        setError("No salary records available for current or future months. Please select a previous month.");
+        setLoading(false);
+        setSearchLoading(false);
+        setPaginationLoading(false);
+        return;
+      }
+      if (resetData) {
+        setLoading(true);
+        setCurrentPage(1);
+        page = 1;
+      } else if (search !== searchQuery) {
+        setSearchLoading(true);
+      } else {
+        setPaginationLoading(true);
+      }
       setError(null);
 
       if (!user?.user_id) {
@@ -127,15 +169,34 @@ export default function FinalizePayroll() {
 
       const formData = new FormData();
       formData.append('user_id', user.user_id);
+      formData.append('page', page.toString());
+
+      // Add search parameter if search query exists
+      if (search && search.trim() !== '') {
+        formData.append('search', search.trim());
+      }
+
+      // Add year_month parameter in format YYYY-MM
+      if (selectedYear && selectedMonth) {
+        const yearMonth = `${selectedYear}-${selectedMonth.padStart(2, '0')}`;
+        formData.append('year_month', yearMonth);
+      } else if (selectedYear) {
+        // If only year is selected, we might need to handle this differently
+        // For now, we'll pass the year with current month
+        const yearMonth = `${selectedYear}-${currentMonth}`;
+        formData.append('year_month', yearMonth);
+      }
 
       const response = await api.post('employee_salary_list', formData);
 
-      if (response.data?.success && response.data.data) {
-        setSalaryRecords(response.data.data);
-      } else if (response.data?.success && response.data.salaries) {
-        setSalaryRecords(response.data.salaries);
-      } else if (Array.isArray(response.data)) {
-        setSalaryRecords(response.data);
+      if (response.data?.success) {
+        const data = response.data.data || response.data.salaries || [];
+        setSalaryRecords(Array.isArray(data) ? data : []);
+
+        // Set pagination data
+        setTotalPages(response.data.total_pages || 1);
+        setTotalRecords(response.data.total_records || 0);
+        setCurrentPage(response.data.current_page || page);
       } else {
         throw new Error(response.data?.message || 'Failed to fetch salary records');
       }
@@ -155,11 +216,15 @@ export default function FinalizePayroll() {
         showToast(errorMessage, 'error');
       }
 
-      setError(errorMessage); // Keep this for the error display in the UI
+      setError(errorMessage);
+      setSalaryRecords([]);
     } finally {
       setLoading(false);
+      setSearchLoading(false);
+      setPaginationLoading(false);
     }
-  }, [user, logout]);
+  }, [user, logout, selectedYear, selectedMonth, searchQuery, isCurrentOrFutureMonth]);
+
   // Show toast notification
   const showToast = useCallback((message, type = 'info') => {
     setToast({ message, type });
@@ -169,6 +234,38 @@ export default function FinalizePayroll() {
   const hideToast = useCallback(() => {
     setToast(null);
   }, []);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery !== '') {
+        fetchSalaryRecords(1, searchQuery, true);
+      } else {
+        fetchSalaryRecords(1, '', true);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery, fetchSalaryRecords]);
+
+  // Handle month/year filter changes
+  useEffect(() => {
+    if (isAuthenticated() && user?.user_id) {
+      fetchSalaryRecords(1, searchQuery, true);
+    }
+  }, [selectedMonth, selectedYear]);
+
+  // Initial load
+  useEffect(() => {
+    if (isAuthenticated() && user?.user_id) {
+      fetchSalaryRecords(1, '', true);
+    }
+  }, [isAuthenticated, user?.user_id]);
+
+  // Handle pagination
+  const handlePageChange = useCallback((page) => {
+    fetchSalaryRecords(page, searchQuery);
+  }, [fetchSalaryRecords, searchQuery]);
 
   // Handle payment
   const handlePayment = useCallback(async () => {
@@ -235,12 +332,8 @@ export default function FinalizePayroll() {
       const response = await api.post('employee_salary_delete', formData);
 
       if (response.data?.success) {
-        // Remove the record from the state
-        setSalaryRecords(prev =>
-          prev.filter(record =>
-            record.employee_salary_id !== selectedRecord.employee_salary_id
-          )
-        );
+        // Refresh the current page data
+        fetchSalaryRecords(currentPage, searchQuery);
 
         setShowDeleteModal(false);
         setSelectedRecord(null);
@@ -258,7 +351,7 @@ export default function FinalizePayroll() {
     } finally {
       setDeleteLoading(false);
     }
-  }, [selectedRecord, user, showToast]);
+  }, [selectedRecord, user, showToast, fetchSalaryRecords, currentPage, searchQuery]);
 
   // Open payment modal
   const openPaymentModal = useCallback((record) => {
@@ -306,57 +399,7 @@ export default function FinalizePayroll() {
     }
   }, []);
 
-  // Filter records based on search, month, and year
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      let filtered = salaryRecords;
-
-      // Filter by search query
-      if (searchQuery) {
-        filtered = filtered.filter(record => {
-          return Object.values(record).some(value =>
-            String(value).toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        });
-      }
-
-      // Filter by month and year
-      if (selectedMonth || selectedYear) {
-        filtered = filtered.filter(record => {
-          const recordMonthYear = record.month_year;
-
-          if (!recordMonthYear) return false;
-
-          // Handle different date formats
-          let recordMonth, recordYear;
-
-          if (recordMonthYear.includes('-')) {
-            const parts = recordMonthYear.split('-');
-            recordYear = parts[0];
-            recordMonth = parts[1];
-          }
-
-          // Apply filters
-          const yearMatch = !selectedYear || recordYear === selectedYear;
-          const monthMatch = !selectedMonth || recordMonth === selectedMonth.padStart(2, '0');
-
-          return yearMatch && monthMatch;
-        });
-      }
-
-      setFilteredRecords(filtered);
-    }, 300);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchQuery, salaryRecords, selectedMonth, selectedYear]);
-
-  useEffect(() => {
-    if (isAuthenticated() && user?.user_id) {
-      fetchSalaryRecords();
-    }
-  }, [isAuthenticated, fetchSalaryRecords, user?.user_id]);
-
-  // Sorting functionality
+  // Sorting functionality (removed as it's now handled by backend)
   const requestSort = useCallback((key) => {
     setSortConfig(prevConfig => {
       const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
@@ -365,36 +408,6 @@ export default function FinalizePayroll() {
       return { key, direction };
     });
   }, []);
-
-  // Memoized sorted records
-  const sortedRecords = useMemo(() => {
-    const source = searchQuery || selectedMonth || selectedYear ? filteredRecords : salaryRecords;
-
-    if (!sortConfig.key) return source;
-
-    return [...source].sort((a, b) => {
-      const aValue = a[sortConfig.key] || '';
-      const bValue = b[sortConfig.key] || '';
-
-      // Handle numeric values
-      if (sortConfig.key === COLUMN_KEYS.TOTAL_SALARY ||
-        sortConfig.key === COLUMN_KEYS.FINAL_SALARY ||
-        sortConfig.key === COLUMN_KEYS.TOTAL_PAY_SALARY) {
-        const aNum = parseFloat(aValue) || 0;
-        const bNum = parseFloat(bValue) || 0;
-        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? aNum - bNum : bNum - aNum;
-      }
-
-      // Handle string values
-      if (aValue < bValue) {
-        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [salaryRecords, filteredRecords, sortConfig, searchQuery, selectedMonth, selectedYear]);
 
   // Format currency
   const formatCurrency = (amount) => {
@@ -430,6 +443,7 @@ export default function FinalizePayroll() {
       <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
       <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
   }, [sortConfig]);
+
   // Open view modal
   const openViewModal = useCallback((record) => {
     setSelectedRecord(record);
@@ -466,6 +480,11 @@ export default function FinalizePayroll() {
                   <h1 className="text-2xl font-bold text-white">
                     Finalize Payroll
                   </h1>
+                  {totalRecords > 0 && (
+                    <p className="text-white/80 text-sm mt-1">
+                      Total Records: {totalRecords} | Page {currentPage} of {totalPages}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -486,7 +505,6 @@ export default function FinalizePayroll() {
 
               <div className="flex items-center gap-3">
                 {/* Month Filter */}
-                {/* Month Filter */}
                 <div className="relative">
                   <select
                     value={selectedMonth}
@@ -500,27 +518,8 @@ export default function FinalizePayroll() {
                     ))}
                   </select>
                   <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-                  {/* Add this helpful tooltip */}
-                  {(() => {
-                    const currentDate = new Date();
-                    const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                    const currentYear = currentDate.getFullYear().toString();
-                    const isCurrentOrFutureMonth = (selectedYear > currentYear) ||
-                      (selectedYear === currentYear && selectedMonth >= currentMonth);
-
-                    if (isCurrentOrFutureMonth && selectedMonth && selectedYear && sortedRecords.length === 0) {
-                      return (
-                        <div className="absolute top-full left-0 mt-1 bg-yellow-100 border border-yellow-300 rounded-md p-2 text-xs text-yellow-800 whitespace-nowrap z-10">
-                          <div className="flex items-center space-x-1">
-                            <AlertCircle className="w-3 h-3" />
-                            <span>No records for current/future month</span>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
                 </div>
+
                 {/* Year Filter */}
                 <div className="relative">
                   <select
@@ -547,10 +546,13 @@ export default function FinalizePayroll() {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                  {searchLoading && (
+                    <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 animate-spin" />
+                  )}
                 </div>
 
                 <button
-                  onClick={fetchSalaryRecords}
+                  onClick={() => fetchSalaryRecords(1, searchQuery, true)}
                   className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -575,7 +577,7 @@ export default function FinalizePayroll() {
                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Salary Records</p>
                 <p className="text-red-600 mb-4">{error}</p>
                 <button
-                  onClick={fetchSalaryRecords}
+                  onClick={() => fetchSalaryRecords(1, searchQuery, true)}
                   className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -591,81 +593,44 @@ export default function FinalizePayroll() {
                 </div>
                 <p className="text-gray-700 text-lg font-medium mb-2">No Salary Records Found</p>
                 <p className="text-gray-500 text-sm mb-4">
-                  No salary records have been generated yet. Generate payroll to see records here.
+                  {searchQuery ? 'No records match your search criteria.' : 'No salary records have been generated yet.'}
                 </p>
               </div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-blue-50">
-                  <tr>
-                    {[
-                      { key: COLUMN_KEYS.FULL_NAME, label: 'Full Name' },
-                      { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
-                      { key: COLUMN_KEYS.MONTH_YEAR, label: 'Month/Year' },
-                      { key: COLUMN_KEYS.TOTAL_SALARY, label: 'Base Salary' },
-                      { key: COLUMN_KEYS.TOTAL_PAY_SALARY, label: 'Total Pay' },
-                      { key: COLUMN_KEYS.PAYMENT_STATUS, label: 'Payment Status' }
-                    ].map(({ key, label }) => (
-                      <th key={`header-${key}`} className="px-6 py-3 text-left">
-                        <button
-                          className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
-                          onClick={() => requestSort(key)}
-                        >
-                          {label}
-                          {renderSortIcon(key)}
-                        </button>
-                      </th>
-                    ))}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Mobile
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {!sortedRecords || sortedRecords.length === 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-blue-50">
                     <tr>
-                      <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
-                        <IndianRupee className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                        {(() => {
-                          const currentDate = new Date();
-                          const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                          const currentYear = currentDate.getFullYear().toString();
-                          const isCurrentOrFutureMonth = (selectedYear > currentYear) ||
-                            (selectedYear === currentYear && selectedMonth >= currentMonth);
-
-                          if (isCurrentOrFutureMonth && selectedMonth && selectedYear) {
-                            return (
-                              <>
-                                <p className="text-lg font-medium">No salary records found for {monthOptions.find(m => m.value === selectedMonth)?.label} {selectedYear}</p>
-                                <p className="text-sm mb-4">
-                                  {selectedMonth === currentMonth && selectedYear === currentYear
-                                    ? "Salary records for the current month haven't been generated yet."
-                                    : "Salary records for future months are not available yet."
-                                  }
-                                </p>
-                                <p className="text-sm text-blue-600 font-medium">
-                                  Try selecting a previous month to view existing salary records.
-                                </p>
-                              </>
-                            );
-                          } else {
-                            return (
-                              <>
-                                <p className="text-lg font-medium">No records found</p>
-                                <p className="text-sm">Try adjusting your filters or search criteria</p>
-                              </>
-                            );
-                          }
-                        })()}
-                      </td>
+                      {[
+                        { key: COLUMN_KEYS.FULL_NAME, label: 'Full Name' },
+                        { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
+                        { key: COLUMN_KEYS.MONTH_YEAR, label: 'Month/Year' },
+                        { key: COLUMN_KEYS.TOTAL_SALARY, label: 'Base Salary' },
+                        { key: COLUMN_KEYS.TOTAL_PAY_SALARY, label: 'Total Pay' },
+                        { key: COLUMN_KEYS.PAYMENT_STATUS, label: 'Payment Status' }
+                      ].map(({ key, label }) => (
+                        <th key={`header-${key}`} className="px-6 py-3 text-left">
+                          <button
+                            className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            onClick={() => requestSort(key)}
+                          >
+                            {label}
+                            {renderSortIcon(key)}
+                          </button>
+                        </th>
+                      ))}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Mobile
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
-                  ) : (
-                    sortedRecords.map((record, index) => {
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {salaryRecords.map((record, index) => {
                       const recordId = record.employee_salary_id || `record-${index}`;
                       const paymentStatus = getPaymentStatusDisplay(record.payment_status);
 
@@ -735,11 +700,19 @@ export default function FinalizePayroll() {
                           </td>
                         </tr>
                       );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                loading={paginationLoading}
+              />
+            </>
           )}
         </div>
       </div>

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
-import Pagination from '../../Components/Pagination'; 
+import Pagination from '../../Components/Pagination';
 
 // Day Status Legend Component
 const DayStatusLegend = () => {
@@ -42,7 +42,7 @@ const ShiftManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredShifts, setFilteredShifts] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     const [toast, setToast] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
     const navigate = useNavigate();
@@ -55,24 +55,21 @@ const ShiftManagement = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalShifts, setTotalShifts] = useState(0);
 
-    // Search functionality
+    // Search functionality with debounce
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            const filtered = shifts.filter(shift => {
-                return Object.values(shift).some(value =>
-                    String(value).toLowerCase().includes(searchQuery.toLowerCase())
-                ) || shift.shift_days?.some(day =>
-                    day.sort_name?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            });
-            setFilteredShifts(filtered);
-        }, 300);
+            // Reset to first page when searching
+            if (searchQuery !== '') {
+                setCurrentPage(1);
+                fetchShifts(1, searchQuery);
+            } else {
+                // If search is cleared, fetch normal data
+                fetchShifts(currentPage, '');
+            }
+        }, 500); // Increased debounce time for backend search
 
         return () => clearTimeout(delayDebounce);
-    }, [searchQuery, shifts]);
-
-    // Get displayed shifts based on search
-    const displayedShifts = searchQuery ? filteredShifts : shifts;
+    }, [searchQuery]);
 
     // Fetch assigned employees for a shift
     const fetchAssignedEmployees = async (shiftId, shiftName) => {
@@ -243,10 +240,15 @@ const ShiftManagement = () => {
         }
     };
 
-    // Fetch shifts from API with pagination
-    const fetchShifts = async (page = 1) => {
+    // Fetch shifts from API with pagination and search
+    const fetchShifts = async (page = 1, search = '') => {
         try {
-            setLoading(true);
+            // Set appropriate loading state
+            if (search !== '') {
+                setSearchLoading(true);
+            } else {
+                setLoading(true);
+            }
             setError(null);
 
             if (!user?.user_id) {
@@ -256,6 +258,11 @@ const ShiftManagement = () => {
             const formData = new FormData();
             formData.append('user_id', user.user_id);
             formData.append('page', page.toString());
+
+            // Add search parameter if search query exists
+            if (search && search.trim() !== '') {
+                formData.append('search', search.trim());
+            }
 
             const response = await api.post('shift_list', formData);
 
@@ -291,25 +298,31 @@ const ShiftManagement = () => {
             }
         } finally {
             setLoading(false);
+            setSearchLoading(false);
         }
     };
 
     // Handle page change
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        fetchShifts(page);
+        fetchShifts(page, searchQuery);
+    };
+
+    // Handle search input change
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    // Clear search
+    const clearSearch = () => {
+        setSearchQuery('');
+        setCurrentPage(1);
+        fetchShifts(1, '');
     };
 
     useEffect(() => {
         fetchShifts(currentPage);
     }, [user]);
-
-    // Reset to first page when searching
-    useEffect(() => {
-        if (searchQuery) {
-            setCurrentPage(1);
-        }
-    }, [searchQuery]);
 
     // Handle edit shift
     const handleEditShift = (shiftId) => {
@@ -340,7 +353,7 @@ const ShiftManagement = () => {
 
                         // Refresh the current page or go to previous page if current page becomes empty
                         const pageToLoad = shifts.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
-                        fetchShifts(pageToLoad);
+                        fetchShifts(pageToLoad, searchQuery);
                     } else {
                         showToast(response.data.message || 'Failed to delete shift', 'error');
                     }
@@ -403,10 +416,23 @@ const ShiftManagement = () => {
                                         type="text"
                                         placeholder="Search shifts..."
                                         value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        onChange={handleSearchChange}
+                                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
                                     />
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={clearSearch}
+                                            className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                    {searchLoading && (
+                                        <div className="absolute right-3 top-2.5">
+                                            <RefreshCw className="h-4 w-4 animate-spin text-gray-400" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 {permissions['shift_assign'] &&
@@ -451,7 +477,7 @@ const ShiftManagement = () => {
                                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Shifts</p>
                                 <p className="text-red-600 mb-4">{error}</p>
                                 <button
-                                    onClick={() => fetchShifts(currentPage)}
+                                    onClick={() => fetchShifts(currentPage, searchQuery)}
                                     className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
@@ -505,92 +531,80 @@ const ShiftManagement = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {!displayedShifts || displayedShifts.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                                                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                                <p className="text-lg font-medium">No shifts found</p>
-                                                <p className="text-sm">
-                                                    {searchQuery ? 'Try adjusting your search terms' : 'Start by creating your first shift'}
-                                                </p>
+                                    {shifts.map((shift) => (
+                                        <tr key={shift.shift_id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <Calendar className="w-4 h-4 text-blue-600" />
+                                                    </div>
+                                                    <span>{shift.shift_name}</span>
+                                                </div>
                                             </td>
-                                        </tr>
-                                    ) : (
-                                        displayedShifts.map((shift) => (
-                                            <tr key={shift.shift_id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    <div className="flex items-center space-x-2">
-                                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <Calendar className="w-4 h-4 text-blue-600" />
-                                                        </div>
-                                                        <span>{shift.shift_name}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {shift.shift_days.map((day) => (
-                                                            <div key={day.day_id} className="relative group">
-                                                                <span
-                                                                    className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-help ${getDayStyles(day.shift_type)}`}
-                                                                >
-                                                                    {shouldShowDayText(day.shift_type) ? day.sort_name : (day.sort_name)}
-                                                                </span>
-                                                                {/* Tooltip */}
-                                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                                                                    {getDayStatusText(day.shift_type)}
-                                                                </div>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {shift.shift_days.map((day) => (
+                                                        <div key={day.day_id} className="relative group">
+                                                            <span
+                                                                className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-help ${getDayStyles(day.shift_type)}`}
+                                                            >
+                                                                {shouldShowDayText(day.shift_type) ? day.sort_name : (day.sort_name)}
+                                                            </span>
+                                                            {/* Tooltip */}
+                                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                                                {getDayStatusText(day.shift_type)}
                                                             </div>
-                                                        ))}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <button
+                                                    onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
+                                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                                                >
+                                                    <span className="font-medium text-lg">
+                                                        {employeeCounts[shift.shift_id] || 0}
+                                                    </span>
+                                                    <Users className="w-4 h-4" />
+                                                </button>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {shift.created_date}
+                                            </td>
+                                            {(permissions?.shift_edit || permissions?.shift_delete) && (
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        {permissions['shift_edit'] && (
+                                                            <button
+                                                                onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
+                                                                className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                                                                title="Edit Shift"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                        {permissions['shift_delete'] && (
+                                                            <button
+                                                                onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
+                                                                className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                title="Delete Shift"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    <button
-                                                        onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
-                                                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
-                                                    >
-                                                        <span className="font-medium text-lg">
-                                                            {employeeCounts[shift.shift_id] || 0}
-                                                        </span>
-                                                        <Users className="w-4 h-4" />
-                                                    </button>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    {shift.created_date}
-                                                </td>
-                                                {(permissions?.shift_edit || permissions?.shift_delete) && (
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                        <div className="flex space-x-2">
-                                                            {permissions['shift_edit'] && (
-                                                                <button
-                                                                    onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
-                                                                    className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
-                                                                    title="Edit Shift"
-                                                                >
-                                                                    <Edit className="w-4 h-4" />
-                                                                </button>
-                                                            )}
-                                                            {permissions['shift_delete'] && (
-                                                                <button
-                                                                    onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
-                                                                    className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
-                                                                    title="Delete Shift"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                )}
-                                            </tr>
-                                        ))
-                                    )}
+                                            )}
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
                     )}
 
                     {/* Pagination Component */}
-                    {!searchQuery && totalPages > 1 && (
+                    {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}

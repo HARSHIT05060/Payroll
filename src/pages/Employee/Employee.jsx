@@ -37,14 +37,13 @@ const KEY_MAPPING = {
     [COLUMN_KEYS.DESIGNATION]: 'designation_name'
 };
 
-const ITEMS_PER_PAGE = 10; 
+const ITEMS_PER_PAGE = 10;
 
 export default function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [sortConfig, setSortConfig] = useState({
         key: null,
         direction: SORT_DIRECTIONS.ASCENDING
@@ -55,18 +54,21 @@ export default function EmployeeManagement() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalEmployees, setTotalEmployees] = useState(0);
     const [paginationLoading, setPaginationLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
 
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
     const permissions = useSelector(state => state.permissions) || {};
 
-    // Fetch employees data with pagination
-    const fetchEmployees = useCallback(async (page = 1, resetData = false) => {
+    // Fetch employees data with pagination and search
+    const fetchEmployees = useCallback(async (page = 1, search = '', resetData = false) => {
         try {
             if (resetData) {
                 setLoading(true);
                 setCurrentPage(1);
                 page = 1;
+            } else if (search !== searchQuery) {
+                setSearchLoading(true);
             } else {
                 setPaginationLoading(true);
             }
@@ -80,6 +82,11 @@ export default function EmployeeManagement() {
             const formData = new FormData();
             formData.append('user_id', user.user_id);
             formData.append('page', page.toString());
+
+            // Add search parameter if search query exists
+            if (search && search.trim() !== '') {
+                formData.append('search', search.trim());
+            }
 
             const response = await api.post('employee_list', formData);
 
@@ -125,34 +132,35 @@ export default function EmployeeManagement() {
         } finally {
             setLoading(false);
             setPaginationLoading(false);
+            setSearchLoading(false);
         }
-    }, [user, logout]);
+    }, [user, logout, searchQuery]);
 
-    // Search functionality (works on current page data)
+    // Debounced search functionality
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            if (searchQuery.trim() === '') {
-                setFilteredEmployees([]);
+            // Reset to page 1 when searching
+            if (searchQuery !== '') {
+                setCurrentPage(1);
+                fetchEmployees(1, searchQuery);
             } else {
-                const filtered = employees.filter(emp => {
-                    return Object.values(emp).some(value =>
-                        String(value).toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                });
-                setFilteredEmployees(filtered);
+                // If search is cleared, fetch all employees from page 1
+                setCurrentPage(1);
+                fetchEmployees(1, '');
             }
-        }, 300);
+        }, 500); // Increased debounce time for API calls
 
         return () => clearTimeout(delayDebounce);
-    }, [searchQuery, employees]);
+    }, [searchQuery]);
 
+    // Initial load
     useEffect(() => {
         if (isAuthenticated() && user?.user_id) {
-            fetchEmployees(1, true);
+            fetchEmployees(1, '', true);
         }
     }, [isAuthenticated, user?.user_id]);
 
-    // Sorting functionality (works on current page data)
+    // Client-side sorting (works on current page data)
     const requestSort = useCallback((key) => {
         setSortConfig(prevConfig => {
             const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
@@ -162,13 +170,11 @@ export default function EmployeeManagement() {
         });
     }, []);
 
-    // Memoized sorted employees
+    // Memoized sorted employees (client-side sorting of current page results)
     const sortedEmployees = useMemo(() => {
-        const source = searchQuery.trim() ? filteredEmployees : employees;
+        if (!sortConfig.key) return employees;
 
-        if (!sortConfig.key) return source;
-
-        return [...source].sort((a, b) => {
+        return [...employees].sort((a, b) => {
             const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
             const aValue = a[actualKey] || '';
             const bValue = b[actualKey] || '';
@@ -181,14 +187,14 @@ export default function EmployeeManagement() {
             }
             return 0;
         });
-    }, [employees, filteredEmployees, sortConfig, searchQuery]);
+    }, [employees, sortConfig]);
 
     // Pagination handler
     const handlePageChange = useCallback((newPage) => {
-        if (newPage >= 1 && newPage <= totalPages && !paginationLoading) {
-            fetchEmployees(newPage);
+        if (newPage >= 1 && newPage <= totalPages && !paginationLoading && !searchLoading) {
+            fetchEmployees(newPage, searchQuery);
         }
-    }, [totalPages, paginationLoading, fetchEmployees]);
+    }, [totalPages, paginationLoading, searchLoading, fetchEmployees, searchQuery]);
 
     // Action handlers
     const handleViewDetails = useCallback((employee_id) => {
@@ -200,8 +206,13 @@ export default function EmployeeManagement() {
     }, [navigate]);
 
     const handleRefresh = useCallback(() => {
-        fetchEmployees(currentPage);
-    }, [currentPage, fetchEmployees]);
+        fetchEmployees(currentPage, searchQuery);
+    }, [currentPage, searchQuery, fetchEmployees]);
+
+    // Clear search
+    const handleClearSearch = useCallback(() => {
+        setSearchQuery('');
+    }, []);
 
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
@@ -257,20 +268,31 @@ export default function EmployeeManagement() {
                                 <div className="relative w-full sm:w-64">
                                     <input
                                         type="text"
-                                        placeholder="Search current page..."
+                                        placeholder="Search employees..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
                                     />
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={handleClearSearch}
+                                            className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+                                        >
+                                            <XCircle className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                    {searchLoading && (
+                                        <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 animate-spin" />
+                                    )}
                                 </div>
 
                                 <button
                                     onClick={handleRefresh}
-                                    disabled={paginationLoading}
+                                    disabled={paginationLoading || searchLoading}
                                     className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
                                 >
-                                    <RefreshCw className={`h-4 w-4 ${paginationLoading ? 'animate-spin' : ''}`} />
+                                    <RefreshCw className={`h-4 w-4 ${(paginationLoading || searchLoading) ? 'animate-spin' : ''}`} />
                                 </button>
 
                                 {permissions['employee_create'] && (
@@ -301,7 +323,7 @@ export default function EmployeeManagement() {
                                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Employees</p>
                                 <p className="text-red-600 mb-4">{error}</p>
                                 <button
-                                    onClick={() => fetchEmployees(currentPage)}
+                                    onClick={() => fetchEmployees(currentPage, searchQuery)}
                                     className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
@@ -315,11 +337,27 @@ export default function EmployeeManagement() {
                                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Users className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">No Employees Found</p>
-                                <p className="text-gray-500 text-sm mb-4">
-                                    {currentPage > 1 ? 'No employees found on this page.' : 'You haven\'t added any employees yet.'}
+                                <p className="text-gray-700 text-lg font-medium mb-2">
+                                    {searchQuery ? 'No employees found' : 'No Employees Found'}
                                 </p>
-                                {permissions['employee_create'] && currentPage === 1 && (
+                                <p className="text-gray-500 text-sm mb-4">
+                                    {searchQuery
+                                        ? `No employees match your search "${searchQuery}". Try different search terms.`
+                                        : currentPage > 1
+                                            ? 'No employees found on this page.'
+                                            : 'You haven\'t added any employees yet.'
+                                    }
+                                </p>
+                                {searchQuery && (
+                                    <button
+                                        onClick={handleClearSearch}
+                                        className="inline-flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                                    >
+                                        <XCircle className="w-4 h-4" />
+                                        <span>Clear Search</span>
+                                    </button>
+                                )}
+                                {permissions['employee_create'] && !searchQuery && currentPage === 1 && (
                                     <button
                                         onClick={() => navigate('/add-employee')}
                                         className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -367,79 +405,65 @@ export default function EmployeeManagement() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {!sortedEmployees || sortedEmployees.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                                                    <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                                    <p className="text-lg font-medium">
-                                                        {searchQuery ? 'No employees found matching your search' : 'No employees found'}
-                                                    </p>
-                                                    <p className="text-sm">
-                                                        {searchQuery ? 'Try adjusting your search terms' : 'Start by adding your first employee'}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            sortedEmployees.map((employee, index) => {
-                                                const employeeId = employee.employee_id || `employee-${index}`;
-                                                return (
-                                                    <tr
-                                                        key={`emp-${employeeId}`}
-                                                        className={`hover:bg-gray-50 transition-colors ${paginationLoading ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                            {employee.employee_code || '-'}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                            <div className="flex items-center space-x-2">
-                                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                                    <Users className="w-4 h-4 text-blue-600" />
-                                                                </div>
-                                                                <span>{employee.full_name || 'Unnamed Employee'}</span>
+                                        {sortedEmployees.map((employee, index) => {
+                                            const employeeId = employee.employee_id || `employee-${index}`;
+                                            return (
+                                                <tr
+                                                    key={`emp-${employeeId}`}
+                                                    className={`hover:bg-gray-50 transition-colors ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
+                                                >
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        {employee.employee_code || '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        <div className="flex items-center space-x-2">
+                                                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                                <Users className="w-4 h-4 text-blue-600" />
+                                                            </div>
+                                                            <span>{employee.full_name || 'Unnamed Employee'}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {employee.department_name || 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {employee.designation_name || 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {employee.email || 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {employee.mobile_number || 'N/A'}
+                                                    </td>
+                                                    {(permissions?.employee_edit || permissions?.employee_view) && (
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                            <div className="flex space-x-2">
+                                                                {permissions['employee_edit'] && (
+                                                                    <button
+                                                                        onClick={() => handleEditEmployee(employee.employee_id)}
+                                                                        disabled={paginationLoading || searchLoading}
+                                                                        className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50 disabled:opacity-50"
+                                                                        title="Edit Employee"
+                                                                    >
+                                                                        <Pencil className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                                {permissions['employee_view'] && (
+                                                                    <button
+                                                                        onClick={() => handleViewDetails(employee.employee_id)}
+                                                                        disabled={paginationLoading || searchLoading}
+                                                                        className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+                                                                        title="View Details"
+                                                                    >
+                                                                        <FileText className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                            {employee.department_name || 'N/A'}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                            {employee.designation_name || 'N/A'}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                            {employee.email || 'N/A'}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                            {employee.mobile_number || 'N/A'}
-                                                        </td>
-                                                        {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                                <div className="flex space-x-2">
-                                                                    {permissions['employee_edit'] && (
-                                                                        <button
-                                                                            onClick={() => handleEditEmployee(employee.employee_id)}
-                                                                            disabled={paginationLoading}
-                                                                            className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50 disabled:opacity-50"
-                                                                            title="Edit Employee"
-                                                                        >
-                                                                            <Pencil className="w-4 h-4" />
-                                                                        </button>
-                                                                    )}
-                                                                    {permissions['employee_view'] && (
-                                                                        <button
-                                                                            onClick={() => handleViewDetails(employee.employee_id)}
-                                                                            disabled={paginationLoading}
-                                                                            className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-50"
-                                                                            title="View Details"
-                                                                        >
-                                                                            <FileText className="w-4 h-4" />
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                        )}
-                                                    </tr>
-                                                );
-                                            })
-                                        )}
+                                                    )}
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -451,7 +475,7 @@ export default function EmployeeManagement() {
                                 totalItems={totalEmployees}
                                 itemsPerPage={ITEMS_PER_PAGE}
                                 onPageChange={handlePageChange}
-                                loading={paginationLoading}
+                                loading={paginationLoading || searchLoading}
                                 showInfo={true}
                                 maxVisiblePages={5}
                             />

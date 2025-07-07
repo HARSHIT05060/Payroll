@@ -151,6 +151,16 @@ const LeaveApplication = () => {
         return `${day}-${month}-${year}`;
     };
 
+    // Handle start date change and clear end date if it's before the new start date
+    const handleStartDateChange = (date) => {
+        setFormData(prev => ({
+            ...prev,
+            start_date: date,
+            // Clear end date if it's before the new start date
+            end_date: prev.end_date && date && prev.end_date < date ? '' : prev.end_date
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -220,6 +230,10 @@ const LeaveApplication = () => {
         setSelectedEmployeeName('');
         setEmployeeSearch('');
     };
+
+    // Get today's date at midnight for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     if (isLoadingData) {
         return (
@@ -320,11 +334,10 @@ const LeaveApplication = () => {
                             <div className="relative">
                                 <DatePicker
                                     selected={formData.start_date}
-                                    onChange={(date) =>
-                                        setFormData({ ...formData, start_date: date })
-                                    }
+                                    onChange={handleStartDateChange}
                                     dateFormat="dd-MM-yyyy"
                                     placeholderText="DD-MM-YYYY"
+                                    minDate={today}
                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <div className="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
@@ -346,6 +359,7 @@ const LeaveApplication = () => {
                                     }
                                     dateFormat="dd-MM-yyyy"
                                     placeholderText="DD-MM-YYYY"
+                                    minDate={formData.start_date || today}
                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <div className="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
@@ -354,7 +368,6 @@ const LeaveApplication = () => {
                             </div>
                         </div>
                     </div>
-
 
                     {/* Reason */}
                     <div className="space-y-2">
