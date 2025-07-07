@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Clock, Save, RotateCcw, Settings } from 'lucide-react';
+import { Clock, Save, ArrowLeft, Settings } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
+import { useNavigate } from 'react-router-dom';
 
 const TimeConfigurationComponent = () => {
   const { user, logout } = useAuth();
@@ -12,6 +13,7 @@ const TimeConfigurationComponent = () => {
     lateTimeMin: 15,
     overtimeMin: 30
   });
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -200,15 +202,28 @@ const TimeConfigurationComponent = () => {
       )}
 
       <div className="p-6 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="border-b border-gray-200 pb-6 mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Settings className="w-6 h-6 text-blue-600" />
+        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+              >
+                <ArrowLeft size={18} />
+                Back
+              </button>
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-lg">
+                      <Settings className="w-6 h-6 text-blue-100" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-white">Time Configuration</h1>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Time Configuration</h2>
           </div>
-          <p className="text-gray-600">Manage attendance policies and overtime settings for your organization</p>
         </div>
 
         {/* Configuration Cards */}
@@ -350,7 +365,7 @@ const TimeConfigurationComponent = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        <div className="flex items-center justify-end pt-6 border-t border-gray-200">
           <button
             onClick={handleSave}
             disabled={Object.keys(errors).length > 0 || updateLoading}

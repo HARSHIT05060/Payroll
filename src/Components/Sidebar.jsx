@@ -90,7 +90,7 @@ const Sidebar = () => {
 
         (permissions?.loan_view) && {
             id: 'loans',
-            label: 'Loans & Advances (edit work pending)',
+            label: 'Loans & Advances',
             icon: Briefcase,
             hasSubmenu: true,
             path: '/loans',

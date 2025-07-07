@@ -1,24 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-    Plus,
-    Eye,
-    Edit,
-    Search,
-    RefreshCw,
-    XCircle,
-    CreditCard,
-    ChevronDown,
-    ChevronUp,
-    Users,
-    DollarSign,
-    ArrowLeft
-} from 'lucide-react';
+import { Plus, Eye, Edit, Search, RefreshCw, XCircle, CreditCard, ChevronDown, ChevronUp, Users, DollarSign, ArrowLeft, Trash2 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { LoanDetailsModal } from '../../Components/ui/LoanDetailsModal';
+import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -71,6 +59,11 @@ const LoanAdvance = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loanDetails, setLoanDetails] = useState([]);
     const [modalLoading, setModalLoading] = useState(false);
+
+    // Delete confirmation modal states
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [loanToDelete, setLoanToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
@@ -288,13 +281,60 @@ const LoanAdvance = () => {
         }
     }, [user, showToast]);
 
-    const handleEdit = useCallback((loanId) => {
-        navigate(`/add-loan-advance?edit=true&loanId=${loanId}`);
-    }, [navigate]);
+    // const handleEdit = useCallback((loanId) => {
+    //     navigate(`/add-loan-advance?edit=${loanId}`);
+    // }, [navigate]);
+
+    // Delete functionality
+    const handleDeleteClick = useCallback((loan) => {
+        setLoanToDelete(loan);
+        setIsDeleteModalOpen(true);
+    }, []);
+
+    const handleDeleteConfirm = useCallback(async () => {
+        if (!loanToDelete || !user?.user_id) {
+            showToast('Unable to delete loan. Missing required information.', 'error');
+            return;
+        }
+
+        try {
+            setDeleteLoading(true);
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+            formData.append('loan_id', loanToDelete.loan_id);
+
+            const response = await api.post('loan_delete', formData);
+
+            if (response.data.success) {
+                showToast('Loan deleted successfully', 'success');
+
+                // Remove the deleted loan from the state
+                setLoans(prevLoans => prevLoans.filter(loan => loan.loan_id !== loanToDelete.loan_id));
+
+                // Close the modal
+                setIsDeleteModalOpen(false);
+                setLoanToDelete(null);
+            } else {
+                showToast(response.data.message || 'Failed to delete loan', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting loan:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete loan';
+            showToast(errorMessage, 'error');
+        } finally {
+            setDeleteLoading(false);
+        }
+    }, [loanToDelete, user, showToast]);
+
+    const handleDeleteCancel = useCallback(() => {
+        setIsDeleteModalOpen(false);
+        setLoanToDelete(null);
+    }, []);
 
     const handleFilterChange = useCallback((newFilter) => {
         setFilter(newFilter);
-    }, [showToast]);
+    }, []);
 
     const closeModal = useCallback(() => {
         setIsModalOpen(false);
@@ -370,6 +410,18 @@ const LoanAdvance = () => {
                     onClose={closeModal}
                     loanDetails={loanDetails}
                     loading={modalLoading}
+                />
+
+                {/* Delete Confirmation Modal */}
+                <ConfirmationModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={handleDeleteCancel}
+                    onConfirm={handleDeleteConfirm}
+                    title="Delete Loan"
+                    message={`Are you sure you want to delete the loan for ${loanToDelete?.employee_full_name || 'this employee'}? This action cannot be undone.`}
+                    confirmText={deleteLoading ? "Deleting..." : "Delete"}
+                    cancelText="Cancel"
+                    type="danger"
                 />
 
                 <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -524,7 +576,7 @@ const LoanAdvance = () => {
                                                 </button>
                                             </th>
                                         ))}
-                                        {(permissions?.loan_edit || permissions?.loan_view) && (
+                                        {(permissions?.loan_edit || permissions?.loan_view || permissions?.loan_delete) && (
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Actions
                                             </th>
@@ -570,7 +622,7 @@ const LoanAdvance = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     {renderStatusBadge(loan.loan_status)}
                                                 </td>
-                                                {(permissions?.loan_edit || permissions?.loan_view) && (
+                                                {(permissions?.loan_edit || permissions?.loan_view || permissions?.loan_delete) && (
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex space-x-2">
                                                             {permissions['loan_view'] && (
@@ -582,13 +634,23 @@ const LoanAdvance = () => {
                                                                     <Eye className="w-4 h-4" />
                                                                 </button>
                                                             )}
-                                                            {permissions['loan_edit'] && (
+                                                            {/* {permissions['loan_edit'] && (
                                                                 <button
                                                                     onClick={() => handleEdit(loan.loan_id)}
                                                                     className="p-2 rounded-md transition-colors text-green-600 hover:text-green-900 hover:bg-green-50"
                                                                     title="Edit Loan"
                                                                 >
                                                                     <Edit className="w-4 h-4" />
+                                                                </button>
+                                                            )} */}
+                                                            {permissions['loan_delete'] && (
+                                                                <button
+                                                                    onClick={() => handleDeleteClick(loan)}
+                                                                    className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                    title="Delete Loan"
+                                                                    disabled={deleteLoading}
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
                                                                 </button>
                                                             )}
                                                         </div>
