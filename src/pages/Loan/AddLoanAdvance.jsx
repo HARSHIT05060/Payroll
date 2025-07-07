@@ -447,7 +447,7 @@ const AddLoanAdvance = ({
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
                                 title="Go Back"
                             >
                                 <ArrowLeft size={18} />
@@ -467,7 +467,7 @@ const AddLoanAdvance = ({
                             <div className="ml-auto">
                                 <button
                                     onClick={handleReset}
-                                    className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                    className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
                                 >
                                     <X size={16} />
                                     Reset

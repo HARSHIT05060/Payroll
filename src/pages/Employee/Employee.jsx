@@ -237,7 +237,7 @@ export default function EmployeeManagement() {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
@@ -290,7 +290,7 @@ export default function EmployeeManagement() {
                                 <button
                                     onClick={handleRefresh}
                                     disabled={paginationLoading || searchLoading}
-                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
                                 >
                                     <RefreshCw className={`h-4 w-4 ${(paginationLoading || searchLoading) ? 'animate-spin' : ''}`} />
                                 </button>

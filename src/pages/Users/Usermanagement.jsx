@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
-import Pagination from '../../Components/Pagination'; 
+import Pagination from '../../Components/Pagination';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -70,7 +70,7 @@ const UserManagement = () => {
             if (res.data?.success) {
                 const usersData = res.data.data || [];
                 setUsers(usersData);
-                
+
                 // Calculate total pages based on response
                 const itemsCount = usersData.length;
                 if (itemsCount < ITEMS_PER_PAGE && page === 1) {
@@ -218,7 +218,7 @@ const UserManagement = () => {
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => navigate(-1)}
-                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
                                     >
                                         <ArrowLeft size={18} />
                                         Back
@@ -240,7 +240,7 @@ const UserManagement = () => {
                                     <button
                                         onClick={handleRefresh}
                                         disabled={loading || paginationLoading}
-                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <RefreshCw size={18} className={`${loading || paginationLoading ? 'animate-spin' : ''}`} />
                                         Refresh
@@ -294,7 +294,7 @@ const UserManagement = () => {
                                     </div>
                                     <p className="text-gray-700 text-lg font-medium mb-2">No Users Found</p>
                                     <p className="text-gray-500 text-sm mb-4">
-                                        {currentPage > 1 
+                                        {currentPage > 1
                                             ? "No users found on this page. Try going back to previous pages."
                                             : "You haven't created any users yet. Create your first user to get started with user management."
                                         }
@@ -413,7 +413,7 @@ const UserManagement = () => {
                                         </tbody>
                                     </table>
                                 </div>
-                                
+
                                 {/* Pagination Component */}
                                 <Pagination
                                     currentPage={currentPage}

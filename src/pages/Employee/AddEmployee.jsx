@@ -241,7 +241,7 @@ const AddEmployee = () => {
                     panCard: null,
                     photo: null,
                     loginMobileNo: employee.login_mobile_number || '',
-                    password: employee.password ||'' ,
+                    password: employee.password || '',
                 };
 
                 setFormData(mappedFormData);
@@ -436,8 +436,8 @@ const AddEmployee = () => {
             });
 
             // Credentials 
-            formDataToSend.append('login_mobile_number', formData.loginMobileNo ||'');
-            formDataToSend.append('password', formData.password ||'');
+            formDataToSend.append('login_mobile_number', formData.loginMobileNo || '');
+            formDataToSend.append('password', formData.password || '');
 
             // Handle file uploads
             const fileFields = ['aadharCard', 'drivingLicence', 'panCard', 'photo'];
@@ -508,7 +508,6 @@ const AddEmployee = () => {
                         photo: null
                     });
                 } else {
-                    // For edit mode, optionally redirect back to employee list after a delay
                     setTimeout(() => {
                         navigate('/employee'); // Adjust the route as needed
                     }, 2000);
@@ -596,7 +595,7 @@ const AddEmployee = () => {
             </div>
         );
     }
-  
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-5xl mx-auto px-4 py-8">
@@ -606,7 +605,7 @@ const AddEmployee = () => {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={goBack}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
