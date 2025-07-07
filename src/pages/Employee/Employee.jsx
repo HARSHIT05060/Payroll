@@ -2,12 +2,9 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     Pencil,
     FileText,
-    ClipboardIcon,
     ChevronDown,
     ChevronUp,
     UserCheck,
-    Loader2,
-    AlertCircle,
     Users,
     Plus,
     Search,
@@ -19,6 +16,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { useSelector } from 'react-redux';
+import Pagination from '../../Components/Pagination'; // Adjust path as needed
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -39,25 +37,40 @@ const KEY_MAPPING = {
     [COLUMN_KEYS.DESIGNATION]: 'designation_name'
 };
 
+const ITEMS_PER_PAGE = 10; 
+
 export default function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredEmployees, setFilteredEmployees] = useState(employees);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [sortConfig, setSortConfig] = useState({
         key: null,
         direction: SORT_DIRECTIONS.ASCENDING
     });
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalEmployees, setTotalEmployees] = useState(0);
+    const [paginationLoading, setPaginationLoading] = useState(false);
+
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
     const permissions = useSelector(state => state.permissions) || {};
 
-    // Fetch employees data
-    const fetchEmployees = useCallback(async () => {
+    // Fetch employees data with pagination
+    const fetchEmployees = useCallback(async (page = 1, resetData = false) => {
         try {
-            setLoading(true);
+            if (resetData) {
+                setLoading(true);
+                setCurrentPage(1);
+                page = 1;
+            } else {
+                setPaginationLoading(true);
+            }
+
             setError(null);
 
             if (!user?.user_id) {
@@ -66,15 +79,31 @@ export default function EmployeeManagement() {
 
             const formData = new FormData();
             formData.append('user_id', user.user_id);
+            formData.append('page', page.toString());
 
             const response = await api.post('employee_list', formData);
 
             if (response.data?.success && response.data.data) {
-                setEmployees(response.data.data);
-            } else if (response.data?.success && response.data.employees) {
-                setEmployees(response.data.employees);
-            } else if (Array.isArray(response.data)) {
-                setEmployees(response.data);
+                const newEmployees = response.data.data;
+                setEmployees(newEmployees);
+
+                // Calculate total pages based on response
+                const itemsCount = newEmployees.length;
+                if (itemsCount < ITEMS_PER_PAGE && page === 1) {
+                    // If we get less than 10 items on first page, that's all we have
+                    setTotalPages(1);
+                    setTotalEmployees(itemsCount);
+                } else if (itemsCount < ITEMS_PER_PAGE && page > 1) {
+                    // If we get less than 10 items on subsequent pages, this is the last page
+                    setTotalPages(page);
+                    setTotalEmployees((page - 1) * ITEMS_PER_PAGE + itemsCount);
+                } else {
+                    // If we get exactly 10 items, there might be more pages
+                    setTotalPages(page + 1); // We'll update this when we hit the last page
+                    setTotalEmployees(page * ITEMS_PER_PAGE);
+                }
+
+                setCurrentPage(page);
             } else {
                 throw new Error(response.data?.message || 'Failed to fetch employees');
             }
@@ -95,17 +124,23 @@ export default function EmployeeManagement() {
             }
         } finally {
             setLoading(false);
+            setPaginationLoading(false);
         }
     }, [user, logout]);
 
+    // Search functionality (works on current page data)
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            const filtered = employees.filter(emp => {
-                return Object.values(emp).some(value =>
-                    String(value).toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            });
-            setFilteredEmployees(filtered);
+            if (searchQuery.trim() === '') {
+                setFilteredEmployees([]);
+            } else {
+                const filtered = employees.filter(emp => {
+                    return Object.values(emp).some(value =>
+                        String(value).toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                });
+                setFilteredEmployees(filtered);
+            }
         }, 300);
 
         return () => clearTimeout(delayDebounce);
@@ -113,11 +148,11 @@ export default function EmployeeManagement() {
 
     useEffect(() => {
         if (isAuthenticated() && user?.user_id) {
-            fetchEmployees();
+            fetchEmployees(1, true);
         }
-    }, [isAuthenticated, fetchEmployees, user?.user_id]);
+    }, [isAuthenticated, user?.user_id]);
 
-    // Sorting functionality
+    // Sorting functionality (works on current page data)
     const requestSort = useCallback((key) => {
         setSortConfig(prevConfig => {
             const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
@@ -129,7 +164,7 @@ export default function EmployeeManagement() {
 
     // Memoized sorted employees
     const sortedEmployees = useMemo(() => {
-        const source = searchQuery ? filteredEmployees : employees;
+        const source = searchQuery.trim() ? filteredEmployees : employees;
 
         if (!sortConfig.key) return source;
 
@@ -148,6 +183,13 @@ export default function EmployeeManagement() {
         });
     }, [employees, filteredEmployees, sortConfig, searchQuery]);
 
+    // Pagination handler
+    const handlePageChange = useCallback((newPage) => {
+        if (newPage >= 1 && newPage <= totalPages && !paginationLoading) {
+            fetchEmployees(newPage);
+        }
+    }, [totalPages, paginationLoading, fetchEmployees]);
+
     // Action handlers
     const handleViewDetails = useCallback((employee_id) => {
         navigate(`/employee/details/${employee_id}`);
@@ -156,6 +198,10 @@ export default function EmployeeManagement() {
     const handleEditEmployee = useCallback((employee_id) => {
         navigate(`/add-employee?edit=${employee_id}`);
     }, [navigate]);
+
+    const handleRefresh = useCallback(() => {
+        fetchEmployees(currentPage);
+    }, [currentPage, fetchEmployees]);
 
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
@@ -195,9 +241,9 @@ export default function EmployeeManagement() {
                         </div>
                     </div>
                 </div>
+
                 <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
                     {/* Header section */}
-
                     <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center">
@@ -211,7 +257,7 @@ export default function EmployeeManagement() {
                                 <div className="relative w-full sm:w-64">
                                     <input
                                         type="text"
-                                        placeholder="Search employees..."
+                                        placeholder="Search current page..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
@@ -219,7 +265,15 @@ export default function EmployeeManagement() {
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                                 </div>
 
-                                {permissions['employee_create'] &&
+                                <button
+                                    onClick={handleRefresh}
+                                    disabled={paginationLoading}
+                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
+                                >
+                                    <RefreshCw className={`h-4 w-4 ${paginationLoading ? 'animate-spin' : ''}`} />
+                                </button>
+
+                                {permissions['employee_create'] && (
                                     <button
                                         onClick={() => navigate('/add-employee')}
                                         className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -227,7 +281,7 @@ export default function EmployeeManagement() {
                                         <Plus className="h-4 w-4" />
                                         Add Employee
                                     </button>
-                                }
+                                )}
                             </div>
                         </div>
                     </div>
@@ -247,7 +301,7 @@ export default function EmployeeManagement() {
                                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Employees</p>
                                 <p className="text-red-600 mb-4">{error}</p>
                                 <button
-                                    onClick={fetchEmployees}
+                                    onClick={() => fetchEmployees(currentPage)}
                                     className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
@@ -263,9 +317,9 @@ export default function EmployeeManagement() {
                                 </div>
                                 <p className="text-gray-700 text-lg font-medium mb-2">No Employees Found</p>
                                 <p className="text-gray-500 text-sm mb-4">
-                                    You haven't added any employees yet. Create your first employee to get started with employee management.
+                                    {currentPage > 1 ? 'No employees found on this page.' : 'You haven\'t added any employees yet.'}
                                 </p>
-                                {permissions['employee_create'] && (
+                                {permissions['employee_create'] && currentPage === 1 && (
                                     <button
                                         onClick={() => navigate('/add-employee')}
                                         className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -277,119 +331,131 @@ export default function EmployeeManagement() {
                             </div>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-blue-50">
-                                    <tr>
-                                        {[
-                                            { key: COLUMN_KEYS.ID, label: 'Employee ID' },
-                                            { key: COLUMN_KEYS.NAME, label: 'Full Name' },
-                                            { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
-                                            { key: COLUMN_KEYS.DESIGNATION, label: 'Designation' }
-                                        ].map(({ key, label }) => (
-                                            <th key={`header-${key}`} className="px-6 py-3 text-left">
-                                                <button
-                                                    className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
-                                                    onClick={() => requestSort(key)}
-                                                >
-                                                    {label}
-                                                    {renderSortIcon(key)}
-                                                </button>
-                                            </th>
-                                        ))}
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Email
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Biometrics
-                                        </th>
-                                        {(permissions?.employee_edit || permissions?.employee_view) && (
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {!sortedEmployees || sortedEmployees.length === 0 ? (
+                        <>
+                            {/* Table */}
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-blue-50">
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                                                <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                                <p className="text-lg font-medium">No employees found</p>
-                                                <p className="text-sm">Start by adding your first employee</p>
-                                            </td>
+                                            {[
+                                                { key: COLUMN_KEYS.ID, label: 'Employee ID' },
+                                                { key: COLUMN_KEYS.NAME, label: 'Full Name' },
+                                                { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
+                                                { key: COLUMN_KEYS.DESIGNATION, label: 'Designation' }
+                                            ].map(({ key, label }) => (
+                                                <th key={`header-${key}`} className="px-6 py-3 text-left">
+                                                    <button
+                                                        className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                        onClick={() => requestSort(key)}
+                                                    >
+                                                        {label}
+                                                        {renderSortIcon(key)}
+                                                    </button>
+                                                </th>
+                                            ))}
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Email
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Mobile
+                                            </th>
+                                            {(permissions?.employee_edit || permissions?.employee_view) && (
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            )}
                                         </tr>
-                                    ) : (
-                                        sortedEmployees.map((employee, index) => {
-                                            const employeeId = employee.employee_code || employee.employee_id || `employee-${index}`;
-                                            return (
-                                                <tr
-                                                    key={`emp-${employeeId}`}
-                                                    className="hover:bg-gray-50 transition-colors"
-                                                >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {employee.employee_code || '-'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                                <Users className="w-4 h-4 text-blue-600" />
-                                                            </div>
-                                                            <span>{employee.full_name || 'Unnamed Employee'}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        {employee.department_name || 'N/A'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        {employee.designation_name || 'N/A'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        {employee.email || 'N/A'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        {employee.biometrics_registered ? (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                                <UserCheck className="w-3 h-3 mr-1" />
-                                                                Registered
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                                Not Registered
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                            <div className="flex space-x-2">
-                                                                {permissions['employee_edit'] && (
-                                                                    <button
-                                                                        onClick={() => handleEditEmployee(employee.employee_id)}
-                                                                        className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
-                                                                        title="Edit Employee"
-                                                                    >
-                                                                        <Pencil className="w-4 h-4" />
-                                                                    </button>
-                                                                )}
-                                                                {permissions['employee_view'] && (
-                                                                    <button
-                                                                        onClick={() => handleViewDetails(employee.employee_id)}
-                                                                        className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                                                        title="View Details"
-                                                                    >
-                                                                        <FileText className="w-4 h-4" />
-                                                                    </button>
-                                                                )}
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {!sortedEmployees || sortedEmployees.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                                    <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                                    <p className="text-lg font-medium">
+                                                        {searchQuery ? 'No employees found matching your search' : 'No employees found'}
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        {searchQuery ? 'Try adjusting your search terms' : 'Start by adding your first employee'}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            sortedEmployees.map((employee, index) => {
+                                                const employeeId = employee.employee_id || `employee-${index}`;
+                                                return (
+                                                    <tr
+                                                        key={`emp-${employeeId}`}
+                                                        className={`hover:bg-gray-50 transition-colors ${paginationLoading ? 'opacity-50' : ''}`}
+                                                    >
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                            {employee.employee_code || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <div className="flex items-center space-x-2">
+                                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                                    <Users className="w-4 h-4 text-blue-600" />
+                                                                </div>
+                                                                <span>{employee.full_name || 'Unnamed Employee'}</span>
                                                             </div>
                                                         </td>
-                                                    )}
-                                                </tr>
-                                            );
-                                        })
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            {employee.department_name || 'N/A'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            {employee.designation_name || 'N/A'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            {employee.email || 'N/A'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            {employee.mobile_number || 'N/A'}
+                                                        </td>
+                                                        {(permissions?.employee_edit || permissions?.employee_view) && (
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                                <div className="flex space-x-2">
+                                                                    {permissions['employee_edit'] && (
+                                                                        <button
+                                                                            onClick={() => handleEditEmployee(employee.employee_id)}
+                                                                            disabled={paginationLoading}
+                                                                            className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50 disabled:opacity-50"
+                                                                            title="Edit Employee"
+                                                                        >
+                                                                            <Pencil className="w-4 h-4" />
+                                                                        </button>
+                                                                    )}
+                                                                    {permissions['employee_view'] && (
+                                                                        <button
+                                                                            onClick={() => handleViewDetails(employee.employee_id)}
+                                                                            disabled={paginationLoading}
+                                                                            className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+                                                                            title="View Details"
+                                                                        >
+                                                                            <FileText className="w-4 h-4" />
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                );
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination Component */}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalItems={totalEmployees}
+                                itemsPerPage={ITEMS_PER_PAGE}
+                                onPageChange={handlePageChange}
+                                loading={paginationLoading}
+                                showInfo={true}
+                                maxVisiblePages={5}
+                            />
+                        </>
                     )}
                 </div>
             </div>

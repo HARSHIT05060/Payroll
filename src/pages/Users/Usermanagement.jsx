@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, ArrowLeft, XCircle, User, Shield } from 'lucide-react';
 import api from '../../api/axiosInstance';
@@ -6,17 +6,23 @@ import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import Pagination from '../../Components/Pagination'; 
 
+const ITEMS_PER_PAGE = 10;
 
 const UserManagement = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [paginationLoading, setPaginationLoading] = useState(false);
     const [error, setError] = useState(null);
     const [deleting, setDeleting] = useState(null);
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalUsers, setTotalUsers] = useState(0);
     const permissions = useSelector(state => state.permissions);
 
     const showToast = (message, type) => {
@@ -37,9 +43,8 @@ const UserManagement = () => {
         return !isAdminUser(userData);
     };
 
-    // fetch users from the API
-
-    const fetchUsers = async () => {
+    // fetch users from the API with pagination
+    const fetchUsers = useCallback(async (page = 1, resetData = false) => {
         if (!user?.user_id) {
             setError('User not authenticated');
             setLoading(false);
@@ -47,17 +52,41 @@ const UserManagement = () => {
         }
 
         try {
-            setLoading(true);
+            if (resetData) {
+                setLoading(true);
+                setCurrentPage(1);
+                page = 1;
+            } else {
+                setPaginationLoading(true);
+            }
             setError(null);
 
             const formData = new FormData();
             formData.append('user_id', String(user.user_id));
+            formData.append('page', page.toString());
 
             const res = await api.post('/user_list', formData);
 
             if (res.data?.success) {
                 const usersData = res.data.data || [];
                 setUsers(usersData);
+                
+                // Calculate total pages based on response
+                const itemsCount = usersData.length;
+                if (itemsCount < ITEMS_PER_PAGE && page === 1) {
+                    // If we get less than 10 items on first page, that's all we have
+                    setTotalPages(1);
+                    setTotalUsers(itemsCount);
+                } else if (itemsCount < ITEMS_PER_PAGE && page > 1) {
+                    // If we get less than 10 items on subsequent pages, this is the last page
+                    setTotalPages(page);
+                    setTotalUsers((page - 1) * ITEMS_PER_PAGE + itemsCount);
+                } else {
+                    // If we get exactly 10 items, there might be more pages
+                    setTotalPages(page + 1); // We'll update this when we hit the last page
+                    setTotalUsers(page * ITEMS_PER_PAGE);
+                }
+                setCurrentPage(page);
             } else {
                 const errorMsg = res.data?.message || 'Failed to fetch users';
                 setError(errorMsg);
@@ -69,19 +98,30 @@ const UserManagement = () => {
             showToast(errorMessage, 'error');
         } finally {
             setLoading(false);
+            setPaginationLoading(false);
         }
-    };
+    }, [user?.user_id]);
 
     useEffect(() => {
         if (user?.user_id) {
-            fetchUsers();
+            fetchUsers(1, true);
         } else {
             setLoading(false);
             setError('User not authenticated');
         }
-    }, [user?.user_id]);
+    }, [user?.user_id, fetchUsers]);
 
+    // Handle page change
+    const handlePageChange = (page) => {
+        if (page !== currentPage) {
+            fetchUsers(page);
+        }
+    };
 
+    // Handle refresh
+    const handleRefresh = () => {
+        fetchUsers(1, true);
+    };
 
     const handleEditUser = (userData) => {
         if (!canModifyUser(userData)) {
@@ -100,7 +140,7 @@ const UserManagement = () => {
         try {
             const userData = confirmModal.data;
             navigate(`/add-user?edit=${userData.edit_user_id}`);
-            console.log(userData.edit_user_id)
+            console.log(userData.edit_user_id);
             setConfirmModal({ isOpen: false, type: '', data: null });
         } catch (error) {
             showToast('Error preparing user for editing', error);
@@ -134,7 +174,13 @@ const UserManagement = () => {
             const res = await api.post('/user_delete', formData);
 
             if (res.data?.success) {
-                await fetchUsers();
+                // After successful deletion, refresh the current page
+                // If current page becomes empty and it's not the first page, go to previous page
+                if (users.length === 1 && currentPage > 1) {
+                    fetchUsers(currentPage - 1);
+                } else {
+                    fetchUsers(currentPage);
+                }
                 showToast('User deleted successfully', 'success');
             } else {
                 showToast(res.data?.message || 'Failed to delete user', 'error');
@@ -182,18 +228,33 @@ const UserManagement = () => {
                                             <h1 className="text-2xl font-bold text-white">
                                                 User Management
                                             </h1>
+                                            {totalUsers > 0 && (
+                                                <p className="text-white/80 text-sm mt-1">
+                                                    Total Users: {totalUsers}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
-                                {permissions['user_create'] && (
+                                <div className="flex items-center gap-3">
                                     <button
-                                        onClick={() => navigate('/add-user')}
-                                        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        onClick={handleRefresh}
+                                        disabled={loading || paginationLoading}
+                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <Plus className="w-4 h-4" />
-                                        <span>Create User</span>
+                                        <RefreshCw size={18} className={`${loading || paginationLoading ? 'animate-spin' : ''}`} />
+                                        Refresh
                                     </button>
-                                )}
+                                    {permissions['user_create'] && (
+                                        <button
+                                            onClick={() => navigate('/add-user')}
+                                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            <span>Create User</span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -216,6 +277,13 @@ const UserManagement = () => {
                                     <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
                                     <p className="text-red-700 text-lg font-medium mb-2">Error Loading Users</p>
                                     <p className="text-red-600 mb-4">{error}</p>
+                                    <button
+                                        onClick={handleRefresh}
+                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    >
+                                        <RefreshCw className="w-4 h-4" />
+                                        <span>Try Again</span>
+                                    </button>
                                 </div>
                             </div>
                         ) : users.length === 0 ? (
@@ -226,117 +294,134 @@ const UserManagement = () => {
                                     </div>
                                     <p className="text-gray-700 text-lg font-medium mb-2">No Users Found</p>
                                     <p className="text-gray-500 text-sm mb-4">
-                                        You haven't created any users yet. Create your first user to get started with user management.
+                                        {currentPage > 1 
+                                            ? "No users found on this page. Try going back to previous pages."
+                                            : "You haven't created any users yet. Create your first user to get started with user management."
+                                        }
                                     </p>
-                                    <button
-                                        onClick={() => navigate('/add-user')}
-                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        <span>Create First User</span>
-                                    </button>
+                                    {currentPage === 1 && permissions['user_create'] && (
+                                        <button
+                                            onClick={() => navigate('/add-user')}
+                                            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            <span>Create First User</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-blue-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Full Name
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Email
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Phone Number
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Type
-                                            </th>
-                                            {permissions['user_edit', 'user_delete'] &&
+                            <>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-blue-50">
+                                            <tr>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Actions
+                                                    Full Name
                                                 </th>
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {users.map(userData => (
-                                            <tr key={userData.edit_user_id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    <div className="flex items-center space-x-2">
-                                                        {isAdminUser(userData) ? (
-                                                            <Shield className="w-4 h-4 text-blue-600" />
-                                                        ) : (
-                                                            <User className="w-4 h-4 text-gray-500" />
-                                                        )}
-                                                        <span>{userData.full_name || 'Unnamed User'}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    {userData.email || 'N/A'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    {userData.number || 'N/A'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminUser(userData)
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-gray-100 text-gray-800'
-                                                        }`}>
-                                                        {isAdminUser(userData) ? (
-                                                            <>
-                                                                <Shield className="w-3 h-3 mr-1" />
-                                                                Admin
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <User className="w-3 h-3 mr-1" />
-                                                                User
-                                                            </>
-                                                        )}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div className="flex space-x-2">
-                                                        {permissions['user_edit'] &&
-                                                            <button
-                                                                onClick={() => handleEditUser(userData)}
-                                                                className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                                    ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
-                                                                    : 'text-gray-400 cursor-not-allowed'
-                                                                    }`}
-                                                                title={canModifyUser(userData) ? "Edit User" : "Admin users cannot be edited"}
-                                                                disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
-                                                            >
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                        }
-                                                        {permissions['user_delete'] &&
-                                                            <button
-                                                                onClick={() => handleDeleteUser(userData)}
-                                                                className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                                    ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                                                    : 'text-gray-400 cursor-not-allowed'
-                                                                    }`}
-                                                                title={canModifyUser(userData) ? "Delete User" : "Admin users cannot be deleted"}
-                                                                disabled={deleting === userData.edit_user_id || !canModifyUser(userData)}
-                                                            >
-                                                                {deleting === userData.edit_user_id ? (
-                                                                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                                                ) : (
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                )}
-                                                            </button>
-                                                        }
-                                                    </div>
-                                                </td>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Email
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Phone Number
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Type
+                                                </th>
+                                                {(permissions['user_edit'] || permissions['user_delete']) && (
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Actions
+                                                    </th>
+                                                )}
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {users.map(userData => (
+                                                <tr key={userData.edit_user_id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        <div className="flex items-center space-x-2">
+                                                            {isAdminUser(userData) ? (
+                                                                <Shield className="w-4 h-4 text-blue-600" />
+                                                            ) : (
+                                                                <User className="w-4 h-4 text-gray-500" />
+                                                            )}
+                                                            <span>{userData.full_name || 'Unnamed User'}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {userData.email || 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        {userData.number || 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminUser(userData)
+                                                            ? 'bg-blue-100 text-blue-800'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                            }`}>
+                                                            {isAdminUser(userData) ? (
+                                                                <>
+                                                                    <Shield className="w-3 h-3 mr-1" />
+                                                                    Admin
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <User className="w-3 h-3 mr-1" />
+                                                                    User
+                                                                </>
+                                                            )}
+                                                        </span>
+                                                    </td>
+                                                    {(permissions['user_edit'] || permissions['user_delete']) && (
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                            <div className="flex space-x-2">
+                                                                {permissions['user_edit'] && (
+                                                                    <button
+                                                                        onClick={() => handleEditUser(userData)}
+                                                                        className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
+                                                                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
+                                                                            : 'text-gray-400 cursor-not-allowed'
+                                                                            }`}
+                                                                        title={canModifyUser(userData) ? "Edit User" : "Admin users cannot be edited"}
+                                                                        disabled={deleting === userData.edit_user_id || !canModifyUser(userData) || paginationLoading}
+                                                                    >
+                                                                        <Edit className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                                {permissions['user_delete'] && (
+                                                                    <button
+                                                                        onClick={() => handleDeleteUser(userData)}
+                                                                        className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
+                                                                            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+                                                                            : 'text-gray-400 cursor-not-allowed'
+                                                                            }`}
+                                                                        title={canModifyUser(userData) ? "Delete User" : "Admin users cannot be deleted"}
+                                                                        disabled={deleting === userData.edit_user_id || !canModifyUser(userData) || paginationLoading}
+                                                                    >
+                                                                        {deleting === userData.edit_user_id ? (
+                                                                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                                                        ) : (
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        )}
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                {/* Pagination Component */}
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    loading={paginationLoading}
+                                />
+                            </>
                         )}
                     </div>
                 </div>

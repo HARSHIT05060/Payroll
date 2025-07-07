@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
+import Pagination from '../../Components/Pagination'; 
 
 // Day Status Legend Component
 const DayStatusLegend = () => {
@@ -48,6 +49,11 @@ const ShiftManagement = () => {
     const [employeeModal, setEmployeeModal] = useState({ isOpen: false, employees: [], loading: false, shiftName: '' });
     const [employeeCounts, setEmployeeCounts] = useState({});
     const permissions = useSelector(state => state.permissions) || {};
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalShifts, setTotalShifts] = useState(0);
 
     // Search functionality
     useEffect(() => {
@@ -237,8 +243,8 @@ const ShiftManagement = () => {
         }
     };
 
-    // Fetch shifts from API
-    const fetchShifts = async () => {
+    // Fetch shifts from API with pagination
+    const fetchShifts = async (page = 1) => {
         try {
             setLoading(true);
             setError(null);
@@ -249,12 +255,19 @@ const ShiftManagement = () => {
 
             const formData = new FormData();
             formData.append('user_id', user.user_id);
+            formData.append('page', page.toString());
 
             const response = await api.post('shift_list', formData);
 
             if (response.data.success) {
                 const shiftsData = response.data.data || [];
                 setShifts(shiftsData);
+
+                // Set pagination data from response
+                const paginationData = response.data.pagination || {};
+                setTotalPages(paginationData.total_pages || 1);
+                setTotalShifts(paginationData.total_records || shiftsData.length);
+                setCurrentPage(paginationData.current_page || page);
 
                 // Fetch employee counts for each shift
                 shiftsData.forEach(shift => {
@@ -281,9 +294,22 @@ const ShiftManagement = () => {
         }
     };
 
+    // Handle page change
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchShifts(page);
+    };
+
     useEffect(() => {
-        fetchShifts();
+        fetchShifts(currentPage);
     }, [user]);
+
+    // Reset to first page when searching
+    useEffect(() => {
+        if (searchQuery) {
+            setCurrentPage(1);
+        }
+    }, [searchQuery]);
 
     // Handle edit shift
     const handleEditShift = (shiftId) => {
@@ -312,8 +338,9 @@ const ShiftManagement = () => {
                     if (response.data.success) {
                         showToast('Shift deleted successfully', 'success');
 
-                        // Refresh the shifts list
-                        fetchShifts();
+                        // Refresh the current page or go to previous page if current page becomes empty
+                        const pageToLoad = shifts.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
+                        fetchShifts(pageToLoad);
                     } else {
                         showToast(response.data.message || 'Failed to delete shift', 'error');
                     }
@@ -366,7 +393,7 @@ const ShiftManagement = () => {
                             <div className="flex items-center">
                                 <Calendar className="h-6 w-6 text-white mr-2" />
                                 <h3 className="text-lg font-medium text-white">
-                                    Available Shifts ({shifts.length})
+                                    Available Shifts ({totalShifts})
                                 </h3>
                             </div>
 
@@ -424,7 +451,7 @@ const ShiftManagement = () => {
                                 <p className="text-red-700 text-lg font-medium mb-2">Error Loading Shifts</p>
                                 <p className="text-red-600 mb-4">{error}</p>
                                 <button
-                                    onClick={fetchShifts}
+                                    onClick={() => fetchShifts(currentPage)}
                                     className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
@@ -440,9 +467,9 @@ const ShiftManagement = () => {
                                 </div>
                                 <p className="text-gray-700 text-lg font-medium mb-2">No Shifts Found</p>
                                 <p className="text-gray-500 text-sm mb-4">
-                                    You haven't created any shifts yet. Create your first shift to get started with shift management.
+                                    {searchQuery ? 'No shifts match your search criteria.' : 'You haven\'t created any shifts yet. Create your first shift to get started with shift management.'}
                                 </p>
-                                {permissions['shift_create'] && (
+                                {permissions['shift_create'] && !searchQuery && (
                                     <button
                                         onClick={handleCreateShift}
                                         className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -560,6 +587,16 @@ const ShiftManagement = () => {
                                 </tbody>
                             </table>
                         </div>
+                    )}
+
+                    {/* Pagination Component */}
+                    {!searchQuery && totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            loading={loading}
+                        />
                     )}
                 </div>
 
