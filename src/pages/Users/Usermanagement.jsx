@@ -200,9 +200,9 @@ const UserManagement = () => {
     if (!user?.user_id && !loading) {
         return (
             <div className="p-6 max-w-6xl mx-auto">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6 text-center">
                     <h2 className="text-xl font-semibold text-red-800 mb-2">Authentication Required</h2>
-                    <p className="text-red-600">Please log in to manage users.</p>
+                    <p className="text-[var(--color-text-error)]">Please log in to manage users.</p>
                 </div>
             </div>
         );
@@ -210,26 +210,26 @@ const UserManagement = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--color-bg-primary)]">
                 <div className="p-6 max-w-7xl mx-auto">
-                    <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => navigate(-1)}
-                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                        className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                                     >
                                         <ArrowLeft size={18} />
                                         Back
                                     </button>
                                     <div className="flex items-center gap-3">
                                         <div>
-                                            <h1 className="text-2xl font-bold text-white">
+                                            <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                                 User Management
                                             </h1>
                                             {totalUsers > 0 && (
-                                                <p className="text-white/80 text-sm mt-1">
+                                                <p className="text-[var(--color-text-white)]/80 text-sm mt-1">
                                                     Total Users: {totalUsers}
                                                 </p>
                                             )}
@@ -240,7 +240,7 @@ const UserManagement = () => {
                                     <button
                                         onClick={handleRefresh}
                                         disabled={loading || paginationLoading}
-                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <RefreshCw size={18} className={`${loading || paginationLoading ? 'animate-spin' : ''}`} />
                                         Refresh
@@ -248,7 +248,7 @@ const UserManagement = () => {
                                     {permissions['user_create'] && (
                                         <button
                                             onClick={() => navigate('/add-user')}
-                                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                            className="flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                         >
                                             <Plus className="w-4 h-4" />
                                             <span>Create User</span>
@@ -259,27 +259,27 @@ const UserManagement = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
-                        <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
-                            <h3 className="text-lg font-medium text-white">All Users</h3>
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
+                        <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
+                            <h3 className="text-lg font-medium text-[var(--color-text-white)]">All Users</h3>
                         </div>
 
                         {loading ? (
                             <div className="px-6 py-12 text-center">
-                                <div className="inline-flex items-center space-x-2 text-gray-500">
+                                <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                                     <RefreshCw className="w-5 h-5 animate-spin" />
                                     <span>Loading users...</span>
                                 </div>
                             </div>
                         ) : error ? (
                             <div className="px-6 py-12 text-center">
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                    <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                    <p className="text-red-700 text-lg font-medium mb-2">Error Loading Users</p>
-                                    <p className="text-red-600 mb-4">{error}</p>
+                                <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                    <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                    <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Users</p>
+                                    <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                     <button
                                         onClick={handleRefresh}
-                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                         <span>Try Again</span>
@@ -288,12 +288,12 @@ const UserManagement = () => {
                             </div>
                         ) : users.length === 0 ? (
                             <div className="px-6 py-12 text-center">
-                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Plus className="w-8 h-8 text-gray-400" />
+                                <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                    <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Plus className="w-8 h-8 text-[var(--color-text-muted)]" />
                                     </div>
-                                    <p className="text-gray-700 text-lg font-medium mb-2">No Users Found</p>
-                                    <p className="text-gray-500 text-sm mb-4">
+                                    <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Users Found</p>
+                                    <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                                         {currentPage > 1
                                             ? "No users found on this page. Try going back to previous pages."
                                             : "You haven't created any users yet. Create your first user to get started with user management."
@@ -302,7 +302,7 @@ const UserManagement = () => {
                                     {currentPage === 1 && permissions['user_create'] && (
                                         <button
                                             onClick={() => navigate('/add-user')}
-                                            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                            className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                         >
                                             <Plus className="w-4 h-4" />
                                             <span>Create First User</span>
@@ -313,51 +313,51 @@ const UserManagement = () => {
                         ) : (
                             <>
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-blue-50">
+                                    <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                        <thead className="bg-[var(--color-blue-lightest)]">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Full Name
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Email
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Phone Number
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Type
                                                 </th>
                                                 {(permissions['user_edit'] || permissions['user_delete']) && (
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                         Actions
                                                     </th>
                                                 )}
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                             {users.map(userData => (
-                                                <tr key={userData.edit_user_id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <tr key={userData.edit_user_id} className="hover:bg-[var(--color-bg-primary)] transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                         <div className="flex items-center space-x-2">
                                                             {isAdminUser(userData) ? (
-                                                                <Shield className="w-4 h-4 text-blue-600" />
+                                                                <Shield className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                             ) : (
-                                                                <User className="w-4 h-4 text-gray-500" />
+                                                                <User className="w-4 h-4 text-[var(--color-text-secondary)]" />
                                                             )}
                                                             <span>{userData.full_name || 'Unnamed User'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {userData.email || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {userData.number || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminUser(userData)
-                                                            ? 'bg-blue-100 text-blue-800'
-                                                            : 'bg-gray-100 text-gray-800'
+                                                            ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
+                                                            : 'bg-[var(--color-bg-gradient-start)] text-gray-800'
                                                             }`}>
                                                             {isAdminUser(userData) ? (
                                                                 <>
@@ -379,8 +379,8 @@ const UserManagement = () => {
                                                                     <button
                                                                         onClick={() => handleEditUser(userData)}
                                                                         className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50'
-                                                                            : 'text-gray-400 cursor-not-allowed'
+                                                                            ? 'text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)]'
+                                                                            : 'text-[var(--color-text-muted)] cursor-not-allowed'
                                                                             }`}
                                                                         title={canModifyUser(userData) ? "Edit User" : "Admin users cannot be edited"}
                                                                         disabled={deleting === userData.edit_user_id || !canModifyUser(userData) || paginationLoading}
@@ -392,8 +392,8 @@ const UserManagement = () => {
                                                                     <button
                                                                         onClick={() => handleDeleteUser(userData)}
                                                                         className={`p-2 rounded-md transition-colors ${canModifyUser(userData)
-                                                                            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
-                                                                            : 'text-gray-400 cursor-not-allowed'
+                                                                            ? 'text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]'
+                                                                            : 'text-[var(--color-text-muted)] cursor-not-allowed'
                                                                             }`}
                                                                         title={canModifyUser(userData) ? "Delete User" : "Admin users cannot be deleted"}
                                                                         disabled={deleting === userData.edit_user_id || !canModifyUser(userData) || paginationLoading}

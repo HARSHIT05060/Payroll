@@ -3,7 +3,7 @@ import Branches from "../../Components/Branches";
 
 const BranchesPage = () => {
     return (
-        <div className="min-h-screen bg-gray-100 py-8">
+        <div className="min-h-screen bg-[var(--color-bg-gradient-start)] py-8">
             <Branches />
         </div>
     );

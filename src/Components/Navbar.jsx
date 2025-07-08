@@ -38,7 +38,7 @@ const Navbar = () => {
     };
 
     return (
-        <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-16 px-6 bg-white border-b border-gray-200 z-50 shadow-sm">
+        <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-16 px-6 bg-[var(--color-bg-secondary)] border-b border-[var(--color-border-primary)] z-50 shadow-sm">
             {/* Left side - Logo/Brand */}
             <div className="flex items-center">
                 <h1 className="text-xl font-bold text-gray-800">Attendance System</h1>
@@ -47,49 +47,49 @@ const Navbar = () => {
             {/* Right side - User menu */}
             <div className="flex items-center space-x-4">
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] rounded-full transition-colors">
                     <Bell size={20} />
                     {/* Notification badge */}
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--color-error-light)]0 rounded-full"></span>
                 </button>
 
                 {/* User Profile Dropdown */}
                 <div className="relative" ref={dropdownRef}>
                     <button
-                        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-[var(--color-bg-gradient-start)] transition-colors"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                         {/* User Avatar */}
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        <div className="w-8 h-8 bg-gradient-to-r from-[var(--color-blue)] to-purple-600 rounded-full flex items-center justify-center text-[var(--color-text-white)] text-sm font-semibold">
                             {getUserInitials(user?.full_name)}
                         </div>
 
                         {/* User Name */}
-                        <span className="text-gray-700 font-medium hidden sm:inline-block max-w-32 truncate">
+                        <span className="text-[var(--color-text-secondary)] font-medium hidden sm:inline-block max-w-32 truncate">
                             {user?.full_name || user?.name || user?.username || 'User'}
                         </span>
 
                         {/* Dropdown Arrow */}
                         <ChevronDown
                             size={16}
-                            className={`text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                            className={`text-[var(--color-text-secondary)] transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                         />
                     </button>
 
                     {/* Dropdown Menu */}
                     {isDropdownOpen && (
-                        <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg w-80 overflow-hidden">
+                        <div className="absolute right-0 top-12 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg w-80 overflow-hidden">
                             {/* User Info Header */}
-                            <div className="px-4 py-3 bg-gray-50 border-b">
+                            <div className="px-4 py-3 bg-[var(--color-bg-primary)] border-b">
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-[var(--color-blue)] to-purple-600 rounded-full flex items-center justify-center text-[var(--color-text-white)] font-semibold">
                                         {getUserInitials(user?.full_name)}
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-800">
                                             {user?.full_name || user?.name || user?.username || 'User'}
                                         </h3>
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-sm text-[var(--color-text-secondary)]">
                                             {user?.email || user?.username || user?.number || 'N/A'}
                                         </p>
                                     </div>
@@ -98,8 +98,8 @@ const Navbar = () => {
 
                             {/* User Details */}
                             <div className="px-4 py-3 border-b">
-                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Account Details</h4>
-                                <div className="space-y-1 text-sm text-gray-600">
+                                <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">Account Details</h4>
+                                <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
                                     <div className="flex justify-between">
                                         <span>User ID:</span>
                                         <span className="font-mono">{user?.user_id || 'N/A'}</span>
@@ -123,14 +123,14 @@ const Navbar = () => {
 
                             {/* Menu Actions */}
                             <div className="py-2">
-                                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
+                                <button className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] flex items-center space-x-2">
                                     <Settings size={16} />
                                     <span>Settings</span>
                                 </button>
 
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-error)] hover:bg-[var(--color-error-light)] flex items-center space-x-2"
                                 >
                                     <LogOut size={16} />
                                     <span>Logout</span>

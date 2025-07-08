@@ -7,10 +7,10 @@ import { Toast } from '../../Components/ui/Toast';
 
 // Professional Loading Component
 const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] flex items-center justify-center">
         <div className="text-center">
             <div className="w-16 h-16 border-4 border-slate-200 rounded-full animate-spin border-t-blue-600 mx-auto"></div>
-            <p className="mt-6 text-slate-600 font-medium text-lg">{message}</p>
+            <p className="mt-6 text-[var(--color-text-secondary)] font-medium text-lg">{message}</p>
         </div>
     </div>
 );
@@ -56,8 +56,8 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={!isSourceConfigured}
                 className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${isSourceConfigured
-                    ? 'text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300 focus:ring-2 focus:ring-blue-500 focus:outline-none'
-                    : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'
+                    ? 'text-[var(--color-blue-darker)] bg-[var(--color-blue-lightest)] border-[var(--color-blue-light)] hover:bg-[var(--color-blue-lighter)] hover:border-blue-300 focus:ring-2 focus:ring-[var(--color-blue)] focus:outline-none'
+                    : 'text-[var(--color-text-muted)] bg-[var(--color-bg-primary)] border-[var(--color-border-primary)] cursor-not-allowed'
                     }`}
             >
                 <Copy className="w-4 h-4" />
@@ -66,10 +66,10 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
             </button>
 
             {isOpen && isSourceConfigured && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
-                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
-                        <h3 className="text-sm font-semibold text-gray-900">Copy Configuration</h3>
-                        <p className="text-xs text-gray-600 mt-1">
+                <div className="absolute right-0 mt-2 w-64 bg-[var(--color-bg-secondary)] rounded-xl shadow-xl border border-[var(--color-border-primary)] z-50 overflow-hidden">
+                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-[var(--color-border-primary)]">
+                        <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Copy Configuration</h3>
+                        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                             From: {sourceConfig.from_time} - {sourceConfig.to_time}
                         </p>
                     </div>
@@ -77,21 +77,21 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
                     <div className="py-2">
                         <button
                             onClick={handleCopyToAll}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center gap-3"
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-[var(--color-blue-darker)] hover:bg-[var(--color-blue-lightest)] transition-colors flex items-center gap-3"
                         >
-                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <Copy className="w-4 h-4 text-blue-600" />
+                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-lg flex items-center justify-center">
+                                <Copy className="w-4 h-4 text-[var(--color-blue-dark)]" />
                             </div>
                             <div>
                                 <div className="font-medium">Copy to All Days</div>
-                                <div className="text-xs text-gray-500">Apply to all other days</div>
+                                <div className="text-xs text-[var(--color-text-secondary)]">Apply to all other days</div>
                             </div>
                         </button>
 
-                        <div className="my-2 border-t border-gray-100"></div>
+                        <div className="my-2 border-t border-[var(--color-border-primary)]"></div>
 
                         <div className="px-4 py-2">
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Copy to Individual Days</p>
+                            <p className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wide">Copy to Individual Days</p>
                         </div>
 
                         {availableDays.map(day => {
@@ -100,14 +100,14 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
                                 <button
                                     key={day.day_id}
                                     onClick={() => handleCopyToDay(day.day_name.toLowerCase())}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center justify-between"
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--color-bg-primary)] transition-colors flex items-center justify-between"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${isConfigured ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${isConfigured ? 'bg-green-100 text-green-700' : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)]'
                                             }`}>
                                             {day.day_name.charAt(0)}
                                         </div>
-                                        <span className="text-gray-700">{day.day_name}</span>
+                                        <span className="text-[var(--color-text-secondary)]">{day.day_name}</span>
                                     </div>
                                     {isConfigured && (
                                         <Check className="w-4 h-4 text-green-500" />
@@ -490,15 +490,15 @@ const CreateShift = () => {
 
         return (
             <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    {label} {required && <span className="text-red-500">*</span>}
+                <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
+                    {label} {required && <span className="text-[var(--color-error)]">*</span>}
                 </label>
                 <div className="flex gap-1">
                     {/* Hour Dropdown */}
                     <select
                         value={hour}
                         onChange={(e) => handleFieldChange('hour', e.target.value)}
-                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
+                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 text-sm bg-[var(--color-bg-secondary)] shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -516,7 +516,7 @@ const CreateShift = () => {
                     <select
                         value={minute}
                         onChange={(e) => handleFieldChange('minute', e.target.value)}
-                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
+                        className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 text-sm bg-[var(--color-bg-secondary)] shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -532,7 +532,7 @@ const CreateShift = () => {
                     <select
                         value={period}
                         onChange={(e) => handleFieldChange('period', e.target.value)}
-                        className="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm"
+                        className="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 text-sm bg-[var(--color-bg-secondary)] shadow-sm"
                         required={required}
                         disabled={disabled}
                     >
@@ -621,26 +621,26 @@ const CreateShift = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Enhanced Header */}
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate('/shift-management')}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                {isEditMode ? <Edit size={24} className="text-white" /> : <Calendar size={24} className="text-white" />}
+                                {isEditMode ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <Calendar size={24} className="text-[var(--color-text-white)]" />}
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Shift Configuration' : 'Create New Shift'}
                                     </h1>
-                                    <p className="text-blue-100 text-sm mt-1">
+                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
                                         {isEditMode ? 'Update shift details below' : 'Fill in the shift details below'}
                                     </p>
                                 </div>
@@ -651,16 +651,16 @@ const CreateShift = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Enhanced Weekly Schedule Configuration */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         {/* Enhanced Basic Information */}
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                    <Settings className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
+                                    <Settings className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Basic Information</h2>
-                                    <p className="text-sm text-slate-600">Define the fundamental details of your shift</p>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Define the fundamental details of your shift</p>
                                 </div>
                                 {isEditMode && (
                                     <span className="ml-auto px-3 py-1.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full border border-orange-200">
@@ -672,14 +672,14 @@ const CreateShift = () => {
                         <div className="p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
-                                        Shift Name <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
+                                        Shift Name <span className="text-[var(--color-error)]">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={shiftName}
                                         onChange={(e) => setShiftName(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         placeholder="Enter a descriptive shift name"
                                         required
                                     />
@@ -688,13 +688,13 @@ const CreateShift = () => {
                                     </p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
                                         Remarks
                                     </label>
                                     <textarea
                                         value={remark}
                                         onChange={(e) => setRemark(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white resize-none"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)] resize-none"
                                         rows={2}
                                         placeholder="Add any additional notes or remarks about this shift"
                                     />
@@ -706,10 +706,10 @@ const CreateShift = () => {
                         </div>
 
                         {/* Weekly Schedule Header */}
-                        <div className="px-8 py-6 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+                        <div className="px-8 py-6 border-t border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)]">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                    <Calendar className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Weekly Schedule Configuration</h2>
@@ -725,19 +725,18 @@ const CreateShift = () => {
                                     const selectedOccasionalDays = day.occasional_days ? day.occasional_days.split(',').filter(id => id) : [];
 
                                     return (
-                                        <div key={day.day_id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
+                                        <div key={day.day_id} className="bg-[var(--color-bg-secondary)] rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
                                             {/* Day Header */}
-                                            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/50 rounded-t-2xl">
+                                            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)]/50 rounded-t-2xl">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-4">
-                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${day.day_name.toLowerCase() === 'sunday' ? 'bg-gradient-to-br from-red-500 to-red-600' :
-                                                            day.day_name.toLowerCase() === 'saturday' ? 'bg-gradient-to-br from-purple-500 to-purple-600' :
-                                                                'bg-gradient-to-br from-blue-500 to-blue-600'
-                                                            }`}>
-                                                            {day.day_name.charAt(0)}{day.day_name.charAt(1)}
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="text-lg font-bold text-slate-900">{day.day_name}</h3>
+                                                        <div
+                                                            className={`px-6 py-3 rounded-lg flex items-center justify-center font-semibold text-white shadow-md transition-all duration-200 hover:shadow-lg ${day.day_name.toLowerCase() === 'sunday'
+                                                                ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                                                                : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                                                                }`}
+                                                        >
+                                                            {day.day_name}
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-3">
@@ -755,7 +754,7 @@ const CreateShift = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                     {/* From Time */}
                                                     <div className="space-y-2">
-                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                        <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
                                                             From Time
                                                         </label>
                                                         <div className="relative">
@@ -769,7 +768,7 @@ const CreateShift = () => {
 
                                                     {/* To Time */}
                                                     <div className="space-y-2">
-                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                        <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
                                                             To Time
                                                         </label>
                                                         <div className="relative">
@@ -783,14 +782,14 @@ const CreateShift = () => {
 
                                                     {/* Shift Type */}
                                                     <div className="space-y-2">
-                                                        <label className="block text-sm font-semibold text-slate-700">
+                                                        <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
                                                             Shift Type
                                                         </label>
                                                         <div className="relative">
                                                             <select
                                                                 value={day.shift_type}
                                                                 onChange={(e) => handleDayChange(day.day_id, 'shift_type', e.target.value)}
-                                                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm bg-white shadow-sm hover:border-slate-400"
+                                                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 text-sm bg-[var(--color-bg-secondary)] shadow-sm hover:border-slate-400"
                                                             >
                                                                 <option value="">Select Type</option>
                                                                 {shiftTypes.map(type => (
@@ -808,9 +807,9 @@ const CreateShift = () => {
                                                     <div className="mt-6 pt-6 border-t border-slate-200">
                                                         <div className="space-y-4">
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                                                <label className="text-sm font-semibold text-slate-700">
-                                                                    Occasional Days <span className="text-red-500">*</span>
+                                                                <div className="w-2 h-2 bg-[var(--color-blue-lightest)]0 rounded-full"></div>
+                                                                <label className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                                    Occasional Days <span className="text-[var(--color-error)]">*</span>
                                                                 </label>
                                                             </div>
                                                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
@@ -822,8 +821,8 @@ const CreateShift = () => {
                                                                                 <label
                                                                                     key={occasionalDay.occasional_day_id}
                                                                                     className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm ${isSelected
-                                                                                        ? 'bg-blue-100 border-2 border-blue-300 text-blue-800 shadow-sm'
-                                                                                        : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                                                                        ? 'bg-[var(--color-blue-lighter)] border-2 border-blue-300 text-[var(--color-blue-darkest)] shadow-sm'
+                                                                                        : 'bg-[var(--color-bg-secondary)] border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                                                                         }`}
                                                                                 >
                                                                                     <input
@@ -834,7 +833,7 @@ const CreateShift = () => {
                                                                                             occasionalDay.occasional_day_id,
                                                                                             e.target.checked
                                                                                         )}
-                                                                                        className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 focus:ring-2 mr-2"
+                                                                                        className="w-4 h-4 text-[var(--color-blue-dark)] border-slate-300 rounded focus:ring-[var(--color-blue)] focus:ring-2 mr-2"
                                                                                     />
                                                                                     <span className="font-medium truncate">
                                                                                         {occasionalDay.occasional_day_name}
@@ -849,7 +848,7 @@ const CreateShift = () => {
                                                                 {selectedOccasionalDays.length > 0 && (
                                                                     <div className="mt-4 pt-3 border-t border-slate-200">
                                                                         <div className="flex items-center gap-2">
-                                                                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                                                            <div className="w-2 h-2 bg-[var(--color-success-light)]0 rounded-full animate-pulse"></div>
                                                                             <span className="text-sm font-medium text-green-700">
                                                                                 {selectedOccasionalDays.length} day{selectedOccasionalDays.length > 1 ? 's' : ''} selected
                                                                             </span>
@@ -863,14 +862,14 @@ const CreateShift = () => {
 
                                                 {/* Warning Message for Occasional Days */}
                                                 {isOccasionalType && selectedOccasionalDays.length === 0 && (
-                                                    <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                                    <div className="mt-4 bg-[var(--color-blue-lightest)] border border-[var(--color-blue-light)] rounded-xl p-4">
                                                         <div className="flex items-start gap-3">
                                                             <div className="flex-shrink-0">
-                                                                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                                                                <AlertCircle className="w-5 h-5 text-[var(--color-blue-dark)] mt-0.5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className="text-sm font-semibold text-blue-800">Selection Required</h4>
-                                                                <p className="text-sm text-blue-700 mt-1">Please select at least one occasional day for this shift type.</p>
+                                                                <h4 className="text-sm font-semibold text-[var(--color-blue-darkest)]">Selection Required</h4>
+                                                                <p className="text-sm text-[var(--color-blue-darker)] mt-1">Please select at least one occasional day for this shift type.</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -884,7 +883,7 @@ const CreateShift = () => {
                     </div>
 
                     {/* Enhanced Action Buttons */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="p-8">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -894,7 +893,7 @@ const CreateShift = () => {
                                     <button
                                         type="button"
                                         onClick={() => navigate('/shift-management')}
-                                        className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                        className="px-6 py-3 text-[var(--color-text-secondary)] bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
                                     >
                                         <div className="flex items-center gap-2">
                                             <X className="w-4 h-4" />
@@ -905,12 +904,12 @@ const CreateShift = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-8 py-3 bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] text-[var(--color-text-white)] rounded-xl hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:ring-2 focus:ring-[var(--color-blue)] focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <div className="flex items-center gap-2">
                                             {submitting ? (
                                                 <>
-                                                    <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
+                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)]/30 rounded-full animate-spin border-t-white"></div>
                                                     {isEditMode ? 'Updating...' : 'Creating...'}
                                                 </>
                                             ) : (

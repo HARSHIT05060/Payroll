@@ -345,25 +345,25 @@ const LoanAdvance = () => {
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
         if (sortConfig.key !== key) {
-            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+            return <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-text-muted)]" />;
         }
         return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-            <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
-            <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+            <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
     }, [sortConfig]);
 
     // Render status badge
     const renderStatusBadge = useCallback((status) => {
         const statusColors = {
             'Approved': 'bg-green-100 text-green-800',
-            'Rejected': 'bg-red-100 text-red-800',
+            'Rejected': 'bg-[var(--color-error-light)] text-red-800',
             'Pending': 'bg-yellow-100 text-yellow-800',
-            'Under Review': 'bg-blue-100 text-blue-800',
-            'Closed': 'bg-gray-100 text-gray-800'
+            'Under Review': 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]',
+            'Closed': 'bg-[var(--color-bg-gradient-start)] text-gray-800'
         };
 
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-[var(--color-bg-gradient-start)] text-gray-800'
                 }`}>
                 {status || 'Unknown'}
             </span>
@@ -374,7 +374,7 @@ const LoanAdvance = () => {
     const renderLoanTypeBadge = useCallback((loanType) => {
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${loanType === 'Loan'
-                ? 'bg-blue-100 text-blue-800'
+                ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
                 : 'bg-green-100 text-green-800'
                 }`}>
                 {loanType || 'N/A'}
@@ -393,7 +393,7 @@ const LoanAdvance = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Toast Notification */}
                 {toast && (
@@ -424,19 +424,19 @@ const LoanAdvance = () => {
                     type="danger"
                 />
 
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Loan & Advance Management
                                     </h1>
                                 </div>
@@ -445,17 +445,17 @@ const LoanAdvance = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
                     {/* Header section */}
-                    <div className="px-6 py-3 border-b border-blue-200 bg-blue-600">
+                    <div className="px-6 py-3 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center">
-                                <CreditCard className="h-6 w-6 text-white mr-2" />
-                                <h3 className="text-lg font-medium text-white">
+                                <CreditCard className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                <h3 className="text-lg font-medium text-[var(--color-text-white)]">
                                     Total Loans/Advances ({sortedLoans.length})
                                 </h3>
                                 {(loading || dropdownLoading) && (
-                                    <div className="flex items-center gap-2 text-white ml-4">
+                                    <div className="flex items-center gap-2 text-[var(--color-text-white)] ml-4">
                                         <RefreshCw className="w-4 h-4 animate-spin" />
                                         <span className="text-sm">
                                             {dropdownLoading ? 'Loading filters...' : 'Loading...'}
@@ -468,7 +468,7 @@ const LoanAdvance = () => {
                                 <select
                                     value={filter}
                                     onChange={(e) => handleFilterChange(e.target.value)}
-                                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                    className="px-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                                     disabled={loading || dropdownLoading}
                                 >
                                     {getFilterOptions.map(option => (
@@ -482,15 +482,15 @@ const LoanAdvance = () => {
                                         placeholder="Search loans..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                                     />
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                                 </div>
 
                                 {permissions['loan_create'] && (
                                     <button
                                         onClick={handleAddLoanRedirect}
-                                        className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                                         disabled={loading}
                                     >
                                         <Plus className="h-4 w-4" />
@@ -504,20 +504,20 @@ const LoanAdvance = () => {
                     {/* Content section */}
                     {loading ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                                 <RefreshCw className="w-5 h-5 animate-spin" />
                                 <span>Loading loans...</span>
                             </div>
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Loans</p>
-                                <p className="text-red-600 mb-4">{error}</p>
+                            <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Loans</p>
+                                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                 <button
                                     onClick={fetchLoanData}
-                                    className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                                    className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
                                     <span>Try Again</span>
@@ -526,18 +526,18 @@ const LoanAdvance = () => {
                         </div>
                     ) : loans.length === 0 ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <DollarSign className="w-8 h-8 text-gray-400" />
+                            <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <DollarSign className="w-8 h-8 text-[var(--color-text-muted)]" />
                                 </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">No Loans Found</p>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Loans Found</p>
+                                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                                     You haven't added any loans or advances yet. Create your first loan to get started.
                                 </p>
                                 {permissions['loan_create'] && (
                                     <button
                                         onClick={handleAddLoanRedirect}
-                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <span>Create First Loan</span>
@@ -546,15 +546,15 @@ const LoanAdvance = () => {
                             </div>
                         </div>
                     ) : sortedLoans.length === 0 ? (
-                        <div className="px-6 py-8 text-center text-gray-500">
-                            <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <div className="px-6 py-8 text-center text-[var(--color-text-secondary)]">
+                            <DollarSign className="h-12 w-12 mx-auto mb-4 text-[var(--color-text-muted)]" />
                             <p className="text-lg font-medium">No loans found for the selected filter</p>
                             <p className="text-sm">Try adjusting your search or filter criteria</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-blue-50">
+                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                <thead className="bg-[var(--color-blue-lightest)]">
                                     <tr>
                                         {[
                                             { key: COLUMN_KEYS.EMPLOYEE_NAME, label: 'Employee Name' },
@@ -568,7 +568,7 @@ const LoanAdvance = () => {
                                         ].map(({ key, label }) => (
                                             <th key={`header-${key}`} className="px-5 py-3 text-left">
                                                 <button
-                                                    className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                    className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider hover:text-[var(--color-text-secondary)]"
                                                     onClick={() => requestSort(key)}
                                                 >
                                                     {label}
@@ -577,13 +577,13 @@ const LoanAdvance = () => {
                                             </th>
                                         ))}
                                         {(permissions?.loan_edit || permissions?.loan_view || permissions?.loan_delete) && (
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Actions
                                             </th>
                                         )}
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                     {sortedLoans.map((loan, index) => {
                                         const loanId = loan.loan_id || `loan-${index}`;
                                         const outstandingAmount = calculateOutstandingAmount(loan);
@@ -591,32 +591,32 @@ const LoanAdvance = () => {
                                         return (
                                             <tr
                                                 key={`loan-${loanId}`}
-                                                className="hover:bg-gray-50 transition-colors"
+                                                className="hover:bg-[var(--color-bg-primary)] transition-colors"
                                             >
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                     <div className="flex items-center space-x-2">
-                                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <Users className="w-4 h-4 text-blue-600" />
+                                                        <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                                            <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                         </div>
                                                         <span>{loan.employee_full_name || 'N/A'}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                     {renderLoanTypeBadge(loan.loan_type_name)}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                     {formatCurrency(loan.amount)}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                     {loan.interest_rate}%
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                     {loan.tenure} months
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                     {formatCurrency(loan.installment_amount)}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                     {formatCurrency(outstandingAmount)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -628,7 +628,7 @@ const LoanAdvance = () => {
                                                             {permissions['loan_view'] && (
                                                                 <button
                                                                     onClick={() => handleViewDetails(loan.loan_id)}
-                                                                    className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                                                                    className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)]"
                                                                     title="View Details"
                                                                 >
                                                                     <Eye className="w-4 h-4" />
@@ -637,7 +637,7 @@ const LoanAdvance = () => {
                                                             {/* {permissions['loan_edit'] && (
                                                                 <button
                                                                     onClick={() => handleEdit(loan.loan_id)}
-                                                                    className="p-2 rounded-md transition-colors text-green-600 hover:text-green-900 hover:bg-green-50"
+                                                                    className="p-2 rounded-md transition-colors text-[var(--color-success-dark)] hover:text-[var(--color-success-dark)] hover:bg-[var(--color-success-light)]"
                                                                     title="Edit Loan"
                                                                 >
                                                                     <Edit className="w-4 h-4" />
@@ -646,7 +646,7 @@ const LoanAdvance = () => {
                                                             {permissions['loan_delete'] && (
                                                                 <button
                                                                     onClick={() => handleDeleteClick(loan)}
-                                                                    className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                    className="p-2 rounded-md transition-colors text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]"
                                                                     title="Delete Loan"
                                                                     disabled={deleteLoading}
                                                                 >

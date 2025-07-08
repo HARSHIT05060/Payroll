@@ -69,7 +69,7 @@ const Pagination = ({
 
 
     return (
-        <div className={`px-6 py-4 border-t border-gray-200 bg-gray-50 ${className}`}>
+        <div className={`px-6 py-4 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] ${className}`}>
             <div className="flex items-center justify-end flex-wrap gap-4">
                 {/* Pagination Controls */}
                 <div className="flex items-center space-x-2">
@@ -77,7 +77,7 @@ const Pagination = ({
                     <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 1 || loading}
-                        className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md hover:bg-[var(--color-bg-primary)] hover:text-[var(--color-text-secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         aria-label="Previous page"
                     >
                         <ChevronLeft className="w-4 h-4 mr-1" />
@@ -92,10 +92,10 @@ const Pagination = ({
                                 onClick={() => handlePageChange(pageNum)}
                                 disabled={typeof pageNum !== 'number' || loading}
                                 className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${pageNum === currentPage
-                                        ? 'bg-blue-600 text-white shadow-sm'
-                                        : typeof pageNum === 'number'
-                                            ? 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-700'
-                                            : 'text-gray-400 cursor-default bg-transparent'
+                                    ? 'bg-[var(--color-blue-dark)] text-[var(--color-text-white)] shadow-sm'
+                                    : typeof pageNum === 'number'
+                                        ? 'text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] hover:bg-[var(--color-bg-primary)] hover:text-[var(--color-text-secondary)]'
+                                        : 'text-[var(--color-text-muted)] cursor-default bg-transparent'
                                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 aria-label={typeof pageNum === 'number' ? `Go to page ${pageNum}` : 'More pages'}
                                 aria-current={pageNum === currentPage ? 'page' : undefined}
@@ -109,7 +109,7 @@ const Pagination = ({
                     <button
                         onClick={handleNextPage}
                         disabled={currentPage === totalPages || loading}
-                        className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md hover:bg-[var(--color-bg-primary)] hover:text-[var(--color-text-secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         aria-label="Next page"
                     >
                         Next

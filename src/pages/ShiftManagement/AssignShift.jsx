@@ -114,10 +114,10 @@ const AssignShift = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)]"></div>
                     </div>
                 </div>
             </div>
@@ -125,27 +125,27 @@ const AssignShift = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Enhanced Header */}
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                                 title="Go Back"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                <Calendar size={24} className="text-white" />
+                                <Calendar size={24} className="text-[var(--color-text-white)]" />
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {editShiftId ? 'Assign Shift' : 'Assign New Shift'}
                                     </h1>
-                                    <p className="text-blue-100 text-sm mt-1">
+                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
                                         Select an employee and shift to create assignment
                                     </p>
                                 </div>
@@ -156,29 +156,29 @@ const AssignShift = () => {
 
                 <div className="space-y-8">
                     {/* Enhanced Employee Selection */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl">
+                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                    <Users className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Employee Selection</h2>
-                                    <p className="text-sm text-slate-600">Choose the employee for shift assignment</p>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Choose the employee for shift assignment</p>
                                 </div>
                             </div>
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
                                         <Users className="w-4 h-4 inline mr-2" />
-                                        Select Employee <span className="text-red-500">*</span>
+                                        Select Employee <span className="text-[var(--color-error)]">*</span>
                                     </label>
                                     <select
                                         value={selectedEmployee}
                                         onChange={(e) => setSelectedEmployee(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         disabled={loading}
                                         required
                                     >
@@ -200,29 +200,29 @@ const AssignShift = () => {
                     </div>
 
                     {/* Enhanced Shift Selection */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                                    <Calendar className="w-5 h-5 text-white" />
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Shift Selection</h2>
-                                    <p className="text-sm text-slate-600">Configure the shift assignment details</p>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Configure the shift assignment details</p>
                                 </div>
                             </div>
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
                                         <Calendar className="w-4 h-4 inline mr-2" />
-                                        Select Shift <span className="text-red-500">*</span>
+                                        Select Shift <span className="text-[var(--color-error)]">*</span>
                                     </label>
                                     <select
                                         value={selectedShift}
                                         onChange={(e) => setSelectedShift(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm bg-white"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         disabled={loading}
                                         required
                                     >
@@ -244,7 +244,7 @@ const AssignShift = () => {
                     </div>
 
                     {/* Enhanced Action Buttons */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="p-8">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -254,7 +254,7 @@ const AssignShift = () => {
                                     <button
                                         type="button"
                                         onClick={handleBack}
-                                        className="px-6 py-3 text-slate-600 bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                        className="px-6 py-3 text-[var(--color-text-secondary)] bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
                                         disabled={submitting}
                                     >
                                         <div className="flex items-center gap-2">
@@ -266,12 +266,12 @@ const AssignShift = () => {
                                     <button
                                         onClick={handleSubmit}
                                         disabled={submitting || !selectedEmployee || !selectedShift}
-                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-8 py-3 bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] text-[var(--color-text-white)] rounded-xl hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:ring-2 focus:ring-[var(--color-blue)] focus:outline-none transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <div className="flex items-center gap-2">
                                             {submitting ? (
                                                 <>
-                                                    <div className="w-4 h-4 border-2 border-white/30 rounded-full animate-spin border-t-white"></div>
+                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)]/30 rounded-full animate-spin border-t-white"></div>
                                                     Assigning...
                                                 </>
                                             ) : (

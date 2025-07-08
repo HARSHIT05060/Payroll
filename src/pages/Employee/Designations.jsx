@@ -3,7 +3,7 @@ import Designation from "../../Components/Designation";
 
 const DesignationPage = () => {
     return (
-        <div className="min-h-screen bg-gray-100 py-8">
+        <div className="min-h-screen bg-[var(--color-bg-gradient-start)] py-8">
             <Designation />
         </div>
     );

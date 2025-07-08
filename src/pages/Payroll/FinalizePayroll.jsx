@@ -393,7 +393,7 @@ export default function FinalizePayroll() {
     } else {
       return {
         text: 'Unpaid',
-        className: 'bg-red-100 text-red-800',
+        className: 'bg-[var(--color-error-light)] text-red-800',
         icon: <AlertCircle className="w-4 h-4" />
       };
     }
@@ -437,11 +437,11 @@ export default function FinalizePayroll() {
   // Render sort icon
   const renderSortIcon = useCallback((key) => {
     if (sortConfig.key !== key) {
-      return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+      return <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-text-muted)]" />;
     }
     return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-      <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
-      <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+      <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
+      <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
   }, [sortConfig]);
 
   // Open view modal
@@ -462,26 +462,26 @@ export default function FinalizePayroll() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--color-bg-primary)]">
       <div className="p-6 max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+          <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
               >
                 <ArrowLeft size={18} />
                 Back
               </button>
               <div className="flex items-center gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                     Finalize Payroll
                   </h1>
                   {totalRecords > 0 && (
-                    <p className="text-white/80 text-sm mt-1">
+                    <p className="text-[var(--color-text-white)]/80 text-sm mt-1">
                       Total Records: {totalRecords} | Page {currentPage} of {totalPages}
                     </p>
                   )}
@@ -492,13 +492,13 @@ export default function FinalizePayroll() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+        <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
           {/* Header section */}
-          <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+          <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
             <div className="flex justify-between items-center">
               <div className="flex items-center">
-                <IndianRupee className="h-6 w-6 text-white mr-2" />
-                <h3 className="text-lg font-medium text-white">
+                <IndianRupee className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                <h3 className="text-lg font-medium text-[var(--color-text-white)]">
                   Employee Salary Records
                 </h3>
               </div>
@@ -509,7 +509,7 @@ export default function FinalizePayroll() {
                   <select
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white"
+                    className="appearance-none bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)]"
                   >
                     {monthOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -517,7 +517,7 @@ export default function FinalizePayroll() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-[var(--color-text-muted)] pointer-events-none" />
                 </div>
 
                 {/* Year Filter */}
@@ -525,7 +525,7 @@ export default function FinalizePayroll() {
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
-                    className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white"
+                    className="appearance-none bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)]"
                   >
                     {yearOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -533,7 +533,7 @@ export default function FinalizePayroll() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-[var(--color-text-muted)] pointer-events-none" />
                 </div>
 
                 {/* Search */}
@@ -543,17 +543,17 @@ export default function FinalizePayroll() {
                     placeholder="Search records..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                    className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                   />
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                   {searchLoading && (
-                    <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 animate-spin" />
+                    <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] animate-spin" />
                   )}
                 </div>
 
                 <button
                   onClick={() => fetchSalaryRecords(1, searchQuery, true)}
-                  className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   <RefreshCw className="h-4 w-4" />
                   Refresh
@@ -565,20 +565,20 @@ export default function FinalizePayroll() {
           {/* Content section */}
           {loading ? (
             <div className="px-6 py-12 text-center">
-              <div className="inline-flex items-center space-x-2 text-gray-500">
+              <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                 <RefreshCw className="w-5 h-5 animate-spin" />
                 <span>Loading salary records...</span>
               </div>
             </div>
           ) : error ? (
             <div className="px-6 py-12 text-center">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Salary Records</p>
-                <p className="text-red-600 mb-4">{error}</p>
+              <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Salary Records</p>
+                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                 <button
                   onClick={() => fetchSalaryRecords(1, searchQuery, true)}
-                  className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                  className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
                   <span>Try Again</span>
@@ -587,12 +587,12 @@ export default function FinalizePayroll() {
             </div>
           ) : salaryRecords.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <IndianRupee className="w-8 h-8 text-gray-400" />
+              <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <IndianRupee className="w-8 h-8 text-[var(--color-text-muted)]" />
                 </div>
-                <p className="text-gray-700 text-lg font-medium mb-2">No Salary Records Found</p>
-                <p className="text-gray-500 text-sm mb-4">
+                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Salary Records Found</p>
+                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                   {searchQuery ? 'No records match your search criteria.' : 'No salary records have been generated yet.'}
                 </p>
               </div>
@@ -600,8 +600,8 @@ export default function FinalizePayroll() {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-blue-50">
+                <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                  <thead className="bg-[var(--color-blue-lightest)]">
                     <tr>
                       {[
                         { key: COLUMN_KEYS.FULL_NAME, label: 'Full Name' },
@@ -613,7 +613,7 @@ export default function FinalizePayroll() {
                       ].map(({ key, label }) => (
                         <th key={`header-${key}`} className="px-6 py-3 text-left">
                           <button
-                            className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider hover:text-[var(--color-text-secondary)]"
                             onClick={() => requestSort(key)}
                           >
                             {label}
@@ -621,15 +621,15 @@ export default function FinalizePayroll() {
                           </button>
                         </th>
                       ))}
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                         Mobile
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                     {salaryRecords.map((record, index) => {
                       const recordId = record.employee_salary_id || `record-${index}`;
                       const paymentStatus = getPaymentStatusDisplay(record.payment_status);
@@ -637,29 +637,29 @@ export default function FinalizePayroll() {
                       return (
                         <tr
                           key={`salary-${recordId}`}
-                          className="hover:bg-gray-50 transition-colors"
+                          className="hover:bg-[var(--color-bg-primary)] transition-colors"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                             <div className="flex items-center space-x-2">
-                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Users className="w-4 h-4 text-blue-600" />
+                              <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
                               </div>
                               <span>{record.full_name || 'Unnamed Employee'}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                             {record.department_name || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                             <div className="flex items-center space-x-1">
-                              <Calendar className="w-4 h-4 text-gray-400" />
+                              <Calendar className="w-4 h-4 text-[var(--color-text-muted)]" />
                               <span>{formatMonthYear(record.month_year)}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)] font-medium">
                             {formatCurrency(record.total_salary)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-success-dark)] font-semibold">
                             {formatCurrency(record.total_pay_salary)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -668,15 +668,15 @@ export default function FinalizePayroll() {
                               <span>{paymentStatus.text}</span>
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                             {record.mobile_number || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                             <div className="flex items-center space-x-2">
                               {record.payment_status === PAYMENT_STATUS.UNPAID && (
                                 <button
                                   onClick={() => openPaymentModal(record)}
-                                  className="inline-flex items-center space-x-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors"
+                                  className="inline-flex items-center space-x-1 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-blue-darker)] transition-colors"
                                 >
                                   <CreditCard className="w-4 h-4" />
                                   <span>Pay</span>
@@ -684,14 +684,14 @@ export default function FinalizePayroll() {
                               )}
                               <button
                                 onClick={() => openDeleteModal(record)}
-                                className="inline-flex items-center space-x-1 bg-red-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-red-700 transition-colors"
+                                className="inline-flex items-center space-x-1 bg-[var(--color-error-dark)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-error-darker)] transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                                 <span>Delete</span>
                               </button>
                               <button
                                 onClick={() => openViewModal(record)}
-                                className="inline-flex items-center space-x-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-700 transition-colors"
+                                className="inline-flex items-center space-x-1 bg-[var(--color-success-medium)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-success-dark)] transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
                                 <span>View</span>
@@ -720,12 +720,12 @@ export default function FinalizePayroll() {
       {/* View Salary Slip Modal */}
       {showViewModal && selectedRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+          <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Salary Slip Details</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Salary Slip Details</h3>
               <button
                 onClick={closeViewModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -734,40 +734,40 @@ export default function FinalizePayroll() {
             <div className="p-6">
               {/* Header Section */}
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">SALARY SLIP</h2>
-                <p className="text-gray-600">Pay Period: {formatMonthYear(selectedRecord.month_year)}</p>
+                <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">SALARY SLIP</h2>
+                <p className="text-[var(--color-text-secondary)]">Pay Period: {formatMonthYear(selectedRecord.month_year)}</p>
               </div>
 
               {/* Employee Information */}
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Employee Information</h4>
+              <div className="bg-[var(--color-bg-primary)] p-6 rounded-lg mb-6">
+                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Employee Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Employee Name:</span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Employee Name:</span>
                       <span className="font-semibold">{selectedRecord.full_name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Employee Code:</span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Employee Code:</span>
                       <span className="font-semibold">{selectedRecord.employee_code}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Department:</span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Department:</span>
                       <span className="font-semibold">{selectedRecord.department_name}</span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Mobile Number:</span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Mobile Number:</span>
                       <span className="font-semibold">{selectedRecord.mobile_number || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Pay Period:</span>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Pay Period:</span>
                       <span className="font-semibold">{formatMonthYear(selectedRecord.month_year)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 font-medium">Payment Status:</span>
-                      <span className={`font-semibold ${selectedRecord.payment_status === PAYMENT_STATUS.PAID ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="text-[var(--color-text-secondary)] font-medium">Payment Status:</span>
+                      <span className={`font-semibold ${selectedRecord.payment_status === PAYMENT_STATUS.PAID ? 'text-[var(--color-success-dark)]' : 'text-[var(--color-text-error)]'}`}>
                         {selectedRecord.payment_status === PAYMENT_STATUS.PAID ? 'Paid' : 'Unpaid'}
                       </span>
                     </div>
@@ -776,28 +776,28 @@ export default function FinalizePayroll() {
               </div>
 
               {/* Salary Breakdown */}
-              <div className="bg-white border border-gray-200 rounded-lg mb-6">
-                <h4 className="text-lg font-semibold text-gray-900 p-4 border-b">Salary Breakdown</h4>
+              <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg mb-6">
+                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] p-4 border-b">Salary Breakdown</h4>
                 <div className="p-4">
                   <div className="space-y-4">
                     {/* Earnings */}
                     <div>
-                      <h5 className="font-medium text-gray-700 mb-3">Earnings</h5>
+                      <h5 className="font-medium text-[var(--color-text-secondary)] mb-3">Earnings</h5>
                       <div className="space-y-2">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Base Salary:</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Base Salary:</span>
                           <span className="font-semibold">{formatCurrency(selectedRecord.total_salary)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Allowances:</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Allowances:</span>
                           <span className="font-semibold">{formatCurrency(selectedRecord.allowances || 0)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Overtime:</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Overtime:</span>
                           <span className="font-semibold">{formatCurrency(selectedRecord.overtime || 0)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Bonus:</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Bonus:</span>
                           <span className="font-semibold">{formatCurrency(selectedRecord.bonus || 0)}</span>
                         </div>
                       </div>
@@ -805,28 +805,28 @@ export default function FinalizePayroll() {
 
                     {/* Deductions */}
                     <div>
-                      <h5 className="font-medium text-gray-700 mb-3">Deductions</h5>
+                      <h5 className="font-medium text-[var(--color-text-secondary)] mb-3">Deductions</h5>
                       <div className="space-y-2">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Tax Deduction:</span>
-                          <span className="font-semibold text-red-600">-{formatCurrency(selectedRecord.tax_deduction || 0)}</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Tax Deduction:</span>
+                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.tax_deduction || 0)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">PF Deduction:</span>
-                          <span className="font-semibold text-red-600">-{formatCurrency(selectedRecord.pf_deduction || 0)}</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">PF Deduction:</span>
+                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.pf_deduction || 0)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Other Deductions:</span>
-                          <span className="font-semibold text-red-600">-{formatCurrency(selectedRecord.other_deductions || 0)}</span>
+                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
+                          <span className="text-[var(--color-text-secondary)]">Other Deductions:</span>
+                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.other_deductions || 0)}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Net Pay */}
-                    <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="bg-[var(--color-blue-lightest)] p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-900">Net Pay:</span>
-                        <span className="text-2xl font-bold text-blue-600">{formatCurrency(selectedRecord.total_pay_salary)}</span>
+                        <span className="text-lg font-semibold text-[var(--color-text-primary)]">Net Pay:</span>
+                        <span className="text-2xl font-bold text-[var(--color-blue-dark)]">{formatCurrency(selectedRecord.total_pay_salary)}</span>
                       </div>
                     </div>
                   </div>
@@ -835,7 +835,7 @@ export default function FinalizePayroll() {
 
               {/* Payment Information */}
               {selectedRecord.payment_status === PAYMENT_STATUS.PAID && (
-                <div className="bg-green-50 p-6 rounded-lg">
+                <div className="bg-[var(--color-success-light)] p-6 rounded-lg">
                   <h4 className="text-lg font-semibold text-green-800 mb-4">Payment Information</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex justify-between">
@@ -860,13 +860,13 @@ export default function FinalizePayroll() {
             <div className="flex justify-end space-x-3 p-6 border-t">
               <button
                 onClick={closeViewModal}
-                className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                className="px-6 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md transition-colors"
               >
                 Close
               </button>
               <button
                 onClick={() => window.print()}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                className="px-6 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-blue-dark)] hover:bg-[var(--color-blue-darker)] rounded-md transition-colors"
               >
                 Print Slip
               </button>
@@ -878,12 +878,12 @@ export default function FinalizePayroll() {
       {/* Payment Modal */}
       {showPaymentModal && selectedRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Process Payment</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Process Payment</h3>
               <button
                 onClick={closePaymentModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -891,32 +891,32 @@ export default function FinalizePayroll() {
 
             <div className="p-6">
               <div className="mb-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">Payment Details</h4>
+                <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
+                  <h4 className="font-medium text-[var(--color-text-primary)] mb-2">Payment Details</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Employee:</span>
+                      <span className="text-[var(--color-text-secondary)]">Employee:</span>
                       <span className="font-medium">{selectedRecord.full_name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Employee Code:</span>
+                      <span className="text-[var(--color-text-secondary)]">Employee Code:</span>
                       <span className="font-medium">{selectedRecord.employee_code}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Department:</span>
+                      <span className="text-[var(--color-text-secondary)]">Department:</span>
                       <span className="font-medium">{selectedRecord.department_name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Month/Year:</span>
+                      <span className="text-[var(--color-text-secondary)]">Month/Year:</span>
                       <span className="font-medium">{formatMonthYear(selectedRecord.month_year)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Mobile:</span>
+                      <span className="text-[var(--color-text-secondary)]">Mobile:</span>
                       <span className="font-medium">{selectedRecord.mobile_number}</span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
-                      <span className="text-gray-600">Amount:</span>
-                      <span className="font-semibold text-green-600">{formatCurrency(selectedRecord.total_pay_salary)}</span>
+                      <span className="text-[var(--color-text-secondary)]">Amount:</span>
+                      <span className="font-semibold text-[var(--color-success-dark)]">{formatCurrency(selectedRecord.total_pay_salary)}</span>
                     </div>
                   </div>
                 </div>
@@ -924,13 +924,13 @@ export default function FinalizePayroll() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     Payment Mode
                   </label>
                   <select
                     value={paymentData.payment_mode}
                     onChange={(e) => setPaymentData(prev => ({ ...prev, payment_mode: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-[var(--color-border-secondary)] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                   >
                     {Object.entries(PAYMENT_MODES).map(([value, label]) => (
                       <option key={value} value={value}>
@@ -941,13 +941,13 @@ export default function FinalizePayroll() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
                     Remark
                   </label>
                   <textarea
                     value={paymentData.remark}
                     onChange={(e) => setPaymentData(prev => ({ ...prev, remark: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-[var(--color-border-secondary)] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                     rows="3"
                     placeholder="Enter payment remark..."
                   />
@@ -958,7 +958,7 @@ export default function FinalizePayroll() {
             <div className="flex justify-end space-x-3 p-6 border-t">
               <button
                 onClick={closePaymentModal}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md transition-colors"
                 disabled={paymentLoading}
               >
                 Cancel
@@ -966,7 +966,7 @@ export default function FinalizePayroll() {
               <button
                 onClick={handlePayment}
                 disabled={paymentLoading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-blue-dark)] hover:bg-[var(--color-blue-darker)] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {paymentLoading ? (
                   <div className="flex items-center space-x-2">
@@ -985,12 +985,12 @@ export default function FinalizePayroll() {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Delete Salary Record</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Delete Salary Record</h3>
               <button
                 onClick={closeDeleteModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -999,40 +999,40 @@ export default function FinalizePayroll() {
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="flex-shrink-0">
-                  <AlertCircle className="h-10 w-10 text-red-500" />
+                  <AlertCircle className="h-10 w-10 text-[var(--color-error)]" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900">
+                  <h4 className="text-lg font-medium text-[var(--color-text-primary)]">
                     Are you sure you want to delete this record?
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1">
                     This action cannot be undone. The salary record will be permanently removed.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h5 className="font-medium text-gray-900 mb-2">Record Details</h5>
+              <div className="bg-[var(--color-bg-primary)] p-4 rounded-lg">
+                <h5 className="font-medium text-[var(--color-text-primary)] mb-2">Record Details</h5>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Employee:</span>
+                    <span className="text-[var(--color-text-secondary)]">Employee:</span>
                     <span className="font-medium">{selectedRecord.full_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Employee Code:</span>
+                    <span className="text-[var(--color-text-secondary)]">Employee Code:</span>
                     <span className="font-medium">{selectedRecord.employee_code}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Department:</span>
+                    <span className="text-[var(--color-text-secondary)]">Department:</span>
                     <span className="font-medium">{selectedRecord.department_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Month/Year:</span>
+                    <span className="text-[var(--color-text-secondary)]">Month/Year:</span>
                     <span className="font-medium">{formatMonthYear(selectedRecord.month_year)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Pay:</span>
-                    <span className="font-medium text-red-600">{formatCurrency(selectedRecord.total_pay_salary)}</span>
+                    <span className="text-[var(--color-text-secondary)]">Total Pay:</span>
+                    <span className="font-medium text-[var(--color-text-error)]">{formatCurrency(selectedRecord.total_pay_salary)}</span>
                   </div>
                 </div>
               </div>
@@ -1041,7 +1041,7 @@ export default function FinalizePayroll() {
             <div className="flex justify-end space-x-3 p-6 border-t">
               <button
                 onClick={closeDeleteModal}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md transition-colors"
                 disabled={deleteLoading}
               >
                 Cancel
@@ -1049,7 +1049,7 @@ export default function FinalizePayroll() {
               <button
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error-dark)] hover:bg-[var(--color-error-darker)] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {deleteLoading ? (
                   <div className="flex items-center space-x-2">

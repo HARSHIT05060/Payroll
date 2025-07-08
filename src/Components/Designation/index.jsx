@@ -34,21 +34,21 @@ const Designation = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-primary)] via-[var(--color-blue-lightest)]/30 to-indigo-50/30">
             <div className="max-w-5xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Designation Management
                                     </h1>
                                 </div>

@@ -43,7 +43,7 @@ const EnhancedPricingComponent = () => {
             billedYearly: '$220 billed yearly',
             description: 'Get started with essential tools to manage your team efficiently. Ideal for small teams with fundamental needs.',
             status: 'Active',
-            statusColor: 'bg-blue-100 text-blue-700',
+            statusColor: 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darker)]',
             features: [
                 { name: 'Access to core HR features', included: true },
                 { name: 'Employee record management', included: true },
@@ -56,7 +56,7 @@ const EnhancedPricingComponent = () => {
                 { name: 'Designed user-focused interfaces, optimized user', included: false }
             ],
             buttonText: 'Cancel',
-            buttonStyle: 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200',
+            buttonStyle: 'bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)] hover:border-gray-400 transition-all duration-200',
             cardStyle: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 shadow-lg'
         },
         {
@@ -82,8 +82,8 @@ const EnhancedPricingComponent = () => {
                 { name: 'Designed user-focused interfaces, optimized user', included: false }
             ],
             buttonText: 'Start 7-days Free Trial',
-            buttonStyle: 'bg-white text-gray-800 hover:bg-gray-100 border-2 border-white font-semibold shadow-md transition-all duration-200',
-            cardStyle: 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-2 border-gray-700 shadow-2xl transform scale-105 relative z-10'
+            buttonStyle: 'bg-[var(--color-bg-secondary)] text-gray-800 hover:bg-[var(--color-bg-gradient-start)] border-2 border-[var(--color-border-primary)] font-semibold shadow-md transition-all duration-200',
+            cardStyle: 'bg-gradient-to-br from-gray-800 to-gray-900 text-[var(--color-text-white)] border-2 border-gray-700 shadow-2xl transform scale-105 relative z-10'
         },
         {
             id: 'master',
@@ -94,7 +94,7 @@ const EnhancedPricingComponent = () => {
             billedYearly: '$408 billed yearly',
             description: 'Maximize team performance with premium tools and full customization options, perfect for larger organizations.',
             status: 'Popular ⭐',
-            statusColor: 'bg-blue-500 text-white font-medium',
+            statusColor: 'bg-[var(--color-blue-lightest)]0 text-[var(--color-text-white)] font-medium',
             features: [
                 { name: 'Access to core HR features', included: true },
                 { name: 'Employee record management', included: true },
@@ -107,8 +107,8 @@ const EnhancedPricingComponent = () => {
                 { name: 'Designed user-focused interfaces, optimized user', included: true }
             ],
             buttonText: 'Start 7-days Free Trial',
-            buttonStyle: 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-semibold transition-all duration-200',
-            cardStyle: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-lg'
+            buttonStyle: 'bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)] hover:border-gray-400 font-semibold transition-all duration-200',
+            cardStyle: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-[var(--color-blue-light)] shadow-lg'
         }
     ];
 
@@ -137,17 +137,17 @@ const EnhancedPricingComponent = () => {
 
     const TimeUnit = ({ value, label }) => (
         <div className="text-center">
-            <div className="bg-white rounded-lg p-3 shadow-md border-2 border-red-200">
-                <div className="text-2xl font-bold text-red-600">{value.toString().padStart(2, '0')}</div>
+            <div className="bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-md border-2 border-[var(--color-border-error)]">
+                <div className="text-2xl font-bold text-[var(--color-text-error)]">{value.toString().padStart(2, '0')}</div>
             </div>
-            <div className="text-sm text-red-600 font-medium mt-1">{label}</div>
+            <div className="text-sm text-[var(--color-text-error)] font-medium mt-1">{label}</div>
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-blue-lightest)]">
             {/* Limited Time Offer Banner */}
-            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white py-6">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 text-[var(--color-text-white)] py-6">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between">
                         <div className="flex items-center mb-4 lg:mb-0">
@@ -176,18 +176,18 @@ const EnhancedPricingComponent = () => {
 
             {/* Header */}
             <div className="max-w-5xl mx-auto px-6 py-20 text-center">
-                <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <div className="inline-flex items-center bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)] px-4 py-2 rounded-full text-sm font-medium mb-6">
                     <Star className="w-4 h-4 mr-2" />
                     Trusted by 100,000+ professionals worldwide
                 </div>
-                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="text-5xl md:text-6xl font-bold text-[var(--color-text-primary)] mb-6 leading-tight">
                     Choose Your Perfect
-                    <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"> Scheduling Plan</span>
+                    <span className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] bg-clip-text text-transparent"> Scheduling Plan</span>
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-xl text-[var(--color-text-secondary)] mb-8 max-w-3xl mx-auto leading-relaxed">
                     Transform your scheduling workflow with our powerful platform. Start free and upgrade as your business grows.
                 </p>
-                <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
+                <div className="flex items-center justify-center space-x-8 text-sm text-[var(--color-text-secondary)]">
                     <div className="flex items-center">
                         <Check className="w-4 h-4 text-green-500 mr-2" />
                         30-day free trial
@@ -222,14 +222,14 @@ const EnhancedPricingComponent = () => {
                                     {plan.status}
                                 </div>
                                 {plan.popular && (
-                                    <div className="px-2 py-1 bg-orange-500 text-white rounded-full text-xs font-bold">
+                                    <div className="px-2 py-1 bg-orange-500 text-[var(--color-text-white)] rounded-full text-xs font-bold">
                                         Popular ⭐
                                     </div>
                                 )}
                             </div>
 
                             {/* Plan Name */}
-                            <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-[var(--color-text-white)]' : 'text-[var(--color-text-primary)]'}`}>
                                 {plan.name}
                             </h3>
 
@@ -237,30 +237,30 @@ const EnhancedPricingComponent = () => {
                             <div className="mb-4">
                                 <div className="flex items-baseline mb-1">
                                     {plan.originalPrice && (
-                                        <span className={`text-lg line-through mr-2 ${isDark ? 'text-gray-400' : 'text-gray-500'
+                                        <span className={`text-lg line-through mr-2 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
                                             }`}>
                                             ${plan.originalPrice}
                                         </span>
                                     )}
-                                    <span className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    <span className={`text-3xl font-bold ${isDark ? 'text-[var(--color-text-white)]' : 'text-[var(--color-text-primary)]'}`}>
                                         ${plan.price}
                                     </span>
-                                    <span className={`text-sm ml-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <span className={`text-sm ml-1 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'}`}>
                                         {plan.period}
                                     </span>
                                 </div>
-                                <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                <p className={`text-xs ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'}`}>
                                     {plan.billedYearly}
                                 </p>
                                 {plan.originalPrice && (
-                                    <p className="text-xs text-green-600 font-semibold mt-1">
+                                    <p className="text-xs text-[var(--color-success-dark)] font-semibold mt-1">
                                         Save $7/month
                                     </p>
                                 )}
                             </div>
 
                             {/* Description */}
-                            <p className={`text-xs mb-5 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'
+                            <p className={`text-xs mb-5 leading-relaxed ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
                                 }`}>
                                 {plan.description}
                             </p>
@@ -271,17 +271,17 @@ const EnhancedPricingComponent = () => {
                                     <div key={index} className="flex items-start">
                                         <div className="flex-shrink-0 w-4 h-4 mr-2.5 mt-0.5">
                                             {feature.included ? (
-                                                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                                                    <Check className="w-2.5 h-2.5 text-white" />
+                                                <div className="w-4 h-4 bg-[var(--color-success-light)]0 rounded-full flex items-center justify-center">
+                                                    <Check className="w-2.5 h-2.5 text-[var(--color-text-white)]" />
                                                 </div>
                                             ) : (
-                                                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-600' : 'bg-gray-200'
+                                                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-600' : 'bg-[var(--color-bg-gray-light)]'
                                                     }`}>
-                                                    <X className={`w-2.5 h-2.5 ${isDark ? 'text-gray-400' : 'text-gray-400'}`} />
+                                                    <X className={`w-2.5 h-2.5 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-muted)]'}`} />
                                                 </div>
                                             )}
                                         </div>
-                                        <span className={`text-xs leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'
+                                        <span className={`text-xs leading-relaxed ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
                                             } ${!feature.included ? 'opacity-50' : ''}`}>
                                             {feature.name}
                                         </span>
@@ -301,22 +301,22 @@ const EnhancedPricingComponent = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="bg-white py-20">
+            <div className="bg-[var(--color-bg-secondary)] py-20">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-4xl font-bold text-[var(--color-text-primary)] mb-4">
                             Why 100,000+ professionals choose us
                         </h2>
-                        <p className="text-xl text-gray-600">Join the world's most trusted scheduling platform</p>
+                        <p className="text-xl text-[var(--color-text-secondary)]">Join the world's most trusted scheduling platform</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {trustIndicators.map((item, index) => (
                             <div key={index} className="text-center group hover:scale-105 transition-transform duration-200">
                                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl mb-6 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors">
-                                    <item.icon className="w-8 h-8 text-blue-600" />
+                                    <item.icon className="w-8 h-8 text-[var(--color-blue-dark)]" />
                                 </div>
-                                <h3 className="font-bold text-gray-900 mb-3 text-lg">{item.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                                <h3 className="font-bold text-[var(--color-text-primary)] mb-3 text-lg">{item.title}</h3>
+                                <p className="text-[var(--color-text-secondary)] leading-relaxed">{item.description}</p>
                             </div>
                         ))}
                     </div>
@@ -324,13 +324,13 @@ const EnhancedPricingComponent = () => {
             </div>
 
             {/* FAQ Section */}
-            <div className="bg-gray-50 py-20">
+            <div className="bg-[var(--color-bg-primary)] py-20">
                 <div className="max-w-5xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-4xl font-bold text-[var(--color-text-primary)] mb-4">
                             Frequently Asked Questions
                         </h2>
-                        <p className="text-xl text-gray-600">Everything you need to know about our pricing and features</p>
+                        <p className="text-xl text-[var(--color-text-secondary)]">Everything you need to know about our pricing and features</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {[
@@ -359,9 +359,9 @@ const EnhancedPricingComponent = () => {
                                 a: "Yes, you can cancel your subscription at any time. There are no cancellation fees, and you'll continue to have access to your plan until the end of your billing period."
                             }
                         ].map((faq, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow">
-                                <h3 className="font-bold text-gray-900 mb-4 text-lg">{faq.q}</h3>
-                                <p className="text-gray-600 leading-relaxed">{faq.a}</p>
+                            <div key={index} className="bg-[var(--color-bg-secondary)] rounded-2xl p-8 hover:shadow-lg transition-shadow">
+                                <h3 className="font-bold text-[var(--color-text-primary)] mb-4 text-lg">{faq.q}</h3>
+                                <p className="text-[var(--color-text-secondary)] leading-relaxed">{faq.a}</p>
                             </div>
                         ))}
                     </div>
@@ -369,15 +369,15 @@ const EnhancedPricingComponent = () => {
             </div>
 
             {/* CTA Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
+            <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] py-16">
                 <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-4xl font-bold text-white mb-6">
+                    <h2 className="text-4xl font-bold text-[var(--color-text-white)] mb-6">
                         Ready to transform your scheduling?
                     </h2>
-                    <p className="text-xl text-blue-100 mb-8">
+                    <p className="text-xl text-[var(--color-blue-lighter)] mb-8">
                         Join thousands of professionals who've already made the switch
                     </p>
-                    <button className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors inline-flex items-center">
+                    <button className="bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[var(--color-bg-gradient-start)] transition-colors inline-flex items-center">
                         Start Your Free Trial Today
                         <ArrowRight className="w-6 h-6 ml-2" />
                     </button>

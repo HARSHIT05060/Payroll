@@ -230,7 +230,7 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 to-white border-r border-gray-200 shadow-lg transition-all duration-300 w-64 z-40">
+        <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[var(--color-bg-gradient-start)] to-white border-r border-[var(--color-border-primary)] shadow-lg transition-all duration-300 w-64 z-40">
             <div className="h-[calc(100%-140px)] relative">
                 <div className="absolute top-0 left-0 right-0 h-4 z-10 scrollbar-fade-top"></div>
 
@@ -250,10 +250,10 @@ const Sidebar = () => {
                                         className={`
                                             relative cursor-pointer rounded-xl transition-all duration-300 group
                                             ${isActive
-                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-[1.02]'
-                                                : 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:transform hover:scale-[1.01]'
+                                                ? 'bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] text-[var(--color-text-white)] shadow-lg transform scale-[1.02]'
+                                                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] hover:shadow-md hover:transform hover:scale-[1.01]'
                                             }
-                                        `}
+                                        `} 
                                         onClick={() => handleMenuClick(item)}
                                     >
                                         <div className="py-3 px-4 flex items-center justify-between">
@@ -261,8 +261,8 @@ const Sidebar = () => {
                                                 <div className={`
                                                     p-2 rounded-lg transition-all duration-300
                                                     ${isActive
-                                                        ? 'bg-white/20 text-white'
-                                                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
+                                                        : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)] group-hover:bg-[var(--color-blue-lighter)] group-hover:text-[var(--color-blue-dark)]'
                                                     }
                                                 `}>
                                                     <Icon size={16} />
@@ -274,8 +274,8 @@ const Sidebar = () => {
                                                     <span className={`
                                                         text-xs px-2 py-1 rounded-full font-medium transition-all duration-300
                                                         ${isActive
-                                                            ? 'bg-white/20 text-white'
-                                                            : 'bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700'
+                                                            ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
+                                                            : 'bg-gradient-to-r from-[var(--color-success-light)] to-[var(--color-success-lighter)] text-[var(--color-text-success)]'
                                                         }
                                                     `}>
                                                         {item.tag}
@@ -286,7 +286,7 @@ const Sidebar = () => {
                                                     className={`
                                                         transform transition-all duration-300 ease-in-out
                                                         ${isExpanded ? 'rotate-90' : 'rotate-0'}
-                                                        ${isActive ? 'text-white' : 'text-gray-400'}
+                                                        ${isActive ? 'text-[var(--color-text-white)]' : 'text-[var(--color-text-muted)]'}
                                                     `}
                                                 />
                                             </div>
@@ -298,8 +298,8 @@ const Sidebar = () => {
                                         className={`
                                             relative block rounded-xl transition-all duration-300 group
                                             ${isActive
-                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-[1.02]'
-                                                : 'text-gray-700 hover:bg-gray-100 hover:shadow-md hover:transform hover:scale-[1.01]'
+                                                ? 'bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] text-[var(--color-text-white)] shadow-lg transform scale-[1.02]'
+                                                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] hover:shadow-md hover:transform hover:scale-[1.01]'
                                             }
                                         `}
                                         onClick={() => setExpandedSubmenu(null)}
@@ -309,8 +309,8 @@ const Sidebar = () => {
                                                 <div className={`
                                                     p-2 rounded-lg transition-all duration-300
                                                     ${isActive
-                                                        ? 'bg-white/20 text-white'
-                                                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
+                                                        : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)] group-hover:bg-[var(--color-blue-lighter)] group-hover:text-[var(--color-blue-dark)]'
                                                     }
                                                 `}>
                                                     <Icon size={16} />
@@ -321,8 +321,8 @@ const Sidebar = () => {
                                                 <span className={`
                                                     text-xs px-2 py-1 rounded-full font-medium transition-all duration-300
                                                     ${isActive
-                                                        ? 'bg-white/20 text-white'
-                                                        : 'bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700'
+                                                        ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
+                                                        : 'bg-gradient-to-r from-[var(--color-success-light)] to-[var(--color-success-lighter)] text-[var(--color-text-success)]'
                                                     }
                                                 `}>
                                                     {item.tag}
@@ -356,8 +356,8 @@ const Sidebar = () => {
                                                             transition-all duration-300 hover:shadow-sm
                                                             border-l-2 hover:pl-6
                                                             ${isSubmenuActive
-                                                                ? 'bg-blue-100 text-blue-700 border-blue-400 font-medium shadow-sm'
-                                                                : 'text-gray-600 border-transparent hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300'
+                                                                ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darker)] border-[var(--color-blue-medium)] font-medium shadow-sm'
+                                                                : 'text-[var(--color-text-secondary)] border-transparent hover:bg-[var(--color-blue-lightest)] hover:text-[var(--color-blue-dark)] hover:border-blue-300'
                                                             }
                                                         `}
                                                         style={{
@@ -367,14 +367,17 @@ const Sidebar = () => {
                                                         <div className={`
                                                             w-2 h-2 rounded-full mr-3 transition-colors duration-300
                                                             ${isMaster
-                                                                ? (isSubmenuActive ? 'bg-yellow-400' : 'bg-yellow-300 hover:bg-yellow-400')
-                                                                : (isSubmenuActive ? 'bg-blue-400' : 'bg-gray-300 hover:bg-blue-400')
+                                                                ? (isSubmenuActive ? 'bg-[var(--color-yellow)]' : 'bg-[var(--color-yellow-light)] hover:[var(--color-yellow)]')
+                                                                : (isSubmenuActive
+                                                                    ? 'bg-[var(--color-blue-medium)]'
+                                                                    : 'bg-[var(--color-border-secondary)] hover:bg-[var(--color-blue-medium)]'
+                                                                )
                                                             }
                                                         `}></div>
                                                         <div className="flex items-center space-x-2">
                                                             {isMaster && (
                                                                 <Star size={12} className={`
-                                                                    ${isSubmenuActive ? 'text-yellow-500' : 'text-yellow-400'}
+                                                                    ${isSubmenuActive ? 'text-[var(--color-yellow-dark)]' : 'text-[var(--color-yellow)]'}
                                                                 `} />
                                                             )}
                                                             <span>{subItem.label}</span>
@@ -395,14 +398,14 @@ const Sidebar = () => {
                 <div className="absolute bottom-0 left-0 right-0 h-4 z-10 scrollbar-fade-bottom"></div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 border-t border-gray-100 p-4 bg-gradient-to-r from-gray-50 to-blue-50">
-                <div className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                        <Phone size={16} className="text-blue-600" />
+            <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-primary)] p-4 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-blue-lightest)]">
+                <div className="flex items-center space-x-3 p-3 bg-[var(--color-bg-secondary)] rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div className="p-2 bg-[var(--color-blue-lighter)] rounded-lg">
+                        <Phone size={16} className="text-[var(--color-blue-dark)]" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 font-medium">Need Help?</p>
-                        <p className="text-sm font-semibold text-blue-600">+91 9769922344</p>
+                        <p className="text-xs text-[var(--color-text-secondary)] font-medium">Need Help?</p>
+                        <p className="text-sm font-semibold text-[var(--color-blue-dark)]">+91 9769922344</p>
                     </div>
                 </div>
             </div>

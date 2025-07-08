@@ -28,7 +28,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(""); 
+        setError("");
 
         if (!number || !password) {
             setError("Please enter both phone number and password");
@@ -66,7 +66,7 @@ const Login = () => {
                 formData.append("user_id", user_data.user_id);
                 formData.append("user_roles_id", user_data.user_role_id);
 
-                const permRes = await api.post("user_permissions", formData,{
+                const permRes = await api.post("user_permissions", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     }
@@ -99,40 +99,40 @@ const Login = () => {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] via-[var(--color-blue-lightest)] to-[var(--color-bg-gradient-end)] flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Main Card */}
-                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div className="bg-[var(--color-bg-primary)] rounded-2xl shadow-xl border border-[var(--color-border-primary)] overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-800 to-blue-700 px-8 py-8 text-center">
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></div>
+                    <div className="bg-gradient-to-r from-[var(--color-blue-darkest)] to-[var(--color-blue-darker)] px-8 py-8 text-center">
+                        <div className="w-16 h-16 bg-[var(--color-border-primary)] rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-8 h-8 bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] rounded-full"></div>
                         </div>
-                        <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-                        <p className="text-slate-300 text-sm">Sign in to continue to your account</p>
+                        <h1 className="text-2xl font-bold text-[var(--color-text-[var(--color-text-white)])] mb-2">Welcome Back</h1>
+                        <p className="text-[var(--color-bg-secondary)] text-sm">Sign in to continue to your account</p>
                     </div>
 
                     {/* Content */}
                     <div className="px-8 py-8">
                         {/* Error Message */}
                         {error && (
-                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                <p className="text-red-600 text-sm">{error}</p>
+                            <div className="mb-4 p-3 bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg">
+                                <p className="text-[var(--color-text-error)] text-sm">{error}</p>
                             </div>
                         )}
 
                         {/* Login Form */}
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
                                     Phone Number
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] w-5 h-5" />
                                     <input
                                         type="text"
                                         placeholder="Enter your number"
-                                        className="w-full pl-12 pr-4 py-4 border-2 border-slate-200 rounded-xl focus:border-slate-600 focus:outline-none transition-all duration-200 text-slate-700 placeholder-slate-400"
+                                        className="w-full pl-12 pr-12 py-4 border-2 border-[var(--color-border-primary)] rounded-xl focus:border-[var(--color-border-focus)] focus:outline-none transition-all duration-200 text-[var(--color-text-secondary)] placeholder-slate-400"
                                         value={number}
                                         onChange={(e) => setNumber(e.target.value)}
                                         disabled={isLoading}
@@ -142,15 +142,15 @@ const Login = () => {
 
                             {/* Password Input */}
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
                                     Password
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] w-5 h-5" />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter your password"
-                                        className="w-full pl-12 pr-12 py-4 border-2 border-slate-200 rounded-xl focus:border-slate-600 focus:outline-none transition-all duration-200 text-slate-700 placeholder-slate-400"
+                                        className="w-full pl-12 pr-12 py-4 border-2 border-[var(--color-border-primary)] rounded-xl focus:border-[var(--color-border-focus)] focus:outline-none transition-all duration-200 text-[var(--color-text-secondary)] placeholder-slate-400"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         disabled={isLoading}
@@ -158,7 +158,7 @@ const Login = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                                         disabled={isLoading}
                                     >
                                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -170,7 +170,7 @@ const Login = () => {
                             <div className="text-right">
                                 <button
                                     type="button"
-                                    className="text-sm text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200"
+                                    className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium transition-colors duration-200"
                                 >
                                     Forgot your password?
                                 </button>
@@ -180,11 +180,11 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-blue-800 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-900 hover:to-blue-800 disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                                className="w-full bg-gradient-to-r from-[var(--color-blue-darkest)] to-[var(--color-blue-darker)] text-[var(--color-text-[var(--color-text-white)])] py-4 rounded-xl font-semibold hover:from-[var(--color-blue-darkest)] hover:to-[var(--color-blue-darkest)] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                        <div className="w-5 h-5 border-2 border-[var(--color-border-primary)] border-t-transparent rounded-full animate-spin mr-2"></div>
                                         Signing in...
                                     </div>
                                 ) : (

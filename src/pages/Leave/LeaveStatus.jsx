@@ -56,37 +56,38 @@ const STATUS_CONFIG = {
     '1': {
         name: 'Pending',
         icon: Clock,
-        bgColor: 'bg-yellow-100',
-        textColor: 'text-yellow-800',
-        tabColor: 'text-yellow-600',
-        borderColor: 'border-yellow-200'
+        bgColor: 'bg-[var(--color-warning-light)]',
+        textColor: 'text-[var(--color-warning-dark)]"',
+        tabColor: 'text-[var(--color-warning)]',
+        borderColor: 'border-[var(--color-warning-lighter)]'
     },
     '2': {
         name: 'Approved',
         icon: CheckCircle,
-        bgColor: 'bg-green-100',
-        textColor: 'text-green-800',
-        tabColor: 'text-green-600',
-        borderColor: 'border-green-200'
+        bgColor: 'bg-[var(--color-success-light)]',
+        textColor: 'text-[var(--color-success-dark)]',
+        tabColor: 'text-[var(--color-success)]',
+        borderColor: 'border-[var(--color-success-lighter)]'
     },
     '3': {
         name: 'Rejected',
         icon: XCircle,
-        bgColor: 'bg-red-100',
+        bgColor: 'bg-[var(--color-error-light)]',
         textColor: 'text-red-800',
-        tabColor: 'text-red-600',
-        borderColor: 'border-red-200'
+        tabColor: 'text-[var(--color-text-error)]',
+        borderColor: 'border-[var(--color-border-error)]'
     }
 };
+
 const DetailCard = ({ icon, label, value, bg }) => (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <div className="bg-[var(--color-bg-primary)] rounded-lg p-4 border border-[var(--color-border-primary)]">
         <div className="flex items-center space-x-3 mb-2">
             <div className={`w-8 h-8 bg-${bg}-100 rounded-full flex items-center justify-center`}>
                 {icon}
             </div>
-            <h4 className="text-sm font-medium text-gray-700">{label}</h4>
+            <h4 className="text-sm font-medium text-[var(--color-text-secondary)]">{label}</h4>
         </div>
-        <p className="text-lg font-semibold text-gray-900 ml-11">{value}</p>
+        <p className="text-lg font-semibold text-[var(--color-text-primary)] ml-11">{value}</p>
     </div>
 );
 
@@ -366,11 +367,11 @@ const LeaveManagement = () => {
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
         if (sortConfig.key !== key) {
-            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+            return <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-text-muted)]" />;
         }
         return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-            <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
-            <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+            <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
     }, [sortConfig]);
 
     // Redirect if not authenticated
@@ -379,21 +380,21 @@ const LeaveManagement = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Leave Management
                                     </h1>
                                 </div>
@@ -402,13 +403,13 @@ const LeaveManagement = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
                     {/* Header section with tabs */}
-                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                    <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center">
-                                <FileText className="h-6 w-6 text-white mr-2" />
-                                <h3 className="text-lg font-medium text-white">Leave Requests</h3>
+                                <FileText className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                <h3 className="text-lg font-medium text-[var(--color-text-white)]">Leave Requests</h3>
                             </div>
 
                             <div className="flex items-center gap-3">
@@ -418,15 +419,15 @@ const LeaveManagement = () => {
                                         placeholder="Search leave requests..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                                     />
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                                 </div>
 
                                 {permissions['leave_create'] && (
                                     <button
                                         onClick={() => navigate('/leaveapplication')}
-                                        className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                                     >
                                         <Plus className="h-4 w-4" />
                                         Add Leave
@@ -443,8 +444,8 @@ const LeaveManagement = () => {
                                     <button
                                         key={statusValue}
                                         className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${selectedStatus === statusValue
-                                            ? 'bg-white text-blue-600'
-                                            : 'text-white hover:bg-blue-700'
+                                            ? 'bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)]'
+                                            : 'text-[var(--color-text-white)] hover:bg-[var(--color-blue-darker)]'
                                             }`}
                                         onClick={() => handleTabChange(statusValue)}
                                     >
@@ -459,20 +460,20 @@ const LeaveManagement = () => {
                     {/* Content section */}
                     {loading ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                                 <RefreshCw className="w-5 h-5 animate-spin" />
                                 <span>Loading leave requests...</span>
                             </div>
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Leave Requests</p>
-                                <p className="text-red-600 mb-4">{error}</p>
+                            <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                <AlertCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Leave Requests</p>
+                                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                 <button
                                     onClick={() => fetchLeaveRequests()}
-                                    className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                                    className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
                                     <span>Try Again</span>
@@ -481,20 +482,20 @@ const LeaveManagement = () => {
                         </div>
                     ) : leaveRequests.length === 0 ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <FileText className="w-8 h-8 text-gray-400" />
+                            <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <FileText className="w-8 h-8 text-[var(--color-text-muted)]" />
                                 </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">No {STATUS_CONFIG[selectedStatus]?.name} Leave Requests</p>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No {STATUS_CONFIG[selectedStatus]?.name} Leave Requests</p>
+                                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                                     There are no leave requests with {STATUS_CONFIG[selectedStatus]?.name.toLowerCase()} status.
                                 </p>
                             </div>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-blue-50">
+                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                <thead className="bg-[var(--color-blue-lightest)]">
                                     <tr>
                                         {[
                                             { key: COLUMN_KEYS.NAME, label: 'Employee Name' },
@@ -506,7 +507,7 @@ const LeaveManagement = () => {
                                         ].map(({ key, label }) => (
                                             <th key={`header-${key}`} className="px-6 py-3 text-left">
                                                 <button
-                                                    className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                    className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider hover:text-[var(--color-text-secondary)]"
                                                     onClick={() => requestSort(key)}
                                                 >
                                                     {label}
@@ -514,16 +515,16 @@ const LeaveManagement = () => {
                                                 </button>
                                             </th>
                                         ))}
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                     {!sortedLeaveRequests || sortedLeaveRequests.length === 0 ? (
                                         <tr>
-                                            <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
-                                                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                            <td colSpan="8" className="px-6 py-8 text-center text-[var(--color-text-secondary)]">
+                                                <FileText className="h-12 w-12 mx-auto mb-4 text-[var(--color-text-muted)]" />
                                                 <p className="text-lg font-medium">No leave requests found</p>
                                                 <p className="text-sm">Try adjusting your search or filters</p>
                                             </td>
@@ -534,42 +535,42 @@ const LeaveManagement = () => {
                                             return (
                                                 <tr
                                                     key={`leave-${leaveId}`}
-                                                    className="hover:bg-gray-50 transition-colors"
+                                                    className="hover:bg-[var(--color-bg-primary)] transition-colors"
                                                 >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                         <div className="flex items-center space-x-2">
-                                                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                                <Users className="w-4 h-4 text-blue-600" />
+                                                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                                                <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                             </div>
                                                             <span>{leave.full_name || 'Unknown Employee'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {leave.leave_type || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         <div className="flex items-center">
-                                                            <Calendar className="w-4 h-4 mr-1 text-gray-400" />
+                                                            <Calendar className="w-4 h-4 mr-1 text-[var(--color-text-muted)]" />
                                                             {formatDate(leave.start_date)}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         <div className="flex items-center">
-                                                            <Calendar className="w-4 h-4 mr-1 text-gray-400" />
+                                                            <Calendar className="w-4 h-4 mr-1 text-[var(--color-text-muted)]" />
                                                             {formatDate(leave.end_date)}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         <span className="font-medium">{leave.total_days || 0}</span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         <StatusChip status={leave.status} />
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex space-x-2">
                                                             <button
                                                                 onClick={() => handleView(leave)}
-                                                                className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                                                className="p-2 rounded-md transition-colors text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-primary)]"
                                                                 title="View Details"
                                                             >
                                                                 <Eye className="w-4 h-4" />
@@ -580,7 +581,7 @@ const LeaveManagement = () => {
                                                                     {permissions['leave_approved'] && (
                                                                         <button
                                                                             onClick={() => handleApprove(leave.leave_id)}
-                                                                            className="p-2 rounded-md transition-colors text-green-600 hover:text-green-900 hover:bg-green-50"
+                                                                            className="p-2 rounded-md transition-colors text-[var(--color-success-dark)] hover:text-[var(--color-success-dark)] hover:bg-[var(--color-success-light)]"
                                                                             title="Approve Leave"
                                                                         >
                                                                             <CheckCircle className="w-4 h-4" />
@@ -589,7 +590,7 @@ const LeaveManagement = () => {
                                                                     {permissions['leave_rejected'] && (
                                                                         <button
                                                                             onClick={() => handleReject(leave)}
-                                                                            className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                            className="p-2 rounded-md transition-colors text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]"
                                                                             title="Reject Leave"
                                                                         >
                                                                             <XCircle className="w-4 h-4" />
@@ -612,27 +613,27 @@ const LeaveManagement = () => {
                 {/* Rejection Modal */}
                 {rejectionModal.isOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+                        <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl w-full max-w-md">
                             <div className="p-6 border-b">
                                 <h2 className="text-lg font-medium">Provide Reason for Rejection</h2>
                             </div>
                             <div className="p-6">
                                 <textarea
-                                    className="w-full border border-gray-300 rounded-md p-3 h-32 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full border border-[var(--color-border-secondary)] rounded-md p-3 h-32 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                                     placeholder="Enter rejection reason"
                                     value={rejectionModal.reason}
                                     onChange={(e) => setRejectionModal(prev => ({ ...prev, reason: e.target.value }))}
                                 />
                             </div>
-                            <div className="p-4 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
+                            <div className="p-4 bg-[var(--color-bg-primary)] flex justify-end space-x-3 rounded-b-lg">
                                 <button
-                                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                                    className="px-4 py-2 text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md shadow-sm hover:bg-[var(--color-bg-primary)]"
                                     onClick={() => setRejectionModal({ isOpen: false, leaveData: null, reason: '' })}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="px-4 py-2 text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700"
+                                    className="px-4 py-2 text-[var(--color-text-white)] bg-[var(--color-error-dark)] border border-transparent rounded-md shadow-sm hover:bg-[var(--color-error-darker)]"
                                     onClick={submitRejection}
                                 >
                                     Submit Rejection
@@ -645,24 +646,24 @@ const LeaveManagement = () => {
                 {/* Enhanced View Modal */}
                 {viewModal.isOpen && viewModal.leaveData && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex custom-scrollbar items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                             {/* Header */}
-                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                            <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] px-6 py-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                                            <User className="w-5 h-5 text-white" />
+                                        <div className="w-10 h-10 bg-[var(--color-bg-secondary)] bg-opacity-20 rounded-full flex items-center justify-center">
+                                            <User className="w-5 h-5 text-[var(--color-text-white)]" />
                                         </div>
                                         <div>
-                                            <h2 className="text-lg font-semibold text-white">Leave Request Details</h2>
-                                            <p className="text-sm text-blue-100">Employee Information</p>
+                                            <h2 className="text-lg font-semibold text-[var(--color-text-white)]">Leave Request Details</h2>
+                                            <p className="text-sm text-[var(--color-blue-lighter)]">Employee Information</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => setViewModal({ isOpen: false, leaveData: null })}
-                                        className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition"
+                                        className="p-2 hover:bg-[var(--color-bg-secondary)] hover:bg-opacity-20 rounded-full transition"
                                     >
-                                        <X className="w-5 h-5 text-white" />
+                                        <X className="w-5 h-5 text-[var(--color-text-white)]" />
                                     </button>
                                 </div>
                             </div>
@@ -670,13 +671,13 @@ const LeaveManagement = () => {
                             {/* Content */}
                             <div className="p-6 overflow-y-auto flex-1">
                                 {/* Employee Info */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                <div className="bg-[var(--color-blue-lightest)] border border-[var(--color-blue-light)] rounded-lg p-4 mb-6">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                                            <User className="w-6 h-6 text-white" />
+                                        <div className="w-12 h-12 bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center">
+                                            <User className="w-6 h-6 text-[var(--color-text-white)]" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">
+                                            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                                                 {viewModal.leaveData.full_name}
                                             </h3>
                                             <div className="mt-1">
@@ -689,25 +690,25 @@ const LeaveManagement = () => {
                                 {/* Leave Details */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <DetailCard
-                                        icon={<FileText className="w-4 h-4 text-indigo-600" />}
+                                        icon={<FileText className="w-4 h-4 text-[var(--color-blue-dark)]" />}
                                         label="Leave Type"
                                         value={viewModal.leaveData.leave_type}
                                         bg="indigo"
                                     />
                                     <DetailCard
-                                        icon={<Timer className="w-4 h-4 text-purple-600" />}
+                                        icon={<Timer className="w-4 h-4 text-[var(--color-blue-dark)]" />}
                                         label="Total Duration"
                                         value={`${viewModal.leaveData.totalDays} ${viewModal.leaveData.totalDays === 1 ? 'Day' : 'Days'}`}
                                         bg="purple"
                                     />
                                     <DetailCard
-                                        icon={<CalendarDays className="w-4 h-4 text-green-600" />}
+                                        icon={<CalendarDays className="w-4 h-4 text-[var(--color-success-dark)]" />}
                                         label="Start Date"
                                         value={formatDate(viewModal.leaveData.start_date)}
                                         bg="green"
                                     />
                                     <DetailCard
-                                        icon={<CalendarDays className="w-4 h-4 text-red-600" />}
+                                        icon={<CalendarDays className="w-4 h-4 text-[var(--color-text-error)]" />}
                                         label="End Date"
                                         value={formatDate(viewModal.leaveData.end_date)}
                                         bg="red"
@@ -717,7 +718,7 @@ const LeaveManagement = () => {
                                 {/* Reason */}
                                 {viewModal.leaveData.reason && (
                                     <NoteCard
-                                        icon={<MessageSquare className="w-4 h-4 text-amber-600" />}
+                                        icon={<MessageSquare className="w-4 h-4 text-[var(--color-warning-dark)]" />}
                                         title="Leave Reason"
                                         color="amber"
                                         content={viewModal.leaveData.reason}
@@ -727,7 +728,7 @@ const LeaveManagement = () => {
                                 {/* Rejection Reason */}
                                 {viewModal.leaveData.status === '3' && viewModal.leaveData.reject_reason && (
                                     <NoteCard
-                                        icon={<AlertTriangle className="w-4 h-4 text-red-600" />}
+                                        icon={<AlertTriangle className="w-4 h-4 text-[var(--color-text-error)]" />}
                                         title="Rejection Reason"
                                         color="red"
                                         content={viewModal.leaveData.reject_reason}
@@ -736,7 +737,7 @@ const LeaveManagement = () => {
 
                                 {/* Application Date */}
                                 {viewModal.leaveData.applied_date && (
-                                    <div className="border-t pt-4 mt-4 text-sm text-gray-600 flex justify-between">
+                                    <div className="border-t pt-4 mt-4 text-sm text-[var(--color-text-secondary)] flex justify-between">
                                         <span>Application submitted on:</span>
                                         <span className="font-medium">{formatDate(viewModal.leaveData.applied_date)}</span>
                                     </div>
@@ -744,7 +745,7 @@ const LeaveManagement = () => {
                             </div>
 
                             {/* Footer */}
-                            <div className="bg-gray-50 px-6 py-4 border-t flex justify-between items-center rounded-b-2xl">
+                            <div className="bg-[var(--color-bg-primary)] px-6 py-4 border-t flex justify-between items-center rounded-b-2xl">
                                 <div className="flex space-x-3">
                                     {viewModal.leaveData.status === '1' && (
                                         <>
@@ -754,7 +755,7 @@ const LeaveManagement = () => {
                                                         handleApprove(viewModal.leaveData.leave_id);
                                                         setViewModal({ isOpen: false, leaveData: null });
                                                     }}
-                                                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md shadow hover:bg-green-700 transition"
+                                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-success-medium)] rounded-md shadow hover:bg-[var(--color-success-dark)] transition"
                                                 >
                                                     <CheckCircle className="w-4 h-4 mr-2 inline" />
                                                     Approve
@@ -766,7 +767,7 @@ const LeaveManagement = () => {
                                                         setViewModal({ isOpen: false, leaveData: null });
                                                         handleReject(viewModal.leaveData);
                                                     }}
-                                                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow hover:bg-red-700 transition"
+                                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error-dark)] rounded-md shadow hover:bg-[var(--color-error-darker)] transition"
                                                 >
                                                     <XCircle className="w-4 h-4 mr-2 inline" />
                                                     Reject
@@ -776,7 +777,7 @@ const LeaveManagement = () => {
                                     )}
                                     <button
                                         onClick={() => setViewModal({ isOpen: false, leaveData: null })}
-                                        className="px-4 py-2 text-sm font-medium bg-white text-gray-700 border border-gray-300 rounded-md shadow hover:bg-gray-100 transition"
+                                        className="px-4 py-2 text-sm font-medium bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] border border-[var(--color-border-secondary)] rounded-md shadow hover:bg-[var(--color-bg-gradient-start)] transition"
                                     >
                                         Close
                                     </button>

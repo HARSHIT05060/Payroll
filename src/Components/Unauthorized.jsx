@@ -13,10 +13,10 @@ const Unauthorized = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-primary)] py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 text-center">
                 <div>
-                    <div className="mx-auto h-24 w-24 text-red-500">
+                    <div className="mx-auto h-24 w-24 text-[var(--color-error)]">
                         <svg
                             className="h-full w-full"
                             fill="none"
@@ -31,22 +31,22 @@ const Unauthorized = () => {
                             />
                         </svg>
                     </div>
-                    <h1 className="mt-6 text-6xl font-bold text-gray-900">401</h1>
-                    <h2 className="mt-2 text-3xl font-bold text-gray-900">Unauthorized</h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <h1 className="mt-6 text-6xl font-bold text-[var(--color-text-primary)]">401</h1>
+                    <h2 className="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">Unauthorized</h2>
+                    <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
                         Sorry, you don't have permission to access this page.
                     </p>
                 </div>
 
                 <div className="mt-8 space-y-4">
-                    <p className="text-gray-500">
+                    <p className="text-[var(--color-text-secondary)]">
                         You may not have the required permissions to view this content, or the page you're looking for doesn't exist.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
                             onClick={handleGoBack}
-                            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex items-center px-4 py-2 border border-[var(--color-border-secondary)] text-sm font-medium rounded-md text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             <svg
                                 className="mr-2 h-4 w-4"
@@ -66,7 +66,7 @@ const Unauthorized = () => {
 
                         <button
                             onClick={handleGoHome}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-[var(--color-text-white)] bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             <svg
                                 className="mr-2 h-4 w-4"
@@ -86,7 +86,7 @@ const Unauthorized = () => {
                     </div>
                 </div>
 
-                <div className="mt-6 text-xs text-gray-400">
+                <div className="mt-6 text-xs text-[var(--color-text-muted)]">
                     If you believe this is an error, please contact your administrator.
                 </div>
             </div>

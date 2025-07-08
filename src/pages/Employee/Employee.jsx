@@ -216,11 +216,11 @@ export default function EmployeeManagement() {
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
         if (sortConfig.key !== key) {
-            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+            return <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-text-muted)]" />;
         }
         return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-            <ChevronUp className="ml-1 h-4 w-4 text-blue-500" /> :
-            <ChevronDown className="ml-1 h-4 w-4 text-blue-500" />;
+            <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
     }, [sortConfig]);
 
     // Redirect if not authenticated
@@ -229,21 +229,21 @@ export default function EmployeeManagement() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Employee Management
                                     </h1>
                                 </div>
@@ -252,13 +252,13 @@ export default function EmployeeManagement() {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
                     {/* Header section */}
-                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                    <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center">
-                                <Users className="h-6 w-6 text-white mr-2" />
-                                <h3 className="text-lg font-medium text-white">
+                                <Users className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                <h3 className="text-lg font-medium text-[var(--color-text-white)]">
                                     All Employee List
                                 </h3>
                             </div>
@@ -270,26 +270,26 @@ export default function EmployeeManagement() {
                                         placeholder="Search employees..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                                     />
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                                     {searchQuery && (
                                         <button
                                             onClick={handleClearSearch}
-                                            className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+                                            className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                                         >
                                             <XCircle className="h-4 w-4" />
                                         </button>
                                     )}
                                     {searchLoading && (
-                                        <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 animate-spin" />
+                                        <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] animate-spin" />
                                     )}
                                 </div>
 
                                 <button
                                     onClick={handleRefresh}
                                     disabled={paginationLoading || searchLoading}
-                                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-2 bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] text-[var(--color-text-white)] px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
                                 >
                                     <RefreshCw className={`h-4 w-4 ${(paginationLoading || searchLoading) ? 'animate-spin' : ''}`} />
                                 </button>
@@ -297,7 +297,7 @@ export default function EmployeeManagement() {
                                 {permissions['employee_create'] && (
                                     <button
                                         onClick={() => navigate('/add-employee')}
-                                        className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                                     >
                                         <Plus className="h-4 w-4" />
                                         Add Employee
@@ -310,20 +310,20 @@ export default function EmployeeManagement() {
                     {/* Content section */}
                     {loading ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                                 <RefreshCw className="w-5 h-5 animate-spin" />
                                 <span>Loading employees...</span>
                             </div>
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Employees</p>
-                                <p className="text-red-600 mb-4">{error}</p>
+                            <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Employees</p>
+                                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                 <button
                                     onClick={() => fetchEmployees(currentPage, searchQuery)}
-                                    className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                                    className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
                                     <span>Try Again</span>
@@ -332,14 +332,14 @@ export default function EmployeeManagement() {
                         </div>
                     ) : employees.length === 0 ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Users className="w-8 h-8 text-gray-400" />
+                            <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Users className="w-8 h-8 text-[var(--color-text-muted)]" />
                                 </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">
+                                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">
                                     {searchQuery ? 'No employees found' : 'No Employees Found'}
                                 </p>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                                     {searchQuery
                                         ? `No employees match your search "${searchQuery}". Try different search terms.`
                                         : currentPage > 1
@@ -350,7 +350,7 @@ export default function EmployeeManagement() {
                                 {searchQuery && (
                                     <button
                                         onClick={handleClearSearch}
-                                        className="inline-flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)] px-4 py-2 rounded-md hover:bg-[var(--color-bg-gray-light)] transition-colors mr-2"
                                     >
                                         <XCircle className="w-4 h-4" />
                                         <span>Clear Search</span>
@@ -359,7 +359,7 @@ export default function EmployeeManagement() {
                                 {permissions['employee_create'] && !searchQuery && currentPage === 1 && (
                                     <button
                                         onClick={() => navigate('/add-employee')}
-                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <span>Create First Employee</span>
@@ -371,8 +371,8 @@ export default function EmployeeManagement() {
                         <>
                             {/* Table */}
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-blue-50">
+                                <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                    <thead className="bg-[var(--color-blue-lightest)]">
                                         <tr>
                                             {[
                                                 { key: COLUMN_KEYS.ID, label: 'Employee ID' },
@@ -382,7 +382,7 @@ export default function EmployeeManagement() {
                                             ].map(({ key, label }) => (
                                                 <th key={`header-${key}`} className="px-6 py-3 text-left">
                                                     <button
-                                                        className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                                                        className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider hover:text-[var(--color-text-secondary)]"
                                                         onClick={() => requestSort(key)}
                                                     >
                                                         {label}
@@ -390,48 +390,48 @@ export default function EmployeeManagement() {
                                                     </button>
                                                 </th>
                                             ))}
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Email
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Mobile
                                             </th>
                                             {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Actions
                                                 </th>
                                             )}
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                         {sortedEmployees.map((employee, index) => {
                                             const employeeId = employee.employee_id || `employee-${index}`;
                                             return (
                                                 <tr
                                                     key={`emp-${employeeId}`}
-                                                    className={`hover:bg-gray-50 transition-colors ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
+                                                    className={`hover:bg-[var(--color-bg-primary)] transition-colors ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
                                                 >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                         {employee.employee_code || '-'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                         <div className="flex items-center space-x-2">
-                                                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                                <Users className="w-4 h-4 text-blue-600" />
+                                                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                                                <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                             </div>
                                                             <span>{employee.full_name || 'Unnamed Employee'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.department_name || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.designation_name || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.email || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.mobile_number || 'N/A'}
                                                     </td>
                                                     {(permissions?.employee_edit || permissions?.employee_view) && (
@@ -441,7 +441,7 @@ export default function EmployeeManagement() {
                                                                     <button
                                                                         onClick={() => handleEditEmployee(employee.employee_id)}
                                                                         disabled={paginationLoading || searchLoading}
-                                                                        className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50 disabled:opacity-50"
+                                                                        className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)] disabled:opacity-50"
                                                                         title="Edit Employee"
                                                                     >
                                                                         <Pencil className="w-4 h-4" />
@@ -451,7 +451,7 @@ export default function EmployeeManagement() {
                                                                     <button
                                                                         onClick={() => handleViewDetails(employee.employee_id)}
                                                                         disabled={paginationLoading || searchLoading}
-                                                                        className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+                                                                        className="p-2 rounded-md transition-colors text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-primary)] disabled:opacity-50"
                                                                         title="View Details"
                                                                     >
                                                                         <Eye className="w-4 h-4" />

@@ -2,31 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    /* Background Colors */
+    --color-bg-primary: #f9fafb;
+    --color-bg-secondary: #ffffff;
+    --color-bg-secondary-20: rgba(255, 255, 255, 0.2);
+    --color-bg-secondary-30: rgba(255, 255, 255, 0.3);
+    --color-bg-gray-light: #e5e7eb;
+    --color-bg-gradient-start: #f1f5f9;
+    --color-bg-gradient-end: #e0f2fe;
+    --color-bg-card: #ffffff;
+    --color-bg-hover: #f1f5f9;
+    --color-bg-sidebar: #f8fafc;
+    --color-bg-sidebar-to: #ffffff;
+
+    /* Border Colors */
+    --color-border-primary: #E2E8F0;
+    --color-border-secondary: #d1d5db;
+    --color-border-focus: #3b82f6;
+    --color-border-error: #ef4444;
+    --color-border-divider: #e5e7eb;
+
+    /* Blue Color Variants */
+    --color-blue-lightest: #eff6ff;
+    --color-blue-lighter: #dbeafe;
+    --color-blue-light: #93c5fd;
+    --color-blue: #3b82f6;
+    --color-blue-dark: #2563eb;
+    --color-blue-darker: #1d4ed8;
+    --color-blue-darkest: #1e40af;
+
+    /* Text Colors */
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #656c7a;
+    --color-text-muted: #9ca3af;
+    --color-text-white: #ffffff;
+    --color-text-white-90: #e6e6e6;
+    --color-text-blue: #2563eb;
+    --color-text-error: #dc2626;
+    --color-text-success: #047857;
+
+    /* State Colors */
+    --color-success-light: #d1fae5;
+    --color-success-lighter: #a7f3d0;
+    --color-success: #10b981;
+    --color-success-medium: #059669; 
+    --color-success-dark: #047857;
+
+    --color-warning-light: #fef3c7;
+    --color-warning-lighter: #fde68a;
+    --color-warning: #f59e0b;
+    --color-warning-dark: #d97706;
+
+    --color-error-light: #fee2e2;
+    --color-error-lighter: #fecaca;
+    --color-error: #ef4444;
+    --color-error-dark: #dc2626;
+
+    /* Special Colors */
+    --color-yellow-light: #fde68a;
+    --color-yellow: #facc15;
+    --color-yellow-dark: #eab308;
+
+    /* Shadow Colors */
+    --color-shadow-light: rgba(0, 0, 0, 0.05);
+    --color-shadow-medium: rgba(0, 0, 0, 0.1);
+    --color-shadow-dark: rgba(0, 0, 0, 0.15);
+
+    /* Scrollbar Colors */
+    --color-scrollbar-track: #f1f5f9;
+    --color-scrollbar-thumb: linear-gradient(45deg, var(--color-blue), #6366f1);
+    --color-scrollbar-thumb-hover: linear-gradient(45deg, var(--color-blue-dark), #4f46e5);
+}
+
+/* Custom Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: var(--color-scrollbar-track);
     border-radius: 10px;
     margin: 8px 0;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #3b82f6, #6366f1);
+    background: var(--color-scrollbar-thumb);
     border-radius: 10px;
     transition: all 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #2563eb, #4f46e5);
+    background: var(--color-scrollbar-thumb-hover);
     width: 6px;
 }
 
 /* Firefox */
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: #3b82f6 #f1f5f9;
+    scrollbar-color: var(--color-blue) var(--color-scrollbar-track);
 }
 
 .scrollbar-fade-top {
@@ -37,4 +111,69 @@
 .scrollbar-fade-bottom {
     background: linear-gradient(0deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
     pointer-events: none;
+}
+
+/* Utility Classes */
+.shadow-custom {
+    box-shadow: 0 4px 6px -1px var(--color-shadow-light), 0 2px 4px -1px var(--color-shadow-light);
+}
+
+.shadow-custom-hover {
+    box-shadow: 0 10px 15px -3px var(--color-shadow-medium), 0 4px 6px -2px var(--color-shadow-medium);
+}
+
+.transition-custom {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive Design Helpers */
+@media (max-width: 768px) {
+    :root {
+        --color-bg-sidebar: #ffffff;
+        --color-bg-sidebar-to: #f8fafc;
+    }
 }

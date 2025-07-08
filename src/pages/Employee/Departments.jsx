@@ -3,7 +3,7 @@ import Department from "../../Components/Department";
 
 const DepartmentsPage = () => {
     return (
-        <div className="min-h-screen bg-gray-100 py-8">
+        <div className="min-h-screen bg-[var(--color-bg-gradient-start)] py-8">
             <Department />
         </div>
     );

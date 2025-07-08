@@ -520,10 +520,10 @@ const AddRole = () => {
 
     if (loading) {
         return (
-            <div className="max-w-4xl mx-auto bg-white min-h-screen">
+            <div className="max-w-4xl mx-auto bg-[var(--color-bg-secondary)] min-h-screen">
                 <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600">Loading...</span>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)]"></div>
+                    <span className="ml-3 text-[var(--color-text-secondary)]">Loading...</span>
                 </div>
             </div>
         );
@@ -531,14 +531,14 @@ const AddRole = () => {
 
     if (error) {
         return (
-            <div className="max-w-4xl mx-auto bg-white min-h-screen">
+            <div className="max-w-4xl mx-auto bg-[var(--color-bg-secondary)] min-h-screen">
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
-                        <div className="text-red-600 text-lg font-semibold mb-2">Error</div>
-                        <div className="text-gray-600 mb-4">{error}</div>
+                        <div className="text-[var(--color-text-error)] text-lg font-semibold mb-2">Error</div>
+                        <div className="text-[var(--color-text-secondary)] mb-4">{error}</div>
                         <button
                             onClick={() => window.location.reload()}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200"
+                            className="px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-md hover:bg-[var(--color-blue-darker)] transition-all duration-200"
                         >
                             Retry
                         </button>
@@ -549,26 +549,26 @@ const AddRole = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700">
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
+                        <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={handleCancel}
-                                    className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                    className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                                 >
                                     <ArrowLeft size={18} />
                                     Back
                                 </button>
                                 <div className="flex items-center gap-3">
-                                    {isEditMode ? <Edit size={24} className="text-white" /> : <UserPlus size={24} className="text-white" />}
+                                    {isEditMode ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <UserPlus size={24} className="text-[var(--color-text-white)]" />}
                                     <div>
-                                        <h2 className="text-2xl font-bold text-white">
+                                        <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             {isEditMode ? 'Edit Role' : 'Create New Role'}
                                         </h2>
-                                        <p className="text-blue-100 text-sm mt-1">
+                                        <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
                                             {isEditMode ? 'Update role details and permissions below' : 'Fill in the role details and permissions below'}
                                         </p>
                                     </div>
@@ -578,11 +578,11 @@ const AddRole = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-blue-200 shadow-xl overflow-hidden">
-                    <div className="px-6 py-4 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-blue-700">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl border border-[var(--color-blue-light)] shadow-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
                         <div className="flex items-center gap-3">
-                            <Shield className="w-5 h-5 text-white" />
-                            <h3 className="text-lg font-semibold text-white">Role Information</h3>
+                            <Shield className="w-5 h-5 text-[var(--color-text-white)]" />
+                            <h3 className="text-lg font-semibold text-[var(--color-text-white)]">Role Information</h3>
                         </div>
                     </div>
 
@@ -590,8 +590,8 @@ const AddRole = () => {
                         {/* Role Name */}
                         <div className="space-y-2">
                             <label htmlFor="role_name" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                <User className="w-4 h-4 text-blue-600" />
-                                Role Name <span className="text-red-500">*</span>
+                                <User className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                Role Name <span className="text-[var(--color-error)]">*</span>
                             </label>
                             <div className="relative">
                                 <input
@@ -599,17 +599,17 @@ const AddRole = () => {
                                     id="role_name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 border-gray-300 hover:border-blue-400"
+                                    className="w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]"
                                     placeholder="Enter role name"
                                 />
-                                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                             </div>
                         </div>
 
                         {/* Permissions Section */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-blue-600" />
+                                <Shield className="w-5 h-5 text-[var(--color-blue-dark)]" />
                                 <h3 className="text-lg font-semibold text-gray-800">Permissions</h3>
                             </div>
 
@@ -618,52 +618,52 @@ const AddRole = () => {
                                 const { activeCount, totalCount } = getActiveCheckboxCount(sectionKey);
 
                                 return (
-                                    <div key={sectionKey} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                    <div key={sectionKey} className="border border-[var(--color-border-primary)] rounded-xl overflow-hidden shadow-sm">
                                         <div
                                             onClick={() => toggleSection(sectionKey)}
-                                            className="flex items-center justify-between py-4 px-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200 bg-white"
+                                            className="flex items-center justify-between py-4 px-6 cursor-pointer hover:bg-[var(--color-bg-primary)] transition-colors duration-200 bg-[var(--color-bg-secondary)]"
                                         >
                                             <div>
-                                                <h4 className="text-sm font-semibold text-gray-900">{config.title}</h4>
-                                                <p className="text-xs text-gray-500 mt-1">{config.subtitle}</p>
+                                                <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">{config.title}</h4>
+                                                <p className="text-xs text-[var(--color-text-secondary)] mt-1">{config.subtitle}</p>
                                             </div>
                                             <div className="flex items-center space-x-3">
                                                 <div className="flex items-center space-x-2">
                                                     <span className={`text-xs font-medium px-3 py-1 rounded-full ${activeCount > 0
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-gray-100 text-gray-600'
+                                                        ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
+                                                        : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)]'
                                                         }`}>
                                                         {activeCount}/{totalCount} Permissions
                                                     </span>
                                                     {activeCount > 0 && (
-                                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                        <div className="w-2 h-2 bg-[var(--color-blue-lightest)]0 rounded-full"></div>
                                                     )}
                                                 </div>
-                                                <div className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200">
+                                                <div className="p-2 rounded-full hover:bg-[var(--color-bg-gradient-start)] transition-all duration-200">
                                                     {isExpanded ? (
-                                                        <ChevronUp className="w-5 h-5 text-blue-600 transition-transform duration-200" />
+                                                        <ChevronUp className="w-5 h-5 text-[var(--color-blue-dark)] transition-transform duration-200" />
                                                     ) : (
-                                                        <ChevronDown className="w-5 h-5 text-blue-600 transition-transform duration-200" />
+                                                        <ChevronDown className="w-5 h-5 text-[var(--color-blue-dark)] transition-transform duration-200" />
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                                            <div className="p-6 space-y-6 bg-gray-50/30 border-t border-gray-100">
+                                            <div className="p-6 space-y-6 bg-[var(--color-bg-primary)]/30 border-t border-[var(--color-border-primary)]">
                                                 {Object.entries(config.subsections).map(([subsectionKey, subsection]) => {
                                                     const subsectionPerms = permissions[sectionKey]?.[subsectionKey] || {};
 
                                                     return (
-                                                        <div key={subsectionKey} className="border border-blue-100 rounded-lg p-4 bg-white">
+                                                        <div key={subsectionKey} className="border border-blue-100 rounded-lg p-4 bg-[var(--color-bg-secondary)]">
                                                             <div className="flex items-center justify-between mb-4">
                                                                 <h5 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                                                                    <Settings className="w-4 h-4 text-blue-600" />
+                                                                    <Settings className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                                     {subsection.title}
                                                                 </h5>
                                                                 <button
                                                                     onClick={() => handlePermissionChange(sectionKey, subsectionKey, 'selectAll')}
-                                                                    className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-blue-50 border border-blue-200"
+                                                                    className="text-xs text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] font-medium transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-[var(--color-blue-lightest)] border border-[var(--color-blue-light)]"
                                                                 >
                                                                     {subsectionPerms.selectAll ? 'Deselect all' : 'Select all'}
                                                                 </button>
@@ -673,15 +673,15 @@ const AddRole = () => {
                                                                 {subsection.permissions.map(permission => (
                                                                     <label
                                                                         key={permission.key}
-                                                                        className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg hover:bg-blue-50 transition-colors duration-150 border border-transparent hover:border-blue-200"
+                                                                        className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg hover:bg-[var(--color-blue-lightest)] transition-colors duration-150 border border-transparent hover:border-[var(--color-blue-light)]"
                                                                     >
                                                                         <input
                                                                             type="checkbox"
                                                                             checked={subsectionPerms[permission.key] || false}
                                                                             onChange={() => handlePermissionChange(sectionKey, subsectionKey, permission.key)}
-                                                                            className="w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-150"
+                                                                            className="w-4 h-4 text-[var(--color-blue-dark)] border-2 border-[var(--color-border-secondary)] rounded focus:ring-[var(--color-blue)] focus:ring-2 transition-colors duration-150"
                                                                         />
-                                                                        <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-150 font-medium">
+                                                                        <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors duration-150 font-medium">
                                                                             {formatPermissionName(permission.title)}
                                                                         </span>
                                                                     </label>
@@ -698,18 +698,18 @@ const AddRole = () => {
                         </div>
 
                         {/* Form Actions */}
-                        <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
+                        <div className="flex items-center justify-end space-x-4 pt-8 border-t border-[var(--color-border-primary)]">
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-3 focus:ring-gray-500/20 transition-all duration-200"
+                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] rounded-xl shadow-sm hover:bg-[var(--color-bg-primary)] hover:border-gray-400 focus:outline-none focus:ring-3 focus:ring-gray-500/20 transition-all duration-200"
                             >
                                 <X className="w-4 h-4" />
                                 Discard
                             </button>
                             <button
                                 onClick={handleSaveChanges}
-                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-3 focus:ring-blue-500/50 transition-all duration-200 transform hover:scale-105"
+                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/50 transition-all duration-200 transform hover:scale-105"
                             >
                                 <Save className="w-4 h-4" />
                                 Save Changes

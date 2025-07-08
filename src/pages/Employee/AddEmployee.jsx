@@ -749,10 +749,10 @@ const AddEmployee = () => {
 
     if (isLoadingDropdowns || isLoadingEmployeeData) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-                    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)] flex items-center justify-center">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl p-8 text-center">
+                    <div className="w-8 h-8 border-4 border-[var(--color-blue-dark)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-[var(--color-text-secondary)]">
                         {isLoadingDropdowns ? 'Loading form data...' : 'Loading employee data...'}
                     </p>
                 </div>
@@ -761,26 +761,26 @@ const AddEmployee = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={goBack}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                {isEditMode ? <Edit size={24} className="text-white" /> : ""}
+                                {isEditMode ? <Edit size={24} className="text-[var(--color-text-white)]" /> : ""}
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Employee' : 'Add New Employee'}
                                     </h1>
-                                    <p className="text-blue-100 text-sm mt-1">
+                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
                                         {isEditMode ? 'Update employee details below' : 'Fill in the employee details below'}
                                     </p>
                                 </div>
@@ -792,7 +792,7 @@ const AddEmployee = () => {
                     {message.text && (
                         <div className={`mx-6 mt-6 p-4 rounded-xl border-l-4 ${message.type === 'success'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-400'
-                            : 'bg-red-50 text-red-800 border-red-400'
+                            : 'bg-[var(--color-error-light)] text-red-800 border-red-400'
                             }`}>
                             <div className="flex items-center gap-2">
                                 <div className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-emerald-400' : 'bg-red-400'}`}></div>
@@ -805,88 +805,88 @@ const AddEmployee = () => {
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {sections.map((section) => (
-                        <div key={section.key} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                        <div key={section.key} className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
                             <button
                                 type="button"
                                 onClick={() => toggleSection(section.key)}
-                                className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-all duration-200"
+                                className="w-full flex items-center justify-between p-6 hover:bg-[var(--color-bg-primary)] transition-all duration-200"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-lg bg-${section.color}-100`}>
                                         <section.icon size={20} className={`text-${section.color}-600`} />
                                     </div>
-                                    <span className="font-semibold text-gray-900 text-lg">{section.title}</span>
+                                    <span className="font-semibold text-[var(--color-text-primary)] text-lg">{section.title}</span>
                                 </div>
-                                <div className={`p-1 rounded-full ${expandedSections[section.key] ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                                <div className={`p-1 rounded-full ${expandedSections[section.key] ? 'bg-[var(--color-blue-lighter)]' : 'bg-[var(--color-bg-gradient-start)]'}`}>
                                     {expandedSections[section.key] ?
-                                        <ChevronUp size={20} className="text-blue-600" /> :
-                                        <ChevronDown size={20} className="text-gray-600" />
+                                        <ChevronUp size={20} className="text-[var(--color-blue-dark)]" /> :
+                                        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
                                     }
                                 </div>
                             </button>
 
                             {expandedSections[section.key] && (
-                                <div className="border-t border-gray-100">
+                                <div className="border-t border-[var(--color-border-primary)]">
                                     {section.key === 'basicDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Employee Code *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Employee Code *</label>
                                                 <input
                                                     type="text"
                                                     name="employeeCode"
                                                     value={formData.employeeCode}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter employee code"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Full Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Full Name *</label>
                                                 <input
                                                     type="text"
                                                     name="name"
                                                     value={formData.name}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter full name"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Mobile Number *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Mobile Number *</label>
                                                 <input
                                                     type="tel"
                                                     name="mobile"
                                                     value={formData.mobile}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter mobile number"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Email Address</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Email Address</label>
                                                 <input
                                                     type="email"
                                                     name="email"
                                                     value={formData.email}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter email address"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Gender *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Gender *</label>
                                                 <select
                                                     name="gender"
                                                     value={formData.gender}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     required
                                                 >
                                                     <option value="">Select Gender</option>
@@ -896,12 +896,12 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Branch *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch *</label>
                                                 <select
                                                     name="branch"
                                                     value={formData.branch}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     required
                                                 >
                                                     <option value="">Select Branch</option>
@@ -911,12 +911,12 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Department *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Department *</label>
                                                 <select
                                                     name="department"
                                                     value={formData.department}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     required
                                                 >
                                                     <option value="">Select Department</option>
@@ -926,12 +926,12 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Designation *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Designation *</label>
                                                 <select
                                                     name="designation"
                                                     value={formData.designation}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     required
                                                 >
                                                     <option value="">Select Designation</option>
@@ -941,12 +941,12 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Employment Type</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Employment Type</label>
                                                 <select
                                                     name="employmentType"
                                                     value={formData.employmentType}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 >
                                                     <option value="">Select Employment Type</option>
                                                     {dropdownOptions.employmentTypeOptions.map(option => (
@@ -955,12 +955,12 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Salary Type</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Salary Type</label>
                                                 <select
                                                     name="salaryType"
                                                     value={formData.salaryType}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 >
                                                     <option value="">Select Salary Type</option>
                                                     {dropdownOptions.salaryTypeOptions.map(option => (
@@ -969,25 +969,25 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Salary</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Salary</label>
                                                 <input
                                                     type="number"
                                                     name="salary"
                                                     value={formData.salary}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter salary amount"
                                                 />
                                             </div>
                                             <div className="space-y-2 md:col-span-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Address</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Address</label>
                                                 <textarea
                                                     name="address"
                                                     value={formData.address}
                                                     onChange={handleInputChange}
                                                     rows="3"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all resize-none"
                                                     placeholder="Enter address"
                                                 />
                                             </div>
@@ -997,53 +997,53 @@ const AddEmployee = () => {
                                     {section.key === 'bankDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Bank Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Bank Name *</label>
                                                 <input
                                                     type="text"
                                                     name="bankName"
                                                     value={formData.bankName}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter bank name"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Branch Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch Name *</label>
                                                 <input
                                                     type="text"
                                                     name="branchName"
                                                     value={formData.branchName}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter branch name"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Account Number *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Account Number *</label>
                                                 <input
                                                     type="text"
                                                     name="accountNo"
                                                     value={formData.accountNo}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter account number"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">IFSC Code *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">IFSC Code *</label>
                                                 <input
                                                     type="text"
                                                     name="ifscCode"
                                                     value={formData.ifscCode}
                                                     onChange={handleInputChange}
                                                     onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter IFSC code"
                                                     required
                                                 />
@@ -1054,15 +1054,15 @@ const AddEmployee = () => {
                                     {section.key === 'legalDocuments' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">
-                                                    Aadhar Card {!isEditMode && '*'}
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                    Aadhar Card {!isEditMode && <span className="text-red-500">*</span>}
                                                 </label>
                                                 <input
                                                     type="file"
                                                     name="aadharCard"
                                                     onChange={handleInputChange}
                                                     accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     {...(!isEditMode && { required: true })}
                                                 />
                                                 {filePreviews.aadharCard && (
@@ -1074,7 +1074,7 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-blue-50 rounded-lg text-sm text-blue-700">
+                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
                                                                 📄 Document uploaded
                                                             </div>
                                                         )}
@@ -1082,13 +1082,13 @@ const AddEmployee = () => {
                                                 )}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Driving Licence</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Driving Licence</label>
                                                 <input
                                                     type="file"
                                                     name="drivingLicence"
                                                     onChange={handleInputChange}
                                                     accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                                 {filePreviews.drivingLicence && (
                                                     <div className="mt-2">
@@ -1099,7 +1099,7 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-blue-50 rounded-lg text-sm text-blue-700">
+                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
                                                                 📄 Document uploaded
                                                             </div>
                                                         )}
@@ -1107,15 +1107,15 @@ const AddEmployee = () => {
                                                 )}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">
-                                                    PAN Card {!isEditMode && '*'}
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                    PAN Card {!isEditMode && <span className="text-red-500">*</span>}
                                                 </label>
                                                 <input
                                                     type="file"
                                                     name="panCard"
                                                     onChange={handleInputChange}
                                                     accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     {...(!isEditMode && { required: true })}
                                                 />
                                                 {filePreviews.panCard && (
@@ -1127,7 +1127,7 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-blue-50 rounded-lg text-sm text-blue-700">
+                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
                                                                 📄 Document uploaded
                                                             </div>
                                                         )}
@@ -1135,13 +1135,13 @@ const AddEmployee = () => {
                                                 )}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Photo</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Photo</label>
                                                 <input
                                                     type="file"
                                                     name="photo"
                                                     onChange={handleInputChange}
                                                     accept="image/*"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                                 {filePreviews.photo && (
                                                     <div className="mt-2">
@@ -1152,7 +1152,7 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-blue-50 rounded-lg text-sm text-blue-700">
+                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
                                                                 📄 Photo uploaded
                                                             </div>
                                                         )}
@@ -1165,34 +1165,34 @@ const AddEmployee = () => {
                                     {section.key === 'contactInformation' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Emergency Contact Number</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Emergency Contact Number</label>
                                                 <input
                                                     type="tel"
                                                     name="emergencyContactNo"
                                                     value={formData.emergencyContactNo}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter emergency contact number"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Contact Person Name</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Contact Person Name</label>
                                                 <input
                                                     type="text"
                                                     name="contactPersonName"
                                                     value={formData.contactPersonName}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     placeholder="Enter contact person name"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Relation</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Relation</label>
                                                 <select
                                                     name="relation"
                                                     value={formData.relation}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 >
                                                     <option value="">Select Relation</option>
                                                     {dropdownOptions.relationOptions.map(option => (
@@ -1201,13 +1201,13 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2 md:col-span-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Emergency Address</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Emergency Address</label>
                                                 <textarea
                                                     name="emergencyAddress"
                                                     value={formData.emergencyAddress}
                                                     onChange={handleInputChange}
                                                     rows="3"
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all resize-none"
                                                     placeholder="Enter emergency address"
                                                 />
                                             </div>
@@ -1217,23 +1217,23 @@ const AddEmployee = () => {
                                     {section.key === 'personalInformation' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Date of Birth</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Birth</label>
                                                 <input
                                                     type="date"
                                                     name="dateOfBirth"
                                                     value={formData.dateOfBirth}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Date of Joining</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Joining</label>
                                                 <input
                                                     type="date"
                                                     name="dateOfJoining"
                                                     value={formData.dateOfJoining}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -1243,14 +1243,14 @@ const AddEmployee = () => {
                                         <div className="p-6">
                                             <div className="space-y-4">
                                                 {formData.references.map((reference, index) => (
-                                                    <div key={index} className="border border-gray-200 rounded-lg p-4">
+                                                    <div key={index} className="border border-[var(--color-border-primary)] rounded-lg p-4">
                                                         <div className="flex items-center justify-between mb-4">
-                                                            <h4 className="text-sm font-semibold text-gray-700">Reference {index + 1}</h4>
+                                                            <h4 className="text-sm font-semibold text-[var(--color-text-secondary)]">Reference {index + 1}</h4>
                                                             {formData.references.length > 1 && (
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => removeReference(index)}
-                                                                    className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                                                    className="text-[var(--color-error)] hover:text-[var(--color-error-dark)] p-1 rounded-full hover:bg-[var(--color-error-light)] transition-colors"
                                                                 >
                                                                     <Trash2 size={16} />
                                                                 </button>
@@ -1258,22 +1258,22 @@ const AddEmployee = () => {
                                                         </div>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <div className="space-y-2">
-                                                                <label className="block text-sm font-medium text-gray-600">Name</label>
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Name</label>
                                                                 <input
                                                                     type="text"
                                                                     value={reference.name}
                                                                     onChange={(e) => handleReferenceChange(index, 'name', e.target.value)}
-                                                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                                     placeholder="Enter reference name"
                                                                 />
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <label className="block text-sm font-medium text-gray-600">Contact Number</label>
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Contact Number</label>
                                                                 <input
                                                                     type="tel"
                                                                     value={reference.contactNumber}
                                                                     onChange={(e) => handleReferenceChange(index, 'contactNumber', e.target.value)}
-                                                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                                     placeholder="Enter contact number"
                                                                 />
                                                             </div>
@@ -1283,7 +1283,7 @@ const AddEmployee = () => {
                                                 <button
                                                     type="button"
                                                     onClick={addReference}
-                                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                                                    className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] font-medium transition-colors"
                                                 >
                                                     <Plus size={16} />
                                                     Add Another Reference
@@ -1294,23 +1294,23 @@ const AddEmployee = () => {
                                     {section.key === 'credentials' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Login Mobile No *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Login Mobile No *</label>
                                                 <input
                                                     type="tel"
                                                     name="loginMobileNo"
                                                     value={formData.loginMobileNo}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-gray-700">Password *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Password *</label>
                                                 <input
                                                     type="password"
                                                     name="password"
                                                     value={formData.password}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -1321,22 +1321,22 @@ const AddEmployee = () => {
                     ))}
 
                     {/* Submit Button */}
-                    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] p-6">
                         <div className="flex gap-4 justify-end">
                             <button
                                 type="button"
                                 onClick={goBack}
-                                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                                className="px-6 py-3 border border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-primary)] transition-colors font-medium"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="px-8 py-3 bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] text-[var(--color-text-white)] rounded-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                                 {isSubmitting && (
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)] border-t-transparent rounded-full animate-spin"></div>
                                 )}
                                 {isSubmitting ? (isEditMode ? 'Updating...' : 'Adding...')
                                     : (isEditMode ? 'Update Employee' : 'Add Employee')

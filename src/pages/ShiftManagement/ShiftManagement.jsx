@@ -11,25 +11,25 @@ import Pagination from '../../Components/Pagination';
 // Day Status Legend Component
 const DayStatusLegend = () => {
     return (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-medium text-gray-700 mb-4">Day Status Legend</h3>
+        <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-medium text-[var(--color-text-secondary)] mb-4">Day Status Legend</h3>
             <div className="flex flex-wrap gap-6">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span className="text-sm text-gray-600 font-medium">W</span>
+                        <span className="text-sm text-[var(--color-text-secondary)] font-medium">W</span>
                     </div>
-                    <span className="text-sm text-gray-600">Week Off</span>
+                    <span className="text-sm text-[var(--color-text-secondary)]">Week Off</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white border-2 border-blue-500">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)]">
                     </div>
-                    <span className="text-sm text-gray-600">Occasional Working</span>
+                    <span className="text-sm text-[var(--color-text-secondary)]">Occasional Working</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                        <span className="text-sm text-white font-medium">D</span>
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-blue-dark)] flex items-center justify-center">
+                        <span className="text-sm text-[var(--color-text-white)] font-medium">D</span>
                     </div>
-                    <span className="text-sm text-gray-600">Working Day</span>
+                    <span className="text-sm text-[var(--color-text-secondary)]">Working Day</span>
                 </div>
             </div>
         </div>
@@ -113,15 +113,15 @@ const ShiftManagement = () => {
 
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-96">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl max-w-md w-full mx-4 max-h-96">
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                                 Assigned Employees - {shiftName}
                             </h3>
                             <button
                                 onClick={onClose}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -129,29 +129,29 @@ const ShiftManagement = () => {
 
                         {loading ? (
                             <div className="flex justify-center items-center h-32">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-blue-dark)]"></div>
                             </div>
                         ) : employees.length > 0 ? (
                             <div className="max-h-64 overflow-y-auto">
                                 <div className="space-y-2">
                                     {employees.map((employee, index) => (
-                                        <div key={employee.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                                <span className="text-white text-sm font-medium">
+                                        <div key={employee.id || index} className="flex items-center gap-3 p-3 bg-[var(--color-bg-primary)] rounded-lg">
+                                            <div className="w-8 h-8 bg-[var(--color-blue-lightest)]0 rounded-full flex items-center justify-center">
+                                                <span className="text-[var(--color-text-white)] text-sm font-medium">
                                                     {employee.full_name?.charAt(0)?.toUpperCase() || 'E'}
                                                 </span>
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-[var(--color-text-primary)]">
                                                     {employee.full_name || 'Unknown Employee'}
                                                 </p>
                                                 {employee.employee_id && (
-                                                    <p className="text-sm text-gray-600">
+                                                    <p className="text-sm text-[var(--color-text-secondary)]">
                                                         ID: {employee.employee_id}
                                                     </p>
                                                 )}
                                                 {employee.cdate && (
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-[var(--color-text-secondary)]">
                                                         Assigned: {employee.cdate}
                                                     </p>
                                                 )}
@@ -162,8 +162,8 @@ const ShiftManagement = () => {
                             </div>
                         ) : (
                             <div className="text-center py-8">
-                                <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                                <p className="text-gray-600">No employees assigned to this shift</p>
+                                <Users className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-3" />
+                                <p className="text-[var(--color-text-secondary)]">No employees assigned to this shift</p>
                             </div>
                         )}
                     </div>
@@ -186,13 +186,13 @@ const ShiftManagement = () => {
     const getDayStyles = (shiftType) => {
         switch (shiftType) {
             case "1":
-                return 'bg-blue-500 text-white'; // Working Day - Blue background with white text
+                return 'bg-[var(--color-blue-dark)] text-[var(--color-text-white)]'; // Working Day - Blue background with white text
             case "2":
-                return 'bg-gray-300 text-gray-600'; // Week Off - Gray background
+                return 'bg-gray-300 text-[var(--color-text-secondary)]'; // Week Off - Gray background
             case "3":
-                return 'bg-white border-2 border-blue-500 text-blue-500'; // Occasional - White background with blue border, no text
+                return 'bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)] text-[var(--color-blue)]'; // Occasional - White background with blue border, no text
             default:
-                return 'bg-gray-300 text-gray-600';
+                return 'bg-gray-300 text-[var(--color-text-secondary)]';
         }
     };
 
@@ -376,21 +376,21 @@ const ShiftManagement = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className=" p-6 max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
                                 <ArrowLeft size={18} />
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Shift Management
                                     </h1>
                                 </div>
@@ -399,13 +399,13 @@ const ShiftManagement = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border border-blue-600 overflow-hidden shadow-sm">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
                     {/* Header section */}
-                    <div className="px-6 py-4 border-b border-blue-200 bg-blue-600">
+                    <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center">
-                                <Calendar className="h-6 w-6 text-white mr-2" />
-                                <h3 className="text-lg font-medium text-white">
+                                <Calendar className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                <h3 className="text-lg font-medium text-[var(--color-text-white)]">
                                     Available Shifts ({totalShifts})
                                 </h3>
                             </div>
@@ -417,20 +417,20 @@ const ShiftManagement = () => {
                                         placeholder="Search shifts..."
                                         value={searchQuery}
                                         onChange={handleSearchChange}
-                                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-white text-sm"
+                                        className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                                     />
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                                     {searchQuery && (
                                         <button
                                             onClick={clearSearch}
-                                            className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+                                            className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                                         >
                                             <X className="h-4 w-4" />
                                         </button>
                                     )}
                                     {searchLoading && (
                                         <div className="absolute right-3 top-2.5">
-                                            <RefreshCw className="h-4 w-4 animate-spin text-gray-400" />
+                                            <RefreshCw className="h-4 w-4 animate-spin text-[var(--color-text-muted)]" />
                                         </div>
                                     )}
                                 </div>
@@ -438,7 +438,7 @@ const ShiftManagement = () => {
                                 {permissions['shift_assign'] &&
                                     <button
                                         onClick={handleAssignShift}
-                                        className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                                     >
                                         <Users className="h-4 w-4" />
                                         Assign Shift
@@ -447,7 +447,7 @@ const ShiftManagement = () => {
                                 {permissions['shift_create'] &&
                                     <button
                                         onClick={handleCreateShift}
-                                        className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                                     >
                                         <Plus className="h-4 w-4" />
                                         Create Shift
@@ -465,20 +465,20 @@ const ShiftManagement = () => {
                     {/* Content section */}
                     {loading ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-gray-500">
+                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
                                 <RefreshCw className="w-5 h-5 animate-spin" />
                                 <span>Loading shifts...</span>
                             </div>
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                                <p className="text-red-700 text-lg font-medium mb-2">Error Loading Shifts</p>
-                                <p className="text-red-600 mb-4">{error}</p>
+                            <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Shifts</p>
+                                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                 <button
                                     onClick={() => fetchShifts(currentPage, searchQuery)}
-                                    className="inline-flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 transition-colors"
+                                    className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
                                     <span>Try Again</span>
@@ -487,18 +487,18 @@ const ShiftManagement = () => {
                         </div>
                     ) : shifts.length === 0 ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Calendar className="w-8 h-8 text-gray-400" />
+                            <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Calendar className="w-8 h-8 text-[var(--color-text-muted)]" />
                                 </div>
-                                <p className="text-gray-700 text-lg font-medium mb-2">No Shifts Found</p>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Shifts Found</p>
+                                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
                                     {searchQuery ? 'No shifts match your search criteria.' : 'You haven\'t created any shifts yet. Create your first shift to get started with shift management.'}
                                 </p>
                                 {permissions['shift_create'] && !searchQuery && (
                                     <button
                                         onClick={handleCreateShift}
-                                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <span>Create First Shift</span>
@@ -508,35 +508,35 @@ const ShiftManagement = () => {
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-blue-50">
+                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                <thead className="bg-[var(--color-blue-lightest)]">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                             Shift Name
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                             Shift Days
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                             Assigned Employees
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                             Created On
                                         </th>
                                         {(permissions?.shift_edit || permissions?.shift_delete) && (
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Actions
                                             </th>
                                         )}
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                     {shifts.map((shift) => (
-                                        <tr key={shift.shift_id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr key={shift.shift_id} className="hover:bg-[var(--color-bg-primary)] transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                 <div className="flex items-center space-x-2">
-                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                        <Calendar className="w-4 h-4 text-blue-600" />
+                                                    <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                                        <Calendar className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                     </div>
                                                     <span>{shift.shift_name}</span>
                                                 </div>
@@ -551,17 +551,17 @@ const ShiftManagement = () => {
                                                                 {shouldShowDayText(day.shift_type) ? day.sort_name : (day.sort_name)}
                                                             </span>
                                                             {/* Tooltip */}
-                                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-[var(--color-text-white)] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                                                                 {getDayStatusText(day.shift_type)}
                                                             </div>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                 <button
                                                     onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
-                                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                                                    className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-blue-800 transition-colors"
                                                 >
                                                     <span className="font-medium text-lg">
                                                         {employeeCounts[shift.shift_id] || 0}
@@ -569,7 +569,7 @@ const ShiftManagement = () => {
                                                     <Users className="w-4 h-4" />
                                                 </button>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                 {shift.created_date}
                                             </td>
                                             {(permissions?.shift_edit || permissions?.shift_delete) && (
@@ -578,7 +578,7 @@ const ShiftManagement = () => {
                                                         {permissions['shift_edit'] && (
                                                             <button
                                                                 onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
-                                                                className="p-2 rounded-md transition-colors text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                                                                className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)]"
                                                                 title="Edit Shift"
                                                             >
                                                                 <Edit className="w-4 h-4" />
@@ -587,7 +587,7 @@ const ShiftManagement = () => {
                                                         {permissions['shift_delete'] && (
                                                             <button
                                                                 onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
-                                                                className="p-2 rounded-md transition-colors text-red-600 hover:text-red-900 hover:bg-red-50"
+                                                                className="p-2 rounded-md transition-colors text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]"
                                                                 title="Delete Shift"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />

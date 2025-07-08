@@ -270,9 +270,9 @@ const AddUser = () => {
     if (!user?.user_id) {
         return (
             <div className="p-6 max-w-4xl mx-auto">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6 text-center">
                     <h2 className="text-xl font-semibold text-red-800 mb-2">Authentication Required</h2>
-                    <p className="text-red-600">Please log in to manage users.</p>
+                    <p className="text-[var(--color-text-error)]">Please log in to manage users.</p>
                 </div>
             </div>
         );
@@ -282,34 +282,34 @@ const AddUser = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
                 <div className="max-w-5xl mx-auto px-4 py-8">
-                    <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700">
-                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
+                            <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={handleCancel}
                                         disabled={isFormDisabled}
-                                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                                        className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
                                     >
                                         <ArrowLeft size={18} />
                                         Back
                                     </button>
                                     <div className="flex items-center gap-3">
-                                        {isEditing ? <Edit size={24} className="text-white" /> : <UserPlus size={24} className="text-white" />}
+                                        {isEditing ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <UserPlus size={24} className="text-[var(--color-text-white)]" />}
                                         <div>
-                                            <h2 className="text-2xl font-bold text-white">
+                                            <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
                                                 {isEditing ? 'Edit User' : 'Create New User'}
                                             </h2>
                                             {userDataLoading && (
-                                                <p className="text-blue-100 text-sm mt-1 flex items-center">
+                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1 flex items-center">
                                                     <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                                                     Loading user data...
                                                 </p>
                                             )}
                                             {!userDataLoading && (
-                                                <p className="text-blue-100 text-sm mt-1">
+                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
                                                     {isEditing ? 'Update user details below' : 'Fill in the user details below'}
                                                 </p>
                                             )}
@@ -320,11 +320,11 @@ const AddUser = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-blue-200 shadow-xl overflow-hidden">
-                        <div className="px-6 py-4 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-blue-700">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-2xl border border-[var(--color-blue-light)] shadow-xl overflow-hidden">
+                        <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
                             <div className="flex items-center gap-3">
-                                <UserPlus className="w-5 h-5 text-white" />
-                                <h3 className="text-lg font-semibold text-white">User Information</h3>
+                                <UserPlus className="w-5 h-5 text-[var(--color-text-white)]" />
+                                <h3 className="text-lg font-semibold text-[var(--color-text-white)]">User Information</h3>
                             </div>
                         </div>
 
@@ -332,8 +332,8 @@ const AddUser = () => {
                             {/* Full Name */}
                             <div className="space-y-2">
                                 <label htmlFor="full_name" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                    <User className="w-4 h-4 text-blue-600" />
-                                    Full Name <span className="text-red-500">*</span>
+                                    <User className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                    Full Name <span className="text-[var(--color-error)]">*</span>
                                 </label>
                                 <div className="relative">
                                     <input
@@ -342,15 +342,15 @@ const AddUser = () => {
                                         name="full_name"
                                         value={formData.full_name}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter your full name"
                                         disabled={isFormDisabled}
                                     />
-                                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
                                 {errors.full_name && (
-                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                    <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
                                         {errors.full_name}
                                     </p>
@@ -360,8 +360,8 @@ const AddUser = () => {
                             {/* Phone Number */}
                             <div className="space-y-2">
                                 <label htmlFor="number" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                    <Phone className="w-4 h-4 text-blue-600" />
-                                    Phone Number <span className="text-red-500">*</span>
+                                    <Phone className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                    Phone Number <span className="text-[var(--color-error)]">*</span>
                                 </label>
                                 <div className="relative">
                                     <input
@@ -370,15 +370,15 @@ const AddUser = () => {
                                         name="number"
                                         value={formData.number}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.number ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.number ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter 10-digit phone number"
                                         disabled={isFormDisabled}
                                     />
-                                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
                                 {errors.number && (
-                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                    <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
                                         {errors.number}
                                     </p>
@@ -388,8 +388,8 @@ const AddUser = () => {
                             {/* Email */}
                             <div className="space-y-2">
                                 <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                    <Mail className="w-4 h-4 text-blue-600" />
-                                    Email Address <span className="text-red-500">*</span>
+                                    <Mail className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                    Email Address <span className="text-[var(--color-error)]">*</span>
                                 </label>
                                 <div className="relative">
                                     <input
@@ -398,15 +398,15 @@ const AddUser = () => {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.email ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.email ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter your email address"
                                         disabled={isFormDisabled}
                                     />
-                                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
                                 {errors.email && (
-                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                    <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
                                         {errors.email}
                                     </p>
@@ -416,9 +416,9 @@ const AddUser = () => {
                             {/* Password */}
                             <div className="space-y-2">
                                 <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                    <Lock className="w-4 h-4 text-blue-600" />
-                                    Password {!isEditing && <span className="text-red-500">*</span>}
-                                    {isEditing && <span className="text-gray-500 text-xs ml-2 bg-gray-100 px-2 py-1 rounded-full">(Leave blank to keep current password)</span>}
+                                    <Lock className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                    Password {!isEditing && <span className="text-[var(--color-error)]">*</span>}
+                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs ml-2 bg-[var(--color-bg-gradient-start)] px-2 py-1 rounded-full">(Leave blank to keep current password)</span>}
                                 </label>
                                 <div className="relative">
                                     <input
@@ -427,15 +427,15 @@ const AddUser = () => {
                                         name="password"
                                         value={formData.password}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${errors.password ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder={isEditing ? "Enter new password (optional)" : "Enter your password"}
                                         disabled={isFormDisabled}
                                     />
-                                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
                                 {errors.password && (
-                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                    <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
                                         {errors.password}
                                     </p>
@@ -445,8 +445,8 @@ const AddUser = () => {
                             {/* Role Selection */}
                             <div className="space-y-2">
                                 <label htmlFor="user_roles_id" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                                    <Shield className="w-4 h-4 text-blue-600" />
-                                    User Role <span className="text-red-500">*</span>
+                                    <Shield className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                    User Role <span className="text-[var(--color-error)]">*</span>
                                 </label>
                                 <div className="relative">
                                     <select
@@ -454,7 +454,7 @@ const AddUser = () => {
                                         name="user_roles_id"
                                         value={formData.user_roles_id}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none bg-white ${errors.user_roles_id ? 'border-red-300 bg-red-50/30' : 'border-gray-300 hover:border-blue-400'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 appearance-none bg-[var(--color-bg-secondary)] ${errors.user_roles_id ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         disabled={isFormDisabled}
                                     >
@@ -467,11 +467,11 @@ const AddUser = () => {
                                             </option>
                                         ))}
                                     </select>
-                                    <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                    <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+                                    <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
                                 {errors.user_roles_id && (
-                                    <p className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                                    <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4" />
                                         {errors.user_roles_id}
                                     </p>
@@ -479,11 +479,11 @@ const AddUser = () => {
                             </div>
 
                             {/* Form Actions */}
-                            <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
+                            <div className="flex items-center justify-end space-x-4 pt-8 border-t border-[var(--color-border-primary)]">
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-3 focus:ring-gray-500/20 transition-all duration-200"
+                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] rounded-xl shadow-sm hover:bg-[var(--color-bg-primary)] hover:border-gray-400 focus:outline-none focus:ring-3 focus:ring-gray-500/20 transition-all duration-200"
                                     disabled={isFormDisabled}
                                 >
                                     <X className="w-4 h-4" />
@@ -491,7 +491,7 @@ const AddUser = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-3 focus:ring-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                                     disabled={isFormDisabled}
                                 >
                                     {loading ? (

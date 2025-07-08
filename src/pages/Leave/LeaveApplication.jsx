@@ -238,13 +238,13 @@ const LeaveApplication = () => {
     if (isLoadingData) {
         return (
             <div className="max-w-2xl mx-auto px-4 py-8 w-full">
-                <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                    <div className="bg-blue-600 py-4 px-6">
-                        <h2 className="text-xl font-bold text-white">Apply for Leave</h2>
+                <div className="bg-[var(--color-bg-secondary)] shadow-lg rounded-lg overflow-hidden">
+                    <div className="bg-[var(--color-blue-dark)] py-4 px-6">
+                        <h2 className="text-xl font-bold text-[var(--color-text-white)]">Apply for Leave</h2>
                     </div>
                     <div className="p-6 text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)] mx-auto"></div>
+                        <p className="mt-4 text-[var(--color-text-secondary)]">Loading...</p>
                     </div>
                 </div>
             </div>
@@ -253,15 +253,15 @@ const LeaveApplication = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-8 w-full">
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                <div className="bg-blue-600 py-4 px-6">
-                    <h2 className="text-xl font-bold text-white">Apply for Leave</h2>
+            <div className="bg-[var(--color-bg-secondary)] shadow-lg rounded-lg overflow-hidden">
+                <div className="bg-[var(--color-blue-dark)] py-4 px-6">
+                    <h2 className="text-xl font-bold text-[var(--color-text-white)]">Apply for Leave</h2>
                 </div>
 
                 {notification.show && (
                     <div className={`mx-6 mt-4 px-4 py-3 text-sm font-medium rounded-md ${notification.type === 'success'
                         ? 'bg-green-100 text-green-700 border border-green-300'
-                        : 'bg-red-100 text-red-700 border border-red-300'
+                        : 'bg-[var(--color-error-light)] text-[var(--color-error-dark)] border border-red-300'
                         }`}>
                         {notification.message}
                     </div>
@@ -270,7 +270,7 @@ const LeaveApplication = () => {
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {/* Employee Selection with Search */}
                     <div className="space-y-2" ref={employeeDropdownRef}>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
                             Select Employee *
                         </label>
                         <div className="relative">
@@ -280,24 +280,24 @@ const LeaveApplication = () => {
                                 onChange={handleEmployeeSearch}
                                 onFocus={() => setShowEmployeeDropdown(true)}
                                 placeholder="Search and select employee"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                                 required
                             />
 
                             {showEmployeeDropdown && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div className="absolute z-10 w-full mt-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-md shadow-lg max-h-60 overflow-y-auto">
                                     {filteredEmployees.length > 0 ? (
                                         filteredEmployees.map((employee) => (
                                             <div
                                                 key={employee.employee_id}
                                                 onClick={() => selectEmployee(employee)}
-                                                className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                className="px-3 py-2 hover:bg-[var(--color-blue-lightest)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0"
                                             >
-                                                <div className="font-medium text-gray-900">{employee.full_name}</div>
+                                                <div className="font-medium text-[var(--color-text-primary)]">{employee.full_name}</div>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="px-3 py-2 text-gray-500">No employees found</div>
+                                        <div className="px-3 py-2 text-[var(--color-text-secondary)]">No employees found</div>
                                     )}
                                 </div>
                             )}
@@ -306,7 +306,7 @@ const LeaveApplication = () => {
 
                     {/* Leave Type Selection */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
                             Leave Type *
                         </label>
                         <select
@@ -314,7 +314,7 @@ const LeaveApplication = () => {
                             value={formData.leave_type}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                         >
                             <option value="">Select leave type</option>
                             {Array.isArray(leaveTypes) && leaveTypes.map((leaveType) => (
@@ -329,7 +329,7 @@ const LeaveApplication = () => {
                         {/* Start Date */}
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-800">
-                                Start Date <span className="text-red-500">*</span>
+                                Start Date <span className="text-[var(--color-error)]">*</span>
                             </label>
                             <div className="relative">
                                 <DatePicker
@@ -338,9 +338,9 @@ const LeaveApplication = () => {
                                     dateFormat="dd-MM-yyyy"
                                     placeholderText="DD-MM-YYYY"
                                     minDate={today}
-                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full pl-10 pr-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                                 />
-                                <div className="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
+                                <div className="absolute left-3 top-2.5 text-[var(--color-text-muted)] pointer-events-none">
                                     📅
                                 </div>
                             </div>
@@ -349,7 +349,7 @@ const LeaveApplication = () => {
                         {/* End Date */}
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-800">
-                                End Date <span className="text-red-500">*</span>
+                                End Date <span className="text-[var(--color-error)]">*</span>
                             </label>
                             <div className="relative">
                                 <DatePicker
@@ -360,9 +360,9 @@ const LeaveApplication = () => {
                                     dateFormat="dd-MM-yyyy"
                                     placeholderText="DD-MM-YYYY"
                                     minDate={formData.start_date || today}
-                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full pl-10 pr-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                                 />
-                                <div className="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
+                                <div className="absolute left-3 top-2.5 text-[var(--color-text-muted)] pointer-events-none">
                                     📅
                                 </div>
                             </div>
@@ -371,7 +371,7 @@ const LeaveApplication = () => {
 
                     {/* Reason */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
                             Reason for Leave *
                         </label>
                         <textarea
@@ -380,7 +380,7 @@ const LeaveApplication = () => {
                             onChange={handleChange}
                             required
                             rows="4"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
                             placeholder="Please provide details about your leave request"
                         />
                     </div>
@@ -390,13 +390,13 @@ const LeaveApplication = () => {
                         <button
                             type="button"
                             onClick={resetForm}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                            className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                         >
                             Reset
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-blue-dark)] hover:bg-[var(--color-blue-darker)] rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-blue)] disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit Request'}
