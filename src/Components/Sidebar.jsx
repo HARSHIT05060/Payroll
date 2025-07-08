@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Home,
@@ -22,6 +22,7 @@ const Sidebar = () => {
     const location = useLocation();
     const currentPath = location.pathname;
     const [expandedSubmenu, setExpandedSubmenu] = useState(null);
+    const [lastActiveItem, setLastActiveItem] = useState('dashboard');
     const navigate = useNavigate();
     const permissions = useSelector(state => state.permissions) || {};
 
@@ -45,7 +46,7 @@ const Sidebar = () => {
                 permissions?.department_view && { label: 'Department', path: '/departments' },
                 permissions?.designation_view && { label: 'Designation', path: '/designation' },
                 permissions?.branch_view && { label: 'Branch', path: '/branches' },
-            ].filter(Boolean) // remove false values from submenu
+            ].filter(Boolean)
         },
 
         (permissions?.shift_view) && {
@@ -69,8 +70,6 @@ const Sidebar = () => {
             submenu: [
                 (permissions?.leave_view) && { label: 'Leave Requests', path: '/leavestatusPage' },
                 (permissions?.leave_create) && { label: 'Leave Application', path: '/leaveapplication' },
-                // { label: 'Holiday Calendar', path: '/holidaycalender' },
-                // { label: 'Policy', path: '/leaves/policy' }
             ].filter(Boolean)
         },
 
@@ -82,7 +81,6 @@ const Sidebar = () => {
             path: '/monthly-payroll',
             tag: 'New',
             submenu: [
-                // { label: 'Bulk Attendance', path: '/bulk-attendance' },
                 { label: 'Monthly Payroll', path: '/monthly-payroll' },
                 { label: 'Finalize Payroll', path: '/Finalize-payroll' },
             ]
@@ -144,7 +142,7 @@ const Sidebar = () => {
             submenu: [
             ]
         }
-    ].filter(Boolean); // Remove any false menu items
+    ].filter(Boolean);
 
     const getActiveItemId = () => {
         for (const item of menuItems) {
@@ -155,7 +153,7 @@ const Sidebar = () => {
                 }
             }
         }
-        return 'dashboard'; // default fallback
+        return null;
     };
 
     const getActiveSubmenuPath = () => {
@@ -169,21 +167,51 @@ const Sidebar = () => {
         return null;
     };
 
-    const activeItem = getActiveItemId();
+    // Function to check if a menu item has an active submenu item
+    const hasActiveSubmenuItem = (item) => {
+        if (!item.submenu) return false;
+        return item.submenu.some(subItem => subItem && currentPath === subItem.path);
+    };
+
+    // Function to get the menu item ID that should be expanded based on active submenu
+    const getExpandedMenuId = () => {
+        for (const item of menuItems) {
+            if (hasActiveSubmenuItem(item)) {
+                return item.id;
+            }
+        }
+        return null;
+    };
+
+    const currentActiveItem = getActiveItemId();
     const activeSubmenuPath = getActiveSubmenuPath();
+    const shouldExpandMenuId = getExpandedMenuId();
+
+    // Update last active item when a valid route is found
+    useEffect(() => {
+        if (currentActiveItem !== null) {
+            setLastActiveItem(currentActiveItem);
+        }
+    }, [currentActiveItem]);
+
+    // Auto-expand submenu when there's an active submenu item
+    useEffect(() => {
+        if (shouldExpandMenuId) {
+            setExpandedSubmenu(shouldExpandMenuId);
+        }
+    }, [shouldExpandMenuId, currentPath]);
+
+    const activeItem = currentActiveItem || lastActiveItem;
 
     const handleMenuClick = (item) => {
-        // Check if item has actual submenu
         const hasActualSubmenu = item.hasSubmenu && item.submenu && item.submenu.length > 0;
 
         if (hasActualSubmenu) {
             setExpandedSubmenu(expandedSubmenu === item.id ? null : item.id);
-            // Navigate to main path if it exists
             if (item.path) {
                 navigate(item.path);
             }
         } else if (item.path) {
-            // Navigate to path for items without submenu or with empty submenu
             setExpandedSubmenu(null);
             navigate(item.path);
         } else {
@@ -194,7 +222,7 @@ const Sidebar = () => {
     const getSubmenuHeight = (itemId) => {
         const submenu = menuItems.find(item => item.id === itemId)?.submenu;
         if (!submenu) return 0;
-        return submenu.length * 40 + 60; // 40px per item + padding
+        return submenu.length * 40 + 60;
     };
 
     const hasActualSubmenu = (item) => {
@@ -203,15 +231,12 @@ const Sidebar = () => {
 
     return (
         <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 to-white border-r border-gray-200 shadow-lg transition-all duration-300 w-64 z-40">
-            {/* Scrollable Navigation Container */}
             <div className="h-[calc(100%-140px)] relative">
-                {/* Top fade overlay */}
                 <div className="absolute top-0 left-0 right-0 h-4 z-10 scrollbar-fade-top"></div>
 
-                {/* Scrollable content */}
                 <div className="h-full overflow-y-auto custom-scrollbar py-4 px-3 pb-6">
                     {menuItems.map((item) => {
-                        if (!item) return null; // Skip false/null items
+                        if (!item) return null;
 
                         const Icon = item.icon;
                         const isActive = activeItem === item.id;
@@ -221,7 +246,6 @@ const Sidebar = () => {
                         return (
                             <div key={item.id} className="mb-1">
                                 {hasSubmenu ? (
-                                    // Menu item with submenu
                                     <div
                                         className={`
                                             relative cursor-pointer rounded-xl transition-all duration-300 group
@@ -269,7 +293,6 @@ const Sidebar = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    // Menu item without submenu (using Link)
                                     <Link
                                         to={item.path}
                                         className={`
@@ -309,7 +332,6 @@ const Sidebar = () => {
                                     </Link>
                                 )}
 
-                                {/* Animated Submenu */}
                                 {hasSubmenu && (
                                     <div
                                         className="overflow-hidden transition-all duration-500 ease-in-out"
@@ -320,7 +342,7 @@ const Sidebar = () => {
                                     >
                                         <div className="ml-6 mt-2 space-y-2">
                                             {item.submenu?.map((subItem, index) => {
-                                                if (!subItem) return null; // Skip false/null subitems
+                                                if (!subItem) return null;
 
                                                 const isSubmenuActive = activeSubmenuPath === subItem.path;
                                                 const isMaster = subItem.label === 'Master';
@@ -367,15 +389,12 @@ const Sidebar = () => {
                         );
                     })}
 
-                    {/* Extra padding at bottom for better scrolling */}
                     <div className="h-4"></div>
                 </div>
 
-                {/* Bottom fade overlay */}
                 <div className="absolute bottom-0 left-0 right-0 h-4 z-10 scrollbar-fade-bottom"></div>
             </div>
 
-            {/* Enhanced Footer */}
             <div className="absolute bottom-0 left-0 right-0 border-t border-gray-100 p-4 bg-gradient-to-r from-gray-50 to-blue-50">
                 <div className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
                     <div className="p-2 bg-blue-100 rounded-lg">
