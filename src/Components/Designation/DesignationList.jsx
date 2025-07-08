@@ -146,38 +146,6 @@ const DesignationList = () => {
                             showToast={showToast}
                         />
                     }
-
-                    {/* Search Bar */}
-                    {totalDesignations > 0 && (
-                        <div className="bg-blue-50/30 border border-gray-100 rounded-lg p-4">
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search designations by name, description, level, or department..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400 bg-white"
-                                />
-                                {searchTerm && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 text-gray-400 transition-colors"
-                                    >
-                                        <X className="h-5 w-5" />
-                                    </button>
-                                )}
-                            </div>
-                            {searchTerm && (
-                                <p className="text-sm text-blue-600 mt-2">
-                                    Showing {filteredCount} of {totalDesignations} designations
-                                </p>
-                            )}
-                        </div>
-                    )}
-
                     {totalDesignations === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">

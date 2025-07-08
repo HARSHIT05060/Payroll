@@ -285,9 +285,9 @@ const AddUser = () => {
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center space-x-3">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700">
+                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                                <div className="flex items-center gap-4">
                                     <button
                                         onClick={handleCancel}
                                         disabled={isFormDisabled}

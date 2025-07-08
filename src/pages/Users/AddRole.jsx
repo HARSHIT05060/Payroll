@@ -551,34 +551,10 @@ const AddRole = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-5xl mx-auto px-4 py-8">
-                {/* Toast Notification */}
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => closeToast()}
-                    />
-                )}
-
-                {/* Confirmation Modal */}
-                <ConfirmationModal
-                    isOpen={confirmModal.isOpen}
-                    onClose={() => setConfirmModal({ isOpen: false, type: '', data: null })}
-                    onConfirm={confirmModal.type === 'save' ? confirmSave : confirmCancel}
-                    title={confirmModal.type === 'save' ? 'Save Changes' : 'Discard Changes'}
-                    message={
-                        confirmModal.type === 'save'
-                            ? `Are you sure you want to ${isEditMode ? 'update' : 'create'} this role?`
-                            : 'Are you sure you want to discard all changes? This action cannot be undone.'
-                    }
-                    confirmText={confirmModal.type === 'save' ? 'Save' : 'Discard'}
-                    cancelText="Cancel"
-                />
-
                 <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center space-x-3">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700">
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+                            <div className="flex items-center gap-4">
                                 <button
                                     onClick={handleCancel}
                                     className="flex items-center gap-2 text-white/90 hover:text-white transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
@@ -742,6 +718,29 @@ const AddRole = () => {
                     </div>
                 </div>
             </div>
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => closeToast()}
+                />
+            )}
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ isOpen: false, type: '', data: null })}
+                onConfirm={confirmModal.type === 'save' ? confirmSave : confirmCancel}
+                title={confirmModal.type === 'save' ? 'Save Changes' : 'Discard Changes'}
+                message={
+                    confirmModal.type === 'save'
+                        ? `Are you sure you want to ${isEditMode ? 'update' : 'create'} this role?`
+                        : 'Are you sure you want to discard all changes? This action cannot be undone.'
+                }
+                confirmText={confirmModal.type === 'save' ? 'Save' : 'Discard'}
+                cancelText="Cancel"
+            />
         </div>
     );
 };

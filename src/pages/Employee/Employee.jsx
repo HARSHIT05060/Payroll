@@ -1,16 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     Pencil,
-    FileText,
     ChevronDown,
     ChevronUp,
-    UserCheck,
     Users,
     Plus,
     Search,
     ArrowLeft,
     RefreshCw,
-    XCircle
+    XCircle,
+    Eye
 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -455,7 +454,7 @@ export default function EmployeeManagement() {
                                                                         className="p-2 rounded-md transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-50"
                                                                         title="View Details"
                                                                     >
-                                                                        <FileText className="w-4 h-4" />
+                                                                        <Eye className="w-4 h-4" />
                                                                     </button>
                                                                 )}
                                                             </div>
