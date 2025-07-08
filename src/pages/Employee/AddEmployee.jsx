@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Plus, Trash2, ArrowLeft, User, Building, Credit
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
+import { Toast } from '../../Components/ui/Toast';
 
 const AddEmployee = () => {
     const { employeeId } = useParams(); // Get employee ID from URL params
@@ -13,6 +14,7 @@ const AddEmployee = () => {
     const queryParams = new URLSearchParams(location.search);
     const editEmployeeId = employeeId || queryParams.get('edit');
     const isEditMode = Boolean(editEmployeeId);
+    const [toast, setToast] = useState(null);
 
     const [formData, setFormData] = useState({
         // Basic Details
@@ -62,7 +64,7 @@ const AddEmployee = () => {
     const { user, isAuthenticated } = useAuth();
 
     const [expandedSections, setExpandedSections] = useState({
-        basicDetails: true,
+        basicDetails: false,
         bankDetails: false,
         legalDocuments: false,
         contactInformation: false,
@@ -273,6 +275,67 @@ const AddEmployee = () => {
         }
     }, [isEditMode, editEmployeeId, user, isAuthenticated, isLoadingDropdowns]);
 
+    const validateName = (name) => {
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!name.trim()) return 'Name is required';
+        if (!nameRegex.test(name)) return 'Name should only contain letters and spaces';
+        if (name.length < 2) return 'Name should be at least 2 characters long';
+        return '';
+    };
+
+    const validateMobile = (mobile) => {
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobile.trim()) return 'Mobile number is required';
+        if (!mobileRegex.test(mobile)) return 'Mobile number should be 10 digits starting with 6-9';
+        return '';
+    };
+
+    const validateEmail = (email) => {
+        if (!email.trim()) return ''; // Email is optional
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) return 'Please enter a valid email address';
+        return '';
+    };
+
+    const validateBankAccount = (accountNo) => {
+        if (!accountNo.trim()) return 'Account number is required';
+        if (accountNo.length < 9 || accountNo.length > 18) return 'Account number should be 9-18 digits';
+        if (!/^\d+$/.test(accountNo)) return 'Account number should only contain numbers';
+        return '';
+    };
+
+    const validateIFSC = (ifsc) => {
+        const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!ifsc.trim()) return 'IFSC code is required';
+        if (!ifscRegex.test(ifsc.toUpperCase())) return 'Please enter a valid IFSC code (e.g., SBIN0123456)';
+        return '';
+    };
+
+    const validateBankName = (bankName) => {
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!bankName.trim()) return 'Bank name is required';
+        if (!nameRegex.test(bankName)) return 'Bank name should only contain letters and spaces';
+        return '';
+    };
+
+    const validateBranchName = (branchName) => {
+        const branchRegex = /^[a-zA-Z\s]+$/;
+        if (!branchName.trim()) return 'Branch name is required';
+        if (!branchRegex.test(branchName)) return 'Branch name should only contain letters and spaces';
+        return '';
+    };
+
+    const validateEmployeeCode = (code) => {
+        if (!code.trim()) return 'Employee code is required';
+        if (code.length < 3) return 'Employee code should be at least 3 characters long';
+        return '';
+    };
+
+    const validateSalary = (salary) => {
+        if (!salary) return ''; // Salary is optional
+        if (isNaN(salary) || parseFloat(salary) < 0) return 'Salary should be a valid positive number';
+        return '';
+    };
 
 
 
@@ -282,15 +345,101 @@ const AddEmployee = () => {
         if (type === 'file') {
             const file = files[0];
             if (file) {
+                // File size validation (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    setToast({ message: 'File size should not exceed 5MB', type: 'error' });
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    setFormData(prev => ({ ...prev, [name]: file })); // Store the actual file object
-                    setFilePreviews(prev => ({ ...prev, [name]: reader.result })); // Store base64 for preview
+                    setFormData(prev => ({ ...prev, [name]: file }));
+                    setFilePreviews(prev => ({ ...prev, [name]: reader.result }));
                 };
                 reader.readAsDataURL(file);
             }
         } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            let processedValue = value;
+
+            // Real-time validation and formatting
+            switch (name) {
+                case 'name':
+                case 'contactPersonName':
+                    // Remove numbers and special characters
+                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    break;
+
+                case 'mobile':
+                case 'emergencyContactNo':
+                case 'loginMobileNo':
+                    // Only allow numbers and limit to 10 digits
+                    processedValue = value.replace(/\D/g, '').slice(0, 10);
+                    break;
+
+                case 'accountNo':
+                    // Only allow numbers for account number
+                    processedValue = value.replace(/\D/g, '').slice(0, 18);
+                    break;
+
+                case 'ifscCode':
+                    // Convert to uppercase and limit to 11 characters
+                    processedValue = value.toUpperCase().slice(0, 11);
+                    break;
+
+                case 'bankName':
+                case 'branchName':
+                    // Only allow letters and spaces
+                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    break;
+
+                case 'salary':
+                    // Only allow numbers and decimal point
+                    processedValue = value.replace(/[^0-9.]/g, '');
+                    break;
+
+                case 'employeeCode':
+                    // Remove spaces and special characters except hyphen and underscore
+                    processedValue = value.replace(/[^a-zA-Z0-9-_]/g, '');
+                    break;
+            }
+
+            setFormData(prev => ({ ...prev, [name]: processedValue }));
+        }
+    };
+    const validateField = (fieldName, value) => {
+        switch (fieldName) {
+            case 'name':
+            case 'contactPersonName':
+                return validateName(value);
+            case 'mobile':
+            case 'emergencyContactNo':
+            case 'loginMobileNo':
+                return validateMobile(value);
+            case 'email':
+                return validateEmail(value);
+            case 'employeeCode':
+                return validateEmployeeCode(value);
+            case 'bankName':
+                return validateBankName(value);
+            case 'branchName':
+                return validateBranchName(value);
+            case 'accountNo':
+                return validateBankAccount(value);
+            case 'ifscCode':
+                return validateIFSC(value);
+            case 'salary':
+                return validateSalary(value);
+            default:
+                return '';
+        }
+    };
+
+    const handleFieldBlur = (e) => {
+        const { name, value } = e.target;
+        const error = validateField(name, value);
+
+        if (error) {
+            setToast({ message: error, type: 'error' });
         }
     };
 
@@ -324,31 +473,50 @@ const AddEmployee = () => {
     const validateForm = () => {
         const errors = [];
 
-        // Basic Details validation
-        if (!formData.employeeCode.trim()) errors.push('Employee Code');
-        if (!formData.name.trim()) errors.push('Full Name');
-        if (!formData.mobile.trim()) errors.push('Mobile Number');
-        if (!formData.gender) errors.push('Gender');
-        if (!formData.branch) errors.push('Branch');
-        if (!formData.department) errors.push('Department');
-        if (!formData.designation) errors.push('Designation');
+        // Validate all fields
+        const fieldsToValidate = [
+            { name: 'employeeCode', value: formData.employeeCode },
+            { name: 'name', value: formData.name },
+            { name: 'mobile', value: formData.mobile },
+            { name: 'email', value: formData.email },
+            { name: 'bankName', value: formData.bankName },
+            { name: 'branchName', value: formData.branchName },
+            { name: 'accountNo', value: formData.accountNo },
+            { name: 'ifscCode', value: formData.ifscCode },
+            { name: 'salary', value: formData.salary }
+        ];
 
-        // Bank Details validation
-        if (!formData.bankName.trim()) errors.push('Bank Name');
-        if (!formData.branchName.trim()) errors.push('Branch Name');
-        if (!formData.accountNo.trim()) errors.push('Account Number');
-        if (!formData.ifscCode.trim()) errors.push('IFSC Code');
-
-        // Credentials validation
         if (!isEditMode) {
-            if (!formData.loginMobileNo.trim()) errors.push('Login Mobile Number');
-            if (!formData.password.trim()) errors.push('Password');
+            fieldsToValidate.push(
+                { name: 'loginMobileNo', value: formData.loginMobileNo },
+                { name: 'password', value: formData.password }
+            );
         }
-        // References validation
 
+        fieldsToValidate.forEach(field => {
+            const error = validateField(field.name, field.value);
+            if (error) {
+                errors.push(error);
+            }
+        });
+
+        // Check required dropdowns
+        if (!formData.gender) errors.push('Gender is required');
+        if (!formData.branch) errors.push('Branch is required');
+        if (!formData.department) errors.push('Department is required');
+        if (!formData.designation) errors.push('Designation is required');
+
+        // File validation for new employees
         if (!isEditMode) {
-            if (!formData.aadharCard) errors.push('Aadhar Card');
-            if (!formData.panCard) errors.push('PAN Card');
+            if (!formData.aadharCard) errors.push('Aadhar Card is required');
+            if (!formData.panCard) errors.push('PAN Card is required');
+        }
+
+        // Password validation for new employees
+        if (!isEditMode && formData.password) {
+            if (formData.password.length < 6) {
+                errors.push('Password should be at least 6 characters long');
+            }
         }
 
         return errors;
@@ -363,15 +531,11 @@ const AddEmployee = () => {
         const validationErrors = validateForm();
 
         if (validationErrors.length > 0) {
-            const errorMessage = validationErrors.length === 1
-                ? `Please fill in the required field: ${validationErrors[0]}`
-                : `Please fill in the following required fields: ${validationErrors.join(', ')}`;
-
-            setMessage({ type: 'error', text: errorMessage });
+            setToast({
+                message: validationErrors[0],
+                type: 'error'
+            });
             setIsSubmitting(false);
-
-            // Scroll to top to show the error message
-            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
@@ -672,6 +836,7 @@ const AddEmployee = () => {
                                                     name="employeeCode"
                                                     value={formData.employeeCode}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter employee code"
                                                     required
@@ -684,6 +849,7 @@ const AddEmployee = () => {
                                                     name="name"
                                                     value={formData.name}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter full name"
                                                     required
@@ -696,6 +862,7 @@ const AddEmployee = () => {
                                                     name="mobile"
                                                     value={formData.mobile}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter mobile number"
                                                     required
@@ -708,6 +875,7 @@ const AddEmployee = () => {
                                                     name="email"
                                                     value={formData.email}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter email address"
                                                 />
@@ -807,6 +975,7 @@ const AddEmployee = () => {
                                                     name="salary"
                                                     value={formData.salary}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter salary amount"
                                                 />
@@ -834,6 +1003,7 @@ const AddEmployee = () => {
                                                     name="bankName"
                                                     value={formData.bankName}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter bank name"
                                                     required
@@ -846,6 +1016,7 @@ const AddEmployee = () => {
                                                     name="branchName"
                                                     value={formData.branchName}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter branch name"
                                                     required
@@ -858,6 +1029,7 @@ const AddEmployee = () => {
                                                     name="accountNo"
                                                     value={formData.accountNo}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter account number"
                                                     required
@@ -870,6 +1042,7 @@ const AddEmployee = () => {
                                                     name="ifscCode"
                                                     value={formData.ifscCode}
                                                     onChange={handleInputChange}
+                                                    onBlur={handleFieldBlur}
                                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                     placeholder="Enter IFSC code"
                                                     required
@@ -1173,6 +1346,13 @@ const AddEmployee = () => {
                     </div>
                 </form>
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };

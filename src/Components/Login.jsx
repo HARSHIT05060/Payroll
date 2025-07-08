@@ -104,9 +104,9 @@ const Login = () => {
                 {/* Main Card */}
                 <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-8 py-8 text-center">
+                    <div className="bg-gradient-to-r from-blue-800 to-blue-700 px-8 py-8 text-center">
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                            <div className="w-8 h-8 bg-gradient-to-r from-slate-600 to-slate-800 rounded-full"></div>
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></div>
                         </div>
                         <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
                         <p className="text-slate-300 text-sm">Sign in to continue to your account</p>
@@ -180,7 +180,7 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-slate-800 to-slate-700 text-white py-4 rounded-xl font-semibold hover:from-slate-900 hover:to-slate-800 disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                                className="w-full bg-gradient-to-r from-blue-800 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-900 hover:to-blue-800 disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
