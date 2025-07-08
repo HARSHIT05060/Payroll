@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://attendance.2-min.in',
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 10000,
     // headers: {
     //     'Content-Type': 'application/json'
@@ -14,7 +14,7 @@ api.interceptors.request.use(
     (config) => {
         // Add basic auth credentials
         const username = 'attendance';
-        const password =  '20$tgbsv09u';    
+        const password = '20$tgbsv09u';
         const basicAuth = `Basic ${btoa(`${username}:${password}`)}`;
 
         config.headers.Authorization = basicAuth;
