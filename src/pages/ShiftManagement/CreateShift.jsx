@@ -635,7 +635,6 @@ const CreateShift = () => {
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                {isEditMode ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <Calendar size={24} className="text-[var(--color-text-white)]" />}
                                 <div>
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Shift Configuration' : 'Create New Shift'}

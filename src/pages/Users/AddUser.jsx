@@ -297,7 +297,6 @@ const AddUser = () => {
                                         Back
                                     </button>
                                     <div className="flex items-center gap-3">
-                                        {isEditing ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <UserPlus size={24} className="text-[var(--color-text-white)]" />}
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
                                                 {isEditing ? 'Edit User' : 'Create New User'}

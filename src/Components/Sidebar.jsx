@@ -106,7 +106,7 @@ const Sidebar = () => {
             path: '/reports',
             submenu: [
                 { label: 'All Reports', path: '/reports' },
-                { label: 'Attendance', path: '/reports/attendance' },
+                { label: 'Daily report', path: '/reports/daily-attendance' },
                 { label: 'Performance', path: '/reports/performance' },
                 { label: 'Financial', path: '/reports/financial' }
             ]

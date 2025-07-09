@@ -29,6 +29,7 @@ import AddLoanAdvance from './pages/Loan/AddLoanAdvance';
 import Configuration from './pages/Configuration/Configuration';
 import PricingComponent from './Components/PricingComponent';
 import AllReports from './pages/Report/AllReports';
+import DailyReport from './pages/Report/DailyReport';
 
 
 const App = () => {
@@ -158,6 +159,7 @@ const App = () => {
 
 
             <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
+            <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
 
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 

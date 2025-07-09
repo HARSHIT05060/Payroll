@@ -563,7 +563,6 @@ const AddRole = () => {
                                     Back
                                 </button>
                                 <div className="flex items-center gap-3">
-                                    {isEditMode ? <Edit size={24} className="text-[var(--color-text-white)]" /> : <UserPlus size={24} className="text-[var(--color-text-white)]" />}
                                     <div>
                                         <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             {isEditMode ? 'Edit Role' : 'Create New Role'}

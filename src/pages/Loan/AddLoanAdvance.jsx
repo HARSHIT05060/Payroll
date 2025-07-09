@@ -454,7 +454,6 @@ const AddLoanAdvance = ({
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                <IndianRupee size={24} className="text-[var(--color-text-white)]" />
                                 <div>
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
