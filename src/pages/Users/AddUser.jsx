@@ -282,7 +282,7 @@ const AddUser = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+            <div className="min-h-screen bg-[var(--color-bg-primary)]">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                         <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
@@ -342,7 +342,7 @@ const AddUser = () => {
                                         name="full_name"
                                         value={formData.full_name}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter your full name"
                                         disabled={isFormDisabled}
@@ -370,7 +370,7 @@ const AddUser = () => {
                                         name="number"
                                         value={formData.number}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.number ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.number ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter 10-digit phone number"
                                         disabled={isFormDisabled}
@@ -398,7 +398,7 @@ const AddUser = () => {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.email ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.email ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder="Enter your email address"
                                         disabled={isFormDisabled}
@@ -427,7 +427,7 @@ const AddUser = () => {
                                         name="password"
                                         value={formData.password}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         placeholder={isEditing ? "Enter new password (optional)" : "Enter your password"}
                                         disabled={isFormDisabled}
@@ -454,7 +454,7 @@ const AddUser = () => {
                                         name="user_roles_id"
                                         value={formData.user_roles_id}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 appearance-none bg-[var(--color-bg-secondary)] ${errors.user_roles_id ? 'border-red-300 bg-[var(--color-error-light)]/30' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 appearance-none bg-[var(--color-bg-secondary)] ${errors.user_roles_id ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
                                         disabled={isFormDisabled}
                                     >
@@ -491,7 +491,7 @@ const AddUser = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                                     disabled={isFormDisabled}
                                 >
                                     {loading ? (

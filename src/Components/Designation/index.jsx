@@ -34,7 +34,7 @@ const Designation = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-primary)] via-[var(--color-blue-lightest)]/30 to-indigo-50/30">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto">
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">

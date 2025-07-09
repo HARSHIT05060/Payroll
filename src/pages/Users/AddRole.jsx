@@ -549,7 +549,7 @@ const AddRole = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
@@ -599,7 +599,7 @@ const AddRole = () => {
                                     id="role_name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/20 focus:border-[var(--color-blue)] transition-all duration-200 border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]"
+                                    className="w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]"
                                     placeholder="Enter role name"
                                 />
                                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
@@ -650,7 +650,7 @@ const AddRole = () => {
                                         </div>
 
                                         <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                                            <div className="p-6 space-y-6 bg-[var(--color-bg-primary)]/30 border-t border-[var(--color-border-primary)]">
+                                            <div className="p-6 space-y-6 bg-[var(--color-bg-primary)] border-t border-[var(--color-border-primary)]">
                                                 {Object.entries(config.subsections).map(([subsectionKey, subsection]) => {
                                                     const subsectionPerms = permissions[sectionKey]?.[subsectionKey] || {};
 
@@ -709,7 +709,7 @@ const AddRole = () => {
                             </button>
                             <button
                                 onClick={handleSaveChanges}
-                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)]/50 transition-all duration-200 transform hover:scale-105"
+                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[var(--color-text-white)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] border border-transparent rounded-xl shadow-lg hover:from-[var(--color-blue-darker)] hover:to-[var(--color-blue-darkest)] focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] transition-all duration-200 transform hover:scale-105"
                             >
                                 <Save className="w-4 h-4" />
                                 Save Changes

@@ -114,7 +114,7 @@ const AssignShift = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+            <div className="min-h-screen bg-[var(--color-bg-primary)]">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)]"></div>
@@ -125,7 +125,7 @@ const AssignShift = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Enhanced Header */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -156,7 +156,7 @@ const AssignShift = () => {
 
                 <div className="space-y-8">
                     {/* Enhanced Employee Selection */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
@@ -200,7 +200,7 @@ const AssignShift = () => {
                     </div>
 
                     {/* Enhanced Shift Selection */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -244,7 +244,7 @@ const AssignShift = () => {
                     </div>
 
                     {/* Enhanced Action Buttons */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="p-8">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ const AssignShift = () => {
                                         <div className="flex items-center gap-2">
                                             {submitting ? (
                                                 <>
-                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)]/30 rounded-full animate-spin border-t-white"></div>
+                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)] rounded-full animate-spin border-t-white"></div>
                                                     Assigning...
                                                 </>
                                             ) : (

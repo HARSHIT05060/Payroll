@@ -439,7 +439,7 @@ const AddLoanAdvance = ({
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Enhanced Header */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -479,7 +479,7 @@ const AddLoanAdvance = ({
 
                 <div className="space-y-8">
                     {/* Enhanced Employee Information */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
@@ -525,7 +525,7 @@ const AddLoanAdvance = ({
                     </div>
 
                     {/* Enhanced Loan Details */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -665,7 +665,7 @@ const AddLoanAdvance = ({
                     </div>
 
                     {/* Enhanced Dates and Status */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-violet-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -731,7 +731,7 @@ const AddLoanAdvance = ({
                     </div>
 
                     {/* Enhanced Guarantor Information */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-amber-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -782,7 +782,7 @@ const AddLoanAdvance = ({
                     </div>
 
                     {/* Enhanced Additional Information */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
@@ -818,7 +818,7 @@ const AddLoanAdvance = ({
                     </div>
 
                     {/* Enhanced Action Buttons */}
-                    <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         <div className="p-8">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -844,7 +844,7 @@ const AddLoanAdvance = ({
                                         <div className="flex items-center gap-2">
                                             {isSubmitting ? (
                                                 <>
-                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)]/30 rounded-full animate-spin border-t-white"></div>
+                                                    <div className="w-4 h-4 border-2 border-[var(--color-border-primary)] rounded-full animate-spin border-t-white"></div>
                                                     {existingLoan ? 'Updating...' : 'Creating...'}
                                                 </>
                                             ) : (

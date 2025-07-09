@@ -749,7 +749,7 @@ const AddEmployee = () => {
 
     if (isLoadingDropdowns || isLoadingEmployeeData) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)] flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl p-8 text-center">
                     <div className="w-8 h-8 border-4 border-[var(--color-blue-dark)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-[var(--color-text-secondary)]">
@@ -761,7 +761,7 @@ const AddEmployee = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">

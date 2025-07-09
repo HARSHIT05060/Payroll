@@ -248,7 +248,7 @@ const UserManagement = () => {
                                     {permissions['user_create'] && (
                                         <button
                                             onClick={() => navigate('/add-user')}
-                                            className="flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
+                                            className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <Plus className="w-4 h-4" />
                                             <span>Create User</span>

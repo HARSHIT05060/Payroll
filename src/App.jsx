@@ -28,6 +28,7 @@ import LoanAdvance from './pages/Loan/LoanAdvance';
 import AddLoanAdvance from './pages/Loan/AddLoanAdvance';
 import Configuration from './pages/Configuration/Configuration';
 import PricingComponent from './Components/PricingComponent';
+import AllReports from './pages/Report/AllReports';
 
 
 const App = () => {
@@ -154,10 +155,11 @@ const App = () => {
             {/* <Route path="/bulk-attendance" element={<ProtectedRoute><BulkAttendance /></ProtectedRoute>} /> */}
             <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
             <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
+
+
+            <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
+
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
-
-
-            <Route path="/dailyreport" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 
             <Route path="*" element={<Navigate to="/unauthorized" replace />} />
           </Routes>
