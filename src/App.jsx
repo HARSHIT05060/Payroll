@@ -156,6 +156,9 @@ const App = () => {
             <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 
+
+            <Route path="/dailyreport" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
+
             <Route path="*" element={<Navigate to="/unauthorized" replace />} />
           </Routes>
         </main>

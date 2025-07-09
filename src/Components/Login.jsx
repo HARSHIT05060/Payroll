@@ -108,7 +108,7 @@ const Login = () => {
                         <div className="w-16 h-16 bg-[var(--color-border-primary)] rounded-full flex items-center justify-center mx-auto mb-4">
                             <div className="w-8 h-8 bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] rounded-full"></div>
                         </div>
-                        <h1 className="text-2xl font-bold text-[var(--color-text-[var(--color-text-white)])] mb-2">Welcome Back</h1>
+                        <h1 className="text-2xl font-bold text-[var(--color-text-white)] mb-2">Welcome Back</h1>
                         <p className="text-[var(--color-bg-secondary)] text-sm">Sign in to continue to your account</p>
                     </div>
 
@@ -180,7 +180,7 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-[var(--color-blue-darkest)] to-[var(--color-blue-darker)] text-[var(--color-text-[var(--color-text-white)])] py-4 rounded-xl font-semibold hover:from-[var(--color-blue-darkest)] hover:to-[var(--color-blue-darkest)] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
+                                className="w-full bg-gradient-to-r from-[var(--color-blue-darkest)] to-[var(--color-blue-darker)] text-[var(--color-text-white)] py-4 rounded-xl font-semibold hover:from-[var(--color-blue-darkest)] hover:to-[var(--color-blue-darkest)] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200 shadow-lg"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
