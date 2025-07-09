@@ -23,7 +23,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 
 const MonthlyPayroll = () => {
   const [employees, setEmployees] = useState([]);
@@ -752,7 +752,7 @@ const MonthlyPayroll = () => {
 
       {/* Confirmation Modal */}
       {confirmModal.isOpen && (
-        <ConfirmationModal
+        <ConfirmDialog
           isOpen={confirmModal.isOpen}
           onClose={closeModal}
           onConfirm={confirmSubmitPayroll}

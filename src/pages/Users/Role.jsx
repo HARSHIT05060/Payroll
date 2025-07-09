@@ -5,7 +5,7 @@ import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import Pagination from '../../Components/Pagination'; // Import the Pagination component
 
 const Role = () => {
@@ -217,7 +217,7 @@ const Role = () => {
                                                 Role Management
                                             </h1>
                                             {totalRoles > 0 && (
-                                                <p className="text-[var(--color-text-white)]/80 text-sm">
+                                                <p className="text-[var(--color-text-white)] text-sm">
                                                     Total Roles: {totalRoles}
                                                 </p>
                                             )}
@@ -269,7 +269,7 @@ const Role = () => {
                                     <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                     <button
                                         onClick={handleRefresh}
-                                        className="inline-flex items-center space-x-2 bg-[var(--color-error-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-error-darker)] transition-colors"
+                                        className="inline-flex items-center space-x-2 bg-[var(--color-error)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-error-dark)] transition-colors"
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                         <span>Try Again</span>
@@ -416,7 +416,7 @@ const Role = () => {
             )}
 
             {/* Confirmation Modals */}
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
                 onClose={closeModal}
                 onConfirm={confirmDeleteRole}
@@ -427,7 +427,7 @@ const Role = () => {
                 type="danger"
             />
 
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen && confirmModal.type === 'edit'}
                 onClose={closeModal}
                 onConfirm={confirmEditRole}

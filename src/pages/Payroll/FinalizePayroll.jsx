@@ -481,7 +481,7 @@ export default function FinalizePayroll() {
                     Finalize Payroll
                   </h1>
                   {totalRecords > 0 && (
-                    <p className="text-[var(--color-text-white)]/80 text-sm mt-1">
+                    <p className="text-[var(--color-text-white)] text-sm mt-1">
                       Total Records: {totalRecords} | Page {currentPage} of {totalPages}
                     </p>
                   )}
@@ -684,7 +684,7 @@ export default function FinalizePayroll() {
                               )}
                               <button
                                 onClick={() => openDeleteModal(record)}
-                                className="inline-flex items-center space-x-1 bg-[var(--color-error-dark)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-error-darker)] transition-colors"
+                                className="inline-flex items-center space-x-1 bg-[var(--color-error)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-error-dark)] transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                                 <span>Delete</span>
@@ -1049,7 +1049,7 @@ export default function FinalizePayroll() {
               <button
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error-dark)] hover:bg-[var(--color-error-darker)] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {deleteLoading ? (
                   <div className="flex items-center space-x-2">

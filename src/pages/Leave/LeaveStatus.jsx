@@ -633,7 +633,7 @@ const LeaveManagement = () => {
                                     Cancel
                                 </button>
                                 <button
-                                    className="px-4 py-2 text-[var(--color-text-white)] bg-[var(--color-error-dark)] border border-transparent rounded-md shadow-sm hover:bg-[var(--color-error-darker)]"
+                                    className="px-4 py-2 text-[var(--color-text-white)] bg-[var(--color-error)] border border-transparent rounded-md shadow-sm hover:bg-[var(--color-error-dark)]"
                                     onClick={submitRejection}
                                 >
                                     Submit Rejection
@@ -767,7 +767,7 @@ const LeaveManagement = () => {
                                                         setViewModal({ isOpen: false, leaveData: null });
                                                         handleReject(viewModal.leaveData);
                                                     }}
-                                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error-dark)] rounded-md shadow hover:bg-[var(--color-error-darker)] transition"
+                                                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-error)] rounded-md shadow hover:bg-[var(--color-error-dark)] transition"
                                                 >
                                                     <XCircle className="w-4 h-4 mr-2 inline" />
                                                     Reject

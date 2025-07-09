@@ -15,7 +15,7 @@ import {
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import { useRef } from 'react';
 
 const AddRole = () => {
@@ -728,9 +728,10 @@ const AddRole = () => {
             )}
 
             {/* Confirmation Modal */}
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ isOpen: false, type: '', data: null })}
+                type="info"
                 onConfirm={confirmModal.type === 'save' ? confirmSave : confirmCancel}
                 title={confirmModal.type === 'save' ? 'Save Changes' : 'Discard Changes'}
                 message={

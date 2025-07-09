@@ -6,7 +6,7 @@ import api from '../../api/axiosInstance';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { LoanDetailsModal } from '../../Components/ui/LoanDetailsModal';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -413,7 +413,7 @@ const LoanAdvance = () => {
                 />
 
                 {/* Delete Confirmation Modal */}
-                <ConfirmationModal
+                <ConfirmDialog
                     isOpen={isDeleteModalOpen}
                     onClose={handleDeleteCancel}
                     onConfirm={handleDeleteConfirm}

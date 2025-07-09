@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, MapPin, Building2, AlertTriangle, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import BranchForm from "./BranchForm";
 import useBranches from "../../hooks/useBranches";
 
@@ -235,18 +235,18 @@ const BranchList = () => {
                     )}
                 </div>
 
-            </div>
-
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
                 onClose={closeModal}
                 onConfirm={confirmDeleteBranch}
-                title="Delete User"
-                message={`Are you sure you want to delete "${confirmModal.data?.full_name || 'this Branch'}"? This action cannot be undone.`}
+                title="Delete Branch"
+                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Branch'}"? This action cannot be undone.`}
                 confirmText="Delete"
                 cancelText="Cancel"
                 type="danger"
             />
+            </div>
+
         </>
     );
 };

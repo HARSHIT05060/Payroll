@@ -480,7 +480,7 @@ const AddLoanAdvance = ({
                 <div className="space-y-8">
                     {/* Enhanced Employee Information */}
                     <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <User className="w-5 h-5 text-[var(--color-text-white)]" />

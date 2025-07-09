@@ -7,7 +7,7 @@ import { Toast } from '../../Components/ui/Toast';
 
 // Professional Loading Component
 const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] flex items-center justify-center">
         <div className="text-center">
             <div className="w-16 h-16 border-4 border-slate-200 rounded-full animate-spin border-t-blue-600 mx-auto"></div>
             <p className="mt-6 text-[var(--color-text-secondary)] font-medium text-lg">{message}</p>
@@ -621,7 +621,7 @@ const CreateShift = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-secondary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Enhanced Header */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -653,7 +653,7 @@ const CreateShift = () => {
                     {/* Enhanced Weekly Schedule Configuration */}
                     <div className="bg-[var(--color-bg-secondary)]/70 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
                         {/* Enhanced Basic Information */}
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)] rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <Settings className="w-5 h-5 text-[var(--color-text-white)]" />
@@ -706,7 +706,7 @@ const CreateShift = () => {
                         </div>
 
                         {/* Weekly Schedule Header */}
-                        <div className="px-8 py-6 border-t border-slate-200 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)]">
+                        <div className="px-8 py-6 border-t border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)]">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
@@ -727,7 +727,7 @@ const CreateShift = () => {
                                     return (
                                         <div key={day.day_id} className="bg-[var(--color-bg-secondary)] rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
                                             {/* Day Header */}
-                                            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[var(--color-bg-gradient-start)] to-[var(--color-blue-lightest)]/50 rounded-t-2xl">
+                                            <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)]/50 rounded-t-2xl">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-4">
                                                         <div

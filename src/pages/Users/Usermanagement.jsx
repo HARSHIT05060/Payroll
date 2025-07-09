@@ -5,7 +5,7 @@ import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
-import { ConfirmationModal } from '../../Components/ui/ConfirmationModal';
+import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import Pagination from '../../Components/Pagination';
 
 const ITEMS_PER_PAGE = 10;
@@ -229,7 +229,7 @@ const UserManagement = () => {
                                                 User Management
                                             </h1>
                                             {totalUsers > 0 && (
-                                                <p className="text-[var(--color-text-white)]/80 text-sm mt-1">
+                                                <p className="text-[var(--color-text-white)] text-sm mt-1">
                                                     Total Users: {totalUsers}
                                                 </p>
                                             )}
@@ -437,7 +437,7 @@ const UserManagement = () => {
             )}
 
             {/* Confirmation Modals */}
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
                 onClose={closeModal}
                 onConfirm={confirmDeleteUser}
@@ -449,7 +449,7 @@ const UserManagement = () => {
             />
 
             {/* Confirmation Modals */}
-            <ConfirmationModal
+            <ConfirmDialog
                 isOpen={confirmModal.isOpen && confirmModal.type === 'edit'}
                 onClose={closeModal}
                 onConfirm={confirmEditUser}

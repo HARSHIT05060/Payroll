@@ -13,7 +13,7 @@ export const ConfirmDialog = ({
     const getButtonStyles = () => {
         switch (type) {
             case 'danger':
-                return 'bg-[var(--color-error-dark)] hover:bg-[var(--color-error-darker)] text-[var(--color-text-white)]';
+                return 'bg-[var(--color-error)] hover:bg-[var(--color-error)] text-[var(--color-text-white)]';
             case 'warning':
                 return 'bg-yellow-600 hover:bg-yellow-700 text-[var(--color-text-white)]';
             case 'info':

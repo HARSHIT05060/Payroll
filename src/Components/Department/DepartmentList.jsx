@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, Users, AlertTriangle, X, Search } from "lucide-react";
 import { useSelector } from 'react-redux';
-import { ConfirmationModal } from '../ui/ConfirmationModal';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import DepartmentForm from "./DepartmentForm";
 import useDepartments from "../../hooks/useDepartments";
 
@@ -223,18 +223,18 @@ const DepartmentList = () => {
                         </div>
                     )}
                 </div>
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
+                    onClose={closeModal}
+                    onConfirm={confirmDeleteDepartment}
+                    title="Delete Department"
+                    message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Department'}"? This action cannot be undone.`}
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    type="danger"
+                />
             </div>
 
-            <ConfirmationModal
-                isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
-                onClose={closeModal}
-                onConfirm={confirmDeleteDepartment}
-                title="Delete Department"
-                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Department'}"? This action cannot be undone.`}
-                confirmText="Delete"
-                cancelText="Cancel"
-                type="danger"
-            />
         </>
     );
 };

@@ -302,7 +302,7 @@ const EmployeeDetail = () => {
             {/* Toast Notification */}
             {toast && (
                 <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${toast.type === 'success' ? 'bg-[var(--color-success-medium)] text-[var(--color-text-white)]' :
-                    toast.type === 'error' ? 'bg-[var(--color-error-dark)] text-[var(--color-text-white)]' :
+                    toast.type === 'error' ? 'bg-[var(--color-error)] text-[var(--color-text-white)]' :
                         'bg-[var(--color-blue-dark)] text-[var(--color-text-white)]'
                     }`}>
                     <div className="flex items-center">
@@ -415,7 +415,7 @@ const EmployeeDetail = () => {
                             {permissions['employee_delete'] &&
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
-                                    className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-darker)] transition-colors font-medium"
+                                    className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
                                 >
                                     <Trash2 size={18} className="mr-2" />
                                     Delete Employee
@@ -660,7 +660,7 @@ const EmployeeDetail = () => {
                                 </button>
                                 <button
                                     onClick={handleDeleteClick}
-                                    className="flex-1 px-4 py-2 bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-darker)] transition-colors font-medium flex items-center justify-center"
+                                    className="flex-1 px-4 py-2 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium flex items-center justify-center"
                                     disabled={loading}
                                 >
                                     {loading && <Loader2 size={16} className="animate-spin mr-2" />}
