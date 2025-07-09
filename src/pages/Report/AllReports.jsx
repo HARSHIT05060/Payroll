@@ -46,6 +46,24 @@ const AllReports = () => {
             ]
         },
         {
+            id: 'attendance-summary',
+            title: 'Attendance Summary',
+            icon: BarChart3,
+            color: 'from-purple-500 to-purple-600',
+            description: 'Generate attendance summaries for different periods',
+            path: '/reports/Monthly-attendance',
+            apiEndpoint: 'daily_attendance_report_list',
+            category: 'attendance',
+            isAvailable: true,
+            features: [
+                'Weekly attendance trends',
+                'Monthly summaries',
+                'Attendance rate calculations',
+                'Department-wise analysis',
+                'Export to CSV/PDF'
+            ]
+        },
+        {
             id: 'employee-list',
             title: 'Employee Directory',
             icon: Users,
@@ -64,24 +82,7 @@ const AllReports = () => {
                 'Export employee data'
             ]
         },
-        {
-            id: 'attendance-summary',
-            title: 'Attendance Summary',
-            icon: BarChart3,
-            color: 'from-purple-500 to-purple-600',
-            description: 'Generate attendance summaries for different periods',
-            path: '/reports/attendance-summary',
-            apiEndpoint: 'daily_attendance_report_list',
-            category: 'attendance',
-            isAvailable: true,
-            features: [
-                'Weekly attendance trends',
-                'Monthly summaries',
-                'Attendance rate calculations',
-                'Department-wise analysis',
-                'Export to CSV/PDF'
-            ]
-        },
+
     ];
 
     const comingSoonReports = [
@@ -170,7 +171,7 @@ const AllReports = () => {
                             </span>
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         {availableReports.map((report) => (
                             <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105">
@@ -236,7 +237,7 @@ const AllReports = () => {
                             </span>
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         {comingSoonReports.map((report) => (
                             <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden opacity-75 hover:opacity-85 transition-opacity">

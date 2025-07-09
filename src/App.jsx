@@ -30,6 +30,7 @@ import Configuration from './pages/Configuration/Configuration';
 import PricingComponent from './Components/PricingComponent';
 import AllReports from './pages/Report/AllReports';
 import DailyReport from './pages/Report/DailyReport';
+import MonthlyReport from './pages/Report/MOthlyReport';
 
 
 const App = () => {
@@ -160,6 +161,7 @@ const App = () => {
 
             <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
             <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
+            <Route path="/reports/Monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
 
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 
