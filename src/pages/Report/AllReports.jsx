@@ -71,7 +71,7 @@ const AllReports = () => {
             icon: Users,
             color: 'from-green-500 to-green-600',
             description: 'Complete employee information and records',
-            path: '/reports/employee-directory',
+            path: '/reports/daterangereport',
             category: 'employees',
             isAvailable: true,
             features: [

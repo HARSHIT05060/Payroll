@@ -4,6 +4,7 @@ import { Bell, ChevronDown, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { clearPermissions } from '../redux/permissionsSlice';
+import { ThemeToggle } from '../context/Themetoggle';
 const Navbar = () => {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -46,6 +47,7 @@ const Navbar = () => {
 
             {/* Right side - User menu */}
             <div className="flex items-center space-x-4">
+                <ThemeToggle />
                 {/* Notifications */}
                 <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] rounded-full transition-colors">
                     <Bell size={20} />
