@@ -30,7 +30,7 @@ import Configuration from './pages/Configuration/Configuration';
 import PricingComponent from './Components/PricingComponent';
 import AllReports from './pages/Report/AllReports';
 import DailyReport from './pages/Report/DailyReport';
-import MonthlyReport from './pages/Report/MOthlyReport';
+import MonthlyReport from './pages/Report/MothlyReport';
 
 
 const App = () => {
