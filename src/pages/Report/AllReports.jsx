@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
@@ -13,9 +14,11 @@ import {
     DollarSign,
     AlertCircle
 } from 'lucide-react';
+import { Toast } from '../../Components/ui/Toast'; // Adjust import path as needed
 
 const AllReports = () => {
     const navigate = useNavigate();
+    const [toast, setToast] = useState(null);
 
     const availableReports = [
         {
@@ -117,18 +120,45 @@ const AllReports = () => {
         },
     ];
 
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
+
+    const hideToast = () => {
+        setToast(null);
+    };
+
     const handleReportClick = (report) => {
         if (report.isAvailable) {
-            navigate(report.path);
+            try {
+                navigate(report.path);
+            } catch (error) {
+                showToast('Failed to navigate to report. Please try again.', error);
+            }
+        } else {
+            showToast('This report is not available yet.', 'warning');
         }
     };
 
     const handleNavigateBack = () => {
-        navigate(-1);
+        try {
+            navigate(-1);
+        } catch (error) {
+            showToast('Failed to navigate back. Please try again.', error);
+        }
     };
 
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
+            {/* Toast Component */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={hideToast}
+                />
+            )}
+
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -279,8 +309,8 @@ const AllReports = () => {
                                             <span className="font-medium">Coming Soon</span>
                                         </div>
                                         <button
-                                            disabled
-                                            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] rounded-lg cursor-not-allowed"
+                                            onClick={() => handleReportClick(report)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] rounded-lg hover:bg-[var(--color-bg-gray-darker)] hover:text-[var(--color-text-primary)] transition-colors"
                                         >
                                             <AlertCircle className="h-4 w-4" />
                                             Not Available

@@ -6,6 +6,7 @@ import api from '../../api/axiosInstance';
 import { Calendar, Users, Building, Award, User, XCircle, CalendarX, FileText, Download, ArrowLeft, Filter, RefreshCw, AlertCircle, CheckCircle, Clock, BarChart3, Loader2, ChevronDown, FileDown, FileSpreadsheet, Coffee } from 'lucide-react';
 import { SearchableDropdown, StatusBadge, SummaryCard } from '../../Components/Report/ReportComponents';
 import Pagination from '../../Components/Pagination';
+import { Toast } from '../../Components/ui/Toast'; 
 import { exportMonthlyReportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
 import { exportToCSV } from '../../utils/exportUtils/csvExportMonthly';
 import { exportToExcel } from '../../utils/exportUtils/excelExportMonthly';
@@ -36,6 +37,9 @@ const MonthlyReport = () => {
     const [reportData, setReportData] = useState(null);
     const [error, setError] = useState(null);
 
+    // Toast state
+    const [toast, setToast] = useState(null);
+
     // Pagination states - simplified
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10); // Fixed items per page
@@ -44,6 +48,15 @@ const MonthlyReport = () => {
     // Refs for dropdown positioning
     const buttonRef = useRef(null);
     const [buttonPosition, setButtonPosition] = useState({ top: 0, left: 0, width: 0 });
+
+    // Toast helper function
+    const showToast = (message, type) => {
+        setToast({ message, type });
+    };
+
+    const closeToast = () => {
+        setToast(null);
+    };
 
     // Update button position when export dropdown is opened
     useEffect(() => {
@@ -152,8 +165,9 @@ const MonthlyReport = () => {
                 throw new Error(response.data?.message || 'Failed to fetch dropdown data');
             }
         } catch (err) {
-            console.error('Error fetching dropdown data:', err);
-            setError(err.message || 'Failed to load filter options');
+            const errorMessage = err.message || 'Failed to load filter options';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setDropdownLoading(false);
         }
@@ -190,8 +204,9 @@ const MonthlyReport = () => {
                 throw new Error(response.data?.message || 'Failed to fetch employees');
             }
         } catch (err) {
-            console.error('Error fetching employees:', err);
-            setError(err.message || 'Failed to load employees');
+            const errorMessage = err.message || 'Failed to load employees';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         }
     }, [user?.user_id, filters.branch_id, filters.department_id, filters.designation_id]);
 
@@ -223,12 +238,14 @@ const MonthlyReport = () => {
             if (response.data?.success && response.data.data) {
                 setReportData(response.data.data);
                 setCurrentPage(1); // Reset to first page
+                showToast('Report generated successfully!', 'success');
             } else {
                 throw new Error(response.data?.message || 'Failed to generate report');
             }
         } catch (err) {
-            console.error('Error generating report:', err);
-            setError(err.message || 'Failed to generate report');
+            const errorMessage = err.message || 'Failed to generate report';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setReportGenerating(false);
         }
@@ -275,68 +292,92 @@ const MonthlyReport = () => {
         setReportData(null);
         setError(null);
         setCurrentPage(1);
+        showToast('Filters reset successfully', 'success');
     };
 
     // Updated handleExportPDF function for the Monthly Report component
     const handleExportPDF = () => {
-        if (!reportData) return;
+        if (!reportData) {
+            showToast('No data available to export', 'error');
+            return;
+        }
 
-        const summaryStats = calculateSummaryStats(reportData);
-        const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
+        try {
+            const summaryStats = calculateSummaryStats(reportData);
+            const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
 
-        // Extract employee name from the dropdown format
-        const employeeName = selectedEmployee?.name || 'Unknown Employee';
-        const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
+            // Extract employee name from the dropdown format
+            const employeeName = selectedEmployee?.name || 'Unknown Employee';
+            const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
 
-        const title = `Monthly Attendance Report`;
+            const title = `Monthly Attendance Report`;
 
-        // Prepare employee info
-        const employeeInfo = {
-            name: cleanEmployeeName,
-            id: filters.employee_id
-        };
+            // Prepare employee info
+            const employeeInfo = {
+                name: cleanEmployeeName,
+                id: filters.employee_id
+            };
 
-        // Prepare filter info with better formatting
-        const filterInfo = {
-            'Month/Year': filters.month_year ? new Date(filters.month_year + '-01').toLocaleDateString('en-GB', {
-                year: 'numeric',
-                month: 'long'
-            }) : 'N/A',
-            'Employee': cleanEmployeeName,
-            'Employee ID': filters.employee_id,
-            'Branch': filters.branch_id ? branches.find(b => b.id === filters.branch_id)?.name || filters.branch_id : 'All Branches',
-            'Department': filters.department_id ? departments.find(d => d.id === filters.department_id)?.name || filters.department_id : 'All Departments',
-            'Designation': filters.designation_id ? designations.find(d => d.id === filters.designation_id)?.name || filters.designation_id : 'All Designations'
-        };
+            // Prepare filter info with better formatting
+            const filterInfo = {
+                'Month/Year': filters.month_year ? new Date(filters.month_year + '-01').toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: 'long'
+                }) : 'N/A',
+                'Employee': cleanEmployeeName,
+                'Employee ID': filters.employee_id,
+                'Branch': filters.branch_id ? branches.find(b => b.id === filters.branch_id)?.name || filters.branch_id : 'All Branches',
+                'Department': filters.department_id ? departments.find(d => d.id === filters.department_id)?.name || filters.department_id : 'All Departments',
+                'Designation': filters.designation_id ? designations.find(d => d.id === filters.designation_id)?.name || filters.designation_id : 'All Designations'
+            };
 
-        const result = exportMonthlyReportToPDF(
-            reportData,
-            `attendance_report_${cleanEmployeeName.replace(/\s+/g, '_')}_${filters.month_year}.pdf`,
-            title,
-            summaryStats,
-            filterInfo,
-            employeeInfo
-        );
+            const result = exportMonthlyReportToPDF(
+                reportData,
+                `attendance_report_${cleanEmployeeName.replace(/\s+/g, '_')}_${filters.month_year}.pdf`,
+                title,
+                summaryStats,
+                filterInfo,
+                employeeInfo
+            );
 
-        if (result.success) {
-            console.log('PDF exported successfully!');
-            // You can add a toast notification here
-        } else {
-            console.error('Export failed:', result.message);
-            // You can add an error toast notification here
+            if (result.success) {
+                showToast('PDF exported successfully!', 'success');
+            } else {
+                throw new Error(result.message || 'Failed to export PDF');
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to export PDF', 'error');
         }
         setExportDropdown(false);
     };
 
     const handleExportCSV = () => {
-        if (!reportData) return;
-        exportToCSV(reportData, `attendance_report_${filters.month_year}.csv`);
+        if (!reportData) {
+            showToast('No data available to export', 'error');
+            return;
+        }
+
+        try {
+            exportToCSV(reportData, `attendance_report_${filters.month_year}.csv`);
+            showToast('CSV exported successfully!', 'success');
+        } catch (err) {
+            showToast('Failed to export CSV', err);
+        }
         setExportDropdown(false);
     };
 
     const handleExportExcel = () => {
-        if (!reportData) return;
-        exportToExcel(reportData, `attendance_report_${filters.month_year}.xlsx`);
+        if (!reportData) {
+            showToast('No data available to export', 'error');
+            return;
+        }
+
+        try {
+            exportToExcel(reportData, `attendance_report_${filters.month_year}.xlsx`);
+            showToast('Excel exported successfully!', 'success');
+        } catch (err) {
+            showToast('Failed to export Excel', err);
+        }
         setExportDropdown(false);
     };
 
@@ -483,7 +524,7 @@ const MonthlyReport = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-blue-50 rounded-lg">
-                            <Filter className="h-5 w-5 text-blue-600" />
+                            <Filter className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900">Report Filters</h2>
                         <button
@@ -603,7 +644,7 @@ const MonthlyReport = () => {
                             <button
                                 onClick={generateReport}
                                 disabled={reportGenerating || !filters.employee_id || !filters.month_year}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-white rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {reportGenerating ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -615,18 +656,6 @@ const MonthlyReport = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Error Message */}
-                {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                        <div className="flex items-center gap-2">
-                            <AlertCircle className="h-5 w-5 text-red-500" />
-                            <span className="text-red-700 font-medium">Error</span>
-                        </div>
-                        <p className="text-red-600 text-sm mt-1">{error}</p>
-                    </div>
-                )}
-
                 {/* Enhanced Summary Statistics */}
                 {summaryStats && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
@@ -869,6 +898,14 @@ const MonthlyReport = () => {
                     </div>
                 )}
             </div>
+            {/* Toast Component */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
         </div>
     );
 };

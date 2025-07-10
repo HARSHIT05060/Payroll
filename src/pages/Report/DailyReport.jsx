@@ -29,6 +29,7 @@ import { createPortal } from 'react-dom';
 import { exportToCSV } from '../../utils/exportUtils/csvExport';
 import { exportToExcel } from '../../utils/exportUtils/excelExport';
 import { exportToPDF } from '../../utils/exportUtils/pdfExport';
+import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
 
 const DailyReport = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -40,11 +41,20 @@ const DailyReport = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [exportDropdown, setExportDropdown] = useState(false);
+    const [toast, setToast] = useState(null);
 
     const navigate = useNavigate();
     const { user } = useAuth();
     const [buttonPosition, setButtonPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
     const buttonRef = useRef(null);
+
+    // Toast helper functions
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
+    const closeToast = () => {
+        setToast(null);
+    };
 
     useEffect(() => {
         if (buttonRef.current) {
@@ -78,8 +88,9 @@ const DailyReport = () => {
                 throw new Error(response.data?.message || 'Failed to fetch daily report');
             }
         } catch (err) {
-            console.error('Daily report fetch error:', err);
-            setError(err.message || 'An error occurred while fetching the report');
+            const errorMessage = err.message || 'An error occurred while fetching the report';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setLoading(false);
         }
@@ -148,15 +159,15 @@ const DailyReport = () => {
         const isWeekOff = employee.status === 'Week Off';
 
         if (isWeekOff) {
-            return 'text-purple-600 font-medium'; // Purple for week off
+            return 'text-purple-600 font-medium';
         }
         if (isLate) {
-            return 'text-yellow-600 font-medium'; // Yellow for late
+            return 'text-yellow-600 font-medium';
         }
         if (hasOvertime) {
-            return 'text-blue-600 font-medium'; // Blue for overtime
+            return 'text-blue-600 font-medium';
         }
-        return 'text-[var(--color-text-primary)]'; // Default color
+        return 'text-[var(--color-text-primary)]';
     };
 
     // Format time
@@ -173,67 +184,82 @@ const DailyReport = () => {
 
     // Export handlers using imported functions
     const handleExportToCSV = useCallback(() => {
-        const exportData = filteredData.map(emp => ({
-            'S.No': emp.sno,
-            'Employee Name': emp.employee_name,
-            'Employee Code': emp.employee_code || '',
-            'Shift': emp.shift_name,
-            'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
-            'Clock In': emp.attandance_first_clock_in || '--',
-            'Clock Out': emp.attandance_last_clock_out || '--',
-            'Working Hours': `${emp.shift_working_hours}h`,
-            'Attendance Hours': `${emp.attandance_hours}h`,
-            'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
-            'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
-        }));
+        try {
+            const exportData = filteredData.map(emp => ({
+                'S.No': emp.sno,
+                'Employee Name': emp.employee_name,
+                'Employee Code': emp.employee_code || '',
+                'Shift': emp.shift_name,
+                'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
+                'Clock In': emp.attandance_first_clock_in || '--',
+                'Clock Out': emp.attandance_last_clock_out || '--',
+                'Working Hours': `${emp.shift_working_hours}h`,
+                'Attendance Hours': `${emp.attandance_hours}h`,
+                'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
+                'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
+                'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
+            }));
 
-        const fileName = `daily_attendance_report_${selectedDate}`;
-        exportToCSV(exportData, fileName);
-        setExportDropdown(false);
+            const fileName = `daily_attendance_report_${selectedDate}`;
+            exportToCSV(exportData, fileName);
+            showToast('CSV exported successfully', 'success');
+            setExportDropdown(false);
+        } catch (err) {
+            showToast('Failed to export CSV', err);
+        }
     }, [filteredData, selectedDate]);
 
     const handleExportToExcel = useCallback(() => {
-        const exportData = filteredData.map(emp => ({
-            'S.No': emp.sno,
-            'Employee Name': emp.employee_name,
-            'Employee Code': emp.employee_code || '',
-            'Shift': emp.shift_name,
-            'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
-            'Clock In': emp.attandance_first_clock_in || '--',
-            'Clock Out': emp.attandance_last_clock_out || '--',
-            'Working Hours': `${emp.shift_working_hours}h`,
-            'Attendance Hours': `${emp.attandance_hours}h`,
-            'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
-            'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
-        }));
+        try {
+            const exportData = filteredData.map(emp => ({
+                'S.No': emp.sno,
+                'Employee Name': emp.employee_name,
+                'Employee Code': emp.employee_code || '',
+                'Shift': emp.shift_name,
+                'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
+                'Clock In': emp.attandance_first_clock_in || '--',
+                'Clock Out': emp.attandance_last_clock_out || '--',
+                'Working Hours': `${emp.shift_working_hours}h`,
+                'Attendance Hours': `${emp.attandance_hours}h`,
+                'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
+                'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
+                'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
+            }));
 
-        const fileName = `daily_attendance_report_${selectedDate}`;
-        exportToExcel(exportData, fileName);
-        setExportDropdown(false);
+            const fileName = `daily_attendance_report_${selectedDate}`;
+            exportToExcel(exportData, fileName);
+            showToast('Excel exported successfully', 'success');
+            setExportDropdown(false);
+        } catch (err) {
+            showToast('Failed to export Excel', err);
+        }
     }, [filteredData, selectedDate]);
 
     const handleExportToPDF = useCallback(() => {
-        const exportData = filteredData.map(emp => ({
-            'S.No': emp.sno,
-            'Employee Name': emp.employee_name,
-            'Employee Code': emp.employee_code || '',
-            'Shift': emp.shift_name,
-            'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
-            'Clock In': emp.attandance_first_clock_in || '--',
-            'Clock Out': emp.attandance_last_clock_out || '--',
-            'Working Hours': `${emp.shift_working_hours}h`,
-            'Attendance Hours': `${emp.attandance_hours}h`,
-            'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
-            'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
-        }));
+        try {
+            const exportData = filteredData.map(emp => ({
+                'S.No': emp.sno,
+                'Employee Name': emp.employee_name,
+                'Employee Code': emp.employee_code || '',
+                'Shift': emp.shift_name,
+                'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
+                'Clock In': emp.attandance_first_clock_in || '--',
+                'Clock Out': emp.attandance_last_clock_out || '--',
+                'Working Hours': `${emp.shift_working_hours}h`,
+                'Attendance Hours': `${emp.attandance_hours}h`,
+                'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
+                'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
+                'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
+            }));
 
-        const fileName = `daily_attendance_report_${selectedDate}`;
-        const title = `Daily Attendance Report - ${new Date(selectedDate).toLocaleDateString('en-GB')}`;
-        exportToPDF(exportData, fileName, title);
-        setExportDropdown(false);
+            const fileName = `daily_attendance_report_${selectedDate}`;
+            const title = `Daily Attendance Report - ${new Date(selectedDate).toLocaleDateString('en-GB')}`;
+            exportToPDF(exportData, fileName, title);
+            showToast('PDF exported successfully', 'success');
+            setExportDropdown(false);
+        } catch (err) {
+            showToast('Failed to export PDF', err);
+        }
     }, [filteredData, selectedDate]);
 
     // Clear search
@@ -241,10 +267,24 @@ const DailyReport = () => {
         setSearchQuery('');
     }, []);
 
+    // Handle retry
+    const handleRetry = () => {
+        setError(null);
+        fetchDailyReport(selectedDate);
+    };
+
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
+            {/* Toast Component */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
             <div className="p-6 max-w-7xl mx-auto">
-                {/* Header Section - Similar to Employee Management */}
+                {/* Header Section */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center justify-between">
@@ -295,7 +335,7 @@ const DailyReport = () => {
                                                 className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
-                                                    left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
+                                                    left: buttonPosition.left + buttonPosition.width - 192,
                                                 }}
                                             >
                                                 <button
@@ -454,15 +494,7 @@ const DailyReport = () => {
                         </div>
                     </div>
 
-                    {/* Close dropdown when clicking outside */}
-                    {exportDropdown && (
-                        <div
-                            className="fixed inset-0 z-0"
-                            onClick={() => setExportDropdown(false)}
-                        />
-                    )}
-
-                    {/* Loading and Error States */}
+                    {/* Loading State */}
                     {loading && (
                         <div className="px-6 py-12 text-center">
                             <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
@@ -472,14 +504,15 @@ const DailyReport = () => {
                         </div>
                     )}
 
-                    {error && (
+                    {/* Error State */}
+                    {error && !loading && (
                         <div className="px-6 py-12 text-center">
                             <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
                                 <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
                                 <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Report</p>
                                 <p className="text-[var(--color-text-error)] mb-4">{error}</p>
                                 <button
-                                    onClick={() => fetchDailyReport(selectedDate)}
+                                    onClick={handleRetry}
                                     className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
                                 >
                                     <RefreshCw className="w-4 h-4" />
@@ -752,6 +785,7 @@ const DailyReport = () => {
                     </div>
                 </div>
             )}
+
         </div>
 
     );
