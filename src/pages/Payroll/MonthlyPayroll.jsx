@@ -360,7 +360,7 @@ const MonthlyPayroll = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[var(--color-bg-primary)]">
+      <div className="min-h-screen bg-[var(--color-bg-secondary)]">
         <div className="p-6 max-w-7xl mx-auto">
           <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
             <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
@@ -393,7 +393,7 @@ const MonthlyPayroll = () => {
             </div>
 
             {/* Filter Section */}
-            <div className="p-6 border-b border-[var(--color-border-primary)] bg-[var(--color-bg-primary)]">
+            <div className="p-6 border-b border-[var(--color-border-primary)] bg-[var(--color-bg-secondary)]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Employee Search Dropdown */}
                 <div className="lg:col-span-2">
@@ -426,7 +426,7 @@ const MonthlyPayroll = () => {
                         {filteredEmployees.map((employee) => (
                           <div
                             key={employee.employee_id}
-                            className="p-3 hover:bg-[var(--color-bg-primary)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0"
+                            className="p-3 hover:bg-[var(--color-bg-secondary)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0"
                             onClick={() => handleEmployeeSelect(employee)}
                           >
                             <div className="flex flex-col">
@@ -535,7 +535,7 @@ const MonthlyPayroll = () => {
               </div>
             ) : employees.length === 0 ? (
               <div className="px-6 py-12 text-center">
-                <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-8">
                   <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Users className="w-8 h-8 text-[var(--color-text-muted)]" />
                   </div>
@@ -627,7 +627,7 @@ const MonthlyPayroll = () => {
                       {/* Attendance Table */}
                       <div className="overflow-x-auto">
                         <table className="w-full">
-                          <thead className="bg-[var(--color-bg-primary)]">
+                          <thead className="bg-[var(--color-bg-secondary)]">
                             <tr>
                               <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Date</th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Status</th>
@@ -639,7 +639,7 @@ const MonthlyPayroll = () => {
                           </thead>
                           <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                             {shiftData.attendance_arr?.map((attendance, attendanceIndex) => (
-                              <tr key={attendanceIndex} className="hover:bg-[var(--color-bg-primary)]">
+                              <tr key={attendanceIndex} className="hover:bg-[var(--color-bg-secondary)]">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                   {new Date(attendance.attendance_date).toLocaleDateString('en-GB')}
                                 </td>
@@ -726,7 +726,7 @@ const MonthlyPayroll = () => {
               </div>
             ) : (
               <div className="px-6 py-12 text-center">
-                <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-8">
                   <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
                     <FileText className="w-8 h-8 text-[var(--color-text-muted)]" />
                   </div>

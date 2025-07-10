@@ -10,7 +10,7 @@ export const exportToExcel = (reportData, filename, summaryStats = null) => {
         if (summaryStats) {
             const summaryData = [
                 ['Monthly Attendance Report Summary'],
-                ['Generated on:', `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`],
+                ['Generated on:', `${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`],
                 [''],
                 ['Summary Statistics'],
                 ['Metric', 'Value'],
@@ -63,7 +63,7 @@ export const exportToExcel = (reportData, filename, summaryStats = null) => {
         reportData.forEach(record => {
             attendanceData.push([
                 record.sno || '',
-                new Date(record.date).toLocaleDateString(),
+                new Date(record.date).toLocaleDateString('en-GB'),
                 record.employee_name || '',
                 record.shift_name || '',
                 record.shift_from_time || '',
@@ -158,7 +158,7 @@ export const exportToExcel = (reportData, filename, summaryStats = null) => {
         
         reportData.forEach(record => {
             analysisData.push([
-                new Date(record.date).toLocaleDateString(),
+                new Date(record.date).toLocaleDateString('en-GB'),
                 record.status || 'N/A',
                 record.attandance_hours || '0',
                 record.overtime_hours || '0',

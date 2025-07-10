@@ -572,7 +572,7 @@ export default function FinalizePayroll() {
             </div>
           ) : error ? (
             <div className="px-6 py-12 text-center">
-              <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+              <div className="bg-[var(--color-error-)] border border-[var(--color-border-error)] rounded-lg p-6">
                 <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
                 <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Salary Records</p>
                 <p className="text-[var(--color-text-error)] mb-4">{error}</p>

@@ -161,7 +161,7 @@ const App = () => {
 
             <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
             <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
-            <Route path="/reports/Monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
+            <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
 
             <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 

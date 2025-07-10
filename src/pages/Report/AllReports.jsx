@@ -8,17 +8,9 @@ import {
     Activity,
     CheckCircle,
     Eye,
-    Plus,
     ArrowLeft,
-    FileText,
-    Download,
-    PieChart,
     Target,
     DollarSign,
-    Award,
-    Building,
-    Timer,
-    UserCheck,
     AlertCircle
 } from 'lucide-react';
 
@@ -51,7 +43,7 @@ const AllReports = () => {
             icon: BarChart3,
             color: 'from-purple-500 to-purple-600',
             description: 'Generate attendance summaries for different periods',
-            path: '/reports/Monthly-attendance',
+            path: '/reports/monthly-attendance',
             apiEndpoint: 'daily_attendance_report_list',
             category: 'attendance',
             isAvailable: true,

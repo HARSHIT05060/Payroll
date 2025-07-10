@@ -5,7 +5,7 @@ export const exportToCSV = (reportData, filename, summaryStats = null) => {
         
         // Add title and timestamp
         csvContent += `Monthly Attendance Report\n`;
-        csvContent += `Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n\n`;
+        csvContent += `Generated on: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}\n\n`;
         
         // Add summary statistics if provided
         if (summaryStats) {
@@ -46,7 +46,7 @@ export const exportToCSV = (reportData, filename, summaryStats = null) => {
         reportData.forEach(record => {
             const row = [
                 record.sno || '',
-                new Date(record.date).toLocaleDateString(),
+                new Date(record.date).toLocaleDateString('en-GB'),
                 `"${record.employee_name || ''}"`, // Quoted to handle commas in names
                 `"${record.shift_name || ''}"`,
                 record.shift_from_time || '',

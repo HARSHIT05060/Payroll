@@ -1,211 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
-import {
-    Calendar,
-    Users,
-    Building,
-    Award,
-    User,
-    Search,
-    FileText,
-    Download,
-    ArrowLeft,
-    Filter,
-    RefreshCw,
-    AlertCircle,
-    CheckCircle,
-    Clock,
-    BarChart3,
-    Loader2,
-    ChevronDown,
-    X,
-    FileDown,
-    Eye,
-    TrendingUp,
-    Activity
-} from 'lucide-react';
-
-// Import your export functions (you'll need to create these files)
-import { exportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
-// import { exportToCSV } from '../../utils/exportToCSV';
-// import { exportToExcel } from '../../utils/exportToExcel';
-
-// Mock export functions for demonstration
-const exportToCSV = (data, filename) => {
-    console.log('Exporting to CSV:', { data, filename });
-    // Your CSV export logic here
-};
-
-const exportToExcel = (data, filename) => {
-    console.log('Exporting to Excel:', { data, filename });
-    // Your Excel export logic here
-};
-
-// Searchable Dropdown Component
-const SearchableDropdown = ({
-    options,
-    value,
-    onChange,
-    placeholder,
-    disabled,
-    displayKey = 'name',
-    valueKey = 'id',
-    className = ""
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [highlightedIndex, setHighlightedIndex] = useState(-1);
-    const dropdownRef = useRef(null);
-
-    const filteredOptions = options.filter(option =>
-        option[displayKey].toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const selectedOption = options.find(option => option[valueKey] === value);
-    const displayText = selectedOption ? selectedOption[displayKey] : '';
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(false);
-                setSearchTerm('');
-                setHighlightedIndex(-1);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleSelect = (option) => {
-        onChange(option[valueKey]);
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(-1);
-    };
-
-    const handleClear = () => {
-        onChange('');
-        setSearchTerm('');
-        setIsOpen(false);
-        setHighlightedIndex(-1);
-    };
-
-    return (
-        <div className={`relative ${className}`} ref={dropdownRef}>
-            <div
-                className={`w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent text-gray-900 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={() => !disabled && setIsOpen(true)}
-            >
-                <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                        {isOpen ? (
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-transparent outline-none"
-                                placeholder={placeholder}
-                                autoFocus
-                            />
-                        ) : (
-                            <span className={displayText ? 'text-gray-900' : 'text-gray-500'}>
-                                {displayText || placeholder}
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                        {value && !disabled && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleClear();
-                                }}
-                                className="p-1 hover:bg-gray-100 rounded"
-                            >
-                                <X className="h-4 w-4 text-gray-500" />
-                            </button>
-                        )}
-                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                    </div>
-                </div>
-            </div>
-
-            {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredOptions.length === 0 ? (
-                        <div className="px-3 py-2 text-gray-500 text-sm">
-                            No options found
-                        </div>
-                    ) : (
-                        filteredOptions.map((option, index) => (
-                            <div
-                                key={option[valueKey]}
-                                className={`px-3 py-2 cursor-pointer text-sm transition-colors ${index === highlightedIndex
-                                    ? 'bg-blue-50 text-blue-600'
-                                    : 'text-gray-900 hover:bg-gray-50'
-                                    }`}
-                                onClick={() => handleSelect(option)}
-                            >
-                                {option[displayKey]}
-                            </div>
-                        ))
-                    )}
-                </div>
-            )}
-        </div>
-    );
-};
-
-// Status Badge Component
-const StatusBadge = ({ status }) => {
-    const getStatusConfig = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'present':
-                return { color: 'bg-green-100 text-green-800', icon: CheckCircle };
-            case 'absent':
-                return { color: 'bg-red-100 text-red-800', icon: AlertCircle };
-            case 'late':
-                return { color: 'bg-yellow-100 text-yellow-800', icon: Clock };
-            default:
-                return { color: 'bg-gray-100 text-gray-800', icon: Activity };
-        }
-    };
-
-    const config = getStatusConfig(status);
-    const IconComponent = config.icon;
-
-    return (
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-            <IconComponent className="h-3 w-3" />
-            {status}
-        </span>
-    );
-};
-
-// Summary Card Component
-const SummaryCard = ({ title, value, icon: Icon, color, percentage }) => (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <div className="flex items-center justify-between">
-            <div>
-                <p className="text-sm font-medium text-gray-600">{title}</p>
-                <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                {percentage && (
-                    <p className="text-xs text-gray-500 mt-1">
-                        {percentage}% of total days
-                    </p>
-                )}
-            </div>
-            {Icon && (
-                <div className={`p-3 rounded-full ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
-                    <Icon className={`h-6 w-6 ${color}`} />
-                </div>
-            )}
-        </div>
-    </div>
-);
+import { Calendar, Users, Building, Award, User, FileText, Download, ArrowLeft, Filter, RefreshCw, AlertCircle, CheckCircle, Clock, BarChart3, Loader2, ChevronDown, FileDown, FileSpreadsheet, Coffee } from 'lucide-react';
+import { SearchableDropdown, StatusBadge, SummaryCard } from '../../Components/Report/ReportComponents';
+import Pagination from '../../Components/Pagination';
+import { exportMonthlyReportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
+import { exportToCSV } from '../../utils/exportUtils/csvExportMonthly';
+import { exportToExcel } from '../../utils/exportUtils/excelExportMonthly';
 
 const MonthlyReport = () => {
     const navigate = useNavigate();
@@ -233,41 +36,132 @@ const MonthlyReport = () => {
     const [reportData, setReportData] = useState(null);
     const [error, setError] = useState(null);
 
-    // Pagination states
+    // Pagination states - simplified
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage] = useState(10); // Fixed items per page
+    const [exportDropdown, setExportDropdown] = useState(false);
 
-    // Calculate summary statistics
+    // Refs for dropdown positioning
+    const buttonRef = useRef(null);
+    const [buttonPosition, setButtonPosition] = useState({ top: 0, left: 0, width: 0 });
+
+    // Update button position when export dropdown is opened
+    useEffect(() => {
+        if (exportDropdown && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            setButtonPosition({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX,
+                width: rect.width
+            });
+        }
+    }, [exportDropdown]);
+
+    // Enhanced summary statistics calculation based on shift data
     const calculateSummaryStats = (data) => {
         if (!data || data.length === 0) return null;
 
         const totalDays = data.length;
+
+        // Calculate working days based on shift_status
+        const workingDays = data.filter(item =>
+            item.shift_status?.toLowerCase() === 'working day'
+        ).length;
+
+        const weekoffDays = data.filter(item => {
+            const shiftStatus = item.shift_status?.toLowerCase() || '';
+            const status = item.status?.toLowerCase() || '';
+            return shiftStatus === 'week off' || status === 'week off' || status === 'weekoff';
+        }).length;
+
+        // Calculate attendance stats
         const presentDays = data.filter(item => item.status?.toLowerCase() === 'present').length;
         const absentDays = data.filter(item => item.status?.toLowerCase() === 'absent').length;
+        const holidayDays = data.filter(item => item.status?.toLowerCase() === 'holiday').length;
+        const leaveDays = data.filter(item => item.status?.toLowerCase() === 'leave').length;
+        const halfDayDays = data.filter(item => item.status?.toLowerCase() === 'half day').length;
         const lateDays = data.filter(item => parseFloat(item.late_hours || 0) > 0).length;
         const overtimeDays = data.filter(item => parseFloat(item.overtime_hours || 0) > 0).length;
 
+        // Calculate hours
         const totalWorkingHours = data.reduce((sum, item) => sum + parseFloat(item.attandance_hours || 0), 0);
         const totalOvertimeHours = data.reduce((sum, item) => sum + parseFloat(item.overtime_hours || 0), 0);
         const totalLateHours = data.reduce((sum, item) => sum + parseFloat(item.late_hours || 0), 0);
 
+        // Calculate attendance percentage based on working days only
+        const attendancePercentage = workingDays > 0 ? ((presentDays + halfDayDays) / workingDays * 100).toFixed(1) : '0.0';
+
         return {
             totalDays,
+            workingDays, // Days marked as "Working Day" in shift_status
+            weekoffDays, // Days marked as "Week off" in shift_status
             presentDays,
             absentDays,
+            holidayDays,
+            leaveDays,
+            halfDayDays,
             lateDays,
             overtimeDays,
             totalWorkingHours: totalWorkingHours.toFixed(2),
             totalOvertimeHours: totalOvertimeHours.toFixed(2),
             totalLateHours: totalLateHours.toFixed(2),
-            attendancePercentage: ((presentDays / totalDays) * 100).toFixed(1)
+            attendancePercentage
         };
     };
 
-    // Fetch dropdown data
+    // Fetch dropdown data for branches, departments, and designations
     const fetchDropdownData = useCallback(async () => {
         try {
             setDropdownLoading(true);
+            setError(null);
+
+            if (!user?.user_id) {
+                throw new Error('User ID is required');
+            }
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+
+            const response = await api.post('employee_drop_down_list', formData);
+
+            if (response.data?.success && response.data.data) {
+                const data = response.data.data;
+
+                // Format branches
+                const formattedBranches = (data.branch_list || []).map(branch => ({
+                    id: branch.branch_id,
+                    name: branch.name
+                }));
+                setBranches(formattedBranches);
+
+                // Format departments
+                const formattedDepartments = (data.department_list || []).map(dept => ({
+                    id: dept.department_id,
+                    name: dept.name
+                }));
+                setDepartments(formattedDepartments);
+
+                // Format designations
+                const formattedDesignations = (data.designation_list || []).map(desig => ({
+                    id: desig.designation_id,
+                    name: desig.name
+                }));
+                setDesignations(formattedDesignations);
+
+            } else {
+                throw new Error(response.data?.message || 'Failed to fetch dropdown data');
+            }
+        } catch (err) {
+            console.error('Error fetching dropdown data:', err);
+            setError(err.message || 'Failed to load filter options');
+        } finally {
+            setDropdownLoading(false);
+        }
+    }, [user?.user_id]);
+
+    // Fetch employees based on selected filters
+    const fetchEmployees = useCallback(async () => {
+        try {
             setError(null);
 
             if (!user?.user_id) {
@@ -285,24 +179,19 @@ const MonthlyReport = () => {
 
             if (response.data?.success && response.data.data) {
                 const data = response.data.data;
-                setBranches(data.branches || []);
-                setDepartments(data.departments || []);
-                setDesignations(data.designations || []);
-
                 const employeeList = data.employee_list || [];
                 const formattedEmployees = employeeList.map(emp => ({
                     id: emp.employee_id,
-                    name: `${emp.full_name} (${emp.employee_id})`
+                    name: `${emp.full_name} - EMP_ID: ${emp.employee_id}`
                 }));
+
                 setEmployees(formattedEmployees);
             } else {
-                throw new Error(response.data?.message || 'Failed to fetch dropdown data');
+                throw new Error(response.data?.message || 'Failed to fetch employees');
             }
         } catch (err) {
-            console.error('Error fetching dropdown data:', err);
-            setError(err.message || 'Failed to load filter options');
-        } finally {
-            setDropdownLoading(false);
+            console.error('Error fetching employees:', err);
+            setError(err.message || 'Failed to load employees');
         }
     }, [user?.user_id, filters.branch_id, filters.department_id, filters.designation_id]);
 
@@ -385,70 +274,205 @@ const MonthlyReport = () => {
         });
         setReportData(null);
         setError(null);
+        setCurrentPage(1);
     };
 
-    // Export functions
-    const handleExportPDF = () => {
-        if (!reportData) return;
+    // Updated handleExportPDF function for the Monthly Report component
+const handleExportPDF = () => {
+    if (!reportData) return;
 
-        const summaryStats = calculateSummaryStats(reportData);
-        const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
-        const title = `Monthly Attendance Report - ${selectedEmployee?.name || 'Employee'} (${filters.month_year})`;
-
-        exportToPDF(reportData, `attendance_report_${filters.month_year}.pdf`, title, summaryStats);
+    const summaryStats = calculateSummaryStats(reportData);
+    const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
+    
+    // Extract employee name from the dropdown format
+    const employeeName = selectedEmployee?.name || 'Unknown Employee';
+    const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
+    
+    const title = `Monthly Attendance Report`;
+    
+    // Prepare employee info
+    const employeeInfo = {
+        name: cleanEmployeeName,
+        id: filters.employee_id
     };
+    
+    // Prepare filter info with better formatting
+    const filterInfo = {
+        'Month/Year': filters.month_year ? new Date(filters.month_year + '-01').toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long'
+        }) : 'N/A',
+        'Employee': cleanEmployeeName,
+        'Employee ID': filters.employee_id,
+        'Branch': filters.branch_id ? branches.find(b => b.id === filters.branch_id)?.name || filters.branch_id : 'All Branches',
+        'Department': filters.department_id ? departments.find(d => d.id === filters.department_id)?.name || filters.department_id : 'All Departments',
+        'Designation': filters.designation_id ? designations.find(d => d.id === filters.designation_id)?.name || filters.designation_id : 'All Designations'
+    };
+
+    const result = exportMonthlyReportToPDF(
+        reportData,
+        `attendance_report_${cleanEmployeeName.replace(/\s+/g, '_')}_${filters.month_year}.pdf`,
+        title,
+        summaryStats,
+        filterInfo,
+        employeeInfo
+    );
+
+    if (result.success) {
+        console.log('PDF exported successfully!');
+        // You can add a toast notification here
+    } else {
+        console.error('Export failed:', result.message);
+        // You can add an error toast notification here
+    }
+    setExportDropdown(false);
+};
 
     const handleExportCSV = () => {
         if (!reportData) return;
         exportToCSV(reportData, `attendance_report_${filters.month_year}.csv`);
+        setExportDropdown(false);
     };
 
     const handleExportExcel = () => {
         if (!reportData) return;
         exportToExcel(reportData, `attendance_report_${filters.month_year}.xlsx`);
+        setExportDropdown(false);
+    };
+
+    // Get row styling based on status
+    const getRowStyling = (status) => {
+        const statusLower = status?.toLowerCase() || '';
+
+        switch (statusLower) {
+            case 'week off':
+            case 'weekoff':
+                return 'bg-purple-50 border-l-4 border-purple-400';
+            case 'holiday':
+                return 'bg-orange-50 border-l-4 border-orange-400';
+            case 'absent':
+                return 'bg-red-50 border-l-4 border-red-400';
+            case 'leave':
+                return 'bg-yellow-50 border-l-4 border-yellow-400';
+            case 'half day':
+                return 'bg-blue-50 border-l-4 border-blue-400';
+            default:
+                return '';
+        }
     };
 
     // Pagination logic
+    const totalItems = reportData?.length || 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = reportData?.slice(indexOfFirstItem, indexOfLastItem) || [];
-    const totalPages = Math.ceil((reportData?.length || 0) / itemsPerPage);
 
+    // Handle page change
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
+    // Initial load of dropdown data
     useEffect(() => {
         fetchDropdownData();
     }, [fetchDropdownData]);
 
+    // Fetch employees when filters change
+    useEffect(() => {
+        fetchEmployees();
+    }, [fetchEmployees]);
+
+    // Reset page when report data changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [reportData]);
+
     const summaryStats = calculateSummaryStats(reportData);
+
+    // Get selected month for display
+    const selectedMonth = filters.month_year ? new Date(filters.month_year + '-01') : new Date();
 
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Header Section */}
-                <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 text-white hover:text-gray-100 transition-colors bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm"
-                            >
-                                <ArrowLeft size={18} />
-                                Back
-                            </button>
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/20 rounded-lg">
-                                    <BarChart3 className="h-6 w-6 text-white" />
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => navigate('/reports')}
+                                    className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
+                                >
+                                    <ArrowLeft size={18} />
+                                    Back
+                                </button>
+                                <div className="flex items-center gap-3">
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
+                                            Monthly Attendance Report
+                                        </h1>
+                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
+                                            {selectedMonth.toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long'
+                                            })}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold text-white">
-                                        Monthly Attendance Report
-                                    </h1>
-                                    <p className="text-white/80 text-sm">
-                                        Generate detailed monthly attendance reports for employees
-                                    </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <button
+                                        ref={buttonRef}
+                                        onClick={() => setExportDropdown(!exportDropdown)}
+                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-lg font-medium transition-colors"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Export
+                                        <ChevronDown className="h-4 w-4" />
+                                    </button>
+
+                                    {/* Portal Dropdown */}
+                                    {exportDropdown && createPortal(
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-40"
+                                                onClick={() => setExportDropdown(false)}
+                                            />
+                                            <div
+                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                style={{
+                                                    top: buttonPosition.top + 10,
+                                                    left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
+                                                }}
+                                            >
+                                                <button
+                                                    onClick={handleExportCSV}
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                >
+                                                    <FileText className="h-4 w-4 text-green-600" />
+                                                    Export to CSV
+                                                </button>
+                                                <button
+                                                    onClick={handleExportExcel}
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                >
+                                                    <FileSpreadsheet className="h-4 w-4 text-blue-600" />
+                                                    Export to Excel
+                                                </button>
+                                                <button
+                                                    onClick={handleExportPDF}
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                >
+                                                    <FileDown className="h-4 w-4 text-red-600" />
+                                                    Export to PDF
+                                                </button>
+                                            </div>
+                                        </>,
+                                        document.body
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -603,14 +627,20 @@ const MonthlyReport = () => {
                     </div>
                 )}
 
-                {/* Summary Statistics */}
+                {/* Enhanced Summary Statistics */}
                 {summaryStats && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
                         <SummaryCard
                             title="Total Days"
                             value={summaryStats.totalDays}
                             icon={Calendar}
                             color="text-blue-600"
+                        />
+                        <SummaryCard
+                            title="Working Days"
+                            value={summaryStats.workingDays}
+                            icon={Clock}
+                            color="text-indigo-600"
                         />
                         <SummaryCard
                             title="Present Days"
@@ -626,133 +656,152 @@ const MonthlyReport = () => {
                             color="text-red-600"
                         />
                         <SummaryCard
+                            title="Week Offs"
+                            value={summaryStats.weekoffDays}
+                            icon={Coffee}
+                            color="text-purple-600"
+                        />
+                        <SummaryCard
                             title="Working Hours"
                             value={summaryStats.totalWorkingHours}
                             icon={Clock}
-                            color="text-purple-600"
+                            color="text-indigo-600"
                         />
                     </div>
                 )}
 
                 {/* Report Results */}
                 {reportData && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-green-50 rounded-lg">
-                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        Monthly Attendance Report
-                                    </h3>
-                                    <p className="text-gray-600 text-sm">
-                                        {reportData.length} records found for {filters.month_year}
-                                    </p>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="p-6 pb-0">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-green-50 rounded-lg">
+                                        <CheckCircle className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            Monthly Attendance Report
+                                        </h3>
+                                        <p className="text-gray-600 text-sm">
+                                            {reportData.length} records found for {filters.month_year}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={handleExportPDF}
-                                    className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                                >
-                                    <FileDown className="h-4 w-4" />
-                                    PDF
-                                </button>
-                                <button
-                                    onClick={handleExportCSV}
-                                    className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                                >
-                                    <FileDown className="h-4 w-4" />
-                                    CSV
-                                </button>
-                                <button
-                                    onClick={handleExportExcel}
-                                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                                >
-                                    <FileDown className="h-4 w-4" />
-                                    Excel
-                                </button>
+
+                            {/* Status Legend */}
+                            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Status Legend:</h4>
+                                <div className="flex flex-wrap gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Present</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Absent</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-purple-100 border border-purple-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Weekoff</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Holiday</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-yellow-100 border border-yellow-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Leave</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
+                                        <span className="text-sm text-gray-600">Half Day</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Attendance Table */}
+                        {/* Table Container */}
                         <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50">
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">S.No</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Employee</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Shift</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Shift Time</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Clock In</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Clock Out</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Working Hours</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Overtime</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Late Hours</th>
-                                        <th className="border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            <table className="w-full min-w-[800px]">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Date
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Day
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Check In
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Check Out
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Working Hours
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Late Hours
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Overtime
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Remarks
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {currentItems.map((record, index) => (
-                                        <tr key={record.sno} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">{record.sno}</td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                {new Date(record.date).toLocaleDateString()}
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {currentItems.map((item, index) => (
+                                        <tr
+                                            key={index}
+                                            className={`hover:bg-gray-50 transition-colors ${getRowStyling(item.status)}`}
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {new Date(item.date).toLocaleDateString('en-US', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric'
+                                                })}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <div>
-                                                    <div className="font-medium">{record.employee_name}</div>
-                                                </div>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {new Date(item.date).toLocaleDateString('en-GB', {
+                                                    weekday: 'short'
+                                                })}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <div>
-                                                    <div className="font-medium">{record.shift_name}</div>
-                                                </div>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <StatusBadge status={item.status} />
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <div className="text-xs">
-                                                    <div>{record.shift_from_time} - {record.shift_to_time}</div>
-                                                </div>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.attandance_first_clock_in || '-'}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <span className={`px-2 py-1 rounded text-xs ${record.attandance_first_clock_in
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {record.attandance_first_clock_in || 'N/A'}
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.attandance_last_clock_out || '-'}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <span className={`px-2 py-1 rounded text-xs ${record.attandance_last_clock_out
-                                                    ? 'bg-red-100 text-red-800'
-                                                    : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {record.attandance_last_clock_out || 'N/A'}
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.attandance_hours ? `${parseFloat(item.attandance_hours).toFixed(2)}h` : '-'}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <span className="font-medium">{record.attandance_hours}h</span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.late_hours && parseFloat(item.late_hours) > 0 ? (
+                                                    <span className="text-red-600 font-medium">
+                                                        {parseFloat(item.late_hours).toFixed(2)}h
+                                                    </span>
+                                                ) : '-'}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <span className={`px-2 py-1 rounded text-xs ${parseFloat(record.overtime_hours) > 0
-                                                    ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {record.overtime_hours}h
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.overtime_hours && parseFloat(item.overtime_hours) > 0 ? (
+                                                    <span className="text-green-600 font-medium">
+                                                        {parseFloat(item.overtime_hours).toFixed(2)}h
+                                                    </span>
+                                                ) : '-'}
                                             </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <span className={`px-2 py-1 rounded text-xs ${parseFloat(record.late_hours) > 0
-                                                    ? 'bg-yellow-100 text-yellow-800'
-                                                    : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {record.late_hours}h
-                                                </span>
-                                            </td>
-                                            <td className="border border-gray-200 px-4 py-3 text-sm text-gray-900">
-                                                <StatusBadge status={record.status} />
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {item.remarks || '-'}
                                             </td>
                                         </tr>
                                     ))}
@@ -761,73 +810,52 @@ const MonthlyReport = () => {
                         </div>
 
                         {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="flex items-center justify-between mt-6">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-700">
-                                        Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, reportData.length)} of {reportData.length} entries
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        Previous
-                                    </button>
-
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                                        <button
-                                            key={pageNum}
-                                            onClick={() => handlePageChange(pageNum)}
-                                            className={`px-3 py-1 rounded-lg transition-colors ${currentPage === pageNum
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                                }`}
-                                        >
-                                            {pageNum}
-                                        </button>
-                                    ))}
-
-                                    <button
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            loading={reportGenerating}
+                        />
                     </div>
                 )}
 
                 {/* No Data Message */}
-                {!reportData && !reportGenerating && (
+                {!reportData && !reportGenerating && !error && (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                        <div className="p-3 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4">
-                            <FileText className="h-10 w-10 text-gray-400 mx-auto" />
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="p-3 bg-gray-50 rounded-full mb-4">
+                                <BarChart3 className="h-8 w-8 text-gray-400" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No Report Generated</h3>
+                            <p className="text-gray-600 mb-4">
+                                Select an employee and generate a report to view monthly attendance data.
+                            </p>
+                            <div className="text-sm text-gray-500">
+                                <p>• Choose a month and year</p>
+                                <p>• Select an employee from the dropdown</p>
+                                <p>• Click "Generate Report" to view attendance details</p>
+                            </div>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Report Generated</h3>
-                        <p className="text-gray-600 mb-6">
-                            Please select an employee and month to generate the attendance report.
-                        </p>
-                        <button
-                            onClick={generateReport}
-                            disabled={!filters.employee_id || !filters.month_year}
-                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
-                        >
-                            <BarChart3 className="h-5 w-5" />
-                            Generate Report
-                        </button>
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {reportGenerating && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="p-3 bg-blue-50 rounded-full mb-4">
+                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Generating Report</h3>
+                            <p className="text-gray-600">
+                                Please wait while we prepare your monthly attendance report...
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>
         </div>
     );
 };
-
-
 
 export default MonthlyReport;

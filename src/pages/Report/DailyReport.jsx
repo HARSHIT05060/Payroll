@@ -6,7 +6,6 @@ import {
     Users,
     TrendingUp,
     Download,
-    Filter,
     Search,
     RefreshCw,
     ArrowLeft,
@@ -16,13 +15,13 @@ import {
     AlertCircle,
     BarChart3,
     User,
-    MapPin,
     Timer,
     Activity,
     FileText,
     FileSpreadsheet,
     FileDown,
-    ChevronDown
+    ChevronDown,
+    CalendarX
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
@@ -99,7 +98,8 @@ const DailyReport = () => {
 
             const matchesFilter = filterStatus === 'all' ||
                 (filterStatus === 'present' && employee.status === 'Present') ||
-                (filterStatus === 'absent' && employee.status !== 'Present') ||
+                (filterStatus === 'absent' && employee.status !== 'Present' && employee.status !== 'Week Off') ||
+                (filterStatus === 'weekoff' && employee.status === 'Week Off') ||
                 (filterStatus === 'late' && parseFloat(employee.late_hours || 0) > 0) ||
                 (filterStatus === 'overtime' && parseFloat(employee.overtime_hours || 0) > 0);
 
@@ -111,19 +111,24 @@ const DailyReport = () => {
     const summaryStats = useMemo(() => {
         const total = attendanceData.length;
         const present = attendanceData.filter(emp => emp.status === 'Present').length;
-        const absent = total - present;
+        const weekOff = attendanceData.filter(emp => emp.status === 'Week Off').length;
+        const absent = attendanceData.filter(emp => emp.status !== 'Present' && emp.status !== 'Week Off').length;
         const late = attendanceData.filter(emp => parseFloat(emp.late_hours || 0) > 0).length;
         const overtime = attendanceData.filter(emp => parseFloat(emp.overtime_hours || 0) > 0).length;
 
-        return { total, present, absent, late, overtime };
+        return { total, present, absent, weekOff, late, overtime };
     }, [attendanceData]);
 
     // Get status color and icon
     const getStatusInfo = (employee) => {
         const isPresent = employee.status === 'Present';
+        const isWeekOff = employee.status === 'Week Off';
         const isLate = parseFloat(employee.late_hours || 0) > 0;
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
 
+        if (isWeekOff) {
+            return { color: 'text-purple-600 bg-purple-50', icon: CalendarX, text: 'Week Off' };
+        }
         if (!isPresent) {
             return { color: 'text-red-600 bg-red-50', icon: XCircle, text: 'Absent' };
         }
@@ -140,7 +145,11 @@ const DailyReport = () => {
     const getTimeColor = (employee) => {
         const isLate = parseFloat(employee.late_hours || 0) > 0;
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
+        const isWeekOff = employee.status === 'Week Off';
 
+        if (isWeekOff) {
+            return 'text-purple-600 font-medium'; // Purple for week off
+        }
         if (isLate) {
             return 'text-yellow-600 font-medium'; // Yellow for late
         }
@@ -176,7 +185,7 @@ const DailyReport = () => {
             'Attendance Hours': `${emp.attandance_hours}h`,
             'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
             'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : 'Absent'
+            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
         }));
 
         const fileName = `daily_attendance_report_${selectedDate}`;
@@ -197,7 +206,7 @@ const DailyReport = () => {
             'Attendance Hours': `${emp.attandance_hours}h`,
             'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
             'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : 'Absent'
+            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
         }));
 
         const fileName = `daily_attendance_report_${selectedDate}`;
@@ -218,11 +227,11 @@ const DailyReport = () => {
             'Attendance Hours': `${emp.attandance_hours}h`,
             'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
             'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-            'Status': emp.status === 'Present' ? 'Present' : 'Absent'
+            'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
         }));
 
         const fileName = `daily_attendance_report_${selectedDate}`;
-        const title = `Daily Attendance Report - ${new Date(selectedDate).toLocaleDateString()}`;
+        const title = `Daily Attendance Report - ${new Date(selectedDate).toLocaleDateString('en-GB')}`;
         exportToPDF(exportData, fileName, title);
         setExportDropdown(false);
     }, [filteredData, selectedDate]);
@@ -329,9 +338,8 @@ const DailyReport = () => {
                     </div>
                 </div>
 
-
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
                     <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                         <div className="flex items-center justify-between">
                             <div>
@@ -357,6 +365,15 @@ const DailyReport = () => {
                                 <p className="text-2xl font-bold text-red-600">{summaryStats.absent}</p>
                             </div>
                             <XCircle className="h-8 w-8 text-red-600" />
+                        </div>
+                    </div>
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-[var(--color-text-secondary)]">Week Off</p>
+                                <p className="text-2xl font-bold text-purple-600">{summaryStats.weekOff}</p>
+                            </div>
+                            <CalendarX className="h-8 w-8 text-purple-600" />
                         </div>
                     </div>
                     <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
@@ -429,6 +446,7 @@ const DailyReport = () => {
                                     <option value="all">All Status</option>
                                     <option value="present">Present</option>
                                     <option value="absent">Absent</option>
+                                    <option value="weekoff">Week Off</option>
                                     <option value="late">Late</option>
                                     <option value="overtime">Overtime</option>
                                 </select>
@@ -583,6 +601,9 @@ const DailyReport = () => {
                             <span className="flex items-center">
                                 <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                                 Overtime ({summaryStats.overtime})
+                            </span><span className="flex items-center">
+                                <div className="w-3 h-3 bg-purple-600 rounded-full mr-2"></div>
+                                Week Off ({summaryStats.weekOff})
                             </span>
                         </div>
                     </div>
