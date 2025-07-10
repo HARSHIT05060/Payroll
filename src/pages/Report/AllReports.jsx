@@ -23,36 +23,43 @@ const AllReports = () => {
             title: 'Daily Attendance Report',
             icon: Calendar,
             color: 'from-blue-500 to-blue-600',
-            description: 'View daily attendance records for all employees',
+            description: 'Comprehensive daily attendance tracking with detailed employee records',
             path: '/reports/daily-attendance',
-            apiEndpoint: 'daily_attendance_report_list',
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Employee attendance status',
-                'Clock in/out times',
-                'Working hours tracking',
-                'Overtime calculations',
-                'Late arrival tracking',
-                'Export to CSV, Excel & PDF'
+                'Real-time employee attendance status',
+                'Detailed clock in/out timestamps',
+                'Automatic working hours calculation',
+                'Overtime hours tracking & analysis',
+                'Late arrival detection & reporting',
+                'Date range filtering',
+                'Department-wise filtering',
+                'Status-based color coding',
+                'Multi-format export (CSV, Excel, PDF)',
+                'Professional PDF reports with summary statistics'
             ]
         },
         {
-            id: 'attendance-summary',
-            title: 'Attendance Summary',
+            id: 'monthly-attendance',
+            title: 'Monthly Attendance Summary',
             icon: BarChart3,
             color: 'from-purple-500 to-purple-600',
-            description: 'Generate attendance summaries for different periods',
+            description: 'Detailed monthly attendance analysis with comprehensive statistics',
             path: '/reports/monthly-attendance',
-            apiEndpoint: 'daily_attendance_report_list',
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Weekly attendance trends',
-                'Monthly summaries',
-                'Attendance rate calculations',
-                'Department-wise analysis',
-                'Export to CSV/PDF'
+                'Complete monthly attendance overview',
+                'Attendance rate calculations & percentages',
+                'Working days vs. present days analysis',
+                'Week-off and holiday tracking',
+                'Leave days and half-day calculations',
+                'Late hours and overtime summaries',
+                'Department and employee-wise breakdowns',
+                'Visual status indicators and legends',
+                'Multi-format export (CSV, Excel, PDF)',
+                'Enhanced PDF export with professional styling',
             ]
         },
         {
@@ -62,7 +69,6 @@ const AllReports = () => {
             color: 'from-green-500 to-green-600',
             description: 'Complete employee information and records',
             path: '/reports/employee-directory',
-            apiEndpoint: 'employee_list',
             category: 'employees',
             isAvailable: true,
             features: [
@@ -74,7 +80,6 @@ const AllReports = () => {
                 'Export employee data'
             ]
         },
-
     ];
 
     const comingSoonReports = [

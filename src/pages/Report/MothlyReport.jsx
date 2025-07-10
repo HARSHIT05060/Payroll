@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
-import { Calendar, Users, Building, Award, User, FileText, Download, ArrowLeft, Filter, RefreshCw, AlertCircle, CheckCircle, Clock, BarChart3, Loader2, ChevronDown, FileDown, FileSpreadsheet, Coffee } from 'lucide-react';
+import { Calendar, Users, Building, Award, User, XCircle, CalendarX, FileText, Download, ArrowLeft, Filter, RefreshCw, AlertCircle, CheckCircle, Clock, BarChart3, Loader2, ChevronDown, FileDown, FileSpreadsheet, Coffee } from 'lucide-react';
 import { SearchableDropdown, StatusBadge, SummaryCard } from '../../Components/Report/ReportComponents';
 import Pagination from '../../Components/Pagination';
 import { exportMonthlyReportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
@@ -278,55 +278,55 @@ const MonthlyReport = () => {
     };
 
     // Updated handleExportPDF function for the Monthly Report component
-const handleExportPDF = () => {
-    if (!reportData) return;
+    const handleExportPDF = () => {
+        if (!reportData) return;
 
-    const summaryStats = calculateSummaryStats(reportData);
-    const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
-    
-    // Extract employee name from the dropdown format
-    const employeeName = selectedEmployee?.name || 'Unknown Employee';
-    const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
-    
-    const title = `Monthly Attendance Report`;
-    
-    // Prepare employee info
-    const employeeInfo = {
-        name: cleanEmployeeName,
-        id: filters.employee_id
+        const summaryStats = calculateSummaryStats(reportData);
+        const selectedEmployee = employees.find(emp => emp.id === filters.employee_id);
+
+        // Extract employee name from the dropdown format
+        const employeeName = selectedEmployee?.name || 'Unknown Employee';
+        const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
+
+        const title = `Monthly Attendance Report`;
+
+        // Prepare employee info
+        const employeeInfo = {
+            name: cleanEmployeeName,
+            id: filters.employee_id
+        };
+
+        // Prepare filter info with better formatting
+        const filterInfo = {
+            'Month/Year': filters.month_year ? new Date(filters.month_year + '-01').toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: 'long'
+            }) : 'N/A',
+            'Employee': cleanEmployeeName,
+            'Employee ID': filters.employee_id,
+            'Branch': filters.branch_id ? branches.find(b => b.id === filters.branch_id)?.name || filters.branch_id : 'All Branches',
+            'Department': filters.department_id ? departments.find(d => d.id === filters.department_id)?.name || filters.department_id : 'All Departments',
+            'Designation': filters.designation_id ? designations.find(d => d.id === filters.designation_id)?.name || filters.designation_id : 'All Designations'
+        };
+
+        const result = exportMonthlyReportToPDF(
+            reportData,
+            `attendance_report_${cleanEmployeeName.replace(/\s+/g, '_')}_${filters.month_year}.pdf`,
+            title,
+            summaryStats,
+            filterInfo,
+            employeeInfo
+        );
+
+        if (result.success) {
+            console.log('PDF exported successfully!');
+            // You can add a toast notification here
+        } else {
+            console.error('Export failed:', result.message);
+            // You can add an error toast notification here
+        }
+        setExportDropdown(false);
     };
-    
-    // Prepare filter info with better formatting
-    const filterInfo = {
-        'Month/Year': filters.month_year ? new Date(filters.month_year + '-01').toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long'
-        }) : 'N/A',
-        'Employee': cleanEmployeeName,
-        'Employee ID': filters.employee_id,
-        'Branch': filters.branch_id ? branches.find(b => b.id === filters.branch_id)?.name || filters.branch_id : 'All Branches',
-        'Department': filters.department_id ? departments.find(d => d.id === filters.department_id)?.name || filters.department_id : 'All Departments',
-        'Designation': filters.designation_id ? designations.find(d => d.id === filters.designation_id)?.name || filters.designation_id : 'All Designations'
-    };
-
-    const result = exportMonthlyReportToPDF(
-        reportData,
-        `attendance_report_${cleanEmployeeName.replace(/\s+/g, '_')}_${filters.month_year}.pdf`,
-        title,
-        summaryStats,
-        filterInfo,
-        employeeInfo
-    );
-
-    if (result.success) {
-        console.log('PDF exported successfully!');
-        // You can add a toast notification here
-    } else {
-        console.error('Export failed:', result.message);
-        // You can add an error toast notification here
-    }
-    setExportDropdown(false);
-};
 
     const handleExportCSV = () => {
         if (!reportData) return;
@@ -630,94 +630,115 @@ const handleExportPDF = () => {
                 {/* Enhanced Summary Statistics */}
                 {summaryStats && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-                        <SummaryCard
-                            title="Total Days"
-                            value={summaryStats.totalDays}
-                            icon={Calendar}
-                            color="text-blue-600"
-                        />
-                        <SummaryCard
-                            title="Working Days"
-                            value={summaryStats.workingDays}
-                            icon={Clock}
-                            color="text-indigo-600"
-                        />
-                        <SummaryCard
-                            title="Present Days"
-                            value={summaryStats.presentDays}
-                            icon={CheckCircle}
-                            color="text-green-600"
-                            percentage={summaryStats.attendancePercentage}
-                        />
-                        <SummaryCard
-                            title="Absent Days"
-                            value={summaryStats.absentDays}
-                            icon={AlertCircle}
-                            color="text-red-600"
-                        />
-                        <SummaryCard
-                            title="Week Offs"
-                            value={summaryStats.weekoffDays}
-                            icon={Coffee}
-                            color="text-purple-600"
-                        />
-                        <SummaryCard
-                            title="Working Hours"
-                            value={summaryStats.totalWorkingHours}
-                            icon={Clock}
-                            color="text-indigo-600"
-                        />
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Total Days</p>
+                                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.totalDays}</p>
+                                </div>
+                                <Calendar className="h-8 w-8 text-blue-600" />
+                            </div>
+                        </div>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Working Days</p>
+                                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.workingDays}</p>
+                                </div>
+                                <Clock className="h-8 w-8 text-indigo-600" />
+                            </div>
+                        </div>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Present Days</p>
+                                    <p className="text-2xl font-bold text-green-600">{summaryStats.presentDays}</p>
+                                    {summaryStats.attendancePercentage && (
+                                        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+                                            {summaryStats.attendancePercentage}%
+                                        </p>
+                                    )}
+                                </div>
+                                <CheckCircle className="h-8 w-8 text-green-600" />
+                            </div>
+                        </div>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Absent Days</p>
+                                    <p className="text-2xl font-bold text-red-600">{summaryStats.absentDays}</p>
+                                </div>
+                                <XCircle className="h-8 w-8 text-red-600" />
+                            </div>
+                        </div>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Week Offs</p>
+                                    <p className="text-2xl font-bold text-purple-600">{summaryStats.weekoffDays}</p>
+                                </div>
+                                <CalendarX className="h-8 w-8 text-purple-600" />
+                            </div>
+                        </div>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Working Hours</p>
+                                    <p className="text-2xl font-bold text-indigo-600">{summaryStats.totalWorkingHours}</p>
+                                </div>
+                                <Clock className="h-8 w-8 text-indigo-600" />
+                            </div>
+                        </div>
                     </div>
                 )}
 
                 {/* Report Results */}
                 {reportData && (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-6 pb-0">
-                            <div className="flex items-center justify-between mb-6">
+                        <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <CheckCircle className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                    <h3 className="text-lg font-medium text-[var(--color-text-white)]">
+                                        Monthly Attendance Details
+                                    </h3>
+                                </div>
+
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-green-50 rounded-lg">
-                                        <CheckCircle className="h-5 w-5 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900">
-                                            Monthly Attendance Report
-                                        </h3>
-                                        <p className="text-gray-600 text-sm">
-                                            {reportData.length} records found for {filters.month_year}
-                                        </p>
-                                    </div>
+                                    <p className="text-[var(--color-text-white)] text-sm">
+                                        {reportData.length} records found for {filters.month_year}
+                                    </p>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Status Legend */}
-                            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                                <h4 className="text-sm font-medium text-gray-700 mb-3">Status Legend:</h4>
-                                <div className="flex flex-wrap gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Present</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Absent</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-purple-100 border border-purple-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Weekoff</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Holiday</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-yellow-100 border border-yellow-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Leave</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
-                                        <span className="text-sm text-gray-600">Half Day</span>
-                                    </div>
+                        {/* Status Legend */}
+                        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">Status Legend:</h4>
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Present</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Absent</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-purple-100 border border-purple-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Weekoff</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Holiday</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-yellow-100 border border-yellow-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Leave</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
+                                    <span className="text-sm text-gray-600">Half Day</span>
                                 </div>
                             </div>
                         </div>
@@ -751,9 +772,6 @@ const handleExportPDF = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Overtime
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Remarks
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -763,7 +781,7 @@ const handleExportPDF = () => {
                                             className={`hover:bg-gray-50 transition-colors ${getRowStyling(item.status)}`}
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {new Date(item.date).toLocaleDateString('en-US', {
+                                                {new Date(item.date).toLocaleDateString('en-GB', {
                                                     day: '2-digit',
                                                     month: '2-digit',
                                                     year: 'numeric'
@@ -799,9 +817,6 @@ const handleExportPDF = () => {
                                                         {parseFloat(item.overtime_hours).toFixed(2)}h
                                                     </span>
                                                 ) : '-'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {item.remarks || '-'}
                                             </td>
                                         </tr>
                                     ))}
