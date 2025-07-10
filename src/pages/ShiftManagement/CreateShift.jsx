@@ -731,8 +731,8 @@ const CreateShift = () => {
                                                     <div className="flex items-center gap-4">
                                                         <div
                                                             className={`px-6 py-3 rounded-lg flex items-center justify-center font-semibold text-white shadow-md transition-all duration-200 hover:shadow-lg ${day.day_name.toLowerCase() === 'sunday'
-                                                                ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-                                                                : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                                                                ? 'bg-gradient-to-r from-[var(--color-error)] to-[var(--color-error-dark)] hover:from-[var(--color-error-dark)] hover:to-[var(--color-error-darker)]'
+                                                                : 'bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] hover:from-[var(--color-blue-dark)] hover:to-[var(--color-blue-darker)]'
                                                                 }`}
                                                         >
                                                             {day.day_name}
