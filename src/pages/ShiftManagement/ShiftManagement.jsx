@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Calendar, Users, Edit, Trash2, Plus, X, CheckCircle, ArrowLeft, Info, Search, RefreshCw, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
@@ -406,7 +407,7 @@ const ShiftManagement = () => {
                             <div className="flex items-center">
                                 <Calendar className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
                                 <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                    Available Shifts ({totalShifts})
+                                    Available Shifts 
                                 </h3>
                             </div>
 

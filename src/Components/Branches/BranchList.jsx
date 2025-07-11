@@ -132,7 +132,7 @@ const BranchList = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
-                                        Branches ({totalBranches})
+                                        Branches
                                     </h3>
                                 </div>
                             </div>

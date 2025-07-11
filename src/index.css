@@ -249,6 +249,8 @@
     --color-yellow: #facc15;
     --color-yellow-dark: #eab308;
 
+    --color-green: #10b981;
+    --color-red: #ef4444;
     /* Shadow Colors */
     --color-shadow-light: rgba(0, 0, 0, 0.05);
     --color-shadow-medium: rgba(0, 0, 0, 0.1);

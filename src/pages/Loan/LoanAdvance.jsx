@@ -452,7 +452,7 @@ const LoanAdvance = () => {
                             <div className="flex items-center">
                                 <CreditCard className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
                                 <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                    Total Loans/Advances ({sortedLoans.length})
+                                    Total Loans/Advances 
                                 </h3>
                                 {(loading || dropdownLoading) && (
                                     <div className="flex items-center gap-2 text-[var(--color-text-white)] ml-4">

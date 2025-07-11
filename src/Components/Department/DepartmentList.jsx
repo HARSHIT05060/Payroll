@@ -128,7 +128,7 @@ const DepartmentList = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
-                                        Departments ({totalDepartments})
+                                        Departments 
                                     </h3>
                                 </div>
                             </div>

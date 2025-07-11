@@ -218,11 +218,7 @@ const AllReports = () => {
                             <CheckCircle className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
                         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Available Reports</h2>
-                        <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-blue-lightest)] rounded-full">
-                            <span className="text-sm font-medium text-[var(--color-blue-dark)]">
-                                {availableReports.length} Reports
-                            </span>
-                        </div>
+                            
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
