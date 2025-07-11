@@ -106,10 +106,10 @@ const Sidebar = () => {
             path: '/reports',
             submenu: [
                 { label: 'All Reports', path: '/reports' },
-                { label: 'Daily report', path: '/reports/daily-attendance' },
+                { label: 'Employee Directory Report', path: '/reports/employee-directory' },
+                { label: 'Daily Report', path: '/reports/daily-attendance' },
                 { label: 'Monthly Report', path: '/reports/monthly-attendance' },
                 { label: 'All Employee Report', path: '/reports/daterangereport' },
-                { label: 'Financial', path: '/reports/financial' }
             ]
         },
 

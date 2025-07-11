@@ -22,6 +22,28 @@ const AllReports = () => {
 
     const availableReports = [
         {
+            id: 'employee-list',
+            title: 'Employee Directory',
+            icon: Users,
+            color: 'from-green-500 to-green-600',
+            description: 'Complete employee information and records',
+            path: '/reports/employee-directory',
+            category: 'employees',
+            isAvailable: true,
+            features: [
+                'Employee profiles with detailed information',
+                'Contact information and communication details',
+                'Department assignments and organizational structure',
+                'Job roles and position hierarchy',
+                'Employment status and current records',
+                'Branch location and office assignments',
+                'Employee ID management and tracking',
+                'Gender demographics and statistics',
+                'Multi-format export (Excel, PDF)',
+                'Professional PDF reports with company branding'
+            ]
+        },
+        {
             id: 'daily-attendance',
             title: 'Daily Attendance Report',
             icon: Calendar,
@@ -31,15 +53,15 @@ const AllReports = () => {
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Real-time employee attendance status',
-                'Detailed clock in/out timestamps',
-                'Automatic working hours calculation',
-                'Overtime hours tracking & analysis',
-                'Late arrival detection & reporting',
-                'Date range filtering',
-                'Department-wise filtering',
-                'Status-based color coding',
-                'Multi-format export (CSV, Excel, PDF)',
+                'Real-time employee attendance status tracking',
+                'Detailed clock in/out timestamps and records',
+                'Automatic working hours calculation and analysis',
+                'Overtime hours tracking and comprehensive analysis',
+                'Late arrival detection and detailed reporting',
+                'Date range filtering and custom period selection',
+                'Department-wise filtering and organizational breakdown',
+                'Status-based color coding and visual indicators',
+                'Multi-format export (Excel, PDF)',
                 'Professional PDF reports with summary statistics'
             ]
         },
@@ -53,15 +75,15 @@ const AllReports = () => {
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Complete monthly attendance overview',
-                'Attendance rate calculations & percentages',
-                'Working days vs. present days analysis',
-                'Week-off and holiday tracking',
-                'Leave days and half-day calculations',
-                'Late hours and overtime summaries',
-                'Department and employee-wise breakdowns',
-                'Visual status indicators and legends',
-                'Multi-format export (CSV, Excel, PDF)',
+                'Complete monthly attendance overview and analysis',
+                'Attendance rate calculations and percentage metrics',
+                'Working days vs. present days detailed analysis',
+                'Week-off and holiday tracking with calendar integration',
+                'Leave days and half-day calculations and summaries',
+                'Late hours and overtime comprehensive summaries',
+                'Department and employee-wise detailed breakdowns',
+                'Visual status indicators and comprehensive legends',
+                'Multi-format export (Excel, PDF)',
                 'Enhanced PDF export with professional styling'
             ]
         },
@@ -75,34 +97,16 @@ const AllReports = () => {
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Employee-wise data organization and grouping',
-                'Individual employee attendance patterns',
-                'Comprehensive analytics',
-                'Hours worked tracking and calculations',
-                'Overtime tracking and analysis',
-                'Late arrival detection and reporting',
-                'Complete daily attendance records',
+                'Employee-wise data organization and smart grouping',
+                'Individual employee attendance patterns and trends',
+                'Comprehensive analytics and performance metrics',
+                'Hours worked tracking and detailed calculations',
+                'Overtime tracking and comprehensive analysis',
+                'Late arrival detection and detailed reporting',
+                'Complete daily attendance records and history',
                 'Detailed clock in/out times with status tracking',
                 'Professional PDF format with clean styling',
                 'Print-ready reports with organized layout'
-            ]
-        },
-        {
-            id: 'employee-list',
-            title: 'Employee Directory',
-            icon: Users,
-            color: 'from-green-500 to-green-600',
-            description: 'Complete employee information and records',
-            path: '/reports/employee-directory',
-            category: 'employees',
-            isAvailable: true,
-            features: [
-                'Employee profiles',
-                'Contact information',
-                'Department assignments',
-                'Job roles and positions',
-                'Employment status',
-                'Export employee data'
             ]
         }
     ];
@@ -223,23 +227,23 @@ const AllReports = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         {availableReports.map((report) => (
-                            <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105">
-                                {/* Report Header */}
-                                <div className={`bg-gradient-to-r ${report.color} p-6`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-white/20 rounded-lg">
+                            <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105 flex flex-col h-full">
+                                {/* Report Header - Fixed Height */}
+                                <div className={`bg-gradient-to-r ${report.color} p-6 h-32 flex items-center`}>
+                                    <div className="flex items-center gap-3 w-full">
+                                        <div className="p-2 bg-white/20 rounded-lg flex-shrink-0">
                                             <report.icon className="h-6 w-6 text-white" />
                                         </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white">{report.title}</h3>
-                                            <p className="text-white/80 text-sm mt-1">{report.description}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-lg font-semibold text-white line-clamp-1">{report.title}</h3>
+                                            <p className="text-white/80 text-sm mt-1 line-clamp-2 leading-relaxed">{report.description}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Report Content */}
-                                <div className="p-6">
-                                    <div className="mb-4">
+                                {/* Report Content - Flexible grow area */}
+                                <div className="p-6 flex-1 flex flex-col">
+                                    <div className="flex-1">
                                         <h4 className="font-medium text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
                                             <Activity className="h-4 w-4 text-[var(--color-blue-dark)]" />
                                             Features:
@@ -254,7 +258,8 @@ const AllReports = () => {
                                         </ul>
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border-primary)]">
+                                    {/* Sticky Footer - Always at bottom */}
+                                    <div className="flex items-center justify-between pt-4 mt-4 border-t border-[var(--color-border-primary)]">
                                         <div className="flex items-center gap-2 text-sm text-[var(--color-blue-dark)]">
                                             <CheckCircle className="h-4 w-4" />
                                             <span className="font-medium">Available</span>
