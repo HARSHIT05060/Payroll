@@ -358,7 +358,7 @@ const Sidebar = () => {
                                                             border-l-2 hover:pl-6
                                                             ${isSubmenuActive
                                                                 ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darker)] border-[var(--color-blue-medium)] font-medium shadow-sm'
-                                                                : 'text-[var(--color-text-secondary)] border-transparent hover:bg-[var(--color-blue-lightest)] hover:text-[var(--color-blue-dark)] hover:border-blue-300'
+                                                                : 'text-[var(--color-text-secondary)] border-transparent hover:bg-[var(--color-blue-lightest)] hover:text-[var(--color-blue-dark)] hover:border-[var(--color-blue-light)]'
                                                             }
                                                         `}
                                                         style={{

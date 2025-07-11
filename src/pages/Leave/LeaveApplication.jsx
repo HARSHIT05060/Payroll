@@ -271,7 +271,7 @@ const LeaveApplication = () => {
                     {/* Employee Selection with Search */}
                     <div className="space-y-2" ref={employeeDropdownRef}>
                         <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
-                            Select Employee *
+                            Select Employee <span className="text-[var(--color-error)]">*</span>
                         </label>
                         <div className="relative">
                             <input
@@ -307,7 +307,7 @@ const LeaveApplication = () => {
                     {/* Leave Type Selection */}
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
-                            Leave Type *
+                            Leave Type <span className="text-[var(--color-error)]">*</span>
                         </label>
                         <select
                             name="leave_type"
@@ -372,7 +372,7 @@ const LeaveApplication = () => {
                     {/* Reason */}
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
-                            Reason for Leave *
+                            Reason for Leave <span className="text-[var(--color-error)]">*</span>
                         </label>
                         <textarea
                             name="reason"

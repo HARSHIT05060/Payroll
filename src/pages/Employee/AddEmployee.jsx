@@ -830,7 +830,7 @@ const AddEmployee = () => {
                                     {section.key === 'basicDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Employee Code *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Employee Code <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="employeeCode"
@@ -843,7 +843,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Full Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Full Name <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="name"
@@ -856,7 +856,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Mobile Number *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Mobile Number <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="tel"
                                                     name="mobile"
@@ -881,7 +881,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Gender *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Gender <span className="text-[var(--color-error)]">*</span></label>
                                                 <select
                                                     name="gender"
                                                     value={formData.gender}
@@ -896,7 +896,7 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch <span className="text-[var(--color-error)]">*</span></label>
                                                 <select
                                                     name="branch"
                                                     value={formData.branch}
@@ -911,7 +911,7 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Department *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Department <span className="text-[var(--color-error)]">*</span></label>
                                                 <select
                                                     name="department"
                                                     value={formData.department}
@@ -926,7 +926,7 @@ const AddEmployee = () => {
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Designation *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Designation <span className="text-[var(--color-error)]">*</span></label>
                                                 <select
                                                     name="designation"
                                                     value={formData.designation}
@@ -997,7 +997,7 @@ const AddEmployee = () => {
                                     {section.key === 'bankDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Bank Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Bank Name <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="bankName"
@@ -1010,7 +1010,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch Name *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Branch Name <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="branchName"
@@ -1023,7 +1023,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Account Number *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Account Number <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="accountNo"
@@ -1036,7 +1036,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">IFSC Code *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">IFSC Code <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="ifscCode"
@@ -1055,7 +1055,7 @@ const AddEmployee = () => {
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
-                                                    Aadhar Card {!isEditMode && <span className="text-red-500">*</span>}
+                                                    Aadhar Card {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}
                                                 </label>
                                                 <input
                                                     type="file"
@@ -1108,7 +1108,7 @@ const AddEmployee = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
-                                                    PAN Card {!isEditMode && <span className="text-red-500">*</span>}
+                                                    PAN Card {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}
                                                 </label>
                                                 <input
                                                     type="file"
@@ -1294,7 +1294,7 @@ const AddEmployee = () => {
                                     {section.key === 'credentials' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Login Mobile No *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Login Mobile No <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="tel"
                                                     name="loginMobileNo"
@@ -1304,7 +1304,7 @@ const AddEmployee = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Password *</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Password <span className="text-[var(--color-error)]">*</span></label>
                                                 <input
                                                     type="password"
                                                     name="password"

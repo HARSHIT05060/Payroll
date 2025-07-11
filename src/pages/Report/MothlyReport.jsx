@@ -617,7 +617,7 @@ const MonthlyReport = () => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 <User className="inline h-4 w-4 mr-1" />
-                                Employee *
+                                Employee  <span className="text-[var(--color-error)]">*</span>
                             </label>
                             <SearchableDropdown
                                 options={employees}

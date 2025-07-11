@@ -21,7 +21,6 @@ import {
     DollarSign,
     FileDown 
 } from 'lucide-react';
-import { StatusBadge } from '../../Components/Report/ReportComponents';
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { useRef } from 'react';
