@@ -1,5 +1,477 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// utils/pdfExportMonthly.js
+
+// Calculate monthly summary statistics
+export const calculateMonthlySummary = (reportData) => {
+    const totalDays = reportData.length;
+    const workingDays = reportData.filter(r => r.shift_status === 'Working Day').length;
+    const presentDays = reportData.filter(r => r.status === 'Present').length;
+    const absentDays = reportData.filter(r => r.status === 'Absent').length;
+    const weekoffDays = reportData.filter(r => r.status === 'Week Off').length;
+    const holidayDays = reportData.filter(r => r.status === 'Holiday').length;
+    const leaveDays = reportData.filter(r => r.status === 'Leave').length;
+    const halfDayDays = reportData.filter(r => r.status === 'Half Day').length;
+    const lateDays = reportData.filter(r => parseFloat(r.late_hours || 0) > 0).length;
+    const overtimeDays = reportData.filter(r => parseFloat(r.overtime_hours || 0) > 0).length;
+    const totalWorkingHours = reportData.reduce((sum, r) => sum + parseFloat(r.attandance_hours || 0), 0);
+    const totalOvertimeHours = reportData.reduce((sum, r) => sum + parseFloat(r.overtime_hours || 0), 0);
+    const totalLateHours = reportData.reduce((sum, r) => sum + parseFloat(r.late_hours || 0), 0);
+    const attendancePercentage = workingDays > 0 ? ((presentDays / workingDays) * 100).toFixed(1) : 0;
+
+    return {
+        totalDays,
+        workingDays,
+        presentDays,
+        absentDays,
+        weekoffDays,
+        holidayDays,
+        leaveDays,
+        halfDayDays,
+        lateDays,
+        overtimeDays,
+        totalWorkingHours: totalWorkingHours.toFixed(2),
+        totalOvertimeHours: totalOvertimeHours.toFixed(2),
+        totalLateHours: totalLateHours.toFixed(2),
+        attendancePercentage
+    };
+};
+
+// Format date
+export const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
+// Generate PDF content for monthly report
+export const generateMonthlyPDFContent = (reportData, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${title}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    color: #333;
+                    line-height: 1.2;
+                    font-size: 12px;
+                }
+                
+                .header {
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                    color: white;
+                    padding: 15px 20px;
+                    margin-bottom: 20px;
+                    position: relative;
+                    min-height: 70px;
+                }
+                
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .logo-area {
+                    width: 60px;
+                    height: 60px;
+                    background: white;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 20px;
+                }
+                
+                .header-info {
+                    flex: 1;
+                }
+                
+                .header-title {
+                    font-size: 22px;
+                    font-weight: bold;
+                    margin: 0 0 8px 0;
+                }
+                
+                .header-subtitle {
+                    font-size: 14px;
+                    margin: 0 0 5px 0;
+                    opacity: 0.9;
+                }
+                
+                .header-period {
+                    font-size: 12px;
+                    margin: 0;
+                    opacity: 0.8;
+                }
+                
+                .header-meta {
+                    text-align: right;
+                    font-size: 10px;
+                }
+                
+                .page-info {
+                    font-size: 12px;
+                    margin-bottom: 5px;
+                }
+                
+                .generation-info {
+                    opacity: 0.8;
+                }
+                
+                .summary-section {
+                    background-color: #f8fafc;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                    border-left: 4px solid #2563eb;
+                }
+                
+                .summary-title {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-bottom: 15px;
+                    color: #2563eb;
+                }
+                
+                .summary-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 15px;
+                    margin-bottom: 20px;
+                }
+                
+                .summary-item {
+                    background: white;
+                    padding: 12px;
+                    border-radius: 6px;
+                    border: 1px solid #e2e8f0;
+                    text-align: center;
+                }
+                
+                .summary-label {
+                    font-size: 11px;
+                    color: #64748b;
+                    margin-bottom: 5px;
+                }
+                
+                .summary-value {
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #1e293b;
+                }
+                
+                .summary-value.success {
+                    color: #22c55e;
+                }
+                
+                .summary-value.error {
+                    color: #ef4444;
+                }
+                
+                .summary-value.warning {
+                    color: #f59e0b;
+                }
+                
+                .summary-value.info {
+                    color: #3b82f6;
+                }
+                
+                .summary-value.purple {
+                    color: #8b5cf6;
+                }
+                
+                .legend-section {
+                    margin-bottom: 20px;
+                }
+                
+                .legend-title {
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    color: #2563eb;
+                }
+                
+                .legend-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+                
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                .legend-color {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 4px;
+                    border: 1px solid #e2e8f0;
+                }
+                
+                .legend-text {
+                    font-size: 11px;
+                    font-weight: 500;
+                }
+                
+                .attendance-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 10px;
+                    margin-bottom: 20px;
+                }
+                
+                .attendance-table th {
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                    color: white;
+                    padding: 8px 6px;
+                    text-align: center;
+                    border: 1px solid #1d4ed8;
+                    font-weight: 600;
+                    font-size: 10px;
+                }
+                
+                .attendance-table td {
+                    padding: 6px;
+                    border: 1px solid #e2e8f0;
+                    text-align: center;
+                    font-size: 9px;
+                }
+                
+                .attendance-table tr:nth-child(even) {
+                    background-color: #f9fafb;
+                }
+                
+                .status-badge {
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 8px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+                
+                .status-present {
+                    background-color: #dcfce7;
+                    color: #166534;
+                }
+                
+                .status-absent {
+                    background-color: #fee2e2;
+                    color: #dc2626;
+                }
+                
+                .status-week-off {
+                    background-color: #f3e8ff;
+                    color: #7c3aed;
+                }
+                
+                .status-holiday {
+                    background-color: #fef3c7;
+                    color: #d97706;
+                }
+                
+                .status-leave {
+                    background-color: #fef9c3;
+                    color: #ca8a04;
+                }
+                
+                .status-half-day {
+                    background-color: #dbeafe;
+                    color: #2563eb;
+                }
+                
+                .status-default {
+                    background-color: #f3f4f6;
+                    color: #6b7280;
+                }
+                
+                .shift-working {
+                    background-color: #dcfce7;
+                    color: #166534;
+                }
+                
+                .shift-weekoff {
+                    background-color: #f3e8ff;
+                    color: #7c3aed;
+                }
+                
+                .hours-highlight {
+                    background-color: #fef9c3;
+                    color: #ca8a04;
+                    font-weight: bold;
+                }
+                
+                .overtime-highlight {
+                    background-color: #dcfce7;
+                    color: #166534;
+                    font-weight: bold;
+                }
+                
+                .footer {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-size: 8px;
+                    color: #666;
+                    border-top: 1px solid #e2e8f0;
+                    padding: 8px;
+                    background: white;
+                }
+                
+                @media print {
+                    body { 
+                        margin: 0; 
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    .header {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    .summary-section {
+                        page-break-inside: avoid;
+                    }
+                }
+                
+                @page {
+                    margin: 15mm;
+                    size: A4 landscape;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="header-content">
+                    <div class="logo-area">
+                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
+                    </div>
+                    <div class="header-info">
+                        <h1 class="header-title">${title}</h1>
+                        <p class="header-subtitle">${employeeInfo.name ? `Employee: ${employeeInfo.name}` : 'Monthly attendance analysis'}</p>
+                        <p class="header-period">${filterInfo.month_year ? `Period: ${filterInfo.month_year}` : ''}</p>
+                    </div>
+                    <div class="header-meta">
+                        <div class="page-info">Page 1</div>
+                        <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            </div>
+
+            ${summaryStats ? `
+                <div class="summary-section">
+                    <div class="summary-title">Attendance Summary</div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Total Days</div>
+                            <div class="summary-value">${summaryStats.totalDays}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Working Days</div>
+                            <div class="summary-value">${summaryStats.workingDays}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Present Days</div>
+                            <div class="summary-value success">${summaryStats.presentDays} (${summaryStats.attendancePercentage}%)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Absent Days</div>
+                            <div class="summary-value error">${summaryStats.absentDays}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Week Offs</div>
+                            <div class="summary-value purple">${summaryStats.weekoffDays}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Working Hours</div>
+                            <div class="summary-value">${summaryStats.totalWorkingHours} hrs</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Overtime Hours</div>
+                            <div class="summary-value success">${summaryStats.totalOvertimeHours} hrs</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Late Hours</div>
+                            <div class="summary-value error">${summaryStats.totalLateHours} hrs</div>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">S.No</th>
+                        <th style="width: 12%;">Date</th>
+                        <th style="width: 15%;">Shift Status</th>
+                        <th style="width: 15%;">Attendance Status</th>
+                        <th style="width: 12%;">Clock In</th>
+                        <th style="width: 12%;">Clock Out</th>
+                        <th style="width: 10%;">Working Hours</th>
+                        <th style="width: 8%;">Late Hours</th>
+                        <th style="width: 8%;">Overtime Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${reportData.map((record, index) => {
+        const date = new Date(record.date);
+        const formattedDate = date.toLocaleDateString('en-GB');
+
+        // Status badge classes
+        const getStatusClass = (status) => {
+            switch (status?.toLowerCase()) {
+                case 'present': return 'status-present';
+                case 'absent': return 'status-absent';
+                case 'week off': case 'weekoff': return 'status-week-off';
+                case 'holiday': return 'status-holiday';
+                case 'leave': return 'status-leave';
+                case 'half day': return 'status-half-day';
+                default: return 'status-default';
+            }
+        };
+
+        const getShiftClass = (shiftStatus) => {
+            if (shiftStatus?.toLowerCase() === 'working day') return 'shift-working';
+            if (shiftStatus?.toLowerCase() === 'week off' || shiftStatus?.toLowerCase() === 'weekoff') return 'shift-weekoff';
+            return '';
+        };
+
+        const lateHours = parseFloat(record.late_hours || 0);
+        const overtimeHours = parseFloat(record.overtime_hours || 0);
+
+        return `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${formattedDate}</td>
+                                <td class="${getShiftClass(record.shift_status)}">${record.shift_status || 'N/A'}</td>
+                                <td>
+                                    <span class="status-badge ${getStatusClass(record.status)}">
+                                        ${record.status || 'N/A'}
+                                    </span>
+                                </td>
+                                <td>${record.attandance_first_clock_in || '-'}</td>
+                                <td>${record.attandance_last_clock_out || '-'}</td>
+                                <td>${record.attandance_hours ? `${parseFloat(record.attandance_hours).toFixed(2)}h` : '-'}</td>
+                                <td class="${lateHours > 0 ? 'hours-highlight' : ''}">${lateHours > 0 ? `${lateHours.toFixed(2)}h` : '-'}</td>
+                                <td class="${overtimeHours > 0 ? 'overtime-highlight' : ''}">${overtimeHours > 0 ? `${overtimeHours.toFixed(2)}h` : '-'}</td>
+                            </tr>
+                        `;
+    }).join('')}
+                </tbody>
+            </table>
+
+        </body>
+        </html>
+    `;
+};
 
 /**
  * Enhanced Export Monthly Attendance Report to PDF
@@ -12,363 +484,26 @@ import 'jspdf-autotable';
  */
 export const exportMonthlyReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
     try {
-        // Create new PDF document in landscape mode for better column fitting
-        const doc = new jsPDF({
-            orientation: 'landscape',
-            unit: 'pt',
-            format: 'a4'
-        });
+        // Calculate summary stats if not provided
+        if (!summaryStats) {
+            summaryStats = calculateMonthlySummary(reportData);
+        }
 
-        // PDF dimensions
-        const pageWidth = doc.internal.pageSize.width;
-        const pageHeight = doc.internal.pageSize.height;
-        const margin = 40;
+        // Generate HTML content
+        const htmlContent = generateMonthlyPDFContent(reportData, title, summaryStats, filterInfo, employeeInfo);
 
-        // Colors
-        const primaryColor = [59, 130, 246]; // Blue
-        const secondaryColor = [248, 250, 252]; // Light gray
-        const successColor = [34, 197, 94]; // Green
-        const errorColor = [239, 68, 68]; // Red
+        // Create a new window for PDF generation
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
 
-        // Helper function to add header
-        const addHeader = (pageNumber = 1) => {
-            // Header background with gradient effect
-            doc.setFillColor(...primaryColor);
-            doc.rect(0, 0, pageWidth, 90, 'F');
-
-            // Company logo area (if needed)
-            doc.setFillColor(255, 255, 255);
-            doc.rect(margin, 15, 60, 60, 'F');
-
-            // Title
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(22);
-            doc.setFont('helvetica', 'bold');
-            doc.text(title, margin + 80, 35);
-
-            // Employee info
-            if (employeeInfo.name) {
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Employee: ${employeeInfo.name}`, margin + 80, 55);
-            }
-
-            // Report period
-            if (filterInfo.month_year) {
-                doc.setFontSize(12);
-                doc.text(`Period: ${filterInfo.month_year}`, margin + 80, 70);
-            }
-
-            // Generation info
-            doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`, margin, pageHeight - 25);
-
-            // Page number
-            doc.setFontSize(12);
-            doc.text(`Page ${pageNumber}`, pageWidth - margin - 60, 35);
-
-            return 100; // Return Y position after header
+        // Wait for content to load then print
+        printWindow.onload = () => {
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         };
-
-        // Helper function to add enhanced summary section
-        const addSummarySection = (startY) => {
-            if (!summaryStats) return startY;
-
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Attendance Summary', margin, startY+10);
-
-            const summaryY = startY + 25;
-            const summaryBoxHeight = 120;
-
-            // Summary box background
-            doc.setFillColor(...secondaryColor);
-            doc.rect(margin, summaryY - 10, pageWidth - (margin * 2), summaryBoxHeight, 'F');
-
-            // Summary border
-            doc.setDrawColor(226, 232, 240);
-            doc.setLineWidth(1);
-            doc.rect(margin, summaryY - 10, pageWidth - (margin * 2), summaryBoxHeight, 'S');
-
-            // Summary items with better organization
-            const summaryItems = [
-                { label: 'Total Days:', value: summaryStats.totalDays, color: [75, 85, 99] },
-                { label: 'Working Days:', value: summaryStats.workingDays, color: [75, 85, 99] },
-                { label: 'Present Days:', value: `${summaryStats.presentDays} (${summaryStats.attendancePercentage}%)`, color: successColor },
-                { label: 'Absent Days:', value: summaryStats.absentDays, color: errorColor },
-                { label: 'Week Offs:', value: summaryStats.weekoffDays, color: [147, 51, 234] },
-                { label: 'Holidays:', value: summaryStats.holidayDays, color: [245, 158, 11] },
-                { label: 'Leave Days:', value: summaryStats.leaveDays, color: [245, 158, 11] },
-                { label: 'Half Days:', value: summaryStats.halfDayDays, color: [59, 130, 246] },
-                { label: 'Late Days:', value: summaryStats.lateDays, color: errorColor },
-                { label: 'Overtime Days:', value: summaryStats.overtimeDays, color: successColor },
-                { label: 'Total Working Hours:', value: `${summaryStats.totalWorkingHours} hrs`, color: [75, 85, 99] },
-                { label: 'Total Overtime Hours:', value: `${summaryStats.totalOvertimeHours} hrs`, color: successColor },
-                { label: 'Total Late Hours:', value: `${summaryStats.totalLateHours} hrs`, color: errorColor }
-            ];
-
-            // Split summary items into three columns
-            const itemsPerColumn = Math.ceil(summaryItems.length / 3);
-            const columnWidth = (pageWidth - (margin * 2)) / 3;
-
-            doc.setFontSize(11);
-
-            summaryItems.forEach((item, index) => {
-                const columnIndex = Math.floor(index / itemsPerColumn);
-                const itemIndex = index % itemsPerColumn;
-                const x = margin + 15 + (columnIndex * columnWidth);
-                const y = summaryY + 15 + (itemIndex * 18);
-
-                // Label
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(75, 85, 99);
-                doc.text(item.label, x, y);
-
-                // Value with color
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(...item.color);
-                doc.text(String(item.value), x + 120, y);
-            });
-
-            return summaryY + summaryBoxHeight + 30;
-        };
-
-        
-
-        // Start PDF generation
-        let currentY = addHeader();
-
-        // Add summary section
-        currentY = addSummarySection(currentY);
-
-        // Add filter section
-
-        // Add legend section
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Status Legend', margin, currentY);
-
-        const legendY = currentY + 20;
-        const legendItems = [
-            { status: 'Present', color: [220, 252, 231], textColor: [22, 163, 74] },
-            { status: 'Absent', color: [254, 226, 226], textColor: [220, 38, 38] },
-            { status: 'Week Off', color: [243, 232, 255], textColor: [147, 51, 234] },
-            { status: 'Holiday', color: [255, 237, 213], textColor: [245, 158, 11] },
-            { status: 'Leave', color: [254, 249, 195], textColor: [245, 158, 11] },
-            { status: 'Half Day', color: [219, 234, 254], textColor: [59, 130, 246] }
-        ];
-
-        legendItems.forEach((item, index) => {
-            const x = margin + (index * 120);
-            const y = legendY;
-
-            // Color box
-            doc.setFillColor(...item.color);
-            doc.rect(x, y - 8, 15, 12, 'F');
-            doc.setDrawColor(...item.textColor);
-            doc.setLineWidth(1);
-            doc.rect(x, y - 8, 15, 12, 'S');
-
-            // Label
-            doc.setTextColor(...item.textColor);
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text(item.status, x + 20, y);
-        });
-
-        currentY = legendY + 40;
-
-        // Prepare table data with separate date and day columns (removed remarks)
-        const tableData = reportData.map((record, index) => {
-            const date = new Date(record.date);
-            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-            const formattedDate = date.toLocaleDateString('en-GB');
-            
-            return [
-                index + 1,
-                formattedDate,
-                dayName,
-                record.shift_status || 'N/A',
-                record.status || 'N/A',
-                record.attandance_first_clock_in || '-',
-                record.attandance_last_clock_out || '-',
-                record.attandance_hours ? `${parseFloat(record.attandance_hours).toFixed(2)}h` : '-',
-                record.late_hours && parseFloat(record.late_hours) > 0 ? `${parseFloat(record.late_hours).toFixed(2)}h` : '-',
-                record.overtime_hours && parseFloat(record.overtime_hours) > 0 ? `${parseFloat(record.overtime_hours).toFixed(2)}h` : '-'
-            ];
-        });
-
-        // Table headers (removed remarks, added separate day column)
-        const headers = [
-            'S.No',
-            'Date',
-            'Day',
-            'Shift Status',
-            'Attendance\nStatus',
-            'Clock In',
-            'Clock Out',
-            'Working\nHours',
-            'Late\nHours',
-            'Overtime\nHours'
-        ];
-
-        // AutoTable configuration with updated column widths
-        const autoTableOptions = {
-            startY: currentY,
-            head: [headers],
-            body: tableData,
-            theme: 'striped',
-            styles: {
-                fontSize: 9,
-                cellPadding: 5,
-                textColor: [0, 0, 0],
-                lineColor: [226, 232, 240],
-                lineWidth: 0.5,
-                halign: 'center',
-                valign: 'middle'
-            },
-            headStyles: {
-                fillColor: primaryColor,
-                textColor: [255, 255, 255],
-                fontSize: 10,
-                fontStyle: 'bold',
-                halign: 'center',
-                valign: 'middle'
-            },
-            alternateRowStyles: {
-                fillColor: [248, 250, 252]
-            },
-            columnStyles: {
-                0: { cellWidth: 40 },  // S.No
-                1: { cellWidth: 70 },  // Date
-                2: { cellWidth: 50 },  // Day
-                3: { cellWidth: 80 },  // Shift Status
-                4: { cellWidth: 80 },  // Attendance Status
-                5: { cellWidth: 70 },  // Clock In
-                6: { cellWidth: 70 },  // Clock Out
-                7: { cellWidth: 70 },  // Working Hours
-                8: { cellWidth: 70 },  // Late Hours
-                9: { cellWidth: 70 }   // Overtime Hours
-            },
-            margin: { left: margin, right: margin },
-            pageBreak: 'auto',
-            showHead: 'everyPage',
-            didDrawPage: (data) => {
-                // Add header to each page
-                if (data.pageNumber > 1) {
-                    addHeader(data.pageNumber);
-                }
-            },
-            // Custom cell styling based on content
-            didParseCell: (data) => {
-                // Attendance Status column styling (column index 4 now)
-                if (data.column.index === 4) {
-                    const status = data.cell.text[0]?.toLowerCase();
-                    switch (status) {
-                        case 'present':
-                            data.cell.styles.fillColor = [220, 252, 231];
-                            data.cell.styles.textColor = [22, 163, 74];
-                            break;
-                        case 'absent':
-                            data.cell.styles.fillColor = [254, 226, 226];
-                            data.cell.styles.textColor = [220, 38, 38];
-                            break;
-                        case 'week off':
-                        case 'weekoff':
-                            data.cell.styles.fillColor = [243, 232, 255];
-                            data.cell.styles.textColor = [147, 51, 234];
-                            break;
-                        case 'holiday':
-                            data.cell.styles.fillColor = [255, 237, 213];
-                            data.cell.styles.textColor = [245, 158, 11];
-                            break;
-                        case 'leave':
-                            data.cell.styles.fillColor = [254, 249, 195];
-                            data.cell.styles.textColor = [245, 158, 11];
-                            break;
-                        case 'half day':
-                            data.cell.styles.fillColor = [219, 234, 254];
-                            data.cell.styles.textColor = [59, 130, 246];
-                            break;
-                        default:
-                            data.cell.styles.fillColor = [243, 244, 246];
-                            data.cell.styles.textColor = [107, 114, 128];
-                    }
-                    data.cell.styles.fontStyle = 'bold';
-                }
-
-                // Shift Status column styling (column index 3 now)
-                if (data.column.index === 3) {
-                    const shiftStatus = data.cell.text[0]?.toLowerCase();
-                    if (shiftStatus === 'week off' || shiftStatus === 'weekoff') {
-                        data.cell.styles.fillColor = [243, 232, 255];
-                        data.cell.styles.textColor = [147, 51, 234];
-                        data.cell.styles.fontStyle = 'bold';
-                    } else if (shiftStatus === 'working day') {
-                        data.cell.styles.fillColor = [220, 252, 231];
-                        data.cell.styles.textColor = [22, 163, 74];
-                    }
-                }
-
-                // Day column styling (column index 2)
-                if (data.column.index === 2) {
-                    const day = data.cell.text[0]?.toLowerCase();
-                    if (day === 'sat' || day === 'sun') {
-                        data.cell.styles.fillColor = [243, 232, 255];
-                        data.cell.styles.textColor = [147, 51, 234];
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                }
-
-                // Late Hours column styling (column index 8 now)
-                if (data.column.index === 8) {
-                    const lateHours = data.cell.text[0];
-                    if (lateHours !== '-' && parseFloat(lateHours) > 0) {
-                        data.cell.styles.fillColor = [254, 249, 195];
-                        data.cell.styles.textColor = [245, 158, 11];
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                }
-
-                // Overtime Hours column styling (column index 9 now)
-                if (data.column.index === 9) {
-                    const overtimeHours = data.cell.text[0];
-                    if (overtimeHours !== '-' && parseFloat(overtimeHours) > 0) {
-                        data.cell.styles.fillColor = [220, 252, 231];
-                        data.cell.styles.textColor = [22, 163, 74];
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                }
-            }
-        };
-
-        // Generate table
-        doc.autoTable(autoTableOptions);
-
-        // Add footer with additional information
-        const finalY = doc.lastAutoTable.finalY + 30;
-        
-        // Add summary footer
-        doc.setFontSize(10);
-        doc.setTextColor(107, 114, 128);
-        doc.text('Summary:', margin, finalY);
-        doc.text(`Total Records: ${reportData.length}`, margin, finalY + 15);
-        doc.text(`Attendance Rate: ${summaryStats?.attendancePercentage || 'N/A'}%`, margin + 150, finalY + 15);
-        doc.text(`Total Working Hours: ${summaryStats?.totalWorkingHours || 'N/A'} hrs`, margin + 300, finalY + 15);
-
-        // Add generation info
-        doc.setFontSize(8);
-        doc.setTextColor(156, 163, 175);
-        doc.text(
-            `This report was generated by the Attendance Management System on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString()}`,
-            margin,
-            finalY + 40
-        );
-
-        // Save the PDF
-        doc.save(fileName);
 
         return {
             success: true,
@@ -384,5 +519,4 @@ export const exportMonthlyReportToPDF = (reportData, fileName, title, summarySta
     }
 };
 
-// Legacy export function for backward compatibility
 export const exportToPDF = exportMonthlyReportToPDF;

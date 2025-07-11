@@ -26,7 +26,6 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { createPortal } from 'react-dom';
-import { exportToCSV } from '../../utils/exportUtils/csvExport';
 import { exportToExcel } from '../../utils/exportUtils/excelExport';
 import { exportToPDF } from '../../utils/exportUtils/pdfExport';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
@@ -182,33 +181,6 @@ const DailyReport = () => {
         setIsModalOpen(true);
     };
 
-    // Export handlers using imported functions
-    const handleExportToCSV = useCallback(() => {
-        try {
-            const exportData = filteredData.map(emp => ({
-                'S.No': emp.sno,
-                'Employee Name': emp.employee_name,
-                'Employee Code': emp.employee_code || '',
-                'Shift': emp.shift_name,
-                'Shift Time': `${emp.shift_from_time} - ${emp.shift_to_time}`,
-                'Clock In': emp.attandance_first_clock_in || '--',
-                'Clock Out': emp.attandance_last_clock_out || '--',
-                'Working Hours': `${emp.shift_working_hours}h`,
-                'Attendance Hours': `${emp.attandance_hours}h`,
-                'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
-                'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-                'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
-            }));
-
-            const fileName = `daily_attendance_report_${selectedDate}`;
-            exportToCSV(exportData, fileName);
-            showToast('CSV exported successfully', 'success');
-            setExportDropdown(false);
-        } catch (err) {
-            showToast('Failed to export CSV', err);
-        }
-    }, [filteredData, selectedDate]);
-
     const handleExportToExcel = useCallback(() => {
         try {
             const exportData = filteredData.map(emp => ({
@@ -338,16 +310,6 @@ const DailyReport = () => {
                                                     left: buttonPosition.left + buttonPosition.width - 192,
                                                 }}
                                             >
-                                                <button
-                                                    onClick={() => {
-                                                        handleExportToCSV();
-                                                        setExportDropdown(false);
-                                                    }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
-                                                >
-                                                    <FileText className="h-4 w-4 text-green-600" />
-                                                    Export to CSV
-                                                </button>
                                                 <button
                                                     onClick={() => {
                                                         handleExportToExcel();

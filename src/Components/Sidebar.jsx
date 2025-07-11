@@ -108,6 +108,7 @@ const Sidebar = () => {
                 { label: 'All Reports', path: '/reports' },
                 { label: 'Daily report', path: '/reports/daily-attendance' },
                 { label: 'Monthly Report', path: '/reports/monthly-attendance' },
+                { label: 'All Employee Report', path: '/reports/daterangereport' },
                 { label: 'Financial', path: '/reports/financial' }
             ]
         },

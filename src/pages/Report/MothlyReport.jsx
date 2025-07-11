@@ -6,9 +6,8 @@ import api from '../../api/axiosInstance';
 import { Calendar, Users, Building, Award, User, XCircle, CalendarX, FileText, Download, ArrowLeft, Filter, RefreshCw, AlertCircle, CheckCircle, Clock, BarChart3, Loader2, ChevronDown, FileDown, FileSpreadsheet, Coffee } from 'lucide-react';
 import { SearchableDropdown, StatusBadge, SummaryCard } from '../../Components/Report/ReportComponents';
 import Pagination from '../../Components/Pagination';
-import { Toast } from '../../Components/ui/Toast'; 
+import { Toast } from '../../Components/ui/Toast';
 import { exportMonthlyReportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
-import { exportToCSV } from '../../utils/exportUtils/csvExportMonthly';
 import { exportToExcel } from '../../utils/exportUtils/excelExportMonthly';
 
 const MonthlyReport = () => {
@@ -310,7 +309,21 @@ const MonthlyReport = () => {
             const employeeName = selectedEmployee?.name || 'Unknown Employee';
             const cleanEmployeeName = employeeName.split(' - EMP_ID:')[0]; // Remove EMP_ID part for display
 
-            const title = `Monthly Attendance Report`;
+            let title = '';
+
+            if (filters.month_year) {
+                const [year, month] = filters.month_year.split('-'); // e.g., "2025-07"
+                if (year && month) {
+                    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                    const monthIndex = parseInt(month, 10) - 1;
+                    const formatted = `${monthNames[monthIndex]} , ${year}`;
+                    title = `MONTHLY REPORT ${formatted}`;
+                } else {
+                    title = "MONTHLY REPORT - INVALID DATE";
+                }
+            } else {
+                title = "MONTHLY REPORT - DATE MISSING";
+            }
 
             // Prepare employee info
             const employeeInfo = {
@@ -347,21 +360,6 @@ const MonthlyReport = () => {
             }
         } catch (err) {
             showToast(err.message || 'Failed to export PDF', 'error');
-        }
-        setExportDropdown(false);
-    };
-
-    const handleExportCSV = () => {
-        if (!reportData) {
-            showToast('No data available to export', 'error');
-            return;
-        }
-
-        try {
-            exportToCSV(reportData, `attendance_report_${filters.month_year}.csv`);
-            showToast('CSV exported successfully!', 'success');
-        } catch (err) {
-            showToast('Failed to export CSV', err);
         }
         setExportDropdown(false);
     };
@@ -489,13 +487,6 @@ const MonthlyReport = () => {
                                                     left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
                                                 }}
                                             >
-                                                <button
-                                                    onClick={handleExportCSV}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
-                                                >
-                                                    <FileText className="h-4 w-4 text-green-600" />
-                                                    Export to CSV
-                                                </button>
                                                 <button
                                                     onClick={handleExportExcel}
                                                     className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"

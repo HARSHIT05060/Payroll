@@ -62,7 +62,29 @@ const AllReports = () => {
                 'Department and employee-wise breakdowns',
                 'Visual status indicators and legends',
                 'Multi-format export (CSV, Excel, PDF)',
-                'Enhanced PDF export with professional styling',
+                'Enhanced PDF export with professional styling'
+            ]
+        },
+        {
+            id: 'date-range-report',
+            title: 'Date Range Report',
+            icon: Calendar,
+            color: 'from-orange-500 to-orange-600',
+            description: 'Generate comprehensive attendance reports for selected date range',
+            path: '/reports/daterangereport',
+            category: 'attendance',
+            isAvailable: true,
+            features: [
+                'Employee-wise data organization and grouping',
+                'Individual employee attendance patterns',
+                'Comprehensive analytics',
+                'Hours worked tracking and calculations',
+                'Overtime tracking and analysis',
+                'Late arrival detection and reporting',
+                'Complete daily attendance records',
+                'Detailed clock in/out times with status tracking',
+                'Professional PDF format with clean styling',
+                'Print-ready reports with organized layout'
             ]
         },
         {
@@ -71,7 +93,7 @@ const AllReports = () => {
             icon: Users,
             color: 'from-green-500 to-green-600',
             description: 'Complete employee information and records',
-            path: '/reports/daterangereport',
+            path: '/reports/employee-directory',
             category: 'employees',
             isAvailable: true,
             features: [
@@ -82,7 +104,7 @@ const AllReports = () => {
                 'Employment status',
                 'Export employee data'
             ]
-        },
+        }
     ];
 
     const comingSoonReports = [

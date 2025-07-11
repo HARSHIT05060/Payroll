@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, RefreshCw, X, ArrowLeft, AlertCircle, XCircle, Shield, User } from 'lucide-react';
@@ -216,11 +217,6 @@ const Role = () => {
                                             <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                                 Role Management
                                             </h1>
-                                            {totalRoles > 0 && (
-                                                <p className="text-[var(--color-text-white)] text-sm">
-                                                    Total Roles: {totalRoles}
-                                                </p>
-                                            )}
                                         </div>
                                     </div>
                                 </div>

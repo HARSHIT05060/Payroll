@@ -1,469 +1,413 @@
-export const exportToPDF = (data, filename, title, summaryStats = null) => {
-    if (!data || data.length === 0) {
-        console.error('No data to export');
-        return;
-    }
+// utils/enhancedPdfExport.js
+
+// Format date helper
+export const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
+// Get dynamic table headers from data
+export const getTableHeaders = (data) => {
+    if (!data || data.length === 0) return [];
 
     const headers = Object.keys(data[0]);
 
-    const summarySection = summaryStats ? `
-        <div class="summary">
-            <div class="summary-item">
-                <div class="summary-icon">👥</div>
-                <h3>Total Employees</h3>
-                <p>${summaryStats.total || 0}</p>
-            </div>
-            <div class="summary-item present-card">
-                <div class="summary-icon">✅</div>
-                <h3>Present</h3>
-                <p class="present">${summaryStats.present || 0}</p>
-            </div>
-            <div class="summary-item absent-card">
-                <div class="summary-icon">❌</div>
-                <h3>Absent</h3>
-                <p class="absent">${summaryStats.absent || 0}</p>
-            </div>
-            <div class="summary-item late-card">
-                <div class="summary-icon">⏰</div>
-                <h3>Late</h3>
-                <p class="late">${summaryStats.late || 0}</p>
-            </div>
-            <div class="summary-item overtime-card">
-                <div class="summary-icon">⏱️</div>
-                <h3>Overtime</h3>
-                <p class="overtime">${summaryStats.overtime || 0}</p>
-            </div>
-        </div>
-    ` : '';
+    // Add S.No column if not present
+    if (!headers.includes('S.No') && !headers.includes('s_no')) {
+        headers.unshift('S.No');
+    }
 
-    const printWindow = window.open('', '_blank');
-    const htmlContent = `
+    return headers;
+};
+
+// Format table data
+export const formatTableData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    return data.map((record, index) => {
+        const formattedRecord = { ...record };
+
+        // Add S.No if not present
+        if (!formattedRecord['S.No'] && !formattedRecord['s_no']) {
+            formattedRecord['S.No'] = index + 1;
+        }
+
+        // Format date fields
+        if (formattedRecord.date) {
+            formattedRecord.date = formatDate(formattedRecord.date);
+        }
+
+        // Format hours fields
+        ['attandance_hours', 'late_hours', 'overtime_hours'].forEach(field => {
+            if (formattedRecord[field]) {
+                const hours = parseFloat(formattedRecord[field]);
+                formattedRecord[field] = hours > 0 ? `${hours.toFixed(2)}h` : '-';
+            }
+        });
+
+        return formattedRecord;
+    });
+};
+
+// Generate enhanced PDF content
+export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, employeeInfo = {}) => {
+    const headers = getTableHeaders(reportData);
+    const formattedData = formatTableData(reportData);
+
+    return `
         <!DOCTYPE html>
         <html>
         <head>
-            <title>${title || 'Report'}</title>
-            <meta charset="utf-8">
+            <meta charset="UTF-8">
+            <title>${title}</title>
             <style>
-                * {
+                body {
+                    font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    box-sizing: border-box;
+                    color: #333;
+                    line-height: 1.2;
+                    font-size: 12px;
                 }
                 
-                body { 
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-                    margin: 0; 
-                    padding: 0; 
-                    line-height: 1.6;
-                    color: #1f2937;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    min-height: 100vh;
-                }
-                
-                .container {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    background: white;
-                    min-height: 100vh;
-                    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
-                }
-                
-                .header { 
-                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                .header {
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                     color: white;
-                    padding: 40px 30px;
-                    text-align: center;
+                    padding: 15px 20px;
+                    margin-bottom: 20px;
                     position: relative;
-                    overflow: hidden;
-                }
-                
-                .header::before {
-                    content: '';
-                    position: absolute;
-                    top: -50%;
-                    left: -50%;
-                    width: 200%;
-                    height: 200%;
-                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-                    animation: pulse 4s ease-in-out infinite;
-                }
-                
-                @keyframes pulse {
-                    0%, 100% { transform: scale(0.8); opacity: 0.5; }
-                    50% { transform: scale(1.2); opacity: 0.8; }
+                    min-height: 70px;
                 }
                 
                 .header-content {
-                    position: relative;
-                    z-index: 2;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 }
                 
-                .header h1 { 
-                    font-size: 32px;
-                    font-weight: 700;
-                    margin-bottom: 10px;
-                    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                .logo-area {
+                    width: 60px;
+                    height: 60px;
+                    background: white;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 20px;
                 }
                 
-                .header p { 
-                    font-size: 16px;
+                .header-info {
+                    flex: 1;
+                }
+                
+                .header-title {
+                    font-size: 22px;
+                    font-weight: bold;
+                    margin: 0 0 8px 0;
+                }
+                
+                .header-subtitle {
+                    font-size: 14px;
+                    margin: 0 0 5px 0;
                     opacity: 0.9;
-                    font-weight: 500;
                 }
                 
-                .main-content {
-                    padding: 40px 30px;
-                }
-                
-                .summary { 
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                    gap: 20px;
-                    margin-bottom: 40px; 
-                }
-                
-                .summary-item { 
-                    text-align: center; 
-                    padding: 25px 20px; 
-                    background: white; 
-                    border-radius: 12px;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                    border: 1px solid #e5e7eb;
-                    transition: transform 0.2s ease, box-shadow 0.2s ease;
-                    position: relative;
-                    overflow: hidden;
-                }
-                
-                .summary-item::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    height: 4px;
-                    background: #e5e7eb;
-                }
-                
-                .summary-item.present-card::before {
-                    background: linear-gradient(90deg, #10b981, #059669);
-                }
-                
-                .summary-item.absent-card::before {
-                    background: linear-gradient(90deg, #ef4444, #dc2626);
-                }
-                
-                .summary-item.late-card::before {
-                    background: linear-gradient(90deg, #f59e0b, #d97706);
-                }
-                
-                .summary-item.overtime-card::before {
-                    background: linear-gradient(90deg, #3b82f6, #2563eb);
-                }
-                
-                .summary-item:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                }
-                
-                .summary-icon {
-                    font-size: 24px;
-                    margin-bottom: 10px;
+                .header-period {
+                    font-size: 12px;
+                    margin: 0;
                     opacity: 0.8;
                 }
                 
-                .summary-item h3 { 
-                    margin: 0 0 12px 0; 
-                    color: #6b7280; 
-                    font-size: 13px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.1em;
+                .header-meta {
+                    text-align: right;
+                    font-size: 10px;
                 }
                 
-                .summary-item p { 
-                    margin: 0; 
-                    font-size: 28px; 
-                    font-weight: 700;
-                    line-height: 1;
+                .page-info {
+                    font-size: 12px;
+                    margin-bottom: 5px;
                 }
                 
-                .present { color: #10b981; }
-                .absent { color: #ef4444; }
-                .late { color: #f59e0b; }
-                .overtime { color: #3b82f6; }
+                .generation-info {
+                    opacity: 0.8;
+                }
                 
-                .section-title {
-                    font-size: 20px;
-                    font-weight: 700;
-                    color: #1f2937;
+                .attendance-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 10px;
                     margin-bottom: 20px;
-                    padding-bottom: 10px;
-                    border-bottom: 2px solid #e5e7eb;
                 }
                 
-                .table-container {
-                    overflow-x: auto;
-                    border-radius: 12px;
-                    border: 1px solid #e5e7eb;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                    background: white;
-                }
-                
-                table { 
-                    width: 100%; 
-                    border-collapse: collapse; 
-                    font-size: 13px;
-                    background: white;
-                }
-                
-                th, td { 
-                    border: 1px solid #f3f4f6; 
-                    padding: 16px 12px; 
-                    text-align: left;
-                    word-wrap: break-word;
-                }
-                
-                th { 
-                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                .attendance-table th {
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                    color: white;
+                    padding: 8px 6px;
+                    text-align: center;
+                    border: 1px solid #1d4ed8;
                     font-weight: 600;
-                    color: #374151;
+                    font-size: 10px;
+                }
+                
+                .attendance-table td {
+                    padding: 6px;
+                    border: 1px solid #e2e8f0;
+                    text-align: center;
+                    font-size: 9px;
+                }
+                
+                .attendance-table tr:nth-child(even) {
+                    background-color: #f9fafb;
+                }
+                
+                .status-badge {
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 8px;
+                    font-weight: 600;
                     text-transform: uppercase;
-                    font-size: 11px;
-                    letter-spacing: 0.05em;
-                    border-bottom: 2px solid #e5e7eb;
                 }
                 
-                tr:nth-child(even) { 
-                    background-color: #f9fafb; 
+                .status-present {
+                    background-color: #dcfce7;
+                    color: #166534;
                 }
                 
-                tr:hover {
+                .status-absent {
+                    background-color: #fee2e2;
+                    color: #dc2626;
+                }
+                
+                .status-week-off {
+                    background-color: #f3e8ff;
+                    color: #7c3aed;
+                }
+                
+                .status-holiday {
+                    background-color: #fef3c7;
+                    color: #d97706;
+                }
+                
+                .status-leave {
+                    background-color: #fef9c3;
+                    color: #ca8a04;
+                }
+                
+                .status-half-day {
+                    background-color: #dbeafe;
+                    color: #2563eb;
+                }
+                
+                .status-late {
+                    background-color: #fef9c3;
+                    color: #ca8a04;
+                }
+                
+                .status-overtime {
+                    background-color: #dcfce7;
+                    color: #166534;
+                }
+                
+                .status-default {
                     background-color: #f3f4f6;
-                    transform: scale(1.001);
-                    transition: all 0.2s ease;
+                    color: #6b7280;
                 }
                 
-                .status-present { 
-                    color: #10b981; 
-                    font-weight: 600; 
-                    background: rgba(16, 185, 129, 0.1);
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    font-size: 12px;
+                .shift-working {
+                    background-color: #dcfce7;
+                    color: #166534;
                 }
                 
-                .status-absent { 
-                    color: #ef4444; 
-                    font-weight: 600; 
-                    background: rgba(239, 68, 68, 0.1);
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    font-size: 12px;
+                .shift-weekoff {
+                    background-color: #f3e8ff;
+                    color: #7c3aed;
                 }
                 
-                .status-late { 
-                    color: #f59e0b; 
-                    font-weight: 600; 
-                    background: rgba(245, 158, 11, 0.1);
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    font-size: 12px;
+                .hours-highlight {
+                    background-color: #fef9c3;
+                    color: #ca8a04;
+                    font-weight: bold;
+                }
+                
+                .overtime-highlight {
+                    background-color: #dcfce7;
+                    color: #166534;
+                    font-weight: bold;
                 }
                 
                 .footer {
-                    margin-top: 40px;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
                     text-align: center;
-                    color: #6b7280;
-                    font-size: 12px;
-                    border-top: 1px solid #e5e7eb;
-                    padding: 30px;
-                    background: #f9fafb;
-                }
-                
-                .print-button {
-                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                    color: white; 
-                    padding: 14px 28px; 
-                    border: none; 
-                    border-radius: 8px; 
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: 600;
-                    transition: all 0.2s ease;
-                    margin-top: 20px;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                }
-                
-                .print-button:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
-                }
-                
-                .legend {
-                    display: flex;
-                    justify-content: center;
-                    gap: 20px;
-                    margin-bottom: 30px;
-                    flex-wrap: wrap;
-                }
-                
-                .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 8px 12px;
+                    font-size: 8px;
+                    color: #666;
+                    border-top: 1px solid #e2e8f0;
+                    padding: 8px;
                     background: white;
-                    border-radius: 6px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                    font-size: 12px;
-                    font-weight: 500;
                 }
-                
-                .legend-color {
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 2px;
-                }
-                
-                .legend-present { background: #10b981; }
-                .legend-absent { background: #ef4444; }
-                .legend-late { background: #f59e0b; }
-                .legend-overtime { background: #3b82f6; }
                 
                 @media print {
                     body { 
                         margin: 0; 
-                        padding: 0;
-                        background: white;
-                    }
-                    
-                    .container {
-                        box-shadow: none;
-                    }
-                    
-                    .no-print { 
-                        display: none !important; 
-                    }
-                    
-                    .header {
-                        background: #3b82f6 !important;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    
-                    .summary {
-                        grid-template-columns: repeat(5, 1fr);
-                        gap: 15px;
+                    .header {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
-                    
-                    .summary-item {
-                        padding: 15px 10px;
-                        box-shadow: none;
-                        border: 1px solid #e5e7eb;
-                    }
-                    
-                    .summary-item p {
-                        font-size: 20px;
-                    }
-                    
-                    table {
-                        font-size: 11px;
-                    }
-                    
-                    th, td {
-                        padding: 8px 6px;
-                    }
-                    
-                    .main-content {
-                        padding: 20px;
-                    }
+                }
+                
+                @page {
+                    margin: 15mm;
+                    size: A4 landscape;
                 }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <div class="header-content">
-                        <h1>${title || 'Attendance Report'}</h1>
-                        <p>Generated on ${new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    })}</p>
+            <div class="header">
+                <div class="header-content">
+                    <div class="logo-area">
+                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
                     </div>
-                </div>
-                
-                <div class="main-content">
-                    ${summarySection}
-                    
-                    ${summaryStats ? `
-                    <div class="legend">
-                        <div class="legend-item">
-                            <div class="legend-color legend-present"></div>
-                            <span>Present</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color legend-absent"></div>
-                            <span>Absent</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color legend-late"></div>
-                            <span>Late</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color legend-overtime"></div>
-                            <span>Overtime</span>
-                        </div>
+                    <div class="header-info">
+                        <h1 class="header-title">${title}</h1>
+                        <p class="header-subtitle">${employeeInfo.name ? `Employee: ${employeeInfo.name}` : 'Data export report'}</p>
+                        <p class="header-period">${filterInfo.period || filterInfo.month_year ? `Period: ${filterInfo.period || filterInfo.month_year}` : ''}</p>
                     </div>
-                    ` : ''}
-                    
-                    <h2 class="section-title">Attendance Details</h2>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    ${headers.map(header => `<th>${header}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.map(item => `
-                                    <tr>
-                                        ${headers.map(header => {
-        const cellValue = item[header] || '';
-        const statusClass = header === 'Status' ? `status-${String(cellValue).toLowerCase()}` : '';
-        return `<td><span class="${statusClass}">${cellValue}</span></td>`;
-    }).join('')}
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+                    <div class="header-meta">
+                        <div class="page-info">Page 1</div>
+                        <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
-                </div>
-                
-                <div class="no-print" style="text-align: center; padding: 30px;">
-                    <button class="print-button" onclick="window.print()">
-                        🖨️ Print Report
-                    </button>
                 </div>
             </div>
+
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        ${headers.map(header => `<th>${header.replace('_', ' ').toUpperCase()}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${formattedData.map((record) => {
+        return `
+                            <tr>
+                                ${headers.map(header => {
+            const value = record[header] || '-';
+
+            // Apply special styling for status columns
+            if (header.toLowerCase().includes('status')) {
+                const statusClass = getStatusClass(value);
+                return `<td><span class="status-badge ${statusClass}">${value}</span></td>`;
+            }
+
+            // Apply special styling for shift columns
+            if (header.toLowerCase().includes('shift')) {
+                const shiftClass = getShiftClass(value);
+                return `<td class="${shiftClass}">${value}</td>`;
+            }
+
+            // Apply special styling for hours columns
+            if (header.toLowerCase().includes('hours')) {
+                const hoursClass = getHoursClass(header, value);
+                return `<td class="${hoursClass}">${value}</td>`;
+            }
+
+            return `<td>${value}</td>`;
+        }).join('')}
+                            </tr>
+                        `;
+    }).join('')}
+                </tbody>
+            </table>
         </body>
         </html>
     `;
+};
 
-    if (printWindow) {
+// Helper functions for styling
+const getStatusClass = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+        case 'present': return 'status-present';
+        case 'absent': return 'status-absent';
+        case 'week off': case 'weekoff': return 'status-week-off';
+        case 'holiday': return 'status-holiday';
+        case 'leave': return 'status-leave';
+        case 'half day': return 'status-half-day';
+        case 'late': return 'status-late';
+        case 'overtime': return 'status-overtime';
+        default: return 'status-default';
+    }
+};
+
+const getShiftClass = (shiftStatus) => {
+    const shiftLower = shiftStatus?.toLowerCase();
+    if (shiftLower === 'working day') return 'shift-working';
+    if (shiftLower === 'week off' || shiftLower === 'weekoff') return 'shift-weekoff';
+    return '';
+};
+
+const getHoursClass = (header, value) => {
+    const headerLower = header.toLowerCase();
+    if (value !== '-' && parseFloat(value) > 0) {
+        if (headerLower.includes('late')) return 'hours-highlight';
+        if (headerLower.includes('overtime')) return 'overtime-highlight';
+    }
+    return '';
+};
+
+/**
+ * Enhanced Export to PDF Function
+ * @param {Array} data - Array of records to export
+ * @param {string} filename - Name for the PDF file (optional)
+ * @param {string} title - Report title
+ * @param {Object} filterInfo - Applied filters information (optional)
+ * @param {Object} employeeInfo - Employee information for header (optional)
+ */
+export const exportToPDF = (data, title = 'Daily Report', filterInfo = {}, employeeInfo = {}) => {
+    try {
+        // Validate input data
+        if (!data || data.length === 0) {
+            console.error('No data to export');
+            return {
+                success: false,
+                message: 'No data available to export'
+            };
+        }
+
+        // Generate HTML content
+        const htmlContent = generateEnhancedPDFContent(data, title, filterInfo, employeeInfo);
+
+        // Create a new window for PDF generation
+        const printWindow = window.open('', '_blank');
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-        printWindow.focus();
 
-        // Wait for content to load before printing
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
-    } else {
-        console.error('Unable to open print window. Please check popup blockers.');
+        // Wait for content to load then print
+        printWindow.onload = () => {
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        };
+
+        return {
+            success: true,
+            message: 'PDF exported successfully!'
+        };
+
+    } catch (error) {
+        console.error('Error exporting PDF:', error);
+        return {
+            success: false,
+            message: 'Failed to export PDF: ' + error.message
+        };
     }
 };

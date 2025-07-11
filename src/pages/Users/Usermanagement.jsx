@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, RefreshCw, X, CheckCircle, ArrowLeft, XCircle, User, Shield } from 'lucide-react';
@@ -228,11 +229,6 @@ const UserManagement = () => {
                                             <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                                 User Management
                                             </h1>
-                                            {totalUsers > 0 && (
-                                                <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                                    Total Users: {totalUsers}
-                                                </p>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
