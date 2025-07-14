@@ -64,7 +64,7 @@ const AddEmployee = () => {
     const { user, isAuthenticated } = useAuth();
 
     const [expandedSections, setExpandedSections] = useState({
-        basicDetails: false,
+        basicDetails: true,
         bankDetails: false,
         legalDocuments: false,
         contactInformation: false,
@@ -713,37 +713,37 @@ const AddEmployee = () => {
             key: 'bankDetails',
             title: 'Bank Details',
             icon: CreditCard,
-            color: 'green'
+            color: 'blue'
         },
         {
             key: 'legalDocuments',
             title: 'Legal Documents',
             icon: FileText,
-            color: 'purple'
+            color: 'blue'
         },
         {
             key: 'contactInformation',
             title: 'Contact Information',
             icon: Phone,
-            color: 'orange'
+            color: 'blue'
         },
         {
             key: 'personalInformation',
             title: 'Personal Information',
             icon: Calendar,
-            color: 'indigo'
+            color: 'blue'
         },
         {
             key: 'reference',
             title: 'References',
             icon: Users,
-            color: 'pink'
+            color: 'blue'
         },
         {
             key: 'credentials',
             title: 'Credentials',
             icon: Lock,
-            color: 'cyan'
+            color: 'blue'
         }
     ];
 

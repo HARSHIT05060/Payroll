@@ -395,29 +395,28 @@ const EmployeeDetail = () => {
                                         </p>
                                     </div>
                                 </div>
+                                {/* Action Buttons */}
+                                <div className="flex flex-row  justify-around gap-4 my-10">
+                                    {permissions['employee_edit'] &&
+                                        <button
+                                            onClick={handleEditClick}
+                                            className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors font-medium"
+                                        >
+                                            <Pencil size={18} className="mr-2" />
+                                            Edit
+                                        </button>
+                                    }
+                                    {permissions['employee_delete'] &&
+                                        <button
+                                            onClick={() => setShowDeleteModal(true)}
+                                            className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
+                                        >
+                                            <Trash2 size={18} className="mr-2" />
+                                            Delete
+                                        </button>
+                                    }
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-row  justify-around gap-4 my-4">
-                            {permissions['employee_edit'] &&
-                                <button
-                                    onClick={handleEditClick}
-                                    className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors font-medium"
-                                >
-                                    <Pencil size={18} className="mr-2" />
-                                    Edit 
-                                </button>
-                            }
-                            {permissions['employee_delete'] &&
-                                <button
-                                    onClick={() => setShowDeleteModal(true)}
-                                    className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
-                                >
-                                    <Trash2 size={18} className="mr-2" />
-                                    Delete 
-                                </button>
-                            }
                         </div>
                     </div>
 
