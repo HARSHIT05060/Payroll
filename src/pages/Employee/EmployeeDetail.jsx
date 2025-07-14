@@ -320,26 +320,25 @@ const EmployeeDetail = () => {
                 </div>
             )}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto p-6 px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <button
-                        onClick={() => navigate('/employee')}
-                        className="flex items-center text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] font-medium mb-4 transition-colors"
-                    >
-                        <ArrowLeft size={18} className="mr-1" />
-                        Back to Employee List
-                    </button>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">Employee Details</h1>
-                            
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <StatusIcon size={20} className={statusInfo.label === 'Active' ? 'text-[var(--color-success-dark)]' : 'text-[var(--color-text-error)]'} />
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.color}`}>
-                                {statusInfo.label}
-                            </span>
+                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
+                            >
+                                <ArrowLeft size={18} />
+                                Back
+                            </button>
+                            <div className="flex items-center gap-3">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
+                                        Employee Details
+                                    </h1>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -400,14 +399,14 @@ const EmployeeDetail = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="mt-6 space-y-3">
+                        <div className="flex flex-row  justify-around gap-4 my-4">
                             {permissions['employee_edit'] &&
                                 <button
                                     onClick={handleEditClick}
                                     className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors font-medium"
                                 >
                                     <Pencil size={18} className="mr-2" />
-                                    Edit Employee
+                                    Edit 
                                 </button>
                             }
                             {permissions['employee_delete'] &&
@@ -416,7 +415,7 @@ const EmployeeDetail = () => {
                                     className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
                                 >
                                     <Trash2 size={18} className="mr-2" />
-                                    Delete Employee
+                                    Delete 
                                 </button>
                             }
                         </div>
@@ -426,9 +425,9 @@ const EmployeeDetail = () => {
                     <div className="lg:col-span-3 space-y-8">
                         {/* Basic Information */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <User size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <User size={20} className="mr-2 text-white" />
                                     Basic Information
                                 </h3>
                             </div>
@@ -468,9 +467,9 @@ const EmployeeDetail = () => {
 
                         {/* Employment Information */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <Briefcase size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <Briefcase size={20} className="mr-2 text-white" />
                                     Employment Information
                                 </h3>
                             </div>
@@ -508,9 +507,9 @@ const EmployeeDetail = () => {
 
                         {/* Salary Information */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <CreditCard size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <CreditCard size={20} className="mr-2 text-white" />
                                     Salary Information
                                 </h3>
                             </div>
@@ -532,9 +531,9 @@ const EmployeeDetail = () => {
 
                         {/* Bank Details */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <Building size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <Building size={20} className="mr-2 text-white" />
                                     Bank Details
                                 </h3>
                             </div>
@@ -562,9 +561,9 @@ const EmployeeDetail = () => {
 
                         {/* Legal Documents */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <Shield size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <Shield size={20} className="mr-2 text-white" />
                                     Legal Documents
                                 </h3>
                             </div>
@@ -599,9 +598,9 @@ const EmployeeDetail = () => {
 
                         {/* Emergency Contact */}
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
-                                    <Phone size={20} className="mr-2 text-[var(--color-blue-dark)]" />
+                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
+                                <h3 className="text-lg font-semibold text-white flex items-center">
+                                    <Phone size={20} className="mr-2 text-white" />
                                     Emergency Contact
                                 </h3>
                             </div>

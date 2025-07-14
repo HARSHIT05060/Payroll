@@ -230,7 +230,7 @@ export default function EmployeeManagement() {
 
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
-            <div className="p-6 max-w-7xl mx-auto">
+            <div className="p-6 max-w-7xl mx-auto ">
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
@@ -403,10 +403,10 @@ export default function EmployeeManagement() {
                                                     key={`emp-${employeeId}`}
                                                     className={`hover:bg-[var(--color-bg-primary)] transition-colors ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
                                                 >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                                                         {employee.employee_code || '-'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                         <div className="flex items-center space-x-2">
                                                             <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
                                                                 <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
@@ -414,20 +414,20 @@ export default function EmployeeManagement() {
                                                             <span>{employee.full_name || 'Unnamed Employee'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.department_name || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.designation_name || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.email || 'N/A'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                                                         {employee.mobile_number || 'N/A'}
                                                     </td>
                                                     {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
                                                             <div className="flex space-x-2">
                                                                 {permissions['employee_edit'] && (
                                                                     <button

@@ -780,9 +780,7 @@ const AddEmployee = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Employee' : 'Add New Employee'}
                                     </h1>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
-                                        {isEditMode ? 'Update employee details below' : 'Fill in the employee details below'}
-                                    </p>
+                                  
                                 </div>
                             </div>
                         </div>
