@@ -64,7 +64,7 @@ const AddEmployee = () => {
     const { user, isAuthenticated } = useAuth();
 
     const [expandedSections, setExpandedSections] = useState({
-        basicDetails: false,
+        basicDetails: true,
         bankDetails: false,
         legalDocuments: false,
         contactInformation: false,
@@ -705,7 +705,7 @@ const AddEmployee = () => {
     const sections = [
         {
             key: 'basicDetails',
-            title: 'Basic Details',
+            title: 'Employement Information',
             icon: User,
             color: 'blue'
         },
@@ -713,37 +713,37 @@ const AddEmployee = () => {
             key: 'bankDetails',
             title: 'Bank Details',
             icon: CreditCard,
-            color: 'green'
+            color: 'blue'
         },
         {
             key: 'legalDocuments',
-            title: 'Legal Documents',
+            title: 'Documents',
             icon: FileText,
-            color: 'purple'
+            color: 'blue'
         },
         {
             key: 'contactInformation',
-            title: 'Contact Information',
+            title: 'Contact',
             icon: Phone,
-            color: 'orange'
+            color: 'blue'
         },
         {
             key: 'personalInformation',
             title: 'Personal Information',
             icon: Calendar,
-            color: 'indigo'
+            color: 'blue'
         },
         {
             key: 'reference',
             title: 'References',
             icon: Users,
-            color: 'pink'
+            color: 'blue'
         },
         {
             key: 'credentials',
             title: 'Credentials',
             icon: Lock,
-            color: 'cyan'
+            color: 'blue'
         }
     ];
 
@@ -780,9 +780,7 @@ const AddEmployee = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Employee' : 'Add New Employee'}
                                     </h1>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
-                                        {isEditMode ? 'Update employee details below' : 'Fill in the employee details below'}
-                                    </p>
+                                  
                                 </div>
                             </div>
                         </div>
