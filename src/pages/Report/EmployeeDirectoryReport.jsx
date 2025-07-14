@@ -24,7 +24,7 @@ import {
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { useRef } from 'react';
-import { exportEmployeeDirectoryToPDF, calculateEmployeeDirectorySummary } from '../../utils/exportUtils/employeeDirectoryPdfExport';
+import { exportEmployeeDirectoryToPDF, calculateEmployeeDirectorySummary } from '../../utils/exportUtils/EmployeeReport/employeeDirectoryPdfExport';
 
 const EmployeeDirectoryReport = () => {
     const navigate = useNavigate();

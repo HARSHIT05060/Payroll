@@ -12,7 +12,8 @@ import {
     ArrowLeft,
     Target,
     DollarSign,
-    AlertCircle
+    AlertCircle,
+    IndianRupee
 } from 'lucide-react';
 import { Toast } from '../../Components/ui/Toast'; // Adjust import path as needed
 
@@ -25,7 +26,7 @@ const AllReports = () => {
             id: 'employee-list',
             title: 'Employee Directory',
             icon: Users,
-            color: 'from-green-500 to-green-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Complete employee information and records',
             path: '/reports/employee-directory',
             category: 'employees',
@@ -47,7 +48,7 @@ const AllReports = () => {
             id: 'daily-attendance',
             title: 'Daily Attendance Report',
             icon: Calendar,
-            color: 'from-blue-500 to-blue-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Comprehensive daily attendance tracking with detailed employee records',
             path: '/reports/daily-attendance',
             category: 'attendance',
@@ -69,7 +70,7 @@ const AllReports = () => {
             id: 'monthly-attendance',
             title: 'Monthly Attendance Summary',
             icon: BarChart3,
-            color: 'from-purple-500 to-purple-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Detailed monthly attendance analysis with comprehensive statistics',
             path: '/reports/monthly-attendance',
             category: 'attendance',
@@ -91,7 +92,7 @@ const AllReports = () => {
             id: 'date-range-report',
             title: 'Date Range Report',
             icon: Calendar,
-            color: 'from-orange-500 to-orange-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Generate comprehensive attendance reports for selected date range',
             path: '/reports/daterangereport',
             category: 'attendance',
@@ -108,7 +109,30 @@ const AllReports = () => {
                 'Professional PDF format with clean styling',
                 'Print-ready reports with organized layout'
             ]
+        },
+        {
+            id: 'monthly-salary-report',
+            title: 'Monthly Salary Report',
+            icon: IndianRupee,
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
+            description: 'Generate detailed monthly salary reports with breakdowns and analytics',
+            path: '/reports/monthly-salary',
+            category: 'payroll',
+            isAvailable: true,
+            features: [
+                'Employee-wise salary calculation and grouping',
+                'Breakdown of base salary, allowances, and deductions',
+                'Automatic calculation of monthly payable amount',
+                'Integration with attendance for accurate work-hour based pay',
+                'Support for both hourly and monthly pay structures',
+                'Overtime earnings calculation and inclusion',
+                'Leave deductions and late penalties adjustment',
+                'Professional PDF format with clear salary slips',
+                'Print-ready reports for HR and finance teams',
+                'Summary analytics for total payout and cost tracking'
+            ]
         }
+
     ];
 
     const comingSoonReports = [
@@ -116,7 +140,7 @@ const AllReports = () => {
             id: 'payroll-summary',
             title: 'Payroll Summary',
             icon: DollarSign,
-            color: 'from-orange-500 to-orange-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Comprehensive payroll calculations and summaries',
             category: 'payroll',
             isAvailable: false,
@@ -132,7 +156,7 @@ const AllReports = () => {
             id: 'performance-reports',
             title: 'Performance Reports',
             icon: TrendingUp,
-            color: 'from-indigo-500 to-indigo-600',
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             description: 'Employee performance analytics and evaluations',
             category: 'performance',
             isAvailable: false,
@@ -218,7 +242,7 @@ const AllReports = () => {
                             <CheckCircle className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
                         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Available Reports</h2>
-                            
+
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

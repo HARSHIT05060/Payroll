@@ -22,7 +22,7 @@ import {
     groupDataByEmployee,
     calculateSummary,
     exportToPDF
-} from '../../utils/exportUtils/PdfExportDateRange';
+} from '../../utils/exportUtils/DateRangeReport/PdfExportDateRange';
 
 const DateRangeReport = () => {
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
