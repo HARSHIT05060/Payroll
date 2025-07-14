@@ -281,18 +281,10 @@ export default function EmployeeManagement() {
                                             <XCircle className="h-4 w-4" />
                                         </button>
                                     )}
-                                    {searchLoading && (
-                                        <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] animate-spin" />
-                                    )}
+                                   
                                 </div>
 
-                                <button
-                                    onClick={handleRefresh}
-                                    disabled={paginationLoading || searchLoading}
-                                    className="flex items-center gap-2 bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] text-[var(--color-text-white)] px-3 py-2 rounded-md text-sm transition-colors disabled:opacity-50"
-                                >
-                                    <RefreshCw className={`h-4 w-4 ${(paginationLoading || searchLoading) ? 'animate-spin' : ''}`} />
-                                </button>
+                            
 
                                 {permissions['employee_create'] && (
                                     <button

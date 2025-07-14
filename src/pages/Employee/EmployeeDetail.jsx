@@ -333,9 +333,7 @@ const EmployeeDetail = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">Employee Details</h1>
-                            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                                Complete employee information and management
-                            </p>
+                            
                         </div>
                         <div className="flex items-center space-x-2">
                             <StatusIcon size={20} className={statusInfo.label === 'Active' ? 'text-[var(--color-success-dark)]' : 'text-[var(--color-text-error)]'} />
