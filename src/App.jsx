@@ -34,6 +34,7 @@ import MonthlyReport from './pages/Report/MothlyReport';
 import DateRangeReport from './pages/Report/DateRangeReport';
 import { ThemeProvider } from './context/Themecontext';
 import EmployeeDirectoryReport from './pages/Report/EmployeeDirectoryReport';
+import MonthlySalaryReport from './pages/Report/MonthlySalaryReport';
 
 
 const App = () => {
@@ -168,6 +169,7 @@ const App = () => {
               <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
               <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
               <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
+              <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
 
 
               <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />

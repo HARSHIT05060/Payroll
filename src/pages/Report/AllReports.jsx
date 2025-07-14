@@ -108,6 +108,28 @@ const AllReports = () => {
                 'Professional PDF format with clean styling',
                 'Print-ready reports with organized layout'
             ]
+        },
+        {
+            id: 'date-range-report',
+            title: 'Date Range Report',
+            icon: Calendar,
+            color: 'from-orange-500 to-orange-600',
+            description: 'Generate comprehensive attendance reports for selected date range',
+            path: '/reports/monthly-salary',
+            category: 'attendance',
+            isAvailable: true,
+            features: [
+                'Employee-wise data organization and smart grouping',
+                'Individual employee attendance patterns and trends',
+                'Comprehensive analytics and performance metrics',
+                'Hours worked tracking and detailed calculations',
+                'Overtime tracking and comprehensive analysis',
+                'Late arrival detection and detailed reporting',
+                'Complete daily attendance records and history',
+                'Detailed clock in/out times with status tracking',
+                'Professional PDF format with clean styling',
+                'Print-ready reports with organized layout'
+            ]
         }
     ];
 
@@ -218,7 +240,7 @@ const AllReports = () => {
                             <CheckCircle className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
                         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Available Reports</h2>
-                            
+
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

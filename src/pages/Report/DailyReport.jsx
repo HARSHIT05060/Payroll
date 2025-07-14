@@ -26,8 +26,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { createPortal } from 'react-dom';
-import { exportToExcel } from '../../utils/exportUtils/excelExport';
-import { exportToPDF } from '../../utils/exportUtils/pdfExport';
+import { exportToExcel } from '../../utils/exportUtils/DailyReport/excelExport';
+import { exportToPDF } from '../../utils/exportUtils/DailyReport/pdfExport';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
 
 const DailyReport = () => {

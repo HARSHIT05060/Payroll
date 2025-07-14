@@ -7,8 +7,8 @@ import { Calendar, Users, Building, Award, User, XCircle, CalendarX, FileText, D
 import { SearchableDropdown, StatusBadge, SummaryCard } from '../../Components/Report/ReportComponents';
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
-import { exportMonthlyReportToPDF } from '../../utils/exportUtils/pdfExportMonthly';
-import { exportToExcel } from '../../utils/exportUtils/excelExportMonthly';
+import { exportMonthlyReportToPDF } from '../../utils/exportUtils/MonthlyReport/pdfExportMonthly';
+import { exportToExcel } from '../../utils/exportUtils/MonthlyReport/excelExportMonthly';
 
 const MonthlyReport = () => {
     const navigate = useNavigate();
