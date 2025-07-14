@@ -204,10 +204,6 @@ export default function EmployeeManagement() {
         navigate(`/add-employee?edit=${employee_id}`);
     }, [navigate]);
 
-    const handleRefresh = useCallback(() => {
-        fetchEmployees(currentPage, searchQuery);
-    }, [currentPage, searchQuery, fetchEmployees]);
-
     // Clear search
     const handleClearSearch = useCallback(() => {
         setSearchQuery('');
