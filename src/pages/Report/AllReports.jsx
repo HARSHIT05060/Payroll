@@ -12,7 +12,8 @@ import {
     ArrowLeft,
     Target,
     DollarSign,
-    AlertCircle
+    AlertCircle,
+    IndianRupee
 } from 'lucide-react';
 import { Toast } from '../../Components/ui/Toast'; // Adjust import path as needed
 
@@ -25,7 +26,7 @@ const AllReports = () => {
             id: 'employee-list',
             title: 'Employee Directory',
             icon: Users,
-            color: 'from-green-500 to-green-600',
+            color: 'from-blue-500 to-blue-600',
             description: 'Complete employee information and records',
             path: '/reports/employee-directory',
             category: 'employees',
@@ -69,7 +70,7 @@ const AllReports = () => {
             id: 'monthly-attendance',
             title: 'Monthly Attendance Summary',
             icon: BarChart3,
-            color: 'from-purple-500 to-purple-600',
+            color: 'from-blue-500 to-blue-600',
             description: 'Detailed monthly attendance analysis with comprehensive statistics',
             path: '/reports/monthly-attendance',
             category: 'attendance',
@@ -91,7 +92,7 @@ const AllReports = () => {
             id: 'date-range-report',
             title: 'Date Range Report',
             icon: Calendar,
-            color: 'from-orange-500 to-orange-600',
+            color: 'from-blue-500 to-blue-600',
             description: 'Generate comprehensive attendance reports for selected date range',
             path: '/reports/daterangereport',
             category: 'attendance',
@@ -110,27 +111,28 @@ const AllReports = () => {
             ]
         },
         {
-            id: 'date-range-report',
-            title: 'Date Range Report',
-            icon: Calendar,
-            color: 'from-orange-500 to-orange-600',
-            description: 'Generate comprehensive attendance reports for selected date range',
+            id: 'monthly-salary-report',
+            title: 'Monthly Salary Report',
+            icon: IndianRupee,
+            color: 'from-blue-500 to-blue-600',
+            description: 'Generate detailed monthly salary reports with breakdowns and analytics',
             path: '/reports/monthly-salary',
-            category: 'attendance',
+            category: 'payroll',
             isAvailable: true,
             features: [
-                'Employee-wise data organization and smart grouping',
-                'Individual employee attendance patterns and trends',
-                'Comprehensive analytics and performance metrics',
-                'Hours worked tracking and detailed calculations',
-                'Overtime tracking and comprehensive analysis',
-                'Late arrival detection and detailed reporting',
-                'Complete daily attendance records and history',
-                'Detailed clock in/out times with status tracking',
-                'Professional PDF format with clean styling',
-                'Print-ready reports with organized layout'
+                'Employee-wise salary calculation and grouping',
+                'Breakdown of base salary, allowances, and deductions',
+                'Automatic calculation of monthly payable amount',
+                'Integration with attendance for accurate work-hour based pay',
+                'Support for both hourly and monthly pay structures',
+                'Overtime earnings calculation and inclusion',
+                'Leave deductions and late penalties adjustment',
+                'Professional PDF format with clear salary slips',
+                'Print-ready reports for HR and finance teams',
+                'Summary analytics for total payout and cost tracking'
             ]
         }
+
     ];
 
     const comingSoonReports = [
@@ -138,7 +140,7 @@ const AllReports = () => {
             id: 'payroll-summary',
             title: 'Payroll Summary',
             icon: DollarSign,
-            color: 'from-orange-500 to-orange-600',
+            color: 'from-blue-500 to-blue-600',
             description: 'Comprehensive payroll calculations and summaries',
             category: 'payroll',
             isAvailable: false,
@@ -154,7 +156,7 @@ const AllReports = () => {
             id: 'performance-reports',
             title: 'Performance Reports',
             icon: TrendingUp,
-            color: 'from-indigo-500 to-indigo-600',
+            color: 'from-blue-500 to-blue-600',
             description: 'Employee performance analytics and evaluations',
             category: 'performance',
             isAvailable: false,
