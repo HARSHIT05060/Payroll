@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Pagination from '../Pagination'; // Adjust path as needed
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Pagination from '../Pagination';
+import { Toast } from '../ui/Toast';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import {
@@ -8,32 +9,75 @@ import {
     Calendar,
     UserX,
     Coffee,
-    AlertCircle,
     CheckCircle,
     Timer,
     Activity,
-    Zap
+    ArrowLeft,
+    XCircle,
+    ChevronDown,
+    ChevronUp,
+    Search,
+    TrendingUp,
 } from 'lucide-react';
+
+const SORT_DIRECTIONS = {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending'
+};
+
+const COLUMN_KEYS = {
+    NAME: 'name',
+    SHIFT: 'shift',
+    CLOCK_IN: 'clockIn',
+    CLOCK_OUT: 'clockOut',
+    WORK_HOURS: 'workHours',
+    STATUS: 'status'
+};
+
+const KEY_MAPPING = {
+    [COLUMN_KEYS.NAME]: 'employee_name',
+    [COLUMN_KEYS.SHIFT]: 'shift_name',
+    [COLUMN_KEYS.CLOCK_IN]: 'attandance_first_clock_in',
+    [COLUMN_KEYS.CLOCK_OUT]: 'attandance_last_clock_out',
+    [COLUMN_KEYS.WORK_HOURS]: 'attandance_hours',
+    [COLUMN_KEYS.STATUS]: 'status'
+};
 
 const AttendanceReport = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [attendanceData, setAttendanceData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [hoveredSegment, setHoveredSegment] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [sortConfig, setSortConfig] = useState({
+        key: null,
+        direction: SORT_DIRECTIONS.ASCENDING
+    });
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
+    // Toast state
+    const [toast, setToast] = useState(null);
+
     const { user } = useAuth();
+
+    // Toast helper function
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
+
+    const closeToast = () => {
+        setToast(null);
+    };
 
     // Fetch daily attendance report
     const fetchDailyReport = useCallback(async (date) => {
         if (!user?.user_id) return;
 
         setLoading(true);
-        setError(null);
 
         try {
             const formData = new FormData();
@@ -44,13 +88,13 @@ const AttendanceReport = () => {
 
             if (response.data?.success && response.data.data) {
                 setAttendanceData(response.data.data);
-                setCurrentPage(1); // Reset to first page when data changes
+                setCurrentPage(1);
             } else {
                 throw new Error(response.data?.message || 'Failed to fetch daily report');
             }
         } catch (err) {
-            const errorMessage = err.message || 'An error occurred while fetching the report';
-            setError(errorMessage);
+            const errorMessage = err.response?.data?.message || err.message || 'An error occurred while fetching the report';
+            showToast(errorMessage, 'error');
             console.error('Error fetching attendance data:', err);
         } finally {
             setLoading(false);
@@ -61,15 +105,75 @@ const AttendanceReport = () => {
         fetchDailyReport(selectedDate);
     }, [selectedDate, fetchDailyReport]);
 
-    // Calculate pagination
-    const totalPages = Math.ceil(attendanceData.length / itemsPerPage);
+    // Client-side filtering and sorting
+    const filteredAndSortedData = useMemo(() => {
+        let filtered = [...attendanceData];
+
+        // Apply search filter
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(employee =>
+                employee.employee_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                employee.employee_code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                employee.shift_name?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        // Apply status filter
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter(employee => employee.status === statusFilter);
+        }
+
+        // Apply sorting
+        if (sortConfig.key) {
+            filtered.sort((a, b) => {
+                const actualKey = KEY_MAPPING[sortConfig.key] || sortConfig.key;
+                const aValue = a[actualKey] || '';
+                const bValue = b[actualKey] || '';
+
+                // Handle time comparison for clock in/out
+                if (sortConfig.key === COLUMN_KEYS.CLOCK_IN || sortConfig.key === COLUMN_KEYS.CLOCK_OUT) {
+                    const aTime = aValue ? new Date(`2000-01-01 ${aValue}`) : new Date(0);
+                    const bTime = bValue ? new Date(`2000-01-01 ${bValue}`) : new Date(0);
+                    return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? aTime - bTime : bTime - aTime;
+                }
+
+                // Handle numeric comparison for work hours
+                if (sortConfig.key === COLUMN_KEYS.WORK_HOURS) {
+                    const aNum = parseFloat(aValue) || 0;
+                    const bNum = parseFloat(bValue) || 0;
+                    return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? aNum - bNum : bNum - aNum;
+                }
+
+                // String comparison
+                if (aValue < bValue) return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ? 1 : -1;
+                return 0;
+            });
+        }
+
+        return filtered;
+    }, [attendanceData, searchQuery, statusFilter, sortConfig]);
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedData = attendanceData.slice(startIndex, startIndex + itemsPerPage);
+    const paginatedData = filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
     // Handle page change
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
+
+    // Handle sorting
+    const requestSort = useCallback((key) => {
+        setSortConfig(prevConfig => {
+            const direction = prevConfig.key === key && prevConfig.direction === SORT_DIRECTIONS.ASCENDING
+                ? SORT_DIRECTIONS.DESCENDING
+                : SORT_DIRECTIONS.ASCENDING;
+
+            return { key, direction };
+        });
+    }, []);
 
     // Calculate statistics from attendance data
     const calculateStats = () => {
@@ -135,10 +239,14 @@ const AttendanceReport = () => {
     // Get attendance status color for table
     const getAttendanceColor = (status) => {
         switch (status) {
-            case 'Present': return 'bg-green-500';
-            case 'Absent': return 'bg-red-500';
-            case 'Week Off': return 'bg-yellow-500';
-            default: return 'bg-gray-500';
+            case 'Present':
+                return 'bg-[var(--color-success)]';
+            case 'Absent':
+                return 'bg-[var(--color-error)]';
+            case 'Week Off':
+                return 'bg-[var(--color-warning)]';
+            default:
+                return 'bg-[var(--color-text-muted)]';
         }
     };
 
@@ -146,13 +254,13 @@ const AttendanceReport = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Present':
-                return 'bg-green-100 text-green-800 border-green-200';
+                return 'bg-[var(--color-success-light)] text-[var(--color-success-dark)] border-[var(--color-success-lighter)]';
             case 'Absent':
-                return 'bg-red-100 text-red-800 border-red-200';
+                return 'bg-[var(--color-error-light)] text-[var(--color-error-dark)] border-[var(--color-error-lighter)]';
             case 'Week Off':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                return 'bg-[var(--color-warning-light)] text-[var(--color-warning-dark)] border-[var(--color-warning-lighter)]';
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
+                return 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-primary)] border-[var(--color-border-secondary)]';
         }
     };
 
@@ -168,36 +276,93 @@ const AttendanceReport = () => {
         return `${hours}h`;
     };
 
-    // Get employee initials for avatar
-    const getEmployeeInitials = (name) => {
-        return name
-            .split(' ')
-            .map(word => word.charAt(0))
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
+    // Render sort icon
+    const renderSortIcon = useCallback((key) => {
+        if (sortConfig.key !== key) {
+            return <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />;
+        }
+        return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
+            <ChevronUp className="ml-1 h-4 w-4 text-blue-600" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-blue-600" />;
+    }, [sortConfig]);
+
+    // Clear search
+    const handleClearSearch = () => {
+        setSearchQuery('');
+        setCurrentPage(1);
     };
 
-    // Get random avatar color
-    const getAvatarColor = (name) => {
-        const colors = [
-            'bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500',
-            'bg-teal-500', 'bg-green-500', 'bg-yellow-500', 'bg-orange-500'
-        ];
-        const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-        return colors[index];
+    // Handle filter change
+    const handleFilterChange = (filterValue) => {
+        setStatusFilter(filterValue);
+        setCurrentPage(1);
     };
 
-    const DonutChart = ({ stats }) => {
+    // Handle clear filters
+    const handleClearFilters = () => {
+        setSearchQuery('');
+        setStatusFilter('all');
+        setCurrentPage(1);
+        showToast('All filters cleared', 'info');
+    };
+
+    // Handle date change
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        setCurrentPage(1);
+        setSearchQuery('');
+        setStatusFilter('all');
+    };
+
+    // Status filter options
+    const statusOptions = [
+        { value: 'all', label: 'All Status' },
+        { value: 'Present', label: 'Present' },
+        { value: 'Absent', label: 'Absent' },
+        { value: 'Week Off', label: 'Week Off' }
+    ];
+
+    const DonutChart = ({ stats, hoveredSegment }) => {
+        const [isLoaded, setIsLoaded] = useState(false);
+        const [animationProgress, setAnimationProgress] = useState(0);
+
         const { totalEmployees, present, absent, weekOff } = stats;
         const total = totalEmployees;
+
+        // Animation effect on mount
+        useEffect(() => {
+            const timer = setTimeout(() => {
+                setIsLoaded(true);
+
+                // Animate progress from 0 to 100
+                const animationDuration = 1500; // 1.5 seconds
+                const steps = 60; // 60 steps for smooth animation
+                const stepDuration = animationDuration / steps;
+                let currentStep = 0;
+
+                const interval = setInterval(() => {
+                    currentStep++;
+                    const progress = (currentStep / steps) * 100;
+                    setAnimationProgress(progress);
+
+                    if (currentStep >= steps) {
+                        clearInterval(interval);
+                        setAnimationProgress(100);
+                    }
+                }, stepDuration);
+
+                return () => clearInterval(interval);
+            }, 200); // Small delay before starting animation
+
+            return () => clearTimeout(timer);
+        }, [stats]);
 
         if (total === 0) {
             return (
                 <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-400">No Data</div>
-                        <div className="text-sm text-gray-400">No employees found</div>
+                        <div className="text-2xl font-bold text-[var(--color-text-muted)]">No Data</div>
+                        <div className="text-sm text-[var(--color-text-muted)]">No employees found</div>
                     </div>
                 </div>
             );
@@ -207,21 +372,21 @@ const AttendanceReport = () => {
         const absentPercent = (absent / total) * 100;
         const weekOffPercent = (weekOff / total) * 100;
 
-        // Fixed radius - no change on hover to prevent displacement
         const radius = 55;
         const circumference = 2 * Math.PI * radius;
 
-        // Calculate stroke dash arrays and offsets
-        const presentStroke = (presentPercent / 100) * circumference;
-        const absentStroke = (absentPercent / 100) * circumference;
-        const weekOffStroke = (weekOffPercent / 100) * circumference;
+        // Apply animation progress to stroke calculations
+        const animationMultiplier = animationProgress / 100;
+        const presentStroke = (presentPercent / 100) * circumference * animationMultiplier;
+        const absentStroke = (absentPercent / 100) * circumference * animationMultiplier;
+        const weekOffStroke = (weekOffPercent / 100) * circumference * animationMultiplier;
 
         const segments = [
             {
                 id: 'present',
                 stroke: presentStroke,
                 offset: 0,
-                color: '#10b981',
+                color: 'var(--color-success)',
                 label: 'AT WORK',
                 count: present,
                 percentage: presentPercent
@@ -230,7 +395,7 @@ const AttendanceReport = () => {
                 id: 'absent',
                 stroke: absentStroke,
                 offset: -presentStroke,
-                color: '#ef4444',
+                color: 'var(--color-error)',
                 label: 'ABSENT',
                 count: absent,
                 percentage: absentPercent
@@ -239,7 +404,7 @@ const AttendanceReport = () => {
                 id: 'weekoff',
                 stroke: weekOffStroke,
                 offset: -(presentStroke + absentStroke),
-                color: '#f59e0b',
+                color: 'var(--color-warning)',
                 label: 'WEEK OFF',
                 count: weekOff,
                 percentage: weekOffPercent
@@ -247,7 +412,7 @@ const AttendanceReport = () => {
         ];
 
         return (
-            <div className="relative w-48 h-48 mx-auto">
+            <div className="relative w-48 h-48 mx-auto mb-6">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                     {/* Background circle */}
                     <circle
@@ -255,16 +420,12 @@ const AttendanceReport = () => {
                         cy="60"
                         r={radius}
                         fill="none"
-                        stroke="#f3f4f6"
+                        stroke="var(--color-bg-gray-light)"
                         strokeWidth="8"
-                        className="animate-pulse"
-                        style={{
-                            animation: loading ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
-                        }}
                     />
 
-                    {/* Render segments */}
-                    {segments.map((segment, index) => (
+                    {/* Animated segments */}
+                    {segments.map((segment) => (
                         segment.stroke > 0 && (
                             <circle
                                 key={segment.id}
@@ -273,158 +434,81 @@ const AttendanceReport = () => {
                                 r={radius}
                                 fill="none"
                                 stroke={segment.color}
-                                strokeWidth={hoveredSegment === segment.id ? "12" : "8"}
+                                strokeWidth={hoveredSegment === segment.id ? "10" : "8"}
                                 strokeDasharray={`${segment.stroke} ${circumference}`}
                                 strokeDashoffset={segment.offset}
                                 strokeLinecap="round"
                                 className="transition-all duration-300 ease-in-out cursor-pointer"
-                                onMouseEnter={() => setHoveredSegment(segment.id)}
-                                onMouseLeave={() => setHoveredSegment(null)}
                                 style={{
                                     opacity: hoveredSegment && hoveredSegment !== segment.id ? 0.6 : 1,
-                                    filter: hoveredSegment === segment.id ? 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' : 'none',
-                                    animation: !loading ? `drawCircle-${index} 2s ease-out forwards` : 'none',
-                                    strokeDasharray: loading ? '0 1000' : `${segment.stroke} ${circumference}`,
-                                    animationDelay: `${index * 0.4}s`
+                                    transition: 'stroke-dasharray 0.1s ease-out, stroke-dashoffset 0.1s ease-out, stroke-width 0.3s ease-in-out, opacity 0.3s ease-in-out'
                                 }}
                             />
                         )
                     ))}
+
+                    {/* Loading indicator */}
+                    {!isLoaded && (
+                        <circle
+                            cx="60"
+                            cy="60"
+                            r={radius}
+                            fill="none"
+                            stroke="var(--color-text-muted)"
+                            strokeWidth="8"
+                            strokeDasharray="10 10"
+                            strokeLinecap="round"
+                            className="animate-spin"
+                            style={{
+                                transformOrigin: '60px 60px'
+                            }}
+                        />
+                    )}
                 </svg>
 
-                {/* Center text */}
+                {/* Center content */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                        {hoveredSegment ? (
+                        {!isLoaded ? (
+                            <div className="animate-pulse">
+                                <div className="text-4xl font-bold text-[var(--color-text-muted)]">...</div>
+                                <div className="text-sm text-[var(--color-text-muted)]">Loading</div>
+                            </div>
+                        ) : hoveredSegment ? (
                             <div className="transition-all duration-300 transform scale-110">
-                                <div className="text-3xl font-bold text-gray-800">
+                                <div className="text-3xl font-bold text-[var(--color-text-primary)]">
                                     {segments.find(s => s.id === hoveredSegment)?.count || 0}
                                 </div>
-                                <div className="text-xs text-gray-500 font-semibold">
+                                <div className="text-xs font-semibold text-[var(--color-text-secondary)]">
                                     {segments.find(s => s.id === hoveredSegment)?.label}
                                 </div>
-                                <div className="text-xs text-gray-400 mt-1">
+                                <div className="text-xs mt-1 text-[var(--color-text-muted)]">
                                     {(segments.find(s => s.id === hoveredSegment)?.percentage || 0).toFixed(1)}%
                                 </div>
                             </div>
                         ) : (
                             <div className="transition-all duration-300">
-                                <div className="text-4xl font-bold text-gray-800">{total}</div>
-                                <div className="text-sm text-gray-500">Total Employees</div>
+                                <div className="text-4xl font-bold text-[var(--color-text-primary)]">{total}</div>
+                                <div className="text-sm text-[var(--color-text-secondary)]">Total Employees</div>
                             </div>
                         )}
                     </div>
                 </div>
-
-                {/* Loading animation styles */}
-                <style jsx>{`
-                    @keyframes drawCircle-0 {
-                        from { stroke-dasharray: 0 1000; }
-                        to { stroke-dasharray: ${presentStroke} ${circumference}; }
-                    }
-                    @keyframes drawCircle-1 {
-                        from { stroke-dasharray: 0 1000; }
-                        to { stroke-dasharray: ${absentStroke} ${circumference}; }
-                    }
-                    @keyframes drawCircle-2 {
-                        from { stroke-dasharray: 0 1000; }
-                        to { stroke-dasharray: ${weekOffStroke} ${circumference}; }
-                    }
-                `}</style>
             </div>
         );
     };
 
     if (loading) {
         return (
-            <div className="space-y-8 p-6">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold mb-2">Daily Attendance Report</h1>
-                            <p className="text-blue-100">Track and monitor employee attendance</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Calendar className="w-5 h-5" />
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/30"
-                                disabled={loading}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Loading Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+            <div className="min-h-screen bg-[var(--color-bg-primary)]">
+                <div className="p-6 max-w-7xl mx-auto">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] p-6">
                             <div className="animate-pulse">
-                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                                <div className="h-8 bg-[var(--color-bg-secondary-20)] rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-[var(--color-bg-secondary-20)] rounded w-1/2"></div>
                             </div>
                         </div>
-                    ))}
-                </div>
-
-                {/* Loading Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-xl shadow-sm p-6 h-[700px]">
-                            <div className="flex items-center justify-center h-full">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-xl shadow-sm p-6 h-[700px]">
-                            <div className="flex items-center justify-center h-full">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="space-y-8 p-6">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold mb-2">Daily Attendance Report</h1>
-                            <p className="text-blue-100">Track and monitor employee attendance</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Calendar className="w-5 h-5" />
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/30"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Error Content */}
-                <div className="bg-white rounded-xl shadow-sm p-8">
-                    <div className="text-center">
-                        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Data</h3>
-                        <p className="text-red-600 text-sm mb-6">{error}</p>
-                        <button
-                            onClick={() => fetchDailyReport(selectedDate)}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                        >
-                            Try Again
-                        </button>
                     </div>
                 </div>
             </div>
@@ -432,27 +516,96 @@ const AttendanceReport = () => {
     }
 
     return (
-        <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
+        <>
             {/* Header */}
-                <div className="flex items-center justify-end space-x-2 ">
-                    <Calendar className="w-5 h-5" />
-                    <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="bg-gradient-to-r from-blue-600 to-blue-500 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-sm"
-                    />
+            <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+                <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div>
+                                <h1 className="text-2xl font-bold text-[var(--color-text-white)] mb-2">DASHBOARD</h1>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
+                            <input
+                                type="date"
+                                value={selectedDate}
+                                onChange={(e) => handleDateChange(e.target.value)}
+                                className="bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
+                            />
+                        </div>
+                    </div>
                 </div>
+            </div>
 
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--color-text-secondary)]">Total Employees</p>
+                            <p className="text-xl font-bold text-[var(--color-text-primary)]">{stats.totalEmployees}</p>
+                        </div>
+                        <div className="p-2 bg-[var(--color-blue-lightest)] rounded-full">
+                            <Users className="w-5 h-5 text-[var(--color-blue)]" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--color-text-secondary)]">Present</p>
+                            <p className="text-xl font-bold text-[var(--color-success)]">{stats.present}</p>
+                        </div>
+                        <div className="p-2 bg-[var(--color-success-light)] rounded-full">
+                            <CheckCircle className="w-5 h-5 text-[var(--color-success)]" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--color-text-secondary)]">Absent</p>
+                            <p className="text-xl font-bold text-[var(--color-error)]">{stats.absent}</p>
+                        </div>
+                        <div className="p-2 bg-[var(--color-error-light)] rounded-full">
+                            <UserX className="w-5 h-5 text-[var(--color-error)]" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--color-text-secondary)]">Week Off</p>
+                            <p className="text-xl font-bold text-[var(--color-warning)]">{stats.weekOff}</p>
+                        </div>
+                        <div className="p-2 bg-[var(--color-warning-light)] rounded-full">
+                            <Coffee className="w-5 h-5 text-[var(--color-warning)]" />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-[var(--color-text-secondary)]">Attendance Rate</p>
+                            <p className="text-xl font-bold text-[var(--color-blue)]">{stats.productivity}%</p>
+                        </div>
+                        <div className="p-2 bg-[var(--color-blue-lightest)] rounded-full">
+                            <TrendingUp className="w-5 h-5 text-[var(--color-blue)]" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Chart Section */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 h-[700px] flex flex-col">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-semibold text-gray-800">Attendance Overview</h3>
-                            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Attendance Overview</h3>
+                            <span className="text-sm text-[var(--color-text-muted)] bg-[var(--color-bg-gray-light)] px-3 py-1 rounded-full">
                                 {new Date(selectedDate).toLocaleDateString('en-US', {
                                     weekday: 'short',
                                     month: 'short',
@@ -461,61 +614,42 @@ const AttendanceReport = () => {
                             </span>
                         </div>
 
-                        <div className="flex-1 flex flex-col justify-center">
-                            <DonutChart stats={stats} />
+                        <DonutChart stats={stats} hoveredSegment={hoveredSegment} setHoveredSegment={setHoveredSegment} />
 
-                            {/* Legend */}
-                            <div className="flex flex-col space-y-4 mt-8">
-                                <div
-                                    className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-green-50"
-                                    onMouseEnter={() => setHoveredSegment('present')}
-                                    onMouseLeave={() => setHoveredSegment(null)}
-                                >
-                                    <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
-                                    <span className="text-sm text-gray-700 font-medium flex-1">AT WORK</span>
-                                    <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-2 py-1 rounded">
-                                        {stats.present}
-                                    </span>
-                                </div>
-                                <div
-                                    className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-red-50"
-                                    onMouseEnter={() => setHoveredSegment('absent')}
-                                    onMouseLeave={() => setHoveredSegment(null)}
-                                >
-                                    <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
-                                    <span className="text-sm text-gray-700 font-medium flex-1">ABSENT</span>
-                                    <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-2 py-1 rounded">
-                                        {stats.absent}
-                                    </span>
-                                </div>
-                                <div
-                                    className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-yellow-50"
-                                    onMouseEnter={() => setHoveredSegment('weekoff')}
-                                    onMouseLeave={() => setHoveredSegment(null)}
-                                >
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></div>
-                                    <span className="text-sm text-gray-700 font-medium flex-1">WEEK OFF</span>
-                                    <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-2 py-1 rounded">
-                                        {stats.weekOff}
-                                    </span>
-                                </div>
+                        {/* Legend */}
+                        <div className="flex flex-col">
+                            <div
+                                className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-success-light)]"
+                                onMouseEnter={() => setHoveredSegment('present')}
+                                onMouseLeave={() => setHoveredSegment(null)}
+                            >
+                                <div className="w-4 h-4 bg-[var(--color-success)] rounded-full shadow-sm"></div>
+                                <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">AT WORK</span>
+                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
+                                    {stats.present}
+                                </span>
                             </div>
-
-                            {/* Performance Metrics */}
-                            <div className="mt-8 pt-6 border-t border-gray-100">
-                                <h4 className="text-sm font-semibold text-gray-700 mb-4">Performance Metrics</h4>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-gray-600">Attendance Rate</span>
-                                        <span className="text-sm font-semibold text-green-600">{stats.productivity}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-green-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                                            style={{ width: `${stats.productivity}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
+                            <div
+                                className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-error-light)]"
+                                onMouseEnter={() => setHoveredSegment('absent')}
+                                onMouseLeave={() => setHoveredSegment(null)}
+                            >
+                                <div className="w-4 h-4 bg-[var(--color-error)] rounded-full shadow-sm"></div>
+                                <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">ABSENT</span>
+                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
+                                    {stats.absent}
+                                </span>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-warning-light)]"
+                                onMouseEnter={() => setHoveredSegment('weekoff')}
+                                onMouseLeave={() => setHoveredSegment(null)}
+                            >
+                                <div className="w-4 h-4 bg-[var(--color-warning)] rounded-full shadow-sm"></div>
+                                <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">WEEK OFF</span>
+                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
+                                    {stats.weekOff}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -523,107 +657,245 @@ const AttendanceReport = () => {
 
                 {/* Table Section */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white rounded-xl shadow-sm h-[700px] flex flex-col">
-                        <div className="p-6 border-b border-gray-200 flex-shrink-0">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-xl font-semibold text-gray-800">Employee Details</h3>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        {new Date(selectedDate).toLocaleDateString('en-US', {
-                                            weekday: 'long',
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </p>
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm overflow-hidden">
+                        {/* Table Header */}
+                        <div className="px-6 py-4 border-b border-[var(--color-border-divider)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <Activity className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                    <h3 className="text-lg font-medium text-[var(--color-text-white)]">
+                                        Employee Attendance Details
+                                    </h3>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <Activity className="w-5 h-5 text-gray-400" />
-                                    <span className="text-sm text-gray-600">
-                                        {attendanceData.length} employees
-                                    </span>
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search employees..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-64 pl-10 pr-10 py-2 border border-[var(--color-bg-secondary-20)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)] focus:border-[var(--color-bg-secondary-30)] text-sm bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)]"
+                                        />
+                                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-white-90)]" />
+                                        {searchQuery && (
+                                            <button
+                                                onClick={handleClearSearch}
+                                                className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-white-90)] hover:text-[var(--color-text-white)]"
+                                            >
+                                                <XCircle className="h-4 w-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => handleFilterChange(e.target.value)}
+                                        className="px-3 py-2 border border-[var(--color-bg-secondary-20)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)] focus:border-[var(--color-bg-secondary-30)] text-sm bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]"
+                                    >
+                                        {statusOptions.map((option) => (
+                                            <option key={option.value} value={option.value} className="text-[var(--color-text-primary)]">
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {(searchQuery || statusFilter !== 'all') && (
+                                        <button
+                                            onClick={handleClearFilters}
+                                            className="px-3 py-2 bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] text-[var(--color-text-white)] rounded-md text-sm transition-colors"
+                                        >
+                                            Clear Filters
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-hidden flex flex-col">
-                            {attendanceData.length === 0 ? (
-                                <div className="flex-1 flex items-center justify-center">
-                                    <div className="text-center py-12">
-                                        <div className="text-gray-500 text-sm">No attendance data found for the selected date.</div>
+                        {/* Table Content */}
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                <thead className="bg-[var(--color-bg-hover)]">
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.NAME)}
+                                        >
+                                            <div className="flex items-center">
+                                                Employee Name
+                                                {renderSortIcon(COLUMN_KEYS.NAME)}
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.SHIFT)}
+                                        >
+                                            <div className="flex items-center">
+                                                Shift
+                                                {renderSortIcon(COLUMN_KEYS.SHIFT)}
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.CLOCK_IN)}
+                                        >
+                                            <div className="flex items-center">
+                                                Clock In
+                                                {renderSortIcon(COLUMN_KEYS.CLOCK_IN)}
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.CLOCK_OUT)}
+                                        >
+                                            <div className="flex items-center">
+                                                Clock Out
+                                                {renderSortIcon(COLUMN_KEYS.CLOCK_OUT)}
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.WORK_HOURS)}
+                                        >
+                                            <div className="flex items-center">
+                                                Work Hours
+                                                {renderSortIcon(COLUMN_KEYS.WORK_HOURS)}
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            onClick={() => requestSort(COLUMN_KEYS.STATUS)}
+                                        >
+                                            <div className="flex items-center">
+                                                Status
+                                                {renderSortIcon(COLUMN_KEYS.STATUS)}
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                                    {paginatedData.length > 0 ? (
+                                        paginatedData.map((employee, index) => (
+                                            <tr key={employee.employee_id || index} className="hover:bg-[var(--color-bg-hover)]">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                                                        {employee.employee_name || 'N/A'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-[var(--color-text-primary)]">
+                                                        {employee.shift_name || '-'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <Clock className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
+                                                        <span className="text-sm text-[var(--color-text-primary)]">
+                                                            {formatTime(employee.attandance_first_clock_in)}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <Clock className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
+                                                        <span className="text-sm text-[var(--color-text-primary)]">
+                                                            {formatTime(employee.attandance_last_clock_out)}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <Timer className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
+                                                        <span className="text-sm text-[var(--color-text-primary)]">
+                                                            {formatHours(employee.attandance_hours)}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(employee.status)}`}>
+                                                        <div className={`w-2 h-2 rounded-full mr-1.5 ${getAttendanceColor(employee.status)}`}></div>
+                                                        {employee.status || 'Unknown'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6" className="px-6 py-12 text-center">
+                                                <div className="text-center">
+                                                    <Users className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-4" />
+                                                    <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No employees found</h3>
+                                                    <p className="text-[var(--color-text-muted)]">
+                                                        {searchQuery || statusFilter !== 'all'
+                                                            ? 'Try adjusting your search or filter criteria.'
+                                                            : 'No attendance data available for this date.'}
+                                                    </p>
+                                                    {(searchQuery || statusFilter !== 'all') && (
+                                                        <button
+                                                            onClick={handleClearFilters}
+                                                            className="mt-4 px-4 py-2 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-md hover:bg-[var(--color-blue-dark)] transition-colors"
+                                                        >
+                                                            Clear Filters
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination */}
+                        {filteredAndSortedData.length > 0 && (
+                            <div className="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-divider)]">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1 flex justify-between sm:hidden">
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            className={`relative inline-flex items-center px-4 py-2 border border-[var(--color-border-secondary)] text-sm font-medium rounded-md ${currentPage === 1
+                                                ? 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] cursor-not-allowed'
+                                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'
+                                                }`}
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={currentPage === totalPages}
+                                            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-[var(--color-border-secondary)] text-sm font-medium rounded-md ${currentPage === totalPages
+                                                ? 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] cursor-not-allowed'
+                                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'
+                                                }`}
+                                        >
+                                            Next
+                                        </button>
                                     </div>
                                 </div>
-                            ) : (
-                                <>
-                                    <div className="flex-1 overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead className="bg-gray-50 sticky top-0">
-                                                <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shift</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clock In</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clock Out</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Work Hours</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {paginatedData.map((employee) => (
-                                                    <tr key={employee.sno} className="hover:bg-gray-50">
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <div className="flex items-center">
-                                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600 flex-shrink-0">
-                                                                    {getEmployeeInitials(employee.employee_name)}
-                                                                </div>
-                                                                <div className="ml-4 min-w-0">
-                                                                    <div className="text-sm font-medium text-gray-900 truncate">{employee.employee_name}</div>
-                                                                    <div className="text-sm text-gray-500 truncate">{employee.employee_code}</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <div className="text-sm text-gray-900">{employee.shift_name}</div>
-                                                            <div className="text-xs text-gray-500">{employee.shift_from_time} - {employee.shift_to_time}</div>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                            {formatTime(employee.attandance_first_clock_in)}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                            {formatTime(employee.attandance_last_clock_out)}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                            {formatHours(employee.attandance_hours)}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <div className="flex items-center">
-                                                                <div className={`w-3 h-3 rounded-full mr-2 ${getAttendanceColor(employee.status)}`}></div>
-                                                                <span className="text-sm text-gray-900">{employee.status}</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    {/* Pagination */}
-                                    {totalPages > 1 && (
-                                        <div className="flex-shrink-0">
-                                            <Pagination
-                                                currentPage={currentPage}
-                                                totalPages={totalPages}
-                                                onPageChange={handlePageChange}
-                                                loading={loading}
-                                            />
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* Toast */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
+        </>
     );
 };
 

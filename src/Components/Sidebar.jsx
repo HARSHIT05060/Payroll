@@ -75,7 +75,7 @@ const Sidebar = () => {
 
         {
             id: 'payroll',
-            label: 'Payroll Pending',
+            label: 'Payroll ',
             icon: DollarSign,
             hasSubmenu: true,
             path: '/monthly-payroll',
@@ -100,7 +100,7 @@ const Sidebar = () => {
 
         {
             id: 'reports',
-            label: 'Reports Pending',
+            label: 'Reports ',
             icon: BarChart2,
             hasSubmenu: true,
             path: '/reports',
@@ -127,7 +127,7 @@ const Sidebar = () => {
 
         {
             id: 'configuration',
-            label: 'Configuration Pending',
+            label: 'Configuration ',
             icon: Settings,
             hasSubmenu: true,
             path: '/configuration',
