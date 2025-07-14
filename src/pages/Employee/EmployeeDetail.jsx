@@ -11,6 +11,7 @@ import {
     Tag,
     Clock,
     Activity,
+    FileText,
     Shield,
     Fingerprint,
     ArrowLeft,
@@ -23,7 +24,9 @@ import {
     X,
     CheckCircle,
     XCircle,
-    Info
+    Info,
+    ChevronDown,
+    ChevronUp
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api/axiosInstance';
@@ -33,6 +36,7 @@ import { useSelector } from 'react-redux';
 
 const EmployeeDetail = () => {
     const [employee, setEmployee] = useState(null);
+    const [baseUrl, setBaseUrl] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -43,6 +47,22 @@ const EmployeeDetail = () => {
     const { employee_id } = useParams();
     const { user } = useAuth();
     const permissions = useSelector(state => state.permissions) || {};
+
+    const [expandedSections, setExpandedSections] = useState({
+        basic: true,
+        employment: false,
+        salary: false,
+        bank: false,
+        legal: false,
+        emergency: false
+    });
+
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
 
 
     // Show toast notification
@@ -83,6 +103,7 @@ const EmployeeDetail = () => {
                 const { data } = response.data;
 
                 if (data?.employee) {
+                    setBaseUrl(data.base_url);
                     setEmployee(data.employee);
                 } else {
                     setError('Employee not found');
@@ -169,15 +190,7 @@ const EmployeeDetail = () => {
         setShowImageModal(true);
     };
 
-    // Get status info
-    const getStatusInfo = (status) => {
-        const isActive = status === "1" || status?.toLowerCase() === 'active';
-        return {
-            label: isActive ? 'Active' : 'Inactive',
-            color: isActive ? 'bg-green-100 text-green-800' : 'bg-[var(--color-error-light)] text-red-800',
-            icon: isActive ? CheckCircle : XCircle
-        };
-    };
+
 
     // Get field value safely
     const getField = (fieldName, fallback = 'N/A') => {
@@ -294,9 +307,6 @@ const EmployeeDetail = () => {
         );
     }
 
-    const statusInfo = getStatusInfo(employee.status);
-    const StatusIcon = statusInfo.icon;
-
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             {/* Toast Notification */}
@@ -335,7 +345,7 @@ const EmployeeDetail = () => {
                             <div className="flex items-center gap-3">
                                 <div>
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
-                                        Employee Details
+                                        Employee Information
                                     </h1>
                                 </div>
                             </div>
@@ -348,13 +358,26 @@ const EmployeeDetail = () => {
                     <div className="lg:col-span-1">
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
                             {/* Profile Header */}
-                            <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
+                            <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6 relative">
                                 <div className="text-center">
-                                    <div className="h-24 w-24 mx-auto mb-4">
-                                        <div className="h-full w-full rounded-full bg-[var(--color-bg-secondary)] flex items-center justify-center text-[var(--color-blue-dark)] text-2xl font-bold">
-                                            {getField('full_name').split(' ').map(name => name[0]).join('').toUpperCase() || 'N/A'}
-                                        </div>
+                                    <div 
+                                      className={`relative h-40 w-40 mx-auto mb-4 rounded-full border-4 flex items-center justify-center ${employee?.status == "1" ? "border-[var(--color-success)]" : "border-[var(--color-error)]"}`}
+                                    >
+                                        {employee?.passport_img ? (
+                                            <img
+                                                src={baseUrl + employee?.passport_img}
+                                                alt={getField('full_name') + " photo"}
+                                                className="h-full w-full object-cover rounded-full"
+                                            />
+                                        ) : (
+                                            <span className="h-full w-full flex items-center justify-center text-[var(--color-blue-dark)] text-5xl font-bold select-none">
+                                                {getField('full_name').split(' ').map(name => name[0]).join('').toUpperCase() || 'N/A'}
+                                            </span>
+                                        )}
+                                        {/* Status Dot */}
+                                        <span className={`absolute bottom-1 right-5 h-4 w-4 rounded-full border-2 ${employee?.status == "1" ? "bg-[var(--color-success)] border-[var(--color-bg-secondary)]" : "bg-[var(--color-error)] border-[var(--color-bg-secondary)]"}`}></span>
                                     </div>
+
                                     <h2 className="text-xl font-bold text-[var(--color-text-white)] mb-1">
                                         {getField('full_name')}
                                     </h2>
@@ -369,7 +392,6 @@ const EmployeeDetail = () => {
                                 <div className="flex items-center">
                                     <Mail size={16} className="text-[var(--color-text-muted)] mr-3" />
                                     <div className="flex-1">
-                                        <p className="text-xs text-[var(--color-text-secondary)]">Email</p>
                                         <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
                                             {getField('email')}
                                         </p>
@@ -379,7 +401,6 @@ const EmployeeDetail = () => {
                                 <div className="flex items-center">
                                     <Phone size={16} className="text-[var(--color-text-muted)] mr-3" />
                                     <div className="flex-1">
-                                        <p className="text-xs text-[var(--color-text-secondary)]">Phone</p>
                                         <p className="text-sm font-medium text-[var(--color-text-primary)]">
                                             {getField('mobile_number')}
                                         </p>
@@ -389,9 +410,8 @@ const EmployeeDetail = () => {
                                 <div className="flex items-center">
                                     <Calendar size={16} className="text-[var(--color-text-muted)] mr-3" />
                                     <div className="flex-1">
-                                        <p className="text-xs text-[var(--color-text-secondary)]">Joining Date</p>
                                         <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                                            {formatDate(getField('date_of_joining'))}
+                                            {formatDate(getField('dob'))}
                                         </p>
                                     </div>
                                 </div>
@@ -400,16 +420,16 @@ const EmployeeDetail = () => {
                                     {permissions['employee_edit'] &&
                                         <button
                                             onClick={handleEditClick}
-                                            className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors font-medium"
+                                            className="w-full flex items-center justify-center px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors font-medium"
                                         >
                                             <Pencil size={18} className="mr-2" />
                                             Edit
-                                        </button>
+                                        </button>   
                                     }
                                     {permissions['employee_delete'] &&
                                         <button
                                             onClick={() => setShowDeleteModal(true)}
-                                            className="w-full flex items-center justify-center px-4 py-3 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
+                                            className="w-full flex items-center justify-center px-4 py-2 bg-[var(--color-error)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-error-dark)] transition-colors font-medium"
                                         >
                                             <Trash2 size={18} className="mr-2" />
                                             Delete
@@ -422,207 +442,201 @@ const EmployeeDetail = () => {
 
                     {/* Right Column - Details Sections */}
                     <div className="lg:col-span-3 space-y-8">
-                        {/* Basic Information */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <User size={20} className="mr-2 text-white" />
-                                    Basic Information
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Full Name</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('full_name')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Employee Code</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('employee_code')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Email Address</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('email')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Mobile Number</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('mobile_number')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Date of Birth</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{formatDate(getField('dob'))}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Gender</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getGenderName()}</p>
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Address</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('address')}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Employment Information */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <Briefcase size={20} className="mr-2 text-white" />
-                                    Employment Information
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Department</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getDepartmentName()}</p>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => toggleSection('employment')}
+                                className="w-full flex items-center justify-between p-6 hover:bg-[var(--color-bg-primary)] transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-blue-100">
+                                        <User size={20} className="text-blue-600" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Designation</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getDesignationName()}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Branch</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getBranchName()}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Date of Joining</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{formatDate(getField('date_of_joining'))}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Employee Type</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getEmployeeTypeName()}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Status</label>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.color}`}>
-                                            {statusInfo.label}
-                                        </span>
+                                    <span className="font-semibold text-[var(--color-text-primary)] text-lg">Employment Information</span>
+                                </div>
+                                <div className={`p-1 rounded-full ${expandedSections.employment ? 'bg-[var(--color-blue-lighter)]' : 'bg-[var(--color-bg-gradient-start)]'}`}>
+                                    {expandedSections.employment ?
+                                        <ChevronUp size={20} className="text-[var(--color-blue-dark)]" /> :
+                                        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
+                                    }
+                                </div>
+                            </button>
+                            {expandedSections.employment && (
+                                <div className="border-t border-[var(--color-border-primary)] p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Gender</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getGenderName()}</p>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Department</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getDepartmentName()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Designation</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getDesignationName()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Branch</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getBranchName()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Date of Joining</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{formatDate(getField('date_of_joining'))}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Employee Type</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getEmployeeTypeName()}</p>
+                                        </div>
+
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Address</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('address')}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
-
                         {/* Salary Information */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <CreditCard size={20} className="mr-2 text-white" />
-                                    Salary Information
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Salary</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium text-xl">
-                                            ₹{parseInt(getField('salary', '0')).toLocaleString('en-IN')}
-                                        </p>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => toggleSection('salary')}
+                                className="w-full flex items-center justify-between p-6 hover:bg-[var(--color-bg-primary)] transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-blue-100">
+                                        <CreditCard size={20} className="text-blue-600" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Salary Type</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getSalaryTypeName()}</p>
+                                    <span className="font-semibold text-[var(--color-text-primary)] text-lg">Salary Information</span>
+                                </div>
+                                <div className={`p-1 rounded-full ${expandedSections.salary ? 'bg-[var(--color-blue-lighter)]' : 'bg-[var(--color-bg-gradient-start)]'}`}>
+                                    {expandedSections.salary ?
+                                        <ChevronUp size={20} className="text-[var(--color-blue-dark)]" /> :
+                                        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
+                                    }
+                                </div>
+                            </button>
+                            {expandedSections.salary && (
+                                <div className="border-t border-[var(--color-border-primary)] p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Salary</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">₹{parseInt(getField('salary', '0')).toLocaleString('en-IN')}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Salary Type</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getSalaryTypeName()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Bank Name</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_name')}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Branch</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_branch')}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Account Number</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_account_number')}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">IFSC Code</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_ifsc_code')}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Bank Details */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <Building size={20} className="mr-2 text-white" />
-                                    Bank Details
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Bank Name</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_name')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Branch</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('bank_branch')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Account Number</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium font-mono">{getField('bank_account_number')}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">IFSC Code</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium font-mono">{getField('bank_ifsc_code')}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Legal Documents */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <Shield size={20} className="mr-2 text-white" />
-                                    Legal Documents
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {[
-                                        { key: 'aadharcard_img', label: 'Aadhar Card' },
-                                        { key: 'pan_img', label: 'PAN Card' },
-                                        { key: 'dl_img', label: 'Driving License' },
-                                        { key: 'passport_img', label: 'Passport' }
-                                    ].map((doc) => (
-                                        <div key={doc.key} className="border border-[var(--color-border-primary)] rounded-lg p-4">
-                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                                                {doc.label}
-                                            </label>
-                                            {getField(doc.key) ? (
-                                                <button
-                                                    onClick={() => handleImagePreview(getField(doc.key), doc.label)}
-                                                    className="flex items-center px-3 py-2 bg-[var(--color-blue-lightest)] text-[var(--color-blue-dark)] rounded-lg hover:bg-[var(--color-blue-lighter)] transition-colors text-sm font-medium"
-                                                >
-                                                    <Eye size={16} className="mr-2" />
-                                                    View Document
-                                                </button>
-                                            ) : (
-                                                <p className="text-[var(--color-text-secondary)] text-sm">Not uploaded</p>
-                                            )}
-                                        </div>
-                                    ))}
+                        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => toggleSection('legal')}
+                                className="w-full flex items-center justify-between p-6 hover:bg-[var(--color-bg-primary)] transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-blue-100">
+                                        <FileText size={20} className="text-blue-600" />
+                                    </div>
+                                    <span className="font-semibold text-[var(--color-text-primary)] text-lg">Documents</span>
                                 </div>
-                            </div>
+                                <div className={`p-1 rounded-full ${expandedSections.legal ? 'bg-[var(--color-blue-lighter)]' : 'bg-[var(--color-bg-gradient-start)]'}`}>
+                                    {expandedSections.legal ?
+                                        <ChevronUp size={20} className="text-[var(--color-blue-dark)]" /> :
+                                        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
+                                    }
+                                </div>
+                            </button>
+                            {expandedSections.legal && (
+                                <div className="border-t border-[var(--color-border-primary)] p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {[{ key: 'aadharcard_img', label: 'Aadhar Card' }, { key: 'pan_img', label: 'PAN Card' }, { key: 'dl_img', label: 'Driving License' }, { key: 'passport_img', label: 'Passport' }].map((doc) => (
+                                            <div key={doc.key} className="border border-[var(--color-border-primary)] rounded-lg p-4">
+                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">{doc.label}</label>
+                                                {getField(doc.key) ? (
+                                                    <button
+                                                        onClick={() => handleImagePreview(getField(doc.key), doc.label)}
+                                                        className="flex items-center px-3 py-2 bg-[var(--color-blue-lightest)] text-[var(--color-blue-dark)] rounded-lg hover:bg-[var(--color-blue-lighter)] transition-colors text-sm font-medium"
+                                                    >
+                                                        <Eye size={16} className="mr-2" />
+                                                        View Document
+                                                    </button>
+                                                ) : (
+                                                    <p className="text-[var(--color-text-secondary)] text-sm">Not uploaded</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-
                         {/* Emergency Contact */}
-                        <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-[var(--color-blue-dark)] border-b border-[var(--color-border-primary)]">
-                                <h3 className="text-lg font-semibold text-white flex items-center">
-                                    <Phone size={20} className="mr-2 text-white" />
-                                    Emergency Contact
-                                </h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Contact Name</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_contact_name') || 'Not provided'}</p>
+                        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => toggleSection('emergency')}
+                                className="w-full flex items-center justify-between p-6 hover:bg-[var(--color-bg-primary)] transition-all duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-blue-100">
+                                        <Phone size={20} className="text-blue-600" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Contact Number</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_contact_number') || 'Not provided'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Relationship</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getEmergencyRelationName()}</p>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Emergency Address</label>
-                                        <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_address') || 'Not provided'}</p>
+                                    <span className="font-semibold text-[var(--color-text-primary)] text-lg">Contact</span>
+                                </div>
+                                <div className={`p-1 rounded-full ${expandedSections.emergency ? 'bg-[var(--color-blue-lighter)]' : 'bg-[var(--color-bg-gradient-start)]'}`}>
+                                    {expandedSections.emergency ?
+                                        <ChevronUp size={20} className="text-[var(--color-blue-dark)]" /> :
+                                        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
+                                    }
+                                </div>
+                            </button>
+                            {expandedSections.emergency && (
+                                <div className="border-t border-[var(--color-border-primary)] p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Contact Name</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_contact_name') || 'Not provided'}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Contact Number</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_contact_number') || 'Not provided'}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Relationship</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getEmergencyRelationName()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Emergency Address</label>
+                                            <p className="text-[var(--color-text-primary)] font-medium">{getField('emergency_address') || 'Not provided'}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

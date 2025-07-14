@@ -705,7 +705,7 @@ const AddEmployee = () => {
     const sections = [
         {
             key: 'basicDetails',
-            title: 'Basic Details',
+            title: 'Employement Information',
             icon: User,
             color: 'blue'
         },
@@ -717,13 +717,13 @@ const AddEmployee = () => {
         },
         {
             key: 'legalDocuments',
-            title: 'Legal Documents',
+            title: 'Documents',
             icon: FileText,
             color: 'blue'
         },
         {
             key: 'contactInformation',
-            title: 'Contact Information',
+            title: 'Contact',
             icon: Phone,
             color: 'blue'
         },
