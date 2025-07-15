@@ -12,25 +12,28 @@ import Pagination from '../../Components/Pagination';
 // Day Status Legend Component
 const DayStatusLegend = () => {
     return (
-        <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-medium text-[var(--color-text-secondary)] mb-4">Day Status Legend</h3>
-            <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-3">
+        <div className="w-36 bg-[var(--color-bg-secondary)] border border-[var(--color-blue-dark)] rounded-lg shadow-sm flex flex-col items-stretch">
+            {/* Header */}
+            <div className="px-6 py-4 bg-[var(--color-blue-dark)] rounded-t-lg flex items-center justify-center" style={{ minHeight: '70px' }}>
+                <h3 className="text-lg font-medium text-[var(--color-text-white)] text-center m-0 p-0">Day Status</h3>
+            </div>
+            {/* Content */}
+            <div className="flex flex-col items-center gap-6 p-3">
+                <div className="flex flex-col items-center gap-1">
                     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span className="text-sm text-[var(--color-text-secondary)] font-medium">W</span>
+                        <span className="text-xs text-[var(--color-text-secondary)] font-medium">W</span>
                     </div>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Week Off</span>
+                    <span className="text-xs text-[var(--color-text-secondary)] text-center">Week Off</span>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)]">
-                    </div>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Occasional Working</span>
+                <div className="flex flex-col items-center gap-1">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)]" />
+                    <span className="text-xs text-[var(--color-text-secondary)] text-center">Occasional</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-center gap-1">
                     <div className="w-8 h-8 rounded-full bg-[var(--color-blue-dark)] flex items-center justify-center">
-                        <span className="text-sm text-[var(--color-text-white)] font-medium">D</span>
+                        <span className="text-xs text-[var(--color-text-white)] font-medium">D</span>
                     </div>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Working Day</span>
+                    <span className="text-xs text-[var(--color-text-secondary)] text-center">Working Day</span>
                 </div>
             </div>
         </div>
@@ -377,8 +380,9 @@ const ShiftManagement = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--color-bg-primary)]">
-            <div className=" p-6 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-[var(--color-bg-primary)] relative">
+            {/* Shift Management header - spans full width */}
+            <div className="max-w-7xl mx-auto p-6">
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                         <div className="flex items-center gap-4">
@@ -400,250 +404,255 @@ const ShiftManagement = () => {
                     </div>
                 </div>
 
-                <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
-                    {/* Header section */}
-                    <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center">
-                                <Calendar className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
-                                <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                    Available Shifts 
-                                </h3>
-                            </div>
+                {/* Flex row: Available Shifts card + Day Status Legend */}
+                <div className="flex flex-row items-start gap-8">
+                    <div className="flex-1">
+                        {/* Available Shifts card and rest of your main content */}
+                        <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
+                            {/* Header section */}
+                            <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center">
+                                        <Calendar className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                        <h3 className="text-lg font-medium text-[var(--color-text-white)]">
+                                            Available Shifts
+                                        </h3>
+                                    </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="relative w-full sm:w-64">
-                                    <input
-                                        type="text"
-                                        placeholder="Search shifts..."
-                                        value={searchQuery}
-                                        onChange={handleSearchChange}
-                                        className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
-                                    />
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
-                                    {searchQuery && (
-                                        <button
-                                            onClick={clearSearch}
-                                            className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </button>
-                                    )}
-                                    {searchLoading && (
-                                        <div className="absolute right-3 top-2.5">
-                                            <RefreshCw className="h-4 w-4 animate-spin text-[var(--color-text-muted)]" />
-                                        </div>
-                                    )}
-                                </div>
-
-                                {permissions['shift_assign'] &&
-                                    <button
-                                        onClick={handleAssignShift}
-                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                                    >
-                                        <Users className="h-4 w-4" />
-                                        Assign Shift
-                                    </button>
-                                }
-                                {permissions['shift_create'] &&
-                                    <button
-                                        onClick={handleCreateShift}
-                                        className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                                    >
-                                        <Plus className="h-4 w-4" />
-                                        Create Shift
-                                    </button>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Day Status Legend */}
-                    <div className="p-6 pb-0">
-                        <DayStatusLegend />
-                    </div>
-
-                    {/* Content section */}
-                    {loading ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                <RefreshCw className="w-5 h-5 animate-spin" />
-                                <span>Loading shifts...</span>
-                            </div>
-                        </div>
-                    ) : error ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
-                                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
-                                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Shifts</p>
-                                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
-                                <button
-                                    onClick={() => fetchShifts(currentPage, searchQuery)}
-                                    className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                    <span>Try Again</span>
-                                </button>
-                            </div>
-                        </div>
-                    ) : shifts.length === 0 ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
-                                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Calendar className="w-8 h-8 text-[var(--color-text-muted)]" />
-                                </div>
-                                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Shifts Found</p>
-                                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
-                                    {searchQuery ? 'No shifts match your search criteria.' : 'You haven\'t created any shifts yet. Create your first shift to get started with shift management.'}
-                                </p>
-                                {permissions['shift_create'] && !searchQuery && (
-                                    <button
-                                        onClick={handleCreateShift}
-                                        className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        <span>Create First Shift</span>
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
-                                <thead className="bg-[var(--color-blue-lightest)]">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                                            Shift Name
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                                            Shift Days
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                                            Assigned Employees
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                                            Created On
-                                        </th>
-                                        {(permissions?.shift_edit || permissions?.shift_delete) && (
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
-                                    {shifts.map((shift) => (
-                                        <tr key={shift.shift_id} className="hover:bg-[var(--color-bg-primary)] transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
-                                                        <Calendar className="w-4 h-4 text-[var(--color-blue-dark)]" />
-                                                    </div>
-                                                    <span>{shift.shift_name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-wrap gap-3">
-                                                    {shift.shift_days.map((day) => (
-                                                        <div key={day.day_id} className="relative group">
-                                                            <span
-                                                                className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-help ${getDayStyles(day.shift_type)}`}
-                                                            >
-                                                                {shouldShowDayText(day.shift_type) ? day.sort_name : (day.sort_name)}
-                                                            </span>
-                                                            {/* Tooltip */}
-                                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-[var(--color-text-white)] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                                                              {getDayStatusText(day.shift_type)}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative w-full sm:w-64">
+                                            <input
+                                                type="text"
+                                                placeholder="Search shifts..."
+                                                value={searchQuery}
+                                                onChange={handleSearchChange}
+                                                className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
+                                            />
+                                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
+                                            {searchQuery && (
                                                 <button
-                                                    onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
-                                                    className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-blue-800 transition-colors"
+                                                    onClick={clearSearch}
+                                                    className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                                                 >
-                                                    <span className="font-medium text-lg">
-                                                        {employeeCounts[shift.shift_id] || 0}
-                                                    </span>
-                                                    <Users className="w-4 h-4" />
+                                                    <X className="h-4 w-4" />
                                                 </button>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                {shift.created_date}
-                                            </td>
-                                            {(permissions?.shift_edit || permissions?.shift_delete) && (
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div className="flex space-x-2">
-                                                        {permissions['shift_edit'] && (
-                                                            <button
-                                                                onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
-                                                                className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)]"
-                                                                title="Edit Shift"
-                                                            >
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                        )}
-                                                        {permissions['shift_delete'] && (
-                                                            <button
-                                                                onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
-                                                                className="p-2 rounded-md transition-colors text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]"
-                                                                title="Delete Shift"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </td>
                                             )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            {searchLoading && (
+                                                <div className="absolute right-3 top-2.5">
+                                                    <RefreshCw className="h-4 w-4 animate-spin text-[var(--color-text-muted)]" />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {permissions['shift_assign'] &&
+                                            <button
+                                                onClick={handleAssignShift}
+                                                className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                            >
+                                                <Users className="h-4 w-4" />
+                                                Assign Shift
+                                            </button>
+                                        }
+                                        {permissions['shift_create'] &&
+                                            <button
+                                                onClick={handleCreateShift}
+                                                className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                                Create Shift
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            {/* Content section */}
+                            {loading ? (
+                                <div className="px-6 py-12 text-center">
+                                    <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
+                                        <RefreshCw className="w-5 h-5 animate-spin" />
+                                        <span>Loading shifts...</span>
+                                    </div>
+                                </div>
+                            ) : error ? (
+                                <div className="px-6 py-12 text-center">
+                                    <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-6">
+                                        <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+                                        <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Shifts</p>
+                                        <p className="text-[var(--color-text-error)] mb-4">{error}</p>
+                                        <button
+                                            onClick={() => fetchShifts(currentPage, searchQuery)}
+                                            className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
+                                        >
+                                            <RefreshCw className="w-4 h-4" />
+                                            <span>Try Again</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : shifts.length === 0 ? (
+                                <div className="px-6 py-12 text-center">
+                                    <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                                        <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Calendar className="w-8 h-8 text-[var(--color-text-muted)]" />
+                                        </div>
+                                        <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Shifts Found</p>
+                                        <p className="text-[var(--color-text-secondary)] text-sm mb-4">
+                                            {searchQuery ? 'No shifts match your search criteria.' : 'You haven\'t created any shifts yet. Create your first shift to get started with shift management.'}
+                                        </p>
+                                        {permissions['shift_create'] && !searchQuery && (
+                                            <button
+                                                onClick={handleCreateShift}
+                                                className="inline-flex items-center space-x-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-blue-darker)] transition-colors"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                                <span>Create First Shift</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
+                                        <thead className="bg-[var(--color-blue-lightest)]">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                    Shift Name
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                    Shift Days
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                    Assigned Employees
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                    Created On
+                                                </th>
+                                                {(permissions?.shift_edit || permissions?.shift_delete) && (
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                        Actions
+                                                    </th>
+                                                )}
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                                            {shifts.map((shift) => (
+                                                <tr key={shift.shift_id} className="hover:bg-[var(--color-bg-primary)] transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
+                                                        <div className="flex items-center space-x-2">
+                                                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
+                                                                <Calendar className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                                                            </div>
+                                                            <span>{shift.shift_name}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex flex-wrap gap-3">
+                                                            {shift.shift_days.map((day) => (
+                                                                <div key={day.day_id} className="relative group">
+                                                                    <span
+                                                                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-help ${getDayStyles(day.shift_type)}`}
+                                                                    >
+                                                                        {shouldShowDayText(day.shift_type) ? day.sort_name : (day.sort_name)}
+                                                                    </span>
+                                                                    {/* Tooltip */}
+                                                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-[var(--color-text-white)] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                                                        {getDayStatusText(day.shift_type)}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                        <button
+                                                            onClick={() => fetchAssignedEmployees(shift.shift_id, shift.shift_name)}
+                                                            className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-blue-800 transition-colors"
+                                                        >
+                                                            <span className="font-medium text-lg">
+                                                                {employeeCounts[shift.shift_id] || 0}
+                                                            </span>
+                                                            <Users className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                        {shift.created_date}
+                                                    </td>
+                                                    {(permissions?.shift_edit || permissions?.shift_delete) && (
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                            <div className="flex space-x-2">
+                                                                {permissions['shift_edit'] && (
+                                                                    <button
+                                                                        onClick={() => handleEditShift(shift.shift_id, shift.shift_name)}
+                                                                        className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)]"
+                                                                        title="Edit Shift"
+                                                                    >
+                                                                        <Edit className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                                {permissions['shift_delete'] && (
+                                                                    <button
+                                                                        onClick={() => handleDeleteShift(shift.shift_id, shift.shift_name)}
+                                                                        className="p-2 rounded-md transition-colors text-[var(--color-text-error)] hover:text-red-900 hover:bg-[var(--color-error-light)]"
+                                                                        title="Delete Shift"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+
+                            {/* Pagination Component */}
+                            {totalPages > 1 && (
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    loading={loading}
+                                />
+                            )}
                         </div>
-                    )}
-
-                    {/* Pagination Component */}
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            loading={loading}
-                        />
-                    )}
+                    </div>
+                    <DayStatusLegend />
                 </div>
-
-                {/* Employee Modal */}
-                <EmployeeModal
-                    isOpen={employeeModal.isOpen}
-                    onClose={() => setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' })}
-                    employees={employeeModal.employees}
-                    loading={employeeModal.loading}
-                    shiftName={employeeModal.shiftName}
-                />
-
-                {/* Toast Notification */}
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={closeToast}
-                    />
-                )}
-
-                {/* Confirm Dialog */}
-                <ConfirmDialog
-                    isOpen={confirmDialog.isOpen}
-                    onClose={() => setConfirmDialog({ isOpen: false })}
-                    onConfirm={confirmDialog.onConfirm}
-                    title={confirmDialog.title}
-                    message={confirmDialog.message}
-                    confirmText={confirmDialog.confirmText}
-                    type={confirmDialog.type}
-                />
             </div>
+
+            {/* Employee Modal */}
+            <EmployeeModal
+                isOpen={employeeModal.isOpen}
+                onClose={() => setEmployeeModal({ isOpen: false, employees: [], loading: false, shiftName: '' })}
+                employees={employeeModal.employees}
+                loading={employeeModal.loading}
+                shiftName={employeeModal.shiftName}
+            />
+
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={closeToast}
+                />
+            )}
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false })}
+                onConfirm={confirmDialog.onConfirm}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                confirmText={confirmDialog.confirmText}
+                type={confirmDialog.type}
+            />
         </div>
     );
 };
