@@ -62,7 +62,7 @@ const Navbar = () => {
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                         {/* User Avatar */}
-                        <div className="w-8 h-8 bg-gradient-to-r from-[var(--color-blue)] to-purple-600 rounded-full flex items-center justify-center text-[var(--color-text-white)] text-sm font-semibold">
+                        <div className="w-8 h-8 bg-[var(--color-blue)] rounded-full flex items-center justify-center text-[var(--color-text-white)] text-sm font-semibold">
                             {getUserInitials(user?.full_name)}
                         </div>
 
@@ -84,7 +84,7 @@ const Navbar = () => {
                             {/* User Info Header */}
                             <div className="px-4 py-3 bg-[var(--color-bg-primary)] border-b">
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-[var(--color-blue)] to-purple-600 rounded-full flex items-center justify-center text-[var(--color-text-white)] font-semibold">
+                                    <div className="w-10 h-10 bg-[var(--color-blue)] rounded-full flex items-center justify-center text-[var(--color-text-white)] font-semibold">
                                         {getUserInitials(user?.full_name)}
                                     </div>
                                     <div>
