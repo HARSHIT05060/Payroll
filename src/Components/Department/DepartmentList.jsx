@@ -136,7 +136,7 @@ const DepartmentList = () => {
                     </div>
                 </div>
 
-                <div className="p-6 bg-gradient-to-br from-blue-50/10 to-white flex flex-col gap-4">
+                <div className="p-6 bg-[var(--color-bg-secondary)] flex flex-col gap-4">
                     {permissions['department_create'] &&
                         <DepartmentForm
                             onSubmit={handleAddDepartment}

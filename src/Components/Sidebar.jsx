@@ -231,7 +231,7 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[var(--color-bg-gradient-start)] to-white border-r border-[var(--color-border-primary)] shadow-lg transition-all duration-300 w-64 z-40">
+        <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)] border-r border-[var(--color-border-primary)] shadow-lg transition-all duration-300 w-64 z-40">
             <div className="h-[calc(100%-140px)] relative">
                 <div className="absolute top-0 left-0 right-0 h-4 z-10 scrollbar-fade-top"></div>
 
@@ -399,7 +399,7 @@ const Sidebar = () => {
                 <div className="absolute bottom-0 left-0 right-0 h-4 z-10 scrollbar-fade-bottom"></div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-primary)] p-4 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-blue-lightest)]">
+            <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-primary)] p-4 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-gradient-end)]">
                 <div className="flex items-center space-x-3 p-3 bg-[var(--color-bg-secondary)] rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
                     <div className="p-2 bg-[var(--color-blue-lighter)] rounded-lg">
                         <Phone size={16} className="text-[var(--color-blue-dark)]" />

@@ -95,6 +95,34 @@ export const ThemeProvider = ({ children }) => {
                 '--color-scrollbar-thumb-hover': 'linear-gradient(45deg, #0d9488, #2dd4bf)',
             }
         },
+        dark: {
+            name: 'Dark Mode',
+            colors: {
+                '--color-bg-primary': '#18181b',
+                '--color-bg-secondary': '#23232a',
+                '--color-bg-gradient-start': '#23232a',
+                '--color-bg-gradient-end': '#18181b',
+                '--color-bg-hover': '#27272a',
+                '--color-bg-sidebar': '#18181b',
+                '--color-bg-sidebar-to': '#23232a',
+                '--color-border-primary': '#27272a',
+                '--color-border-secondary': '#3f3f46',
+                '--color-border-focus': '#818cf8',
+                '--color-blue': '#60a5fa',
+                '--color-blue-dark': '#3b82f6',
+                '--color-blue-light': '#64748b',
+                '--color-blue-lighter': '#334155',
+                '--color-blue-lightest': '#1e293b',
+                '--color-blue-darker': '#2563eb',
+                '--color-blue-darkest': '#1d4ed8',
+                '--color-text-primary': '#f4f4f5',
+                '--color-text-secondary': '#a1a1aa',
+                '--color-text-blue': '#60a5fa',
+                '--color-scrollbar-track': '#23232a',
+                '--color-scrollbar-thumb': 'linear-gradient(45deg, #60a5fa, #334155)',
+                '--color-scrollbar-thumb-hover': 'linear-gradient(45deg, #3b82f6, #1e293b)',
+            }
+        },
         // Extend other themes (purple, green, dark) similarly...
     };
 
@@ -112,6 +140,13 @@ export const ThemeProvider = ({ children }) => {
         Object.entries(themeColors).forEach(([property, value]) => {
             root.style.setProperty(property, value);
         });
+
+        // Add or remove dark-theme class on body
+        if (newTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
     };
 
     useEffect(() => {
