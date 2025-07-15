@@ -42,6 +42,9 @@ const AddLoanAdvance = ({
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toast, setToast] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
 
     // Toast function
     const showToast = (message, type = 'info') => {
@@ -51,6 +54,17 @@ const AddLoanAdvance = ({
     const hideToast = () => {
         setToast(null);
     };
+    useEffect(() => {
+        if (searchTerm) {
+            const filtered = employees.filter(employee =>
+                employee.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee.employee_id.toString().includes(searchTerm)
+            );
+            setFilteredEmployees(filtered);
+        } else {
+            setFilteredEmployees(employees);
+        }
+    }, [searchTerm, employees]);
 
     // Fetch employee dropdown data
     const fetchEmployeeData = async () => {
@@ -163,26 +177,16 @@ const AddLoanAdvance = ({
     }, [existingLoan, loanTypes, priorities, statuses]);
 
     // Handle employee selection
-    const handleEmployeeSelect = (e) => {
-        const employeeId = e.target.value;
-        setSelectedEmployee(employeeId);
+    const handleEmployeeSelect = (employee) => {
+        setSelectedEmployee(employee.employee_id);
+        setSearchTerm(employee.full_name);
+        setIsDropdownOpen(false);
 
-        if (employeeId) {
-            const selectedEmp = employees.find(emp => emp.employee_id === employeeId);
-            if (selectedEmp) {
-                setFormData(prev => ({
-                    ...prev,
-                    employeeName: selectedEmp.full_name,
-                    employeeId: selectedEmp.employee_id
-                }));
-            }
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                employeeName: '',
-                employeeId: ''
-            }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            employeeName: employee.full_name,
+            employeeId: employee.employee_id
+        }));
 
         // Clear error when user selects an employee
         if (errors.employeeName) {
@@ -478,7 +482,7 @@ const AddLoanAdvance = ({
 
                 <div className="space-y-8">
                     {/* Enhanced Employee Information */}
-                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg relative z-30">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
@@ -492,42 +496,65 @@ const AddLoanAdvance = ({
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <div>
-                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
+                                <div className="lg:col-span-2">
+                                    <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                         <Users className="w-4 h-4 inline mr-2" />
-                                        Select Employee <span className="text-[var(--color-error)]">*</span>
+                                        Select Employee
                                     </label>
-                                    <select
-                                        value={selectedEmployee}
-                                        onChange={handleEmployeeSelect}
-                                        className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)] ${errors.employeeName ? 'border-red-500' : ''}`}
-                                        disabled={loading}
-                                    >
-                                        <option value="">
-                                            {loading ? 'Loading employees...' : 'Choose an employee...'}
-                                        </option>
-                                        {employees.map((employee) => (
-                                            <option key={employee.employee_id} value={employee.employee_id}>
-                                                {employee.full_name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.employeeName && (
-                                        <p className="text-[var(--color-error)] text-xs mt-2">{errors.employeeName}</p>
-                                    )}
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        Select the employee who will receive this loan/advance
-                                    </p>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search employee by name or ID..."
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                setIsDropdownOpen(true);
+                                                if (!e.target.value) {
+                                                    setSelectedEmployee('');
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        employeeName: '',
+                                                        employeeId: ''
+                                                    }));
+                                                }
+                                            }}
+                                            onFocus={() => setIsDropdownOpen(true)}
+                                            className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)]"
+                                            disabled={loading}
+                                        />
+
+                                        {isDropdownOpen && filteredEmployees.length > 0 && (
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                                                {filteredEmployees.map((employee) => (
+                                                    <div
+                                                        key={employee.employee_id}
+                                                        className="p-3 hover:bg-[var(--color-bg-secondary)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0"
+                                                        onClick={() => handleEmployeeSelect(employee)}
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-[var(--color-text-primary)]">{employee.full_name}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {isDropdownOpen && searchTerm && filteredEmployees.length === 0 && (
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg z-50 mt-1">
+                                                <div className="p-3 text-[var(--color-text-secondary)] text-center">No employees found</div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Enhanced Loan Details */}
-                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg relative z-10">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <IndianRupee className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
@@ -608,7 +635,7 @@ const AddLoanAdvance = ({
                                 <div className="mt-8 pt-6 border-t border-slate-200">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div>
-                                            <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
+                                            <label className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
                                                 <Percent size={16} className="text-[var(--color-blue-dark)]" />
                                                 Interest Rate (Monthly) <span className="text-[var(--color-error)]">*</span>
                                             </label>
@@ -627,7 +654,7 @@ const AddLoanAdvance = ({
                                             )}
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
+                                            <label className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
                                                 <Clock size={16} className="text-[var(--color-blue-dark)]" />
                                                 Tenure (Months) <span className="text-[var(--color-error)]">*</span>
                                             </label>
@@ -665,9 +692,9 @@ const AddLoanAdvance = ({
 
                     {/* Enhanced Dates and Status */}
                     <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-violet-50 rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
@@ -731,9 +758,9 @@ const AddLoanAdvance = ({
 
                     {/* Enhanced Guarantor Information */}
                     <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-amber-50 rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <CheckCircle className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
@@ -782,9 +809,9 @@ const AddLoanAdvance = ({
 
                     {/* Enhanced Additional Information */}
                     <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-t-2xl">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <FileText className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>

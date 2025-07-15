@@ -18,6 +18,11 @@ const AssignShift = () => {
     const [shifts, setShifts] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [selectedShift, setSelectedShift] = useState('');
+    
+    // New states for searchable dropdown
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
 
     // Show toast notification
     const showToast = (message, type = 'info') => {
@@ -28,6 +33,38 @@ const AssignShift = () => {
     const closeToast = () => {
         setToast(null);
     };
+
+    // Filter employees based on search term
+    useEffect(() => {
+        if (searchTerm) {
+            const filtered = employees.filter(employee =>
+                employee.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee.employee_id.toString().includes(searchTerm)
+            );
+            setFilteredEmployees(filtered);
+        } else {
+            setFilteredEmployees(employees);
+        }
+    }, [searchTerm, employees]);
+
+    // Handle employee selection from dropdown
+    const handleEmployeeSelect = (employee) => {
+        setSelectedEmployee(employee.employee_id);
+        setSearchTerm(employee.full_name);
+        setIsDropdownOpen(false);
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.employee-dropdown-container')) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // Fetch dropdown data
     const fetchDropdownData = async () => {
@@ -46,6 +83,7 @@ const AssignShift = () => {
             if (response.data.success) {
                 setEmployees(response.data.data.employee_list || []);
                 setShifts(response.data.data.shift_list || []);
+                setFilteredEmployees(response.data.data.employee_list || []);
 
                 // If editing, pre-select the shift
                 if (editShiftId) {
@@ -91,6 +129,7 @@ const AssignShift = () => {
                 // Reset form
                 setSelectedEmployee('');
                 setSelectedShift('');
+                setSearchTerm('');
 
                 // Optionally navigate back after a delay
                 setTimeout(() => {
@@ -155,8 +194,8 @@ const AssignShift = () => {
                 </div>
 
                 <div className="space-y-8">
-                    {/* Enhanced Employee Selection */}
-                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    {/* Enhanced Employee Selection with Searchable Dropdown */}
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg relative z-20">
                         <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
@@ -170,29 +209,57 @@ const AssignShift = () => {
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-                                <div>
+                                <div className="employee-dropdown-container relative">
                                     <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
                                         <Users className="w-4 h-4 inline mr-2" />
                                         Select Employee <span className="text-[var(--color-error)]">*</span>
                                     </label>
-                                    <select
-                                        value={selectedEmployee}
-                                        onChange={(e) => setSelectedEmployee(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
-                                        disabled={loading}
-                                        required
-                                    >
-                                        <option value="">
-                                            {loading ? 'Loading employees...' : 'Choose an employee...'}
-                                        </option>
-                                        {employees.map((employee) => (
-                                            <option key={employee.employee_id} value={employee.employee_id}>
-                                                {employee.full_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search employee by name or ID..."
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                setIsDropdownOpen(true);
+                                                if (!e.target.value) {
+                                                    setSelectedEmployee('');
+                                                }
+                                            }}
+                                            onFocus={() => setIsDropdownOpen(true)}
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
+                                            disabled={loading}
+                                            required
+                                        />
+
+                                        {isDropdownOpen && filteredEmployees.length > 0 && (
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-slate-300 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                                                {filteredEmployees.map((employee) => (
+                                                    <div
+                                                        key={employee.employee_id}
+                                                        className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-200 last:border-b-0 transition-colors"
+                                                        onClick={() => handleEmployeeSelect(employee)}
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-[var(--color-text-primary)]">
+                                                                {employee.full_name}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {isDropdownOpen && searchTerm && filteredEmployees.length === 0 && (
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-slate-300 rounded-xl shadow-lg z-50 mt-1">
+                                                <div className="p-3 text-[var(--color-text-secondary)] text-center">
+                                                    No employees found
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <p className="text-xs text-slate-500 mt-2">
-                                        Select the employee who will be assigned to the shift
+                                        Search and select the employee who will be assigned to the shift
                                     </p>
                                 </div>
                             </div>
@@ -200,10 +267,10 @@ const AssignShift = () => {
                     </div>
 
                     {/* Enhanced Shift Selection */}
-                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
-                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-2xl">
+                    <div className="bg-[var(--color-bg-secondary)] backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg relative z-10">
+                        <div className="px-8 py-6 border-b border-slate-200 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-secondary)] rounded-t-2xl">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-xl flex items-center justify-center">
                                     <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
@@ -287,7 +354,6 @@ const AssignShift = () => {
                         </div>
                     </div>
                 </div>
-
 
                 {/* Toast Notification */}
                 {toast && (

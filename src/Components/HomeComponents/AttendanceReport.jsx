@@ -303,7 +303,6 @@ const AttendanceReport = () => {
         setSearchQuery('');
         setStatusFilter('all');
         setCurrentPage(1);
-        showToast('All filters cleared', 'info');
     };
 
     // Handle date change
