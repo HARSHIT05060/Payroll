@@ -10,7 +10,7 @@ import {
     Calendar
 } from 'lucide-react';
 
-// Searchable Dropdown Component
+// ✅ Searchable Dropdown Component (Dark Mode Support)
 const SearchableDropdown = ({
     options,
     value,
@@ -63,7 +63,7 @@ const SearchableDropdown = ({
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
             <div
-                className={`w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent text-gray-900 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full px-3 py-2 bg-[var(--color-bg-surface)] border border-[var(--color-border)] rounded-lg focus-within:ring-2 focus-within:ring-[var(--color-ring)] focus-within:border-transparent text-[var(--color-text-primary)] cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={() => !disabled && setIsOpen(true)}
             >
                 <div className="flex items-center justify-between">
@@ -73,12 +73,12 @@ const SearchableDropdown = ({
                                 type="text"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-transparent outline-none"
+                                className="w-full bg-transparent outline-none text-[var(--color-text-primary)]"
                                 placeholder={placeholder}
                                 autoFocus
                             />
                         ) : (
-                            <span className={displayText ? 'text-gray-900' : 'text-gray-500'}>
+                            <span className={displayText ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}>
                                 {displayText || placeholder}
                             </span>
                         )}
@@ -90,30 +90,31 @@ const SearchableDropdown = ({
                                     e.stopPropagation();
                                     handleClear();
                                 }}
-                                className="p-1 hover:bg-gray-100 rounded"
+                                className="p-1 hover:bg-[var(--color-bg-hover)] rounded"
                             >
-                                <X className="h-4 w-4 text-gray-500" />
+                                <X className="h-4 w-4 text-[var(--color-text-secondary)]" />
                             </button>
                         )}
-                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`h-4 w-4 text-[var(--color-text-secondary)] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                     </div>
                 </div>
             </div>
 
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-[var(--color-bg-surface)] border border-[var(--color-border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {filteredOptions.length === 0 ? (
-                        <div className="px-3 py-2 text-gray-500 text-sm">
+                        <div className="px-3 py-2 text-[var(--color-text-secondary)] text-sm">
                             No options found
                         </div>
                     ) : (
                         filteredOptions.map((option, index) => (
                             <div
                                 key={option[valueKey]}
-                                className={`px-3 py-2 cursor-pointer text-sm transition-colors ${index === highlightedIndex
-                                    ? 'bg-blue-50 text-blue-600'
-                                    : 'text-gray-900 hover:bg-gray-50'
-                                    }`}
+                                className={`px-3 py-2 cursor-pointer text-sm transition-colors ${
+                                    index === highlightedIndex
+                                        ? 'bg-[var(--color-bg-highlight)] text-[var(--color-text-accent)]'
+                                        : 'text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]'
+                                }`}
                                 onClick={() => handleSelect(option)}
                             >
                                 {option[displayKey]}
@@ -126,51 +127,44 @@ const SearchableDropdown = ({
     );
 };
 
-// Enhanced StatusBadge component with weekoff support
+// ✅ StatusBadge (Dark Mode Aware)
 const StatusBadge = ({ status }) => {
     const statusLower = status?.toLowerCase() || '';
 
     const getStatusStyle = () => {
         switch (statusLower) {
             case 'present':
-                return 'bg-green-100 text-green-800 border-green-200';
+                return 'bg-[var(--color-success-light)] text-[var(--color-text-success)] border-[var(--color-text-success)]';
             case 'absent':
-                return 'bg-red-100 text-red-800 border-red-200';
+                return 'bg-[var(--color-error-light)] text-[var(--color-text-error)] border-[var(--color-text-error)]';
             case 'weekoff':
             case 'week-off':
             case 'week off':
-                return 'bg-purple-100 text-purple-800 border-purple-200';
+                return 'bg-purple-100 text-purple-600 border-purple-300 dark:bg-purple-900 dark:text-purple-200 dark:border-purple-500';
             case 'holiday':
-                return 'bg-orange-100 text-orange-800 border-orange-200';
+                return 'bg-orange-100 text-orange-600 border-orange-300 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-500';
             case 'leave':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                return 'bg-yellow-100 text-yellow-600 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-100 dark:border-yellow-500';
             case 'half day':
             case 'half-day':
-                return 'bg-blue-100 text-blue-800 border-blue-200';
+                return 'bg-blue-100 text-blue-600 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-500';
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
+                return 'bg-[var(--color-bg-neutral)] text-[var(--color-text-primary)] border-[var(--color-border)]';
         }
     };
 
     const getStatusIcon = () => {
         switch (statusLower) {
-            case 'present':
-                return <CheckCircle className="h-3 w-3" />;
-            case 'absent':
-                return <AlertCircle className="h-3 w-3" />;
+            case 'present': return <CheckCircle className="h-3 w-3" />;
+            case 'absent': return <AlertCircle className="h-3 w-3" />;
             case 'weekoff':
             case 'week-off':
-            case 'week off':
-                return <Coffee className="h-3 w-3" />;
-            case 'holiday':
-                return <Calendar className="h-3 w-3" />;
-            case 'leave':
-                return <Clock className="h-3 w-3" />;
+            case 'week off': return <Coffee className="h-3 w-3" />;
+            case 'holiday': return <Calendar className="h-3 w-3" />;
+            case 'leave': return <Clock className="h-3 w-3" />;
             case 'half day':
-            case 'half-day':
-                return <Activity className="h-3 w-3" />;
-            default:
-                return null;
+            case 'half-day': return <Activity className="h-3 w-3" />;
+            default: return null;
         }
     };
 
@@ -182,21 +176,21 @@ const StatusBadge = ({ status }) => {
     );
 };
 
-// Summary Card Component
+// ✅ Summary Card Component (Dark Mode Aware)
 const SummaryCard = ({ title, value, icon: Icon, color, percentage }) => (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+    <div className="bg-[var(--color-bg-surface)] rounded-lg p-6 shadow-sm border border-[var(--color-border)]">
         <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm font-medium text-gray-600">{title}</p>
+                <p className="text-sm font-medium text-[var(--color-text-secondary)]">{title}</p>
                 <p className={`text-2xl font-bold ${color}`}>{value}</p>
                 {percentage && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                         {percentage}% of total days
                     </p>
                 )}
             </div>
             {Icon && (
-                <div className={`p-3 rounded-full ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+                <div className={`p-3 rounded-full bg-[var(--color-bg-highlight)]`}>
                     <Icon className={`h-6 w-6 ${color}`} />
                 </div>
             )}

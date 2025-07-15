@@ -68,16 +68,18 @@ export const formatDate = (dateString) => {
 
 // Generate status badge HTML
 export const generateStatusBadge = (status) => {
-    const statusClass = getStatusClass(status);
-    return `<span class="status-badge ${statusClass}">${status || 'N/A'}</span>`;
+    const statusInfo = getStatusInfo(status);
+    return `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>`;
 };
 
-// Get status class for styling
-export const getStatusClass = (status) => {
-    switch (status?.toLowerCase()) {
-        case 'active': return 'status-active';
-        case 'inactive': return 'status-inactive';
-        default: return 'status-default';
+// Get status info for styling and text
+export const getStatusInfo = (status) => {
+    if (status === 1 || status === '1') {
+        return { text: 'Active', class: 'status-active' };
+    } else if (status === 2 || status === '2') {
+        return { text: 'Inactive', class: 'status-inactive' };
+    } else {
+        return { text: 'N/A', class: 'status-default' };
     }
 };
 
@@ -133,6 +135,25 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     font-size: 22px;
                     font-weight: bold;
                     margin: 0 0 8px 0;
+                }
+                
+                .export-pdf-btn {
+                    background: #fff;
+                    color: #2563eb;
+                    border: 1px solid white;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin: 16px 0px 5px 16px;
+                    vertical-align: middle;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+                    transition: background 0.2s, color 0.2s;
+                }
+                .export-pdf-btn:hover {
+                    background: #2563eb;
+                    color: #fff;
                 }
                 
                 .header-subtitle {
@@ -383,6 +404,10 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
+                        <button class="export-pdf-btn" onclick="window.print()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                            Export PDF
+                        </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
@@ -443,14 +468,11 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 </thead>
                 <tbody>
                     ${reportData.map((employee, index) => {
-                        const joinDate = formatDate(employee.joining_date);
-                        
-                        return `
+        return `
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>
                                     <div class="employee-name">${employee.full_name || 'N/A'}</div>
-                                    <div class="employee-id">${employee.employee_id || 'N/A'}</div>
                                     <div class="gender-info">${employee.gender || 'N/A'}</div>
                                 </td>
                                 <td>
@@ -469,13 +491,13 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                                         ${!employee.email && !employee.phone ? '<div class="contact-item">No contact info</div>' : ''}
                                     </div>
                                 </td>
-                                <td>${joinDate}</td>
+                                <td>${employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-GB') : 'N/A'}</td>
                                 <td>
                                     ${generateStatusBadge(employee.status)}
                                 </td>
                             </tr>
                         `;
-                    }).join('')}
+    }).join('')}
                 </tbody>
             </table>
 
@@ -521,14 +543,6 @@ export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summar
 
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-
-        // Wait for content to load then print
-        printWindow.onload = () => {
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        };
 
         return {
             success: true,

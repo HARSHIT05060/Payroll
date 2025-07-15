@@ -137,34 +137,53 @@ const DailyReport = () => {
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
 
         if (isWeekOff) {
-            return { color: 'text-purple-600 bg-purple-50', icon: CalendarX, text: 'Week Off' };
+            return {
+                color: 'text-[var(--color-text-blue)] bg-[var(--color-blue)]',
+                icon: CalendarX,
+                text: 'Week Off'
+            };
         }
         if (!isPresent) {
-            return { color: 'text-red-600 bg-red-50', icon: XCircle, text: 'Absent' };
+            return {
+                color: 'text-[var(--color-text-error)] bg-[var(--color-error)]',
+                icon: XCircle,
+                text: 'Absent'
+            };
         }
         if (isLate) {
-            return { color: 'text-yellow-600 bg-yellow-50', icon: AlertCircle, text: 'Late' };
+            return {
+                color: 'text-[var(--color-warning-dark)] bg-[var(--color-warning)]',
+                icon: AlertCircle,
+                text: 'Late'
+            };
         }
         if (hasOvertime) {
-            return { color: 'text-blue-600 bg-blue-50', icon: TrendingUp, text: 'Overtime' };
+            return {
+                color: 'text-[var(--color-blue-dark)] bg-[var(--color-blue)]',
+                icon: TrendingUp,
+                text: 'Overtime'
+            };
         }
-        return { color: 'text-green-600 bg-green-50', icon: CheckCircle, text: 'Present' };
+        return {
+            color: 'text-[var(--color-text-success)] bg-[var(--color-success)]',
+            icon: CheckCircle,
+            text: 'Present'
+        };
     };
 
-    // Get time color based on late/overtime status
     const getTimeColor = (employee) => {
         const isLate = parseFloat(employee.late_hours || 0) > 0;
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
         const isWeekOff = employee.status === 'Week Off';
 
         if (isWeekOff) {
-            return 'text-purple-600 font-medium';
+            return 'text-[var(--color-text-blue)] font-medium';
         }
         if (isLate) {
-            return 'text-yellow-600 font-medium';
+            return 'text-[var(--color-warning-dark)] font-medium';
         }
         if (hasOvertime) {
-            return 'text-blue-600 font-medium';
+            return 'text-[var(--color-blue-dark)] font-medium';
         }
         return 'text-[var(--color-text-primary)]';
     };
@@ -304,10 +323,10 @@ const DailyReport = () => {
                                                 onClick={() => setExportDropdown(false)}
                                             />
                                             <div
-                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                className="fixed z-50 bg-[var(--color-bg-secondary)] rounded-lg shadow-2xl border border-[var(--color-border-secondary)] py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
-                                                    left: buttonPosition.left + buttonPosition.width - 192,
+                                                    left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
                                                 }}
                                             >
                                                 <button
@@ -315,7 +334,7 @@ const DailyReport = () => {
                                                         handleExportToExcel();
                                                         setExportDropdown(false);
                                                     }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileSpreadsheet className="h-4 w-4 text-blue-600" />
                                                     Export to Excel
@@ -325,7 +344,7 @@ const DailyReport = () => {
                                                         handleExportToPDF();
                                                         setExportDropdown(false);
                                                     }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileDown className="h-4 w-4 text-red-600" />
                                                     Export to PDF

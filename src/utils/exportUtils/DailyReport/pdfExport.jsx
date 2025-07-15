@@ -415,14 +415,6 @@ export const exportToPDF = (data, title = 'Daily Report', filterInfo = {}, emplo
         printWindow.document.write(htmlContent);
         printWindow.document.close();
 
-        // Wait for content to load then print
-        // printWindow.onload = () => {
-        //     setTimeout(() => {
-        //         printWindow.print();
-        //         printWindow.close();
-        //     }, 500);
-        // };
-
         return {
             success: true,
             message: 'PDF exported successfully!'

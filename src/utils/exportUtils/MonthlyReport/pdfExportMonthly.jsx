@@ -98,6 +98,25 @@ export const generateMonthlyPDFContent = (reportData, title, summaryStats, filte
                     margin: 0 0 8px 0;
                 }
                 
+                .export-pdf-btn {
+                    background: #fff;
+                    color: #2563eb;
+                    border: 1px solid white;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin: 16px 0px 5px 16px;
+                    vertical-align: middle;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+                    transition: background 0.2s, color 0.2s;
+                }
+                .export-pdf-btn:hover {
+                    background: #2563eb;
+                    color: #fff;
+                }
+                
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
@@ -340,6 +359,9 @@ export const generateMonthlyPDFContent = (reportData, title, summaryStats, filte
                     .summary-section {
                         page-break-inside: avoid;
                     }
+                    .export-pdf-btn {
+                        display: none;
+                    }
                 }
                 
                 @page {
@@ -361,6 +383,10 @@ export const generateMonthlyPDFContent = (reportData, title, summaryStats, filte
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
+                        <button class="export-pdf-btn" onclick="window.print()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                            Export PDF
+                        </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
@@ -476,18 +502,23 @@ export const generateMonthlyPDFContent = (reportData, title, summaryStats, filte
 /**
  * Enhanced Export Monthly Attendance Report to PDF
  * @param {Array} reportData - Array of attendance records
- * @param {string} fileName - Name for the PDF file
  * @param {string} title - Report title
- * @param {Object} summaryStats - Summary statistics object
  * @param {Object} filterInfo - Applied filters information
  * @param {Object} employeeInfo - Employee information for header
  */
-export const exportMonthlyReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
+export const exportToPDF = (reportData, title = 'Monthly Attendance Report', filterInfo = {}, employeeInfo = {}) => {
     try {
-        // Calculate summary stats if not provided
-        if (!summaryStats) {
-            summaryStats = calculateMonthlySummary(reportData);
+        // Validate input data
+        if (!reportData || reportData.length === 0) {
+            console.error('No data to export');
+            return {
+                success: false,
+                message: 'No data available to export'
+            };
         }
+
+        // Calculate summary statistics
+        const summaryStats = calculateMonthlySummary(reportData);
 
         // Generate HTML content
         const htmlContent = generateMonthlyPDFContent(reportData, title, summaryStats, filterInfo, employeeInfo);
@@ -496,14 +527,6 @@ export const exportMonthlyReportToPDF = (reportData, fileName, title, summarySta
         const printWindow = window.open('', '_blank');
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-
-        // Wait for content to load then print
-        printWindow.onload = () => {
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        };
 
         return {
             success: true,
@@ -519,4 +542,7 @@ export const exportMonthlyReportToPDF = (reportData, fileName, title, summarySta
     }
 };
 
-export const exportToPDF = exportMonthlyReportToPDF;
+// Legacy function for backward compatibility
+export const exportMonthlyReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
+    return exportToPDF(reportData, title, filterInfo, employeeInfo);
+};

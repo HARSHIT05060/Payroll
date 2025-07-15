@@ -1,7 +1,13 @@
-export const exportToExcel = (data, filename) => {
+/**
+ * Basic Excel export function
+ * @param {Array} data - Array of objects to export
+ * @param {string} filename - Name of the file (without extension)
+ * @param {string} sheetName - Name of the Excel sheet (optional)
+ */
+export const exportToExcel = (data, filename, ) => {
     if (!data || data.length === 0) {
         console.error('No data to export');
-        return;
+        throw new Error('No data available to export');
     }
 
     // Get headers from the first object
@@ -19,9 +25,9 @@ export const exportToExcel = (data, filename) => {
                 ${data.map(item => `
                     <tr>
                         ${headers.map(header => {
-                            const cellValue = item[header] || '';
-                            return `<td style="border: 1px solid #ccc; padding: 8px; text-align: center;">${cellValue}</td>`;
-                        }).join('')}
+        const cellValue = item[header] || '';
+        return `<td style="border: 1px solid #ccc; padding: 8px;text-align: center;">${cellValue}</td>`;
+    }).join('')}
                     </tr>
                 `).join('')}
             </tbody>

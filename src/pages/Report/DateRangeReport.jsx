@@ -23,6 +23,8 @@ import {
     calculateSummary,
     exportToPDF
 } from '../../utils/exportUtils/DateRangeReport/PdfExportDateRange';
+import { exportToExcel } from '../../utils/exportUtils/DateRangeReport/ExcelExportDateRange.jsx';
+
 
 const DateRangeReport = () => {
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -30,6 +32,7 @@ const DateRangeReport = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
+    const [exportType, setExportType] = useState('pdf');
 
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -44,7 +47,7 @@ const DateRangeReport = () => {
     };
 
     // Generate and export PDF directly
-    const handleGenerateAndExportPDF = useCallback(async () => {
+    const handleGenerateAndExport = useCallback(async () => {
         if (!startDate || !endDate) {
             showToast('Please select both start and end dates', 'error');
             return;
@@ -66,7 +69,7 @@ const DateRangeReport = () => {
         try {
             // Step 1: Fetch data
             showToast('Fetching attendance data...', 'info');
-            
+
             const formData = new FormData();
             formData.append('user_id', user.user_id);
             formData.append('start_date', startDate);
@@ -79,18 +82,23 @@ const DateRangeReport = () => {
             }
 
             const attendanceData = response.data.data;
-            
+
             // Step 2: Process data
             showToast('Processing data...', 'info');
             const groupedData = groupDataByEmployee(attendanceData);
             const reportSummary = calculateSummary(attendanceData);
 
-            // Step 3: Generate PDF
-            showToast('Generating PDF...', 'info');
-            exportToPDF(attendanceData, reportSummary, groupedData, startDate, endDate);
+            // Step 3: Generate export based on selected type
+            if (exportType === 'pdf') {
+                showToast('Generating PDF...', 'info');
+                exportToPDF(attendanceData, reportSummary, groupedData, startDate, endDate);
+                showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
+            } else if (exportType === 'excel') {
+                showToast('Generating Excel file...', 'info');
+                exportToExcel(attendanceData, startDate, endDate);
+                showToast(`Excel file generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
+            }
 
-            showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
-            
         } catch (err) {
             const errorMessage = err.message || 'An error occurred while generating the report';
             setError(errorMessage);
@@ -98,12 +106,13 @@ const DateRangeReport = () => {
         } finally {
             setLoading(false);
         }
-    }, [user?.user_id, startDate, endDate]);
+    }, [user?.user_id, startDate, endDate, exportType]); // Add exportType to dependencies
+
 
     // Handle retry
     const handleRetry = () => {
         setError(null);
-        handleGenerateAndExportPDF();
+        handleGenerateAndExport();
     };
 
     return (
@@ -151,7 +160,7 @@ const DateRangeReport = () => {
                         <div className="flex items-center">
                             <FileText className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
                             <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                PDF Export Settings
+                                Export Settings
                             </h3>
                         </div>
                     </div>
@@ -185,22 +194,34 @@ const DateRangeReport = () => {
                                     />
                                 </div>
                             </div>
-
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                                    Export Format
+                                </label>
+                                <select
+                                    value={exportType}
+                                    onChange={(e) => setExportType(e.target.value)}
+                                    className="w-full px-4 py-3 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-[var(--color-border-primary)] bg-[var(--color-bg-secondary)]"
+                                >
+                                    <option value="pdf">PDF Report</option>
+                                    <option value="excel">Excel Spreadsheet</option>
+                                </select>
+                            </div>
                             <div className="flex items-end">
                                 <button
-                                    onClick={handleGenerateAndExportPDF}
+                                    onClick={handleGenerateAndExport}
                                     disabled={loading}
                                     className="w-full px-6 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
                                 >
                                     {loading ? (
                                         <>
                                             <RefreshCw className="w-5 h-5 animate-spin" />
-                                            Generating PDF...
+                                            Generating {exportType === 'pdf' ? 'PDF' : 'Excel'}...
                                         </>
                                     ) : (
                                         <>
                                             <Download className="w-5 h-5" />
-                                            Generate & Export PDF
+                                            Generate & Export {exportType === 'pdf' ? 'PDF' : 'Excel'}
                                         </>
                                     )}
                                 </button>
@@ -246,7 +267,7 @@ const DateRangeReport = () => {
                         <div className="flex items-center">
                             <TrendingUp className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
                             <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                PDF Report Features
+                                Report Features
                             </h3>
                         </div>
                     </div>
@@ -320,8 +341,16 @@ const DateRangeReport = () => {
                             <div className="flex items-start gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-primary)]">
                                 <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">2</div>
                                 <div>
+                                    <h4 className="font-medium text-[var(--color-text-primary)] mb-1">Choose Export Format</h4>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Select whether you want to export as PDF or Excel spreadsheet format</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-primary)]">
+                                <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                                <div>
                                     <h4 className="font-medium text-[var(--color-text-primary)] mb-1">Generate Report</h4>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Click "Generate & Export PDF" to fetch attendance data and create the comprehensive report</p>
+                                    <p className="text-sm text-[var(--color-text-secondary)]">Click "Generate & Export" to fetch attendance data and create the comprehensive report in your chosen format</p>
                                 </div>
                             </div>
 
@@ -341,14 +370,21 @@ const DateRangeReport = () => {
                                 </div>
                             </div>
                         </div>
-                        
-                        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+
+                        <div className="mt-6 p-4 bg-[var(--color-warning-light)] dark:bg-[var(--color-warning-dark-bg)] border border-[var(--color-warning)] rounded-md">
                             <div className="flex items-center gap-2 mb-2">
-                                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                                <span className="text-yellow-800 font-medium">Important Note</span>
+                                <AlertCircle className="w-5 h-5 text-[var(--color-warning-dark)] dark:text-[var(--color-warning-light)]" />
+                                <span className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-white)] font-semibold">
+                                    Important Note
+                                </span>
                             </div>
-                            <p className="text-yellow-700 text-sm">The PDF will be generated in a new browser window. Please ensure pop-ups are enabled for this site to guarantee proper functionality and successful report generation.</p>
+                            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-white)] leading-relaxed">
+                                PDF reports will open in a new browser window, and Excel files will be downloaded directly.
+                                Please ensure pop-ups are enabled for this site to guarantee proper report generation.
+                            </p>
                         </div>
+
+
                     </div>
                 </div>
             </div>

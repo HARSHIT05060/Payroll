@@ -12,7 +12,7 @@ export const exportToExcel = (data, filename) => {
         <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
             <thead>
                 <tr>
-                    ${headers.map(header => `<th style="background-color: #2563eb; border: 1px solid #ccc; padding: 8px; text-align: left; color: white; font-weight: bold; min-height: 35px; height: 30px;">${header}</th>`).join('')}
+                    ${headers.map(header => `<th style="background-color: #2563eb; border: 1px solid #ccc; padding: 8px; text-align: center; color: white; font-weight: bold; min-height: 35px; height: 30px;">${header}</th>`).join('')}
                 </tr>
             </thead>
             <tbody>
@@ -20,7 +20,7 @@ export const exportToExcel = (data, filename) => {
                     <tr>
                         ${headers.map(header => {
         const cellValue = item[header] || '';
-        return `<td style="border: 1px solid #ccc; padding: 8px;">${cellValue}</td>`;
+        return `<td style="border: 1px solid #ccc; padding: 8px; text-align: center;">${cellValue}</td>`;
     }).join('')}
                     </tr>
                 `).join('')}

@@ -15,16 +15,18 @@ import {
     UserCheck,
     Mail,
     Phone,
-    Download ,
-    ChevronDown ,
+    Download,
+    ChevronDown,
     Briefcase,
     DollarSign,
-    FileDown 
+    FileDown,
+    FileSpreadsheet
 } from 'lucide-react';
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { useRef } from 'react';
 import { exportEmployeeDirectoryToPDF, calculateEmployeeDirectorySummary } from '../../utils/exportUtils/EmployeeReport/employeeDirectoryPdfExport';
+import { exportToExcel } from '../../utils/exportUtils/EmployeeReport/excelExportEmployeeDirectory';
 
 const EmployeeDirectoryReport = () => {
     const navigate = useNavigate();
@@ -92,8 +94,8 @@ const EmployeeDirectoryReport = () => {
         if (!data || data.length === 0) return null;
 
         const totalEmployees = data.length;
-        const activeEmployees = data.filter(emp => emp.status?.toLowerCase() === 'active').length;
-        const inactiveEmployees = data.filter(emp => emp.status?.toLowerCase() === 'inactive').length;
+        const activeEmployees = data.filter(emp => emp.status === 1 || emp.status === '1').length;
+        const inactiveEmployees = data.filter(emp => emp.status === 2 || emp.status === '2').length;
 
         // Gender distribution
         const maleCount = data.filter(emp => emp.gender?.toLowerCase() === 'male').length;
@@ -310,6 +312,48 @@ const EmployeeDirectoryReport = () => {
         }
     };
 
+    const handleExportExcel = useCallback(() => {
+        try {
+            if (!reportData || reportData.length === 0) {
+                showToast('No data available to export', 'error');
+                return;
+            }
+
+            // Transform the data for Excel export
+            const exportData = reportData.map((employee, index) => ({
+                'S.No': index + 1,
+                'Employee Name': employee.full_name || '',
+                'Employee Code': employee.employee_code || '',
+                'Department': employee.department_name || '',
+                'Designation': employee.designation_name || '',
+                'Branch': employee.branch_name || '',
+                'Email': employee.email || '',
+                'Phone': employee.phone || '',
+                'Gender': employee.gender || '',
+                'Date of Joining': employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-GB') : '',
+                'Employee Type': employee.employee_type_name || '',
+                'Salary Type': employee.salary_type_name || '',
+                'Status': employee.status === 1 || employee.status === '1' ? 'Active' :
+                    employee.status === 2 || employee.status === '2' ? 'Inactive' : 'Unknown'
+            }));
+
+            // Generate filename with timestamp
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const fileName = `Employee_Directory_Report_${timestamp}`;
+
+            // Export to Excel
+            exportToExcel(exportData, fileName);
+
+            showToast('Excel export completed successfully!', 'success');
+            setExportDropdown(false);
+
+        } catch (error) {
+            console.error('Error in handleExportExcel:', error);
+            showToast('Failed to export Excel: ' + error.message, 'error');
+            setExportDropdown(false);
+        }
+    }, [reportData]);
+
     // Reset filters
     const resetFilters = () => {
         setFilters({
@@ -326,17 +370,6 @@ const EmployeeDirectoryReport = () => {
         showToast('Filters reset successfully', 'success');
     };
 
-    // Get status badge color
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'active':
-                return 'bg-green-100 text-green-800';
-            case 'inactive':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
 
     // Pagination logic
     const totalItems = reportData?.length || 0;
@@ -370,7 +403,7 @@ const EmployeeDirectoryReport = () => {
     const summaryStats = calculateSummaryStats(reportData);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -415,24 +448,24 @@ const EmployeeDirectoryReport = () => {
                                                 onClick={() => setExportDropdown(false)}
                                             />
                                             <div
-                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                className="fixed z-50 bg-[var(--color-bg-secondary)] rounded-lg shadow-2xl border border-[var(--color-border-secondary)] py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
                                                     left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
                                                 }}
                                             >
-                                                {/* <button
+                                                <button
                                                     onClick={handleExportExcel}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-secondary)]"
                                                 >
-                                                    <FileSpreadsheet className="h-4 w-4 text-blue-600" />
+                                                    <FileSpreadsheet className="h-4 w-4 text-[var(--color-success)]" />
                                                     Export to Excel
-                                                </button> */}
+                                                </button>
                                                 <button
                                                     onClick={handleExportPDF}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-secondary)]"
                                                 >
-                                                    <FileDown className="h-4 w-4 text-red-600" />
+                                                    <FileDown className="h-4 w-4 text-[var(--color-error)]" />
                                                     Export to PDF
                                                 </button>
                                             </div>
@@ -454,25 +487,25 @@ const EmployeeDirectoryReport = () => {
                                     <p className="text-sm text-[var(--color-text-secondary)]">Total Employees</p>
                                     <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.totalEmployees}</p>
                                 </div>
-                                <Users className="h-8 w-8 text-blue-600" />
+                                <Users className="h-8 w-8 text-[var(--color-blue)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Active</p>
-                                    <p className="text-2xl font-bold text-green-600">{summaryStats.activeEmployees}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-success)]">{summaryStats.activeEmployees}</p>
                                 </div>
-                                <UserCheck className="h-8 w-8 text-green-600" />
+                                <UserCheck className="h-8 w-8 text-[var(--color-success)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Male</p>
-                                    <p className="text-2xl font-bold text-blue-600">{summaryStats.maleCount}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-blue)]">{summaryStats.maleCount}</p>
                                 </div>
-                                <User className="h-8 w-8 text-blue-600" />
+                                <User className="h-8 w-8 text-[var(--color-blue)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
@@ -488,15 +521,15 @@ const EmployeeDirectoryReport = () => {
                 )}
 
                 {/* Filters Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-6 mb-8">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
+                        <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg">
                             <Filter className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-900">Filter Employees</h2>
+                        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Filter Employees</h2>
                         <button
                             onClick={resetFilters}
-                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-[var(--color-bg-gray-light)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors text-sm"
                         >
                             <RefreshCw className="h-4 w-4" />
                             Reset
@@ -504,7 +537,7 @@ const EmployeeDirectoryReport = () => {
                     </div>
 
                     {dropdownLoading && (
-                        <div className="flex items-center gap-2 mb-4 text-gray-600">
+                        <div className="flex items-center gap-2 mb-4 text-[var(--color-text-secondary)]">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span className="text-sm">Loading filter options...</span>
                         </div>
@@ -513,14 +546,14 @@ const EmployeeDirectoryReport = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Branch Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <Building className="inline h-4 w-4 mr-1" />
                                 Branch
                             </label>
                             <select
                                 value={filters.branch_id}
                                 onChange={(e) => handleFilterChange('branch_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Branches</option>
@@ -534,14 +567,14 @@ const EmployeeDirectoryReport = () => {
 
                         {/* Department Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <Users className="inline h-4 w-4 mr-1" />
                                 Department
                             </label>
                             <select
                                 value={filters.department_id}
                                 onChange={(e) => handleFilterChange('department_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Departments</option>
@@ -555,14 +588,14 @@ const EmployeeDirectoryReport = () => {
 
                         {/* Designation Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <Award className="inline h-4 w-4 mr-1" />
                                 Designation
                             </label>
                             <select
                                 value={filters.designation_id}
                                 onChange={(e) => handleFilterChange('designation_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Designations</option>
@@ -576,14 +609,14 @@ const EmployeeDirectoryReport = () => {
 
                         {/* Employee Type Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <Briefcase className="inline h-4 w-4 mr-1" />
                                 Employee Type
                             </label>
                             <select
                                 value={filters.employee_type_id}
                                 onChange={(e) => handleFilterChange('employee_type_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Employee Types</option>
@@ -597,14 +630,14 @@ const EmployeeDirectoryReport = () => {
 
                         {/* Salary Type Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <DollarSign className="inline h-4 w-4 mr-1" />
                                 Salary Type
                             </label>
                             <select
                                 value={filters.salary_type_id}
                                 onChange={(e) => handleFilterChange('salary_type_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Salary Types</option>
@@ -618,14 +651,14 @@ const EmployeeDirectoryReport = () => {
 
                         {/* Gender Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <User className="inline h-4 w-4 mr-1" />
                                 Gender
                             </label>
                             <select
                                 value={filters.gender_id}
                                 onChange={(e) => handleFilterChange('gender_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Genders</option>
@@ -642,7 +675,7 @@ const EmployeeDirectoryReport = () => {
                             <button
                                 onClick={generateReport}
                                 disabled={reportGenerating}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-white rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {reportGenerating ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -657,7 +690,7 @@ const EmployeeDirectoryReport = () => {
 
                 {/* Employee Directory Results */}
                 {reportData && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] overflow-hidden">
                         <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center">
@@ -672,91 +705,90 @@ const EmployeeDirectoryReport = () => {
                         {/* Table Container */}
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[1200px]">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-[var(--color-bg-gray-light)] border-b border-[var(--color-border-secondary)]">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Employee
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             ID
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Department
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Designation
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Branch
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Contact
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
                                             Join Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-secondary)]">
                                     {currentItems.map((employee, index) => (
-                                        <tr key={employee.employee_id || index} className="hover:bg-gray-50 transition-colors">
+                                        <tr key={employee.employee_id || index} className="hover:bg-[var(--color-bg-hover)] transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-10 w-10">
+                                                    <div className="flex-shrink-0 h-10 w-10 relative">
                                                         <div className="h-10 w-10 rounded-full bg-[var(--color-blue-dark)] flex items-center justify-center">
-                                                            <span className="text-sm font-medium text-white">
+                                                            <span className="text-sm font-medium text-[var(--color-text-white)]">
                                                                 {employee.full_name?.charAt(0) || 'N'}
                                                             </span>
                                                         </div>
+                                                        {/* Status indicator */}
+                                                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${employee.status === 1 || employee.status === '1'
+                                                            ? 'bg-green-500'
+                                                            : employee.status === 2 || employee.status === '2'
+                                                                ? 'bg-red-500'
+                                                                : 'bg-gray-400'
+                                                            }`}></div>
                                                     </div>
                                                     <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">
+                                                        <div className="text-sm font-medium text-[var(--color-text-primary)]">
                                                             {employee.full_name || 'N/A'}
                                                         </div>
-                                                        <div className="text-sm text-gray-500">
+                                                        <div className="text-sm text-[var(--color-text-muted)]">
                                                             {employee.gender || 'N/A'}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {employee.employee_id || 'N/A'}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
+                                                {employee.employee_code || 'N/A'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                 {employee.department_name || 'N/A'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                 {employee.designation_name || 'N/A'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                 {employee.branch_name || 'N/A'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
                                                 <div className="space-y-1">
                                                     {employee.email && (
                                                         <div className="flex items-center gap-1">
-                                                            <Mail className="h-3 w-3 text-gray-400" />
+                                                            <Mail className="h-3 w-3 text-[var(--color-text-muted)]" />
                                                             <span className="text-xs">{employee.email}</span>
                                                         </div>
                                                     )}
                                                     {employee.phone && (
                                                         <div className="flex items-center gap-1">
-                                                            <Phone className="h-3 w-3 text-gray-400" />
+                                                            <Phone className="h-3 w-3 text-[var(--color-text-muted)]" />
                                                             <span className="text-xs">{employee.phone}</span>
                                                         </div>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {employee.joining_date ? new Date(employee.joining_date).toLocaleDateString('en-GB') : 'N/A'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(employee.status)}`}>
-                                                    {employee.status || 'N/A'}
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
+                                                {employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-GB') : 'N/A'}
                                             </td>
                                         </tr>
                                     ))}
@@ -776,16 +808,16 @@ const EmployeeDirectoryReport = () => {
 
                 {/* No Data Message */}
                 {!reportData && !reportGenerating && !error && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-gray-50 rounded-full mb-4">
-                                <Users className="h-8 w-8 text-gray-400" />
+                            <div className="p-3 bg-[var(--color-bg-gray-light)] rounded-full mb-4">
+                                <Users className="h-8 w-8 text-[var(--color-text-muted)]" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No Employees Found</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No Employees Found</h3>
+                            <p className="text-[var(--color-text-secondary)] mb-4">
                                 No employees match your current filter criteria.
                             </p>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[var(--color-text-muted)]">
                                 <p>• Try adjusting your filters</p>
                                 <p>• Or reset filters to see all employees</p>
                             </div>
@@ -795,13 +827,13 @@ const EmployeeDirectoryReport = () => {
 
                 {/* Loading State */}
                 {reportGenerating && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-blue-50 rounded-full mb-4">
-                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                            <div className="p-3 bg-[var(--color-blue-lightest)] rounded-full mb-4">
+                                <Loader2 className="h-8 w-8 text-[var(--color-blue)] animate-spin" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Generating Report</h3>
-                            <p className="text-gray-600">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Generating Report</h3>
+                            <p className="text-[var(--color-text-secondary)]">
                                 Please wait while we prepare your monthly attendance report...
                             </p>
                         </div>
