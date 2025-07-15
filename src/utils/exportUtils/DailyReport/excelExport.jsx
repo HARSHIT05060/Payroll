@@ -11,8 +11,8 @@ export const exportToExcel = (data, filename) => {
     const tableHTML = `
         <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
             <thead>
-                <tr style="background-color: #f0f0f0; font-weight: bold;">
-                    ${headers.map(header => `<th style="border: 1px solid #ccc; padding: 8px; text-align: left;">${header}</th>`).join('')}
+                <tr>
+                    ${headers.map(header => `<th style="background-color: #2563eb; border: 1px solid #ccc; padding: 8px; text-align: left; color: white; font-weight: bold; min-height: 35px; height: 30px;">${header}</th>`).join('')}
                 </tr>
             </thead>
             <tbody>
