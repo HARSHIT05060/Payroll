@@ -42,7 +42,7 @@ const Navbar = () => {
         <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-16 px-6 bg-[var(--color-bg-secondary)] border-b border-[var(--color-border-primary)] z-50 shadow-sm">
             {/* Left side - Logo/Brand */}
             <div className="flex items-center">
-                <h1 className="text-xl font-bold text-gray-800">Attendance System</h1>
+                <h1 className="text-xl font-bold text-[var(--color-text-primary)]">Attendance System</h1>
             </div>
 
             {/* Right side - User menu */}

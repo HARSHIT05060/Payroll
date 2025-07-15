@@ -41,9 +41,9 @@ const DesignationForm = ({ onSubmit, loading = false, showToast }) => {
 
     return (
         <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-blue-dark)] overflow-hidden">
-            <div className="p-6 bg-gradient-to-br from-blue-50/20 to-white">
+            <div className="p-6 bg-[var(--color-bg-secondary)]">
                 <div className="flex w-full flex-row items-center justify-between mb-4">
-                    <div >
+                    <div className="space-y-2" >
                         <label htmlFor="designationName" className=" text-sm font-medium text-[var(--color-text-secondary)] mb-2 ">
                             Add New Designation <span className="text-[var(--color-error)]">*</span>
                         </label>
