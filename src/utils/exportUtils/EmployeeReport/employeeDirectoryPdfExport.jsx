@@ -59,10 +59,10 @@ export const calculateEmployeeDirectorySummary = (reportData) => {
 // Format date for display
 export const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
     });
 };
 
@@ -82,12 +82,7 @@ export const getStatusClass = (status) => {
 };
 
 // Generate PDF content for employee directory
-export const generateEmployeeDirectoryPDFContent = (reportData, title, summaryStats) => {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('en-GB');
-    const formattedTime = currentDate.toLocaleTimeString('en-GB', { hour12: false });
-    const monthYear = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-
+export const generateEmployeeDirectoryPDFContent = (reportData, title, summaryStats, filterInfo = {}) => {
     return `
         <!DOCTYPE html>
         <html>
@@ -96,22 +91,21 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
             <title>${title}</title>
             <style>
                 body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    color: #2c3e50;
+                    color: #333;
                     line-height: 1.2;
-                    font-size: 10px;
-                    background-color: #ffffff;
+                    font-size: 12px;
                 }
                 
                 .header {
-                    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                     color: white;
-                    padding: 12px 20px;
-                    margin-bottom: 15px;
-                    border-radius: 0 0 8px 8px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    padding: 15px 20px;
+                    margin-bottom: 20px;
+                    position: relative;
+                    min-height: 70px;
                 }
                 
                 .header-content {
@@ -121,18 +115,14 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 }
                 
                 .logo-area {
-                    width: 50px;
-                    height: 50px;
-                    background: rgba(255,255,255,0.15);
+                    width: 60px;
+                    height: 60px;
+                    background: white;
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin-right: 15px;
-                    font-size: 10px;
-                    font-weight: bold;
-                    color: white;
-                    border: 2px solid rgba(255,255,255,0.3);
+                    margin-right: 20px;
                 }
                 
                 .header-info {
@@ -140,214 +130,195 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 }
                 
                 .header-title {
-                    font-size: 18px;
-                    font-weight: 700;
-                    margin: 0 0 4px 0;
-                    letter-spacing: 0.5px;
+                    font-size: 22px;
+                    font-weight: bold;
+                    margin: 0 0 8px 0;
                 }
                 
                 .header-subtitle {
-                    font-size: 11px;
-                    margin: 0 0 2px 0;
+                    font-size: 14px;
+                    margin: 0 0 5px 0;
                     opacity: 0.9;
-                    font-weight: 400;
                 }
                 
                 .header-period {
-                    font-size: 10px;
+                    font-size: 12px;
                     margin: 0;
                     opacity: 0.8;
-                    font-weight: 500;
                 }
                 
                 .header-meta {
                     text-align: right;
-                    font-size: 9px;
-                    opacity: 0.9;
+                    font-size: 10px;
+                }
+                
+                .page-info {
+                    font-size: 12px;
+                    margin-bottom: 5px;
+                }
+                
+                .generation-info {
+                    opacity: 0.8;
                 }
                 
                 .summary-section {
-                    background: #f8fafc;
-                    padding: 15px;
-                    margin-bottom: 15px;
+                    background-color: #f8fafc;
+                    padding: 20px;
+                    margin-bottom: 20px;
                     border-radius: 8px;
-                    border: 1px solid #e2e8f0;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                    border-left: 4px solid #2563eb;
                 }
                 
                 .summary-title {
-                    font-size: 14px;
-                    font-weight: 600;
-                    margin-bottom: 12px;
-                    color: #1e3a8a;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-bottom: 15px;
+                    color: #2563eb;
                 }
                 
                 .summary-grid {
                     display: grid;
-                    grid-template-columns: repeat(5, 1fr);
-                    gap: 12px;
-                    margin-bottom: 10px;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 15px;
+                    margin-bottom: 20px;
                 }
                 
                 .summary-item {
                     background: white;
-                    padding: 10px;
+                    padding: 12px;
                     border-radius: 6px;
                     border: 1px solid #e2e8f0;
                     text-align: center;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
                 }
                 
                 .summary-label {
-                    font-size: 8px;
+                    font-size: 11px;
                     color: #64748b;
-                    margin-bottom: 4px;
-                    font-weight: 500;
-                    text-transform: uppercase;
-                    letter-spacing: 0.3px;
+                    margin-bottom: 5px;
                 }
                 
                 .summary-value {
-                    font-size: 14px;
-                    font-weight: 700;
+                    font-size: 16px;
+                    font-weight: bold;
                     color: #1e293b;
-                    margin-bottom: 2px;
                 }
                 
-                .summary-percentage {
-                    font-size: 8px;
-                    color: #64748b;
-                    font-weight: 400;
+                .summary-value.success {
+                    color: #22c55e;
                 }
                 
-                .summary-value.success { color: #059669; }
-                .summary-value.error { color: #dc2626; }
-                .summary-value.warning { color: #d97706; }
-                .summary-value.info { color: #2563eb; }
-                .summary-value.purple { color: #7c3aed; }
-                .summary-value.pink { color: #ec4899; }
+                .summary-value.error {
+                    color: #ef4444;
+                }
+                
+                .summary-value.warning {
+                    color: #f59e0b;
+                }
+                
+                .summary-value.info {
+                    color: #3b82f6;
+                }
+                
+                .summary-value.purple {
+                    color: #8b5cf6;
+                }
+                
+                .summary-value.pink {
+                    color: #ec4899;
+                }
                 
                 .employee-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 9px;
-                    margin-bottom: 15px;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                    border-radius: 6px;
-                    overflow: hidden;
-                    background: white;
+                    font-size: 10px;
+                    margin-bottom: 20px;
                 }
                 
                 .employee-table th {
-                    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                     color: white;
                     padding: 8px 6px;
-                    text-align: left;
+                    text-align: center;
+                    border: 1px solid #1d4ed8;
                     font-weight: 600;
-                    font-size: 8px;
-                    text-transform: uppercase;
-                    letter-spacing: 0.3px;
-                    border-bottom: 2px solid #1e40af;
+                    font-size: 10px;
                 }
                 
                 .employee-table td {
                     padding: 6px;
-                    border-bottom: 1px solid #f1f5f9;
-                    font-size: 8px;
-                    vertical-align: middle;
+                    border: 1px solid #e2e8f0;
+                    text-align: center;
+                    font-size: 9px;
                 }
                 
                 .employee-table tr:nth-child(even) {
-                    background-color: #f8fafc;
-                }
-                
-                .employee-table tr:hover {
-                    background-color: #f1f5f9;
+                    background-color: #f9fafb;
                 }
                 
                 .employee-name {
                     font-weight: 600;
                     color: #1e293b;
-                    font-size: 9px;
-                    margin-bottom: 1px;
+                    font-size: 10px;
+                    margin-bottom: 2px;
                 }
                 
                 .employee-id {
-                    font-size: 7px;
+                    font-size: 8px;
                     color: #64748b;
                     font-family: 'Courier New', monospace;
                     background: #f1f5f9;
-                    padding: 1px 3px;
+                    padding: 1px 4px;
                     border-radius: 3px;
-                }
-                
-                .employee-details {
-                    line-height: 1.3;
+                    display: inline-block;
                 }
                 
                 .gender-info {
-                    font-size: 7px;
+                    font-size: 8px;
                     color: #64748b;
                     margin-top: 2px;
                 }
                 
                 .contact-info {
-                    line-height: 1.2;
+                    line-height: 1.3;
+                    text-align: left;
                 }
                 
                 .contact-item {
-                    font-size: 7px;
-                    color: #475569;
-                    margin-bottom: 1px;
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                }
-                
-                .contact-icon {
                     font-size: 8px;
-                    width: 8px;
-                    text-align: center;
+                    color: #475569;
+                    margin-bottom: 2px;
                 }
                 
                 .status-badge {
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    font-size: 7px;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 8px;
                     font-weight: 600;
                     text-transform: uppercase;
-                    letter-spacing: 0.3px;
-                    border: 1px solid transparent;
                 }
                 
                 .status-active {
-                    background: #dcfce7;
+                    background-color: #dcfce7;
                     color: #166534;
-                    border-color: #bbf7d0;
                 }
                 
                 .status-inactive {
-                    background: #fee2e2;
+                    background-color: #fee2e2;
                     color: #dc2626;
-                    border-color: #fecaca;
                 }
                 
                 .status-default {
-                    background: #f3f4f6;
+                    background-color: #f3f4f6;
                     color: #6b7280;
-                    border-color: #d1d5db;
                 }
                 
                 .department-tag, .designation-tag, .branch-tag {
-                    font-size: 7px;
+                    font-size: 8px;
                     font-weight: 500;
-                    padding: 2px 5px;
+                    padding: 3px 6px;
                     border-radius: 4px;
+                    display: inline-block;
                     text-align: center;
-                    line-height: 1.2;
                 }
                 
                 .department-tag {
@@ -372,33 +343,10 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     right: 0;
                     text-align: center;
                     font-size: 8px;
-                    color: #64748b;
+                    color: #666;
                     border-top: 1px solid #e2e8f0;
                     padding: 8px;
                     background: white;
-                    box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
-                }
-                
-                .report-meta {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 10px;
-                    padding: 8px 12px;
-                    background: #f8fafc;
-                    border-radius: 6px;
-                    border-left: 3px solid #3b82f6;
-                }
-                
-                .report-period {
-                    font-size: 10px;
-                    font-weight: 600;
-                    color: #1e40af;
-                }
-                
-                .report-count {
-                    font-size: 9px;
-                    color: #64748b;
                 }
                 
                 @media print {
@@ -407,23 +355,17 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    .header, .employee-table th, .status-badge {
+                    .header {
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
                     .summary-section {
                         page-break-inside: avoid;
                     }
-                    .employee-table {
-                        page-break-inside: auto;
-                    }
-                    .employee-table tr {
-                        page-break-inside: avoid;
-                    }
                 }
                 
                 @page {
-                    margin: 12mm;
+                    margin: 15mm;
                     size: A4 landscape;
                 }
             </style>
@@ -432,54 +374,55 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
             <div class="header">
                 <div class="header-content">
                     <div class="logo-area">
-                        LOGO
+                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
                     </div>
                     <div class="header-info">
                         <h1 class="header-title">${title}</h1>
                         <p class="header-subtitle">Employee Directory Report</p>
-                        <p class="header-period">Period: ${monthYear}</p>
+                        <p class="header-period">${filterInfo.period || `Period: ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}</p>
                     </div>
                     <div class="header-meta">
-                        <div>Report Date: ${formattedDate}</div>
-                        <div>Generated: ${formattedTime}</div>
+                        <div class="page-info">Page 1</div>
+                        <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="report-meta">
-                <div class="report-period">Monthly Employee Directory - ${monthYear}</div>
-                <div class="report-count">Total Records: ${reportData.length} employees</div>
-            </div>
-
             ${summaryStats ? `
                 <div class="summary-section">
-                    <div class="summary-title">
-                        📊 Employee Statistics Summary
-                    </div>
+                    <div class="summary-title">Employee Directory Summary</div>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <div class="summary-label">Total Staff</div>
-                            <div class="summary-value info">${summaryStats.totalEmployees}</div>
+                            <div class="summary-label">Total Employees</div>
+                            <div class="summary-value">${summaryStats.totalEmployees}</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">Active</div>
-                            <div class="summary-value success">${summaryStats.activeEmployees}</div>
-                            <div class="summary-percentage">${summaryStats.activePercentage}%</div>
+                            <div class="summary-label">Active Employees</div>
+                            <div class="summary-value success">${summaryStats.activeEmployees} (${summaryStats.activePercentage}%)</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">Male</div>
-                            <div class="summary-value info">${summaryStats.maleCount}</div>
-                            <div class="summary-percentage">${summaryStats.malePercentage}%</div>
+                            <div class="summary-label">Inactive Employees</div>
+                            <div class="summary-value error">${summaryStats.inactiveEmployees}</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">Female</div>
-                            <div class="summary-value pink">${summaryStats.femaleCount}</div>
-                            <div class="summary-percentage">${summaryStats.femalePercentage}%</div>
+                            <div class="summary-label">Male Employees</div>
+                            <div class="summary-value info">${summaryStats.maleCount} (${summaryStats.malePercentage}%)</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">Departments</div>
+                            <div class="summary-label">Female Employees</div>
+                            <div class="summary-value pink">${summaryStats.femaleCount} (${summaryStats.femalePercentage}%)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Departments</div>
                             <div class="summary-value purple">${Object.keys(summaryStats.departmentCounts).length}</div>
-                            <div class="summary-percentage">Active</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Branches</div>
+                            <div class="summary-value warning">${Object.keys(summaryStats.branchCounts).length}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Designations</div>
+                            <div class="summary-value info">${Object.keys(summaryStats.designationCounts).length}</div>
                         </div>
                     </div>
                 </div>
@@ -488,14 +431,14 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
             <table class="employee-table">
                 <thead>
                     <tr>
-                        <th style="width: 4%;">No.</th>
-                        <th style="width: 20%;">Employee Details</th>
-                        <th style="width: 16%;">Department</th>
-                        <th style="width: 16%;">Designation</th>
+                        <th style="width: 5%;">S.No</th>
+                        <th style="width: 18%;">Employee Details</th>
+                        <th style="width: 15%;">Department</th>
+                        <th style="width: 15%;">Designation</th>
                         <th style="width: 12%;">Branch</th>
                         <th style="width: 20%;">Contact Info</th>
-                        <th style="width: 8%;">Join Date</th>
-                        <th style="width: 4%;">Status</th>
+                        <th style="width: 10%;">Join Date</th>
+                        <th style="width: 5%;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -504,13 +447,11 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                         
                         return `
                             <tr>
-                                <td style="text-align: center; font-weight: 600; color: #64748b;">${index + 1}</td>
+                                <td>${index + 1}</td>
                                 <td>
-                                    <div class="employee-details">
-                                        <div class="employee-name">${employee.full_name || 'N/A'}</div>
-                                        <div class="employee-id">ID: ${employee.employee_id || 'N/A'}</div>
-                                        <div class="gender-info">${employee.gender || 'N/A'}</div>
-                                    </div>
+                                    <div class="employee-name">${employee.full_name || 'N/A'}</div>
+                                    <div class="employee-id">${employee.employee_id || 'N/A'}</div>
+                                    <div class="gender-info">${employee.gender || 'N/A'}</div>
                                 </td>
                                 <td>
                                     <div class="department-tag">${employee.department_name || 'N/A'}</div>
@@ -523,25 +464,13 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                                 </td>
                                 <td>
                                     <div class="contact-info">
-                                        ${employee.email ? `
-                                            <div class="contact-item">
-                                                <span class="contact-icon">📧</span>
-                                                <span>${employee.email}</span>
-                                            </div>
-                                        ` : ''}
-                                        ${employee.phone ? `
-                                            <div class="contact-item">
-                                                <span class="contact-icon">📱</span>
-                                                <span>${employee.phone}</span>
-                                            </div>
-                                        ` : ''}
-                                        ${!employee.email && !employee.phone ? '<span style="color: #9ca3af;">No contact</span>' : ''}
+                                        ${employee.email ? `<div class="contact-item">📧 ${employee.email}</div>` : ''}
+                                        ${employee.phone ? `<div class="contact-item">📱 ${employee.phone}</div>` : ''}
+                                        ${!employee.email && !employee.phone ? '<div class="contact-item">No contact info</div>' : ''}
                                     </div>
                                 </td>
-                                <td style="text-align: center; font-family: monospace; font-size: 8px;">
-                                    ${joinDate}
-                                </td>
-                                <td style="text-align: center;">
+                                <td>${joinDate}</td>
+                                <td>
                                     ${generateStatusBadge(employee.status)}
                                 </td>
                             </tr>
@@ -550,9 +479,6 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 </tbody>
             </table>
 
-            <div class="footer">
-                <p>Employee Directory Report - ${monthYear} | Generated: ${formattedDate} at ${formattedTime} | Records: ${reportData.length} | Confidential</p>
-            </div>
         </body>
         </html>
     `;
@@ -600,22 +526,13 @@ export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summar
         printWindow.onload = () => {
             setTimeout(() => {
                 printWindow.print();
-                // Close window after printing
-                setTimeout(() => {
-                    printWindow.close();
-                }, 1000);
+                printWindow.close();
             }, 500);
-        };
-
-        // Handle print window errors
-        printWindow.onerror = (error) => {
-            console.error('Print window error:', error);
-            printWindow.close();
         };
 
         return {
             success: true,
-            message: 'PDF export initiated successfully! Check your browser\'s print dialog.'
+            message: 'PDF exported successfully!'
         };
 
     } catch (error) {
@@ -626,6 +543,9 @@ export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summar
         };
     }
 };
+
+// Alternative export name for consistency
+export const exportToPDF = exportEmployeeDirectoryToPDF;
 
 // Default export
 export default exportEmployeeDirectoryToPDF;

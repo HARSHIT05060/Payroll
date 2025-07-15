@@ -53,6 +53,38 @@ export const formatTableData = (data) => {
     });
 };
 
+// Helper functions for styling
+const getStatusClass = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+        case 'present': return 'status-present';
+        case 'absent': return 'status-absent';
+        case 'week off': case 'weekoff': return 'status-week-off';
+        case 'holiday': return 'status-holiday';
+        case 'leave': return 'status-leave';
+        case 'half day': return 'status-half-day';
+        case 'late': return 'status-late';
+        case 'overtime': return 'status-overtime';
+        default: return 'status-default';
+    }
+};
+
+const getShiftClass = (shiftStatus) => {
+    const shiftLower = shiftStatus?.toLowerCase();
+    if (shiftLower === 'working day') return 'shift-working';
+    if (shiftLower === 'week off' || shiftLower === 'weekoff') return 'shift-weekoff';
+    return '';
+};
+
+const getHoursClass = (header, value) => {
+    const headerLower = header.toLowerCase();
+    if (value !== '-' && parseFloat(value) > 0) {
+        if (headerLower.includes('late')) return 'hours-highlight';
+        if (headerLower.includes('overtime')) return 'overtime-highlight';
+    }
+    return '';
+};
+
 // Generate enhanced PDF content
 export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, employeeInfo = {}) => {
     const headers = getTableHeaders(reportData);
@@ -331,42 +363,9 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
     `;
 };
 
-// Helper functions for styling
-const getStatusClass = (status) => {
-    const statusLower = status?.toLowerCase();
-    switch (statusLower) {
-        case 'present': return 'status-present';
-        case 'absent': return 'status-absent';
-        case 'week off': case 'weekoff': return 'status-week-off';
-        case 'holiday': return 'status-holiday';
-        case 'leave': return 'status-leave';
-        case 'half day': return 'status-half-day';
-        case 'late': return 'status-late';
-        case 'overtime': return 'status-overtime';
-        default: return 'status-default';
-    }
-};
-
-const getShiftClass = (shiftStatus) => {
-    const shiftLower = shiftStatus?.toLowerCase();
-    if (shiftLower === 'working day') return 'shift-working';
-    if (shiftLower === 'week off' || shiftLower === 'weekoff') return 'shift-weekoff';
-    return '';
-};
-
-const getHoursClass = (header, value) => {
-    const headerLower = header.toLowerCase();
-    if (value !== '-' && parseFloat(value) > 0) {
-        if (headerLower.includes('late')) return 'hours-highlight';
-        if (headerLower.includes('overtime')) return 'overtime-highlight';
-    }
-    return '';
-};
-
 /**
  * Enhanced Export to PDF Function
  * @param {Array} data - Array of records to export
- * @param {string} filename - Name for the PDF file (optional)
  * @param {string} title - Report title
  * @param {Object} filterInfo - Applied filters information (optional)
  * @param {Object} employeeInfo - Employee information for header (optional)
@@ -411,3 +410,44 @@ export const exportToPDF = (data, title = 'Daily Report', filterInfo = {}, emplo
         };
     }
 };
+
+// Additional utility functions for compatibility
+
+/**
+ * Calculate monthly summary statistics (for compatibility with monthly reports)
+ * @param {Array} reportData - Array of attendance records
+ */
+export const calculateMonthlySummary = (reportData) => {
+    const totalDays = reportData.length;
+    const workingDays = reportData.filter(r => r.shift_status === 'Working Day').length;
+    const presentDays = reportData.filter(r => r.status === 'Present').length;
+    const absentDays = reportData.filter(r => r.status === 'Absent').length;
+    const weekoffDays = reportData.filter(r => r.status === 'Week Off').length;
+    const holidayDays = reportData.filter(r => r.status === 'Holiday').length;
+    const leaveDays = reportData.filter(r => r.status === 'Leave').length;
+    const halfDayDays = reportData.filter(r => r.status === 'Half Day').length;
+    const lateDays = reportData.filter(r => parseFloat(r.late_hours || 0) > 0).length;
+    const overtimeDays = reportData.filter(r => parseFloat(r.overtime_hours || 0) > 0).length;
+    const totalWorkingHours = reportData.reduce((sum, r) => sum + parseFloat(r.attandance_hours || 0), 0);
+    const totalOvertimeHours = reportData.reduce((sum, r) => sum + parseFloat(r.overtime_hours || 0), 0);
+    const totalLateHours = reportData.reduce((sum, r) => sum + parseFloat(r.late_hours || 0), 0);
+    const attendancePercentage = workingDays > 0 ? ((presentDays / workingDays) * 100).toFixed(1) : 0;
+
+    return {
+        totalDays,
+        workingDays,
+        presentDays,
+        absentDays,
+        weekoffDays,
+        holidayDays,
+        leaveDays,
+        halfDayDays,
+        lateDays,
+        overtimeDays,
+        totalWorkingHours: totalWorkingHours.toFixed(2),
+        totalOvertimeHours: totalOvertimeHours.toFixed(2),
+        totalLateHours: totalLateHours.toFixed(2),
+        attendancePercentage
+    };
+};
+
