@@ -406,10 +406,10 @@
     --color-blue-darker: #2563eb;
     --color-blue-darkest: #1d4ed8;
     --color-text-primary: #ffffff;
-    --color-text-secondary: #e5e7eb;
-    --color-text-muted: #d1d5db;
+    --color-text-secondary: #ffffff;
+    --color-text-muted: #ffffff;
     --color-text-white: #ffffff;
-    --color-text-white-90: #f3f4f6;
+    --color-text-white-90: #ffffff;
     --color-text-blue: #60a5fa;
     --color-text-error: #f87171;
     --color-text-success: #34d399;
@@ -436,4 +436,86 @@
     --color-scrollbar-track: #23232a;
     --color-scrollbar-thumb: #60a5fa;
     --color-scrollbar-thumb-hover: #3b82f6;
+}
+
+/* Dark theme text overrides for all text elements */
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6,
+.dark-theme p,
+.dark-theme span,
+.dark-theme div,
+.dark-theme label,
+.dark-theme td,
+.dark-theme th,
+.dark-theme li,
+.dark-theme a {
+    color: #ffffff !important;
+}
+
+/* Specific overrides for different text sizes and weights */
+.dark-theme .text-xs,
+.dark-theme .text-sm,
+.dark-theme .text-base,
+.dark-theme .text-lg,
+.dark-theme .text-xl,
+.dark-theme .text-2xl,
+.dark-theme .text-3xl,
+.dark-theme .text-4xl,
+.dark-theme .text-5xl,
+.dark-theme .text-6xl {
+    color: #ffffff !important;
+}
+
+/* Override any gray text classes */
+.dark-theme .text-gray-50,
+.dark-theme .text-gray-100,
+.dark-theme .text-gray-200,
+.dark-theme .text-gray-300,
+.dark-theme .text-gray-400,
+.dark-theme .text-gray-500,
+.dark-theme .text-gray-600,
+.dark-theme .text-gray-700,
+.dark-theme .text-gray-800,
+.dark-theme .text-gray-900 {
+    color: #ffffff !important;
+}
+
+/* Override any slate text classes */
+.dark-theme .text-slate-50,
+.dark-theme .text-slate-100,
+.dark-theme .text-slate-200,
+.dark-theme .text-slate-300,
+.dark-theme .text-slate-400,
+.dark-theme .text-slate-500,
+.dark-theme .text-slate-600,
+.dark-theme .text-slate-700,
+.dark-theme .text-slate-800,
+.dark-theme .text-slate-900 {
+    color: #ffffff !important;
+}
+
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select {
+    background-color: #23232a !important;
+    color: #ffffff !important;
+    border-color: #3f3f46 !important;
+}
+
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+    color: #bdbdbd !important;
+    opacity: 1;
+}
+
+.dark-theme input:focus,
+.dark-theme textarea:focus,
+.dark-theme select:focus {
+    outline: none;
+    border-color: #818cf8 !important;
+    box-shadow: 0 0 0 2px #818cf8;
 }

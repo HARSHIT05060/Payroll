@@ -2,8 +2,12 @@ import { createContext, useState, useEffect } from 'react';
 
 export const ThemeContext = createContext();
 
+const getInitialTheme = () => {
+    return localStorage.getItem('theme') || 'blue';
+};
+
 export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState('blue');
+    const [theme, setTheme] = useState(getInitialTheme);
 
     const baseVariables = {
         '--color-bg-secondary-20': 'rgba(255, 255, 255, 0.2)',
@@ -128,6 +132,7 @@ export const ThemeProvider = ({ children }) => {
 
     const changeTheme = (newTheme) => {
         setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
         const root = document.documentElement;
         const themeColors = themes[newTheme].colors;
 
@@ -150,8 +155,9 @@ export const ThemeProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        changeTheme(theme); // Set default theme on mount
-    }, []);
+        changeTheme(theme); // Set theme on mount and when theme changes
+        // eslint-disable-next-line
+    }, [theme]);
 
     return (
         <ThemeContext.Provider value={{ theme, themes, changeTheme }}>

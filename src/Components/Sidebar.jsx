@@ -79,7 +79,6 @@ const Sidebar = () => {
             icon: DollarSign,
             hasSubmenu: true,
             path: '/monthly-payroll',
-            tag: 'New',
             submenu: [
                 { label: 'Monthly Payroll', path: '/monthly-payroll' },
                 { label: 'Finalize Payroll', path: '/Finalize-payroll' },
