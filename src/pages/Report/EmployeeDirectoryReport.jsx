@@ -328,11 +328,11 @@ const EmployeeDirectoryReport = () => {
                 'Designation': employee.designation_name || '',
                 'Branch': employee.branch_name || '',
                 'Email': employee.email || '',
-                'Phone': employee.phone || '',
+                'Phone': employee.mobile_number || '',
                 'Gender': employee.gender || '',
                 'Date of Joining': employee.date_of_joining ? new Date(employee.date_of_joining).toLocaleDateString('en-GB') : '',
-                'Employee Type': employee.employee_type_name || '',
-                'Salary Type': employee.salary_type_name || '',
+                'Employee Type': employee.employee_type || '',
+                'Salary Type': employee.salary_type || '',
                 'Status': employee.status === 1 || employee.status === '1' ? 'Active' :
                     employee.status === 2 || employee.status === '2' ? 'Inactive' : 'Unknown'
             }));

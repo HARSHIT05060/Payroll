@@ -188,6 +188,8 @@
     }
 }
 
+/* Replace your existing dark theme text overrides with these more specific ones */
+
 .dark-theme {
     --color-bg-primary: #1f2937;
     --color-bg-secondary: #111827;
@@ -246,39 +248,33 @@
     --color-scrollbar-thumb-hover: #3b82f6;
 }
 
-/* Dark theme text overrides for all text elements */
+/* More specific dark theme text overrides - target specific elements instead of all text */
 .dark-theme h1,
 .dark-theme h2,
 .dark-theme h3,
 .dark-theme h4,
 .dark-theme h5,
-.dark-theme h6,
-.dark-theme p,
-.dark-theme span,
-.dark-theme div,
-.dark-theme label,
-.dark-theme td,
-.dark-theme th,
-.dark-theme li,
-.dark-theme a {
+.dark-theme h6 {
     color: #ffffff !important;
 }
 
-/* Specific overrides for different text sizes and weights */
-.dark-theme .text-xs,
-.dark-theme .text-sm,
-.dark-theme .text-base,
-.dark-theme .text-lg,
-.dark-theme .text-xl,
-.dark-theme .text-2xl,
-.dark-theme .text-3xl,
-.dark-theme .text-4xl,
-.dark-theme .text-5xl,
-.dark-theme .text-6xl {
+.dark-theme p:not([class*="text-"]),
+.dark-theme span:not([class*="text-"]),
+.dark-theme div:not([class*="text-"]),
+.dark-theme label:not([class*="text-"]) {
     color: #ffffff !important;
 }
 
-/* Override any gray text classes */
+/* Target specific text using CSS variables */
+.dark-theme .text-\[var\(--color-text-primary\)\] {
+    color: #ffffff !important;
+}
+
+.dark-theme .text-\[var\(--color-text-secondary\)\] {
+    color: #9ca3af !important;
+}
+
+/* Override only neutral gray text classes, not color-specific ones */
 .dark-theme .text-gray-50,
 .dark-theme .text-gray-100,
 .dark-theme .text-gray-200,
@@ -292,7 +288,6 @@
     color: #ffffff !important;
 }
 
-/* Override any slate text classes */
 .dark-theme .text-slate-50,
 .dark-theme .text-slate-100,
 .dark-theme .text-slate-200,
@@ -305,6 +300,9 @@
 .dark-theme .text-slate-900 {
     color: #ffffff !important;
 }
+
+/* DO NOT override color-specific text classes like text-green-600, text-blue-600, etc. */
+/* These should maintain their colors in dark mode for visual distinction */
 
 .dark-theme input,
 .dark-theme textarea,

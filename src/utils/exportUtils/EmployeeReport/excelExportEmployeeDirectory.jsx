@@ -1,10 +1,9 @@
 /**
- * Basic Excel export function
- * @param {Array} data - Array of objects to export
+ * Excel export function for Employee Directory Report
+ * @param {Array} data - Array of employee objects to export
  * @param {string} filename - Name of the file (without extension)
- * @param {string} sheetName - Name of the Excel sheet (optional)
  */
-export const exportToExcel = (data, filename, ) => {
+export const exportToExcel = (data, filename) => {
     if (!data || data.length === 0) {
         console.error('No data to export');
         throw new Error('No data available to export');
@@ -13,20 +12,64 @@ export const exportToExcel = (data, filename, ) => {
     // Get headers from the first object
     const headers = Object.keys(data[0]);
 
-    // Create HTML table with improved styling
+    // Prepare data for Excel export
+    const excelData = [];
+
+    // Add report header
+    excelData.push(['', '', '', '', '',
+        'Employee Directory Report', '', '', '', 
+    ]);
+    excelData.push([
+        '','',
+        '',
+        `Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`,
+        '',
+        '',
+        `Total Employees: ${data.length}`,
+        
+    ]);
+
+    // Add empty row
+    excelData.push(['']);
+
+    // Add table headers
+    excelData.push(headers);
+
+    // Add employee data rows
+    data.forEach(employee => {
+        excelData.push(headers.map(header => employee[header] || ''));
+    });
+
+    // Convert to HTML table format
     const tableHTML = `
         <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
-            <thead>
-                <tr>
-                    ${headers.map(header => `<th style="background-color: #2563eb; border: 1px solid #ccc; padding: 8px; text-align: center; color: white; font-weight: bold; min-height: 35px; height: 30px;">${header}</th>`).join('')}
-                </tr>
-            </thead>
             <tbody>
-                ${data.map(item => `
+                ${excelData.map((row, rowIndex) => `
                     <tr>
-                        ${headers.map(header => {
-        const cellValue = item[header] || '';
-        return `<td style="border: 1px solid #ccc; padding: 8px;text-align: center;">${cellValue}</td>`;
+                        ${row.map((cell, cellIndex) => {
+        // Style for headers and important rows
+        let cellStyle = "border: 1px solid #ccc; padding: 8px; text-align: center;";
+
+        // Report title row
+        if (rowIndex === 0 && cellIndex === 5) {
+            cellStyle += " background-color: #2563eb; color: white; font-weight: bold; font-size: 25px; text-align: center;";
+        }
+        // Table headers row
+        else if (rowIndex === 3) {
+            cellStyle += " background-color: #2563eb; color: white; font-weight: bold; text-align: center; min-height: 35px; height: 30px;";
+        }
+        // Status column styling
+        else if (rowIndex > 3 && cellIndex === headers.indexOf('Status')) {
+            if (cell === 'Active') {
+                cellStyle += " background-color: #dcfce7; color: #166534; text-align: center;";
+            } else if (cell === 'Inactive') {
+                cellStyle += " background-color: #fef2f2; color: #dc2626; text-align: center;";
+            } else if (cell === 'Unknown') {
+                cellStyle += " background-color: #f3f4f6; color: #6b7280; text-align: center;";
+            }
+        }
+
+        return `<td style="${cellStyle}">${cell}</td>`;
     }).join('')}
                     </tr>
                 `).join('')}

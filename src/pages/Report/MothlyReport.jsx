@@ -371,10 +371,15 @@ const MonthlyReport = () => {
         }
 
         try {
-            exportToExcel(reportData, `attendance_report_${filters.month_year}.xlsx`);
+            exportToExcel(reportData, 'report', {
+                showTitle: true,
+                showSummary: true,
+                showEmployeeDetails: true,
+                reportTitle: 'Monthly Attendance Report'
+            });
             showToast('Excel exported successfully!', 'success');
-        } catch (err) {
-            showToast('Failed to export Excel', err);
+        } catch (error) {
+            showToast('Failed to export Excel', error);
         }
         setExportDropdown(false);
     };

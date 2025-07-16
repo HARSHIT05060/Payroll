@@ -29,6 +29,8 @@ import { createPortal } from 'react-dom';
 import { exportToExcel } from '../../utils/exportUtils/DailyReport/excelExport';
 import { exportToPDF } from '../../utils/exportUtils/DailyReport/pdfExport';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
+import { StatusBadge } from '../../Components/Report/ReportComponents';
+
 
 const DailyReport = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -129,48 +131,6 @@ const DailyReport = () => {
         return { total, present, absent, weekOff, late, overtime };
     }, [attendanceData]);
 
-    // Get status color and icon
-    const getStatusInfo = (employee) => {
-        const isPresent = employee.status === 'Present';
-        const isWeekOff = employee.status === 'Week Off';
-        const isLate = parseFloat(employee.late_hours || 0) > 0;
-        const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
-
-        if (isWeekOff) {
-            return {
-                color: 'text-[var(--color-text-blue)] bg-[var(--color-blue)]',
-                icon: CalendarX,
-                text: 'Week Off'
-            };
-        }
-        if (!isPresent) {
-            return {
-                color: 'text-[var(--color-text-error)] bg-[var(--color-error)]',
-                icon: XCircle,
-                text: 'Absent'
-            };
-        }
-        if (isLate) {
-            return {
-                color: 'text-[var(--color-warning-dark)] bg-[var(--color-warning)]',
-                icon: AlertCircle,
-                text: 'Late'
-            };
-        }
-        if (hasOvertime) {
-            return {
-                color: 'text-[var(--color-blue-dark)] bg-[var(--color-blue)]',
-                icon: TrendingUp,
-                text: 'Overtime'
-            };
-        }
-        return {
-            color: 'text-[var(--color-text-success)] bg-[var(--color-success)]',
-            icon: CheckCircle,
-            text: 'Present'
-        };
-    };
-
     const getTimeColor = (employee) => {
         const isLate = parseFloat(employee.late_hours || 0) > 0;
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
@@ -200,8 +160,34 @@ const DailyReport = () => {
         setIsModalOpen(true);
     };
 
+    const getRowStyling = (status) => {
+        const statusLower = status?.toLowerCase() || '';
+
+        switch (statusLower) {
+            case 'week off':
+            case 'weekoff':
+                return 'bg-[var(--color-blue-lightest)] border-l-4 border-[var(--color-blue-light)]';
+            case 'holiday':
+                return 'bg-[var(--color-warning-light)] border-l-4 border-[var(--color-warning)]';
+            case 'absent':
+                return 'bg-[var(--color-error-light)] border-l-4 border-[var(--color-error)]';
+            case 'leave':
+                return 'bg-[var(--color-yellow-light)] border-l-4 border-[var(--color-yellow-dark)]';
+            case 'half day':
+                return 'bg-[var(--color-blue-lighter)] border-l-4 border-[var(--color-blue-dark)]';
+            default:
+                return '';
+        }
+    };
+
     const handleExportToExcel = useCallback(() => {
         try {
+            if (!filteredData || filteredData.length === 0) {
+                showToast('No data available to export', 'error');
+                return;
+            }
+
+            // Transform the data for Excel export
             const exportData = filteredData.map(emp => ({
                 'S.No': emp.sno,
                 'Employee Name': emp.employee_name,
@@ -217,12 +203,19 @@ const DailyReport = () => {
                 'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
             }));
 
+            // Generate filename with selected date
             const fileName = `daily_attendance_report_${selectedDate}`;
-            exportToExcel(exportData, fileName);
-            showToast('Excel exported successfully', 'success');
+
+            // Export to Excel
+            exportToExcel(exportData, selectedDate, fileName);
+
+            showToast('Excel exported successfully!', 'success');
             setExportDropdown(false);
-        } catch (err) {
-            showToast('Failed to export Excel', err);
+
+        } catch (error) {
+            console.error('Error in handleExportToExcel:', error);
+            showToast('Failed to export Excel: ' + error.message, 'error');
+            setExportDropdown(false);
         }
     }, [filteredData, selectedDate]);
 
@@ -551,10 +544,12 @@ const DailyReport = () => {
                                         </thead>
                                         <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                             {filteredData.map((employee, index) => {
-                                                const statusInfo = getStatusInfo(employee);
                                                 const timeColorClass = getTimeColor(employee);
                                                 return (
-                                                    <tr key={index} className="hover:bg-[var(--color-bg-primary)] transition-colors">
+                                                    <tr
+                                                        key={index}
+                                                        className={`hover:bg-[var(--color-bg-hover)] transition-colors ${getRowStyling(employee.status)}`}
+                                                    >
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.sno}</td>
                                                         <td className="text-center py-4 px-4 text-sm font-medium text-[var(--color-text-primary)]">{employee.employee_name}</td>
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.shift_name}</td>
@@ -570,12 +565,7 @@ const DailyReport = () => {
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.shift_working_hours}h</td>
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.attandance_hours}h</td>
                                                         <td className="py-4 px-4">
-                                                            <div className="flex items-center justify-center">
-                                                                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
-                                                                    <statusInfo.icon className="w-3 h-3 mr-1" />
-                                                                    {statusInfo.text}
-                                                                </div>
-                                                            </div>
+                                                            <StatusBadge status={employee.status} />
                                                         </td>
                                                         <td className="py-4 px-4 text-center">
                                                             <button
@@ -744,22 +734,6 @@ const DailyReport = () => {
                                             </div>
                                         </div>
                                     )}
-
-                                    {(() => {
-                                        const statusInfo = getStatusInfo(selectedEmployee);
-                                        const StatusIcon = statusInfo.icon;
-                                        return (
-                                            <div className={`rounded-lg p-4 ${statusInfo.color}`}>
-                                                <div className="flex items-center space-x-2">
-                                                    <StatusIcon className="w-5 h-5" />
-                                                    <div>
-                                                        <p className="text-sm">Status</p>
-                                                        <p className="font-medium">{statusInfo.text}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })()}
                                 </div>
                             </div>
                         </div>

@@ -108,7 +108,8 @@ const Sidebar = () => {
                 { label: 'Employee Directory Report', path: '/reports/employee-directory' },
                 { label: 'Daily Report', path: '/reports/daily-attendance' },
                 { label: 'Monthly Report', path: '/reports/monthly-attendance' },
-                { label: 'All Employee Report', path: '/reports/daterangereport' },
+                { label: 'Monthly Salary Report', path: '/reports/monthly-salary' },
+                { label: 'Custom Range Report', path: '/reports/daterangereport' },
             ]
         },
 
