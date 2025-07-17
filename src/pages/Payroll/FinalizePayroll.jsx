@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
-  XCircle,
+  AlertCircle ,
   Users,
   Calendar,
   RefreshCw,
@@ -12,7 +12,6 @@ import {
   CreditCard,
   X,
   CheckCircle,
-  AlertCircle,
   Trash2,
   Eye
 } from 'lucide-react';
@@ -146,12 +145,13 @@ export default function FinalizePayroll() {
         setTotalPages(1);
         setTotalRecords(0);
         setCurrentPage(1);
-        setError("No salary records available for current or future months. Please select a previous month.");
+        setError("Salary records for the current or future months are not yet available. Please select a previous month to view the data.");
         setLoading(false);
         setSearchLoading(false);
         setPaginationLoading(false);
         return;
       }
+
       if (resetData) {
         setLoading(true);
         setCurrentPage(1);
@@ -387,13 +387,13 @@ export default function FinalizePayroll() {
     if (status === PAYMENT_STATUS.PAID) {
       return {
         text: 'Paid',
-        className: 'bg-green-100 text-green-800',
+        className: 'bg-[var(--color-success-light)] text-[var(--color-text-success)] border-[var(--color-text-success)]',
         icon: <CheckCircle className="w-4 h-4" />
       };
     } else {
       return {
         text: 'Unpaid',
-        className: 'bg-[var(--color-error-light)] text-red-800',
+        className: 'bg-[var(--color-error)] text-[var(--color-text-white)] border-[var(--color-text-error)]',
         icon: <AlertCircle className="w-4 h-4" />
       };
     }
@@ -572,17 +572,16 @@ export default function FinalizePayroll() {
             </div>
           ) : error ? (
             <div className="px-6 py-12 text-center">
-              <div className="bg-[var(--color-error-)] border border-[var(--color-border-error)] rounded-lg p-6">
-                <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
-                <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Salary Records</p>
-                <p className="text-[var(--color-text-error)] mb-4">{error}</p>
-                <button
-                  onClick={() => fetchSalaryRecords(1, searchQuery, true)}
-                  className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  <span>Try Again</span>
-                </button>
+              <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
+                <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-[var(--color-text-muted)]" />
+                </div>
+                <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">
+                  Unable to Load Salary Records
+                </p>
+                <p className="text-[var(--color-text-secondary)] text-sm mb-4">
+                  {error || "We couldn’t retrieve the salary records at this time. Please try again later or select a different month."}
+                </p>
               </div>
             </div>
           ) : salaryRecords.length === 0 ? (
