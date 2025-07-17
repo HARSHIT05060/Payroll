@@ -12,14 +12,24 @@ const SubscriptionGuard = ({ children }) => {
     useEffect(() => {
         // Simply set loading to false after checking user
         setIsLoading(false);
-        
+
         // Check if we need to show warning modal
         if (user && isAuthenticated()) {
             const subscriptionStatus = parseInt(user?.subscriptions_status || 0);
             const subscriptionDays = parseInt(user?.subscriptions_days || 0);
+
             // Show warning if subscription is active (status 1) but expiring in 15 days or less
             if (subscriptionStatus === 1 && subscriptionDays <= 15 && subscriptionDays > 0) {
-                setShowWarningModal(true);
+                // Check if warning was already shown for this login session
+                const warningShownKey = `subscription_warning_shown_${user.user_id}`;
+                const warningShown = sessionStorage.getItem(warningShownKey);
+
+                // Only show if not already shown in this session
+                if (!warningShown) {
+                    setShowWarningModal(true);
+                    // Mark as shown for this session
+                    sessionStorage.setItem(warningShownKey, 'true');
+                }
             }
         }
     }, [user, isAuthenticated]);
@@ -27,10 +37,10 @@ const SubscriptionGuard = ({ children }) => {
     // Loading state
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+            <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-primary)]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue)] mx-auto mb-4"></div>
+                    <p className="text-[var(--color-text-secondary)]">Loading...</p>
                 </div>
             </div>
         );
