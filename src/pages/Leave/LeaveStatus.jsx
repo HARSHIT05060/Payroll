@@ -435,11 +435,11 @@ const LeaveManagement = () => {
 
                 <div className="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border-primary)] overflow-hidden shadow-custom">
                     {/* Header section with tabs */}
-                    <div className="px-6 py-4 border-b border-[var(--color-border-primary)]">
-                        <div className="flex justify-between items-center mb-4 ">
+                    <div className="px-6 py-4 border-b border-[var(--color-border-primary)] bg-[var(--color-blue-dark)]">
+                        <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center">
-                                <FileText className="h-6 w-6 text-[var(--color-text-primary)] mr-2" />
-                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Leave Requests</h3>
+                                <FileText className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
+                                <h3 className="text-lg font-semibold text-[var(--color-text-white)]">Leave Requests</h3>
                             </div>
 
                             <div className="flex items-center gap-3">
@@ -474,8 +474,8 @@ const LeaveManagement = () => {
                                     <button
                                         key={statusValue}
                                         className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${selectedStatus === statusValue
-                                            ? 'bg-[var(--color-blue-dark)] text-[var(--color-text-white)] shadow-sm border border-[var(--color-border-primary)]'
-                                            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-dark)] hover:text-[var(--color-text-white)]'
+                                            ? 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] shadow-sm border border-[var(--color-border-primary)]'
+                                            : 'text-[var(--color-text-white)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text-primary)]'
                                             }`}
                                         onClick={() => handleTabChange(statusValue)}
                                     >
