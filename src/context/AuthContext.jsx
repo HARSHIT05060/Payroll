@@ -78,7 +78,6 @@ export const AuthProvider = ({ children }) => {
 
     const login = (userData) => {
         if (!userData) return false;
-
         const userWithSession = {
             ...userData,
             loginTime: Date.now(),

@@ -325,3 +325,84 @@
     border-color: #818cf8 !important;
     box-shadow: 0 0 0 2px #818cf8;
 }
+
+
+
+
+/* Add this to your global CSS or create a separate CSS file for security */
+/* Security styles for subscription pages */
+.subscription-security {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+
+    /* Disable drag and drop */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+
+    /* Disable text selection highlighting */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* Disable image dragging */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+
+    /* Disable context menu */
+    -webkit-context-menu: none;
+
+    /* Disable print */
+    -webkit-print-color-adjust: exact;
+}
+
+/* Disable text selection on all elements */
+.subscription-security *,
+.subscription-security *::before,
+.subscription-security *::after {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable image dragging */
+.subscription-security img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+}
+
+/* Hide scrollbars to prevent right-click on them */
+.subscription-security::-webkit-scrollbar {
+    display: none;
+}
+
+.subscription-security {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Disable print media queries */
+@media print {
+    .subscription-security {
+        display: none !important;
+    }
+}
