@@ -260,7 +260,7 @@ const Sidebar = () => {
                                         <div className="py-3 px-4 flex items-center justify-between">
                                             <div className="flex items-center space-x-3">
                                                 <div className={`
-                                                    p-2 rounded-lg transition-all duration-300
+                                                    p-2 rounded-full transition-all duration-300
                                                     ${isActive
                                                         ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
                                                         : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)] group-hover:bg-[var(--color-blue-lighter)] group-hover:text-[var(--color-blue-dark)]'
@@ -308,7 +308,7 @@ const Sidebar = () => {
                                         <div className="py-3 px-4 flex items-center justify-between">
                                             <div className="flex items-center space-x-3">
                                                 <div className={`
-                                                    p-2 rounded-lg transition-all duration-300
+                                                    p-2 rounded-full transition-all duration-300
                                                     ${isActive
                                                         ? 'bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]'
                                                         : 'bg-[var(--color-bg-gradient-start)] text-[var(--color-text-secondary)] group-hover:bg-[var(--color-blue-lighter)] group-hover:text-[var(--color-blue-dark)]'

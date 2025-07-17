@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Pagination from '../Pagination';
 import { Toast } from '../ui/Toast';
 import { useAuth } from '../../context/AuthContext';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import api from '../../api/axiosInstance';
 import {
     Users,
@@ -44,7 +46,7 @@ const KEY_MAPPING = {
 };
 
 const AttendanceReport = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [attendanceData, setAttendanceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [hoveredSegment, setHoveredSegment] = useState(null);
@@ -72,6 +74,24 @@ const AttendanceReport = () => {
     const closeToast = () => {
         setToast(null);
     };
+
+    const formatDate = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        setCurrentPage(1);
+        setSearchQuery('');
+        setStatusFilter('all');
+
+    };
+
+
 
     // Fetch daily attendance report
     const fetchDailyReport = useCallback(async (date) => {
@@ -102,8 +122,9 @@ const AttendanceReport = () => {
     }, [user?.user_id]);
 
     useEffect(() => {
-        fetchDailyReport(selectedDate);
-    }, [selectedDate, fetchDailyReport]);
+        fetchDailyReport(formatDate(selectedDate));
+    }, [selectedDate]);
+
 
     // Client-side filtering and sorting
     const filteredAndSortedData = useMemo(() => {
@@ -305,13 +326,6 @@ const AttendanceReport = () => {
         setCurrentPage(1);
     };
 
-    // Handle date change
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-        setCurrentPage(1);
-        setSearchQuery('');
-        setStatusFilter('all');
-    };
 
     // Status filter options
     const statusOptions = [
@@ -527,11 +541,12 @@ const AttendanceReport = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                             <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => handleDateChange(e.target.value)}
-                                className="bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
+                            <DatePicker
+                                selected={selectedDate}
+                                onChange={(date) => handleDateChange(date)}
+                                dateFormat="dd-MM-yyyy"
+                                placeholderText="DD-MM-YYYY"
+                                className="w-full bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
                             />
                         </div>
                     </div>
