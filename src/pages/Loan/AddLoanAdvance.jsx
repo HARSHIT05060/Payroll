@@ -462,7 +462,7 @@ const AddLoanAdvance = ({
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
                                     </h1>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
+                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
                                         {existingLoan ? 'Update existing loan/advance details' : 'Fill in the details to create a new loan/advance'}
                                     </p>
                                 </div>
@@ -528,7 +528,7 @@ const AddLoanAdvance = ({
                                                 {filteredEmployees.map((employee) => (
                                                     <div
                                                         key={employee.employee_id}
-                                                        className="p-3 hover:bg-[var(--color-bg-secondary)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0"
+                                                        className="p-3 hover:bg-[var(--color-bg-secondary)] cursor-pointer border-b border-[var(--color-border-primary)] last:border-b-0 "
                                                         onClick={() => handleEmployeeSelect(employee)}
                                                     >
                                                         <div className="flex flex-col">
@@ -637,7 +637,7 @@ const AddLoanAdvance = ({
                                         <div>
                                             <label className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
                                                 <Percent size={16} className="text-[var(--color-blue-dark)]" />
-                                                Interest Rate (Monthly) <span className="text-[var(--color-error)]">*</span>
+                                                Interest Rate (Annually) <span className="text-[var(--color-error)]">*</span>
                                             </label>
                                             <input
                                                 type="number"
@@ -647,7 +647,7 @@ const AddLoanAdvance = ({
                                                 className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)] ${errors.interestRate ? 'border-red-500' : ''}`}
                                                 min="0"
                                                 step="0.01"
-                                                placeholder="Enter interest rate"
+                                                placeholder="Enter annual interest rate (e.g., 12)"
                                             />
                                             {errors.interestRate && (
                                                 <p className="text-[var(--color-error)] text-xs mt-2">{errors.interestRate}</p>
@@ -680,7 +680,7 @@ const AddLoanAdvance = ({
                                                 name="installmentAmount"
                                                 value={formData.installmentAmount}
                                                 onChange={handleInputChange}
-                                                className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 text-[var(--color-text-secondary)] shadow-sm"
+                                                className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 text-[var(--color-text-white)] shadow-sm"
                                                 readOnly
                                             />
                                         </div>
@@ -783,9 +783,6 @@ const AddLoanAdvance = ({
                                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         placeholder="Enter guarantor name"
                                     />
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        Full name of the person guaranteeing this loan
-                                    </p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
@@ -799,9 +796,6 @@ const AddLoanAdvance = ({
                                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         placeholder="Enter contact number/email"
                                     />
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        Phone number or email address of the guarantor
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -836,9 +830,6 @@ const AddLoanAdvance = ({
                                 {errors.reason && (
                                     <p className="text-[var(--color-error)] text-xs mt-2">{errors.reason}</p>
                                 )}
-                                <p className="text-xs text-slate-500 mt-2">
-                                    Provide detailed information about why this loan/advance is needed
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -852,14 +843,12 @@ const AddLoanAdvance = ({
 
                                 <div className="flex items-center gap-4">
                                     <button
+                                        type="button"
                                         onClick={handleBack}
-                                        className="px-6 py-3 text-[var(--color-text-secondary)] bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
                                         disabled={isSubmitting}
+                                        className="px-6 py-3 border border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-primary)] transition-colors font-medium"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <X className="w-4 h-4" />
-                                            Cancel
-                                        </div>
+                                        Cancel
                                     </button>
 
                                     <button

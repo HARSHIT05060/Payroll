@@ -54,6 +54,7 @@ const KEY_MAPPING = {
     [COLUMN_KEYS.TOTAL_DAYS]: 'total_days',
     [COLUMN_KEYS.STATUS]: 'status'
 };
+
 // Updated STATUS_CONFIG with proper dark/light mode support
 const STATUS_CONFIG = {
     '1': {
@@ -132,7 +133,6 @@ const StatusChip = ({ status }) => {
     );
 };
 
-
 const LeaveManagement = () => {
     const { user, isAuthenticated, logout } = useAuth();
     const permissions = useSelector(state => state.permissions) || {};
@@ -167,6 +167,23 @@ const LeaveManagement = () => {
         message: '',
         type: 'success'
     });
+
+    // Date parsing and formatting functions - moved to top level
+    const parseDate = useCallback((dateString) => {
+        if (!dateString) return new Date(0);
+        const [day, month, year] = dateString.split('-');
+        return new Date(year, month - 1, day);
+    }, []);
+
+    const formatDate = useCallback((dateString) => {
+        try {
+            const date = parseDate(dateString);
+            return date.toLocaleDateString('en-GB');
+        } catch (error) {
+            console.log(error)
+            return dateString;
+        }
+    }, [parseDate]);
 
     // Toast functions
     const showToast = useCallback((message, type = 'success') => {
@@ -276,24 +293,7 @@ const LeaveManagement = () => {
             }
             return 0;
         });
-    }, [leaveRequests, filteredRequests, sortConfig, searchQuery]);
-
-    // Date parsing and formatting
-    const parseDate = useCallback((dateString) => {
-        if (!dateString) return new Date(0);
-        const [day, month, year] = dateString.split('-');
-        return new Date(year, month - 1, day);
-    }, []);
-
-    const formatDate = useCallback((dateString) => {
-        try {
-            const date = parseDate(dateString);
-            return date.toLocaleDateString('en-GB');
-        } catch (error) {
-            console.log(error)
-            return dateString;
-        }
-    }, [parseDate]);
+    }, [leaveRequests, filteredRequests, sortConfig, searchQuery, parseDate]);
 
     // Action handlers
     const handleTabChange = useCallback((status) => {
@@ -376,20 +376,6 @@ const LeaveManagement = () => {
             showToast('Failed to reject leave request. Please try again.', 'error');
         }
     }, [user, rejectionModal, showToast, fetchLeaveRequests]);
-
-    // Status chip component
-    const StatusChip = useCallback(({ status }) => {
-        const config = STATUS_CONFIG[status];
-        if (!config) return null;
-
-        const IconComponent = config.icon;
-        return (
-            <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${config.bgColor} ${config.textColor} border ${config.borderColor}`}>
-                <IconComponent className="w-3 h-3 mr-1.5" />
-                {config.name}
-            </span>
-        );
-    }, []);
 
     // Render sort icon
     const renderSortIcon = useCallback((key) => {

@@ -30,10 +30,12 @@ import { exportToExcel } from '../../utils/exportUtils/DailyReport/excelExport';
 import { exportToPDF } from '../../utils/exportUtils/DailyReport/pdfExport';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
 import { StatusBadge } from '../../Components/Report/ReportComponents';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const DailyReport = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [attendanceData, setAttendanceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -69,6 +71,18 @@ const DailyReport = () => {
         }
     }, [exportDropdown]);
 
+    const formatDate = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+
+    };
+
     // Fetch daily attendance report
     const fetchDailyReport = useCallback(async (date) => {
         if (!user?.user_id) return;
@@ -99,8 +113,8 @@ const DailyReport = () => {
 
     // Initial load and date change
     useEffect(() => {
-        fetchDailyReport(selectedDate);
-    }, [selectedDate, fetchDailyReport]);
+        fetchDailyReport(formatDate(selectedDate));
+    }, [selectedDate]);
 
     // Filter and search logic
     const filteredData = useMemo(() => {
@@ -423,13 +437,14 @@ const DailyReport = () => {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-[var(--color-text-white)]" />
-                                    <input
-                                        type="date"
-                                        value={selectedDate}
-                                        onChange={(e) => setSelectedDate(e.target.value)}
-                                        className="px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
+                                <div className="flex items-center space-x-2">
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
+                                    <DatePicker
+                                        selected={selectedDate}
+                                        onChange={(date) => handleDateChange(date)}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="w-full bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
                                     />
                                 </div>
 

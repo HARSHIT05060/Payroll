@@ -216,7 +216,7 @@ const TimeConfigurationComponent = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <div className="rounded-lg">
-                      <Settings className="w-6 h-6 text-[var(--color-blue-lighter)]" />
+                      <Settings className="w-6 h-6 text-[var(--color-text-white)]" />
                     </div>
                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">Time Configuration</h1>
                   </div>

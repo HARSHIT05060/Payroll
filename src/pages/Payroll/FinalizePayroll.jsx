@@ -52,7 +52,6 @@ const PAYMENT_MODES = {
 export default function FinalizePayroll() {
   const [salaryRecords, setSalaryRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,7 +146,6 @@ export default function FinalizePayroll() {
         setCurrentPage(1);
         setError("Salary records for the current or future months are not yet available. Please select a previous month to view the data.");
         setLoading(false);
-        setSearchLoading(false);
         setPaginationLoading(false);
         return;
       }
@@ -156,8 +154,6 @@ export default function FinalizePayroll() {
         setLoading(true);
         setCurrentPage(1);
         page = 1;
-      } else if (search !== searchQuery) {
-        setSearchLoading(true);
       } else {
         setPaginationLoading(true);
       }
@@ -220,7 +216,6 @@ export default function FinalizePayroll() {
       setSalaryRecords([]);
     } finally {
       setLoading(false);
-      setSearchLoading(false);
       setPaginationLoading(false);
     }
   }, [user, logout, selectedYear, selectedMonth, searchQuery, isCurrentOrFutureMonth]);
@@ -546,18 +541,8 @@ export default function FinalizePayroll() {
                     className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
-                  {searchLoading && (
-                    <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)] animate-spin" />
-                  )}
+                  
                 </div>
-
-                <button
-                  onClick={() => fetchSalaryRecords(1, searchQuery, true)}
-                  className="flex items-center gap-2 bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] hover:bg-[var(--color-bg-primary)] px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Refresh
-                </button>
               </div>
             </div>
           </div>

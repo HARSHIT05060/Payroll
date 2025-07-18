@@ -18,7 +18,7 @@ const AssignShift = () => {
     const [shifts, setShifts] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [selectedShift, setSelectedShift] = useState('');
-    
+
     // New states for searchable dropdown
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -184,7 +184,7 @@ const AssignShift = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {editShiftId ? 'Assign Shift' : 'Assign New Shift'}
                                     </h1>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
+                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
                                         Select an employee and shift to create assignment
                                     </p>
                                 </div>
@@ -202,7 +202,7 @@ const AssignShift = () => {
                                     <Users className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900">Employee Selection</h2>
+                                    <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Employee Selection</h2>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Choose the employee for shift assignment</p>
                                 </div>
                             </div>
@@ -227,13 +227,13 @@ const AssignShift = () => {
                                                 }
                                             }}
                                             onFocus={() => setIsDropdownOpen(true)}
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
+                                            className="w-full px-4 py-3 border border-[var(--color-border-secondary)] rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                             disabled={loading}
                                             required
                                         />
 
                                         {isDropdownOpen && filteredEmployees.length > 0 && (
-                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-slate-300 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
                                                 {filteredEmployees.map((employee) => (
                                                     <div
                                                         key={employee.employee_id}
@@ -251,14 +251,14 @@ const AssignShift = () => {
                                         )}
 
                                         {isDropdownOpen && searchTerm && filteredEmployees.length === 0 && (
-                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-slate-300 rounded-xl shadow-lg z-50 mt-1">
+                                            <div className="absolute top-full left-0 right-0 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-xl shadow-lg z-50 mt-1">
                                                 <div className="p-3 text-[var(--color-text-secondary)] text-center">
                                                     No employees found
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-[var(--color-text-secondary)] mt-2">
                                         Search and select the employee who will be assigned to the shift
                                     </p>
                                 </div>
@@ -274,7 +274,7 @@ const AssignShift = () => {
                                     <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900">Shift Selection</h2>
+                                    <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Shift Selection</h2>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Configure the shift assignment details</p>
                                 </div>
                             </div>
@@ -289,7 +289,7 @@ const AssignShift = () => {
                                     <select
                                         value={selectedShift}
                                         onChange={(e) => setSelectedShift(e.target.value)}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
+                                        className="w-full px-4 py-3 border border-[var(--color-border-secondary)] rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)]"
                                         disabled={loading}
                                         required
                                     >
@@ -302,7 +302,7 @@ const AssignShift = () => {
                                             </option>
                                         ))}
                                     </select>
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-[var(--color-text-secondary)] mt-2">
                                         Select the shift schedule for this assignment
                                     </p>
                                 </div>
@@ -321,13 +321,10 @@ const AssignShift = () => {
                                     <button
                                         type="button"
                                         onClick={handleBack}
-                                        className="px-6 py-3 text-[var(--color-text-secondary)] bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
                                         disabled={submitting}
+                                        className="px-6 py-3 border border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-primary)] transition-colors font-medium"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <X className="w-4 h-4" />
-                                            Cancel
-                                        </div>
+                                        Cancel
                                     </button>
 
                                     <button

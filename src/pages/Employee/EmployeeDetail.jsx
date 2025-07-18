@@ -360,8 +360,8 @@ const EmployeeDetail = () => {
                             {/* Profile Header */}
                             <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6 relative">
                                 <div className="text-center">
-                                    <div 
-                                      className={`relative h-40 w-40 mx-auto mb-4 rounded-full border-4 flex items-center justify-center ${employee?.status == "1" ? "border-[var(--color-success)]" : "border-[var(--color-error)]"}`}
+                                    <div
+                                        className={`relative h-40 w-40 mx-auto mb-4 rounded-full border-4 flex items-center justify-center ${employee?.status == "1" ? "border-[var(--color-success)]" : "border-[var(--color-error)]"}`}
                                     >
                                         {employee?.passport_img ? (
                                             <img
@@ -381,7 +381,7 @@ const EmployeeDetail = () => {
                                     <h2 className="text-xl font-bold text-[var(--color-text-white)] mb-1">
                                         {getField('full_name')}
                                     </h2>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm">
+                                    <p className="text-[var(--color-text-white)] text-sm">
                                         Employee ID: {getField('employee_code')}
                                     </p>
                                 </div>
@@ -424,7 +424,7 @@ const EmployeeDetail = () => {
                                         >
                                             <Pencil size={18} className="mr-2" />
                                             Edit
-                                        </button>   
+                                        </button>
                                     }
                                     {permissions['employee_delete'] &&
                                         <button

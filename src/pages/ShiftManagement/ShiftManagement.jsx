@@ -22,7 +22,8 @@ const DayStatusLegend = () => {
                     <span className="text-sm text-[var(--color-text-secondary)]">Week Off</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)]">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] flex items-center justify-center border-2 border-[var(--color-blue)]">
+                        <span className="text-sm text-[var(--color-text-secondary)] font-medium">O</span>
                     </div>
                     <span className="text-sm text-[var(--color-text-secondary)]">Occasional Working</span>
                 </div>

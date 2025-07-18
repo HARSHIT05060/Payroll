@@ -21,6 +21,8 @@ import {
     Search,
     TrendingUp,
 } from 'lucide-react';
+import { StatusBadge } from '../../Components/Report/ReportComponents';
+
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -88,7 +90,6 @@ const AttendanceReport = () => {
         setCurrentPage(1);
         setSearchQuery('');
         setStatusFilter('all');
-
     };
 
 
@@ -257,34 +258,25 @@ const AttendanceReport = () => {
 
     const stats = calculateStats();
 
-    // Get attendance status color for table
-    const getAttendanceColor = (status) => {
-        switch (status) {
-            case 'Present':
-                return 'bg-[var(--color-success)]';
-            case 'Absent':
-                return 'bg-[var(--color-error)]';
-            case 'Week Off':
-                return 'bg-[var(--color-warning)]';
+    const getRowStyling = (status) => {
+        const statusLower = status?.toLowerCase() || '';
+
+        switch (statusLower) {
+            case 'week off':
+            case 'weekoff':
+                return 'bg-[var(--color-blue-lightest)] border-[var(--color-blue-light)]';
+            case 'holiday':
+                return 'bg-[var(--color-warning-light)] border-[var(--color-warning)]';
+            case 'absent':
+                return 'bg-[var(--color-error-light)]  border-[var(--color-error)]';
+            case 'leave':
+                return 'bg-[var(--color-yellow-light)] border-[var(--color-yellow-dark)]';
+            case 'half day':
+                return 'bg-[var(--color-blue-lighter)] border-[var(--color-blue-dark)]';
             default:
-                return 'bg-[var(--color-text-muted)]';
+                return '';
         }
     };
-
-    // Get status badge styling
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'Present':
-                return 'bg-[var(--color-success-light)] text-[var(--color-success-dark)] border-[var(--color-success-lighter)]';
-            case 'Absent':
-                return 'bg-[var(--color-error-light)] text-[var(--color-error-dark)] border-[var(--color-error-lighter)]';
-            case 'Week Off':
-                return 'bg-[var(--color-warning-light)] text-[var(--color-warning-dark)] border-[var(--color-warning-lighter)]';
-            default:
-                return 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-primary)] border-[var(--color-border-secondary)]';
-        }
-    };
-
     // Format time display
     const formatTime = (time) => {
         if (!time || time === '') return '-';
@@ -793,7 +785,7 @@ const AttendanceReport = () => {
                                 <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                     {paginatedData.length > 0 ? (
                                         paginatedData.map((employee, index) => (
-                                            <tr key={employee.employee_id || index} className="hover:bg-[var(--color-bg-hover)]">
+                                            <tr key={employee.employee_id || index} className={`hover:bg-[var(--color-bg-hover)] transition-colors ${getRowStyling(employee.status)}`}>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm font-medium text-[var(--color-text-primary)]">
                                                         {employee.employee_name || 'N/A'}
@@ -829,10 +821,7 @@ const AttendanceReport = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(employee.status)}`}>
-                                                        <div className={`w-2 h-2 rounded-full mr-1.5 ${getAttendanceColor(employee.status)}`}></div>
-                                                        {employee.status || 'Unknown'}
-                                                    </span>
+                                                    <StatusBadge status={employee.status} />
                                                 </td>
                                             </tr>
                                         ))

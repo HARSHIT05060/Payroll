@@ -134,9 +134,9 @@ const StatusBadge = ({ status }) => {
     const getStatusStyle = () => {
         switch (statusLower) {
             case 'present':
-                return 'bg-[var(--color-success-light)] text-[var(--color-text-success)] border-[var(--color-text-success)]';
+                return 'bg-[var(--color-success)] text-[var(--color-text-white)] border-[var(--color-text-success)]';
             case 'absent':
-                return 'bg-[var(--color-error)] text-[var(--color-text-error)] border-[var(--color-text-error)]';
+                return 'bg-[var(--color-error)] text-[var(--color-text-white)] border-[var(--color-text-error)]';
             case 'weekoff':
             case 'week-off':
             case 'week off':

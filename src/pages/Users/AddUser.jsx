@@ -352,13 +352,13 @@ const AddUser = () => {
                                                 {isEditing ? 'Edit User' : 'Create New User'}
                                             </h2>
                                             {userDataLoading && (
-                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1 flex items-center">
+                                                <p className="text-[var(--color-text-white)] text-sm mt-1 flex items-center">
                                                     <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                                                     Loading user data...
                                                 </p>
                                             )}
                                             {!userDataLoading && (
-                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
+                                                <p className="text-[var(--color-text-white)] text-sm mt-1">
                                                     {isEditing ? 'Update user details below' : 'Fill in the user details below'}
                                                 </p>
                                             )}
@@ -469,8 +469,8 @@ const AddUser = () => {
                             <div className="space-y-2">
                                 <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                                     <Lock className="w-4 h-4 text-[var(--color-blue-dark)]" />
-                                    Password {!isEditing && <span className="text-[var(--color-error)]">*</span>}
-                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs ml-2 bg-[var(--color-bg-gradient-start)] px-2 py-1 rounded-full">(Do not Leave blank)</span>}
+                                    Password  <span className="text-[var(--color-error)]">*</span>
+                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs bg-[var(--color-bg-gradient-start)] py-1 rounded-full">(Do not Leave blank)</span>}
                                 </label>
                                 <div className="relative">
                                     <input
@@ -501,11 +501,9 @@ const AddUser = () => {
                                         {errors.password}
                                     </p>
                                 )}
-                                {!isEditing && (
                                     <p className="text-xs text-[var(--color-text-muted)] mt-1">
                                         Password must contain: uppercase letter, lowercase letter, number, and be at least 6 characters long
                                     </p>
-                                )}
                             </div>
 
                             {/* Role Selection */}
