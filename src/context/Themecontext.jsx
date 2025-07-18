@@ -46,7 +46,7 @@ export const ThemeProvider = ({ children }) => {
 
     const themes = {
         blue: {
-            name: 'Blue Ocean',
+            name: 'Light Mode',
             colors: {
                 '--color-bg-primary': '#eff2f5',
                 '--color-bg-secondary': '#ffffff',
@@ -69,34 +69,6 @@ export const ThemeProvider = ({ children }) => {
                 '--color-scrollbar-track': '#f1f5f9',
                 '--color-scrollbar-thumb': 'linear-gradient(45deg, #3b82f6, #6366f1)',
                 '--color-scrollbar-thumb-hover': 'linear-gradient(45deg, #2563eb, #4f46e5)',
-            }
-        },
-        teal: {
-            name: 'Teal Fresh',
-            colors: {
-                '--color-bg-primary': '#f0fdfa',
-                '--color-bg-secondary': '#ffffff',
-                '--color-bg-gradient-start': '#f0fdfa',
-                '--color-bg-gradient-end': '#ccfbf1',
-                '--color-bg-hover': '#ecfdf5',
-                '--color-bg-sidebar': '#f0fdfa',
-                '--color-bg-sidebar-to': '#ffffff',
-                '--color-border-primary': '#ccfbf1',
-                '--color-border-secondary': '#a7f3d0',
-                '--color-border-focus': '#14b8a6',
-                '--color-blue': '#14b8a6',
-                '--color-blue-dark': '#0d9488',
-                '--color-blue-light': '#99f6e4',
-                '--color-blue-lighter': '#d1fae5',
-                '--color-blue-lightest': '#ecfdf5',
-                '--color-blue-darker': '#0f766e',
-                '--color-blue-darkest': '#115e59',
-                '--color-text-primary': '#1f2937',
-                '--color-text-secondary': '#4b5563',
-                '--color-text-blue': '#0d9488',
-                '--color-scrollbar-track': '#ecfdf5',
-                '--color-scrollbar-thumb': 'linear-gradient(45deg, #14b8a6, #5eead4)',
-                '--color-scrollbar-thumb-hover': 'linear-gradient(45deg, #0d9488, #2dd4bf)',
             }
         },
         dark: {

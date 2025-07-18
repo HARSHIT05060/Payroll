@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apply to all scrollable elements */
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-blue) var(--color-scrollbar-track);
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
 }
 
 *::-webkit-scrollbar {
@@ -349,6 +349,149 @@
 /* Month container spacing */
 .react-datepicker__month-container {
     padding: 0 5px;
+}
+
+/* Header styling */
+.react-datepicker__header {
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-secondary);
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    position: relative;
+}
+
+/* Year dropdown styling */
+.react-datepicker__year-dropdown-container {
+    position: relative;
+    display: inline-block;
+    padding-top: 5px;
+}
+
+.react-datepicker__year-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-bg-gray-light);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    min-width: 90px;
+    padding: 4px 10px;
+}
+
+.react-datepicker__year-option {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    font-weight: 500;
+}
+
+.react-datepicker__year-option:hover {
+    background-color: var(--color-blue);
+    color: #fff;
+}
+
+
+/* Year read view (clickable year text) */
+.react-datepicker__year-read-view {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.react-datepicker__year-read-view:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+/* Month dropdown styling */
+.react-datepicker__month-dropdown-container {
+    position: relative;
+    display: inline-block;
+    padding-top: 5px;
+}
+
+.react-datepicker__month-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-bg-gray-light);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    min-width: 120px;
+    padding: 4px 0;
+}
+
+.react-datepicker__month-option {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    font-weight: 500;
+}
+
+.react-datepicker__month-option:hover {
+    background-color: var(--color-blue);
+    color: #fff;
+}
+
+.react-datepicker__month-option--selected {
+    background-color: var(--color-blue);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Month read view (clickable month text) */
+.react-datepicker__month-read-view {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.react-datepicker__month-read-view:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+/* Custom scrollbar for dropdowns */
+.react-datepicker__year-dropdown::-webkit-scrollbar,
+.react-datepicker__month-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-track,
+.react-datepicker__month-dropdown::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-thumb,
+.react-datepicker__month-dropdown::-webkit-scrollbar-thumb {
+    background: var(--color-border-secondary);
+    border-radius: 3px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-thumb:hover,
+.react-datepicker__month-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--color-blue);
 }
 
 

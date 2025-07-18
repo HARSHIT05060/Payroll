@@ -52,8 +52,8 @@ const AddEmployee = () => {
         emergencyAddress: '',
 
         // Personal Information
-        dateOfBirth: '',
-        dateOfJoining: '',
+        dateOfBirth: null,
+        dateOfJoining: null,
 
         // References
         references: [{ name: '', contactNumber: '' }],
@@ -291,20 +291,12 @@ const AddEmployee = () => {
         if (!mobileRegex.test(mobile)) return 'Mobile number should be 10 digits starting with 6-9';
         return '';
     };
-
     const validateLoginMobile = (mobile) => {
         const mobileRegex = /^[6-9]\d{9}$/;
         if (!mobile.trim()) return 'Login Mobile number is required';
         if (!mobileRegex.test(mobile)) return 'Login Mobile number should be 10 digits starting with 6-9';
         return '';
     };
-
-    const validatePassword = (password) => {
-        if (!password.trim()) return 'Password is required';
-        if (password.length < 6) return 'Password should be at least 6 characters long';
-        return '';
-    };
-
 
     const validateEmail = (email) => {
         if (!email.trim()) return ''; // Email is optional
@@ -377,57 +369,62 @@ const AddEmployee = () => {
         } else {
             let processedValue = value;
 
+            if (value instanceof Date && !isNaN(value)) {
+                processedValue = value.toISOString().split('T')[0];
+            }
             // Real-time validation and formatting
             switch (name) {
                 case 'name':
                 case 'contactPersonName':
-                    // Remove numbers and special characters
-                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z\s]/g, '');
                     break;
 
                 case 'mobile':
                 case 'emergencyContactNo':
                 case 'loginMobileNo':
-                    // Only allow numbers and limit to 10 digits
-                    processedValue = value.replace(/\D/g, '').slice(0, 10);
+                    processedValue = processedValue.replace(/\D/g, '').slice(0, 10);
                     break;
 
                 case 'accountNo':
-                    // Only allow numbers for account number
-                    processedValue = value.replace(/\D/g, '').slice(0, 18);
+                    processedValue = processedValue.replace(/\D/g, '').slice(0, 18);
                     break;
 
                 case 'ifscCode':
-                    // Convert to uppercase and limit to 11 characters
-                    processedValue = value.toUpperCase().slice(0, 11);
+                    processedValue = processedValue.toUpperCase().slice(0, 11);
                     break;
 
                 case 'bankName':
                 case 'branchName':
-                    // Only allow letters and spaces
-                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z\s]/g, '');
                     break;
 
                 case 'salary':
-                    // Only allow numbers and decimal point
-                    processedValue = value.replace(/[^0-9.]/g, '');
+                    processedValue = processedValue.replace(/[^0-9.]/g, '');
                     break;
 
                 case 'employeeCode':
-                    // Remove spaces and special characters except hyphen and underscore
-                    processedValue = value.replace(/[^a-zA-Z0-9-_]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z0-9-_]/g, '');
                     break;
             }
 
             setFormData(prev => ({ ...prev, [name]: processedValue }));
         }
     };
+
+    const getValidDate = (value) => {
+        if (!value) return null;
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? null : date;
+    };
+
+
     const validateField = (fieldName, value) => {
         switch (fieldName) {
             case 'name':
             case 'contactPersonName':
                 return validateName(value);
             case 'mobile':
+            case 'emergencyContactNo':
                 return validateMobile(value);
             case 'loginMobileNo':
                 return validateLoginMobile(value);
@@ -445,8 +442,6 @@ const AddEmployee = () => {
                 return validateIFSC(value);
             case 'salary':
                 return validateSalary(value);
-            case 'password':
-                return validatePassword(value);
             default:
                 return '';
         }
@@ -491,7 +486,7 @@ const AddEmployee = () => {
     const validateForm = () => {
         const errors = [];
 
-        // Core fields
+        // Validate all fields
         const fieldsToValidate = [
             { name: 'employeeCode', value: formData.employeeCode },
             { name: 'name', value: formData.name },
@@ -501,45 +496,50 @@ const AddEmployee = () => {
             { name: 'branchName', value: formData.branchName },
             { name: 'accountNo', value: formData.accountNo },
             { name: 'ifscCode', value: formData.ifscCode },
-            { name: 'salary', value: formData.salary },
-            { name: 'dateOfBirth', value: formData.dateOfBirth },
-            { name: 'dateOfJoining', value: formData.dateOfJoining },
-            { name: 'contactPersonName', value: formData.contactPersonName },
-            { name: 'loginMobileNo', value: formData.loginMobileNo }
+            { name: 'salary', value: formData.salary }
         ];
 
         if (!isEditMode) {
             fieldsToValidate.push(
+                { name: 'loginMobileNo', value: formData.loginMobileNo },
                 { name: 'password', value: formData.password }
             );
         }
 
         fieldsToValidate.forEach(field => {
             const error = validateField(field.name, field.value);
-            if (error) errors.push(error);
+            if (error) {
+                errors.push(error);
+            }
         });
 
-        // Required dropdowns
+        // Check required dropdowns
         if (!formData.gender) errors.push('Gender is required');
         if (!formData.branch) errors.push('Branch is required');
         if (!formData.department) errors.push('Department is required');
         if (!formData.designation) errors.push('Designation is required');
 
-        // File validations only for new employee
+        // File validation for new employees
+        if (!isEditMode) {
+            if (!formData.aadharCard) errors.push('Aadhar Card is required');
+            if (!formData.panCard) errors.push('PAN Card is required');
+        }
+
         if (!isEditMode) {
             if (!formData.aadharCard) errors.push('Aadhar Card is required');
             if (!formData.panCard) errors.push('PAN Card is required');
             if (!formData.photo) errors.push('Profile Photo is required');
         }
 
-        // Password length check for new employee
-        if (!isEditMode && formData.password && formData.password.length < 6) {
-            errors.push('Password should be at least 6 characters long');
+        // Password validation for new employees
+        if (!isEditMode && formData.password) {
+            if (formData.password.length < 6) {
+                errors.push('Password should be at least 6 characters long');
+            }
         }
 
         return errors;
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -678,8 +678,8 @@ const AddEmployee = () => {
                         contactPersonName: '',
                         relation: '',
                         emergencyAddress: '',
-                        dateOfBirth: '',
-                        dateOfJoining: '',
+                        dateOfBirth: null,
+                        dateOfJoining: null,
                         references: [{ name: '', contactNumber: '' }],
                         loginMobileNo: '',
                         password: ''
@@ -1268,46 +1268,52 @@ const AddEmployee = () => {
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Birth</label>
                                                 <DatePicker
-                                                    selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : null}
+                                                    selected={getValidDate(formData.dateOfBirth)}
                                                     onChange={(date) =>
                                                         handleInputChange({
                                                             target: {
                                                                 name: 'dateOfBirth',
-                                                                value: date?.toISOString().split('T')[0] || '', // Save as 'yyyy-mm-dd'
+                                                                value: date,
                                                             },
                                                         })
                                                     }
-                                                    placeholderText="Select Date of Birth"
                                                     className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     dateFormat="dd-MM-yyyy"
+                                                    placeholderText="DD-MM-YYYY"
                                                     showYearDropdown
+                                                    showMonthDropdown
                                                     scrollableYearDropdown
+                                                    scrollableMonthDropdown
                                                     yearDropdownItemNumber={100}
-                                                    maxDate={new Date()} // Optional: prevents future DoB
+                                                    maxDate={new Date()}
                                                 />
                                             </div>
+
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Joining</label>
                                                 <DatePicker
-                                                    selected={formData.dateOfJoining ? new Date(formData.dateOfJoining) : null}
+                                                    selected={getValidDate(formData.dateOfJoining)}
                                                     onChange={(date) =>
                                                         handleInputChange({
                                                             target: {
                                                                 name: 'dateOfJoining',
-                                                                value: date?.toISOString().split('T')[0] || '',
+                                                                value: date,
                                                             },
                                                         })
                                                     }
-                                                    placeholderText="Select Date of Joining"
                                                     className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                     dateFormat="dd-MM-yyyy"
+                                                    placeholderText="DD-MM-YYYY"
                                                     showYearDropdown
+                                                    showMonthDropdown
                                                     scrollableYearDropdown
+                                                    scrollableMonthDropdown
                                                     maxDate={new Date()}
                                                 />
                                             </div>
                                         </div>
                                     )}
+
 
                                     {section.key === 'reference' && (
                                         <div className="p-6">

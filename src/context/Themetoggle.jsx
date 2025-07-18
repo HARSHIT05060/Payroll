@@ -34,8 +34,6 @@ export const ThemeToggle = () => {
                 return <Moon size={16} />;
             case 'blue':
                 return <Sun size={16} />;
-            case 'teal':
-                return <Palette size={16} color="#14b8a6" />;
             default:
                 return <Palette size={16} />;
         }
