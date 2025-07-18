@@ -19,7 +19,7 @@ const TimeConfigurationComponent = () => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [toast, setToast] = useState(null);
-
+  console.log("📦 Configuration component loaded");
   // Show toast function
   const showToast = (message, type = 'info') => {
     setToast({ message, type });
