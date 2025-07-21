@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Toolti
 
 const PayrollSummary = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
-  
+
   // Sample payroll data with Indian rupee values
   const payrollData = [
     {
@@ -143,17 +143,16 @@ const PayrollSummary = () => {
           </div>
           <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Payroll Overview</h2>
         </div>
-        
+
         <div className="flex gap-2 bg-[var(--color-bg-hover)] p-1 rounded-lg border border-[var(--color-border-secondary)]">
           {['Day', 'Week', 'Month'].map((period) => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-4 py-2 text-sm rounded-md font-medium transition-all duration-200 ${
-                selectedPeriod === period
+              className={`px-4 py-2 text-sm rounded-md font-medium transition-all duration-200 ${selectedPeriod === period
                   ? 'bg-[var(--color-blue)] text-[var(--color-text-white)] shadow-md'
                   : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text-primary)]'
-              }`}
+                }`}
             >
               {period}
             </button>
@@ -271,11 +270,10 @@ const PayrollSummary = () => {
                       {employee.overtime}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${
-                        employee.status === 'Paid' 
-                          ? 'bg-[var(--color-success-light)] text-[var(--color-success)] border border-[var(--color-success)] border-opacity-20' 
+                      <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${employee.status === 'Paid'
+                          ? 'bg-[var(--color-success-light)] text-[var(--color-success)] border border-[var(--color-success)] border-opacity-20'
                           : 'bg-[var(--color-warning-light)] text-[var(--color-warning)] border border-[var(--color-warning)] border-opacity-20'
-                      }`}>
+                        }`}>
                         {employee.status}
                       </span>
                     </td>
@@ -301,13 +299,13 @@ const PayrollSummary = () => {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-divider)" opacity={0.3} />
-                <XAxis 
-                  dataKey="month" 
+                <XAxis
+                  dataKey="month"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                 />
-                <YAxis 
+                <YAxis
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
@@ -323,29 +321,29 @@ const PayrollSummary = () => {
                   }}
                   formatter={(value, name) => [`₹${value}k`, name]}
                 />
-                <Bar 
-                  dataKey="monthlyPayroll" 
-                  stackId="a" 
-                  fill="var(--color-blue)" 
+                <Bar
+                  dataKey="monthlyPayroll"
+                  stackId="a"
+                  fill="var(--color-blue)"
                   name="Monthly Payroll"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="overtime" 
-                  stackId="a" 
-                  fill="var(--color-success)" 
+                <Bar
+                  dataKey="overtime"
+                  stackId="a"
+                  fill="var(--color-success)"
                   name="Overtime"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="bonuses" 
-                  stackId="a" 
-                  fill="var(--color-warning)" 
+                <Bar
+                  dataKey="bonuses"
+                  stackId="a"
+                  fill="var(--color-warning)"
                   name="Bonuses & Incentives"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
-                        </ResponsiveContainer>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
