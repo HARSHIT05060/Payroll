@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 
 const PayrollSummary = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
@@ -132,25 +132,27 @@ const PayrollSummary = () => {
   const totalBonuses = payrollData.reduce((sum, item) => sum + item.bonuses, 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl border border-[var(--color-border-secondary)] p-6 mb-8 hover:shadow-2xl transition-all duration-300">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <h2 className="text-lg font-semibold text-gray-800">Payroll Overview</h2>
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-lg">
+            <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Payroll Overview</h2>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 bg-[var(--color-bg-hover)] p-1 rounded-lg border border-[var(--color-border-secondary)]">
           {['Day', 'Week', 'Month'].map((period) => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+              className={`px-4 py-2 text-sm rounded-md font-medium transition-all duration-200 ${
                 selectedPeriod === period
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-[var(--color-blue)] text-[var(--color-text-white)] shadow-md'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               {period}
@@ -160,43 +162,43 @@ const PayrollSummary = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-[var(--color-blue-lightest)] to-[var(--color-blue-lightest)] p-6 rounded-xl border border-[var(--color-blue)] border-opacity-20 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Payroll</p>
-              <p className="text-2xl font-bold text-blue-600">₹{(totalPayroll * 1000).toLocaleString('en-IN')}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">Total Payroll</p>
+              <p className="text-2xl font-bold text-[var(--color-blue)]">₹{(totalPayroll * 1000).toLocaleString('en-IN')}</p>
             </div>
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[var(--color-blue)] rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+        <div className="bg-gradient-to-br from-[var(--color-success-light)] to-[var(--color-success-light)] p-6 rounded-xl border border-[var(--color-success)] border-opacity-20 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Overtime</p>
-              <p className="text-2xl font-bold text-green-600">₹{(totalOvertime * 1000).toLocaleString('en-IN')}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">Overtime</p>
+              <p className="text-2xl font-bold text-[var(--color-success)]">₹{(totalOvertime * 1000).toLocaleString('en-IN')}</p>
             </div>
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[var(--color-success)] rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+        <div className="bg-gradient-to-br from-[var(--color-warning-light)] to-[var(--color-warning-light)] p-6 rounded-xl border border-[var(--color-warning)] border-opacity-20 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Bonuses & Incentives</p>
-              <p className="text-2xl font-bold text-purple-600">₹{(totalBonuses * 1000).toLocaleString('en-IN')}</p>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">Bonuses & Incentives</p>
+              <p className="text-2xl font-bold text-[var(--color-warning)]">₹{(totalBonuses * 1000).toLocaleString('en-IN')}</p>
             </div>
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[var(--color-warning)] rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
             </div>
@@ -205,18 +207,18 @@ const PayrollSummary = () => {
       </div>
 
       {/* Table and Chart Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Employee Payroll Table */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-md font-semibold text-gray-800">Employee Payroll Details</h3>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Employee Payroll Details</h3>
             <div className="flex gap-2">
-              <button className="p-2 text-gray-500 hover:text-gray-700 border rounded">
+              <button className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] border border-[var(--color-border-secondary)] rounded-lg transition-all duration-200">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
               </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700 border rounded">
+              <button className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] border border-[var(--color-border-secondary)] rounded-lg transition-all duration-200">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -224,55 +226,55 @@ const PayrollSummary = () => {
             </div>
           </div>
 
-          <div className="overflow-hidden border border-gray-200 rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="overflow-hidden border border-[var(--color-border-secondary)] rounded-xl shadow-sm">
+            <table className="min-w-full">
+              <thead className="bg-[var(--color-bg-hover)]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Employee
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Salary
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Overtime
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                 {employeePayrollData.map((employee) => (
-                  <tr key={employee.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap">
+                  <tr key={employee.id} className="hover:bg-[var(--color-bg-hover)] transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8">
-                          <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--color-blue-lightest)] to-[var(--color-blue)] flex items-center justify-center text-lg shadow-md">
                             {employee.avatar}
                           </div>
                         </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
+                        <div className="ml-4">
+                          <div className="text-sm font-semibold text-[var(--color-text-primary)]">
                             {employee.name}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[var(--color-text-secondary)]">
                             {employee.position}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                       {employee.salary}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
                       {employee.overtime}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${
                         employee.status === 'Paid' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-[var(--color-success-light)] text-[var(--color-success)] border border-[var(--color-success)] border-opacity-20' 
+                          : 'bg-[var(--color-warning-light)] text-[var(--color-warning)] border border-[var(--color-warning)] border-opacity-20'
                       }`}>
                         {employee.status}
                       </span>
@@ -286,8 +288,8 @@ const PayrollSummary = () => {
 
         {/* Chart Section */}
         <div>
-          <h3 className="text-md font-semibold text-gray-800 mb-4">Monthly Payroll Breakdown</h3>
-          <div className="h-80 border border-gray-200 rounded-lg p-4">
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)] mb-6">Monthly Payroll Breakdown</h3>
+          <div className="h-80 border border-[var(--color-border-secondary)] rounded-xl p-4 bg-[var(--color-bg-secondary)] shadow-sm">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={payrollData}
@@ -298,58 +300,52 @@ const PayrollSummary = () => {
                   bottom: 5,
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-divider)" opacity={0.3} />
                 <XAxis 
                   dataKey="month" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#666', fontSize: 12 }}
+                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                 />
                 <YAxis 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#666', fontSize: 12 }}
+                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                   tickFormatter={(value) => `₹${value}k`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--color-bg-secondary)',
+                    border: '1px solid var(--color-border-secondary)',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                    color: 'var(--color-text-primary)'
+                  }}
+                  formatter={(value, name) => [`₹${value}k`, name]}
                 />
                 <Bar 
                   dataKey="monthlyPayroll" 
                   stackId="a" 
-                  fill="#3B82F6" 
+                  fill="var(--color-blue)" 
                   name="Monthly Payroll"
                   radius={[0, 0, 0, 0]}
                 />
                 <Bar 
                   dataKey="overtime" 
                   stackId="a" 
-                  fill="#93C5FD" 
+                  fill="var(--color-success)" 
                   name="Overtime"
                   radius={[0, 0, 0, 0]}
                 />
                 <Bar 
                   dataKey="bonuses" 
                   stackId="a" 
-                  fill="#DBEAFE" 
+                  fill="var(--color-warning)" 
                   name="Bonuses & Incentives"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Legend */}
-          <div className="flex justify-center mt-4 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded"></div>
-              <span className="text-xs text-gray-600">Monthly Payroll</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-300 rounded"></div>
-              <span className="text-xs text-gray-600">Overtime</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-100 rounded"></div>
-              <span className="text-xs text-gray-600">Bonuses</span>
-            </div>
+                        </ResponsiveContainer>
           </div>
         </div>
       </div>
