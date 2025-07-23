@@ -4,6 +4,8 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const AddEmployee = () => {
     const { employeeId } = useParams(); // Get employee ID from URL params
@@ -50,8 +52,8 @@ const AddEmployee = () => {
         emergencyAddress: '',
 
         // Personal Information
-        dateOfBirth: '',
-        dateOfJoining: '',
+        dateOfBirth: null,
+        dateOfJoining: null,
 
         // References
         references: [{ name: '', contactNumber: '' }],
@@ -252,7 +254,7 @@ const AddEmployee = () => {
                     aadharCard: employee.aadharcard_img ? baseUrl + employee.aadharcard_img : null,
                     drivingLicence: employee.dl_img ? baseUrl + employee.dl_img : null,
                     panCard: employee.pan_img ? baseUrl + employee.pan_img : null,
-                    photo: employee.photo_img ? baseUrl + employee.photo_img : null
+                    photo: employee.passport_img ? baseUrl + employee.passport_img : null
                 };
 
                 setFilePreviews(filePreviews);
@@ -287,6 +289,12 @@ const AddEmployee = () => {
         const mobileRegex = /^[6-9]\d{9}$/;
         if (!mobile.trim()) return 'Mobile number is required';
         if (!mobileRegex.test(mobile)) return 'Mobile number should be 10 digits starting with 6-9';
+        return '';
+    };
+    const validateLoginMobile = (mobile) => {
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobile.trim()) return 'Login Mobile number is required';
+        if (!mobileRegex.test(mobile)) return 'Login Mobile number should be 10 digits starting with 6-9';
         return '';
     };
 
@@ -361,51 +369,55 @@ const AddEmployee = () => {
         } else {
             let processedValue = value;
 
+            if (value instanceof Date && !isNaN(value)) {
+                processedValue = value.toISOString().split('T')[0];
+            }
             // Real-time validation and formatting
             switch (name) {
                 case 'name':
                 case 'contactPersonName':
-                    // Remove numbers and special characters
-                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z\s]/g, '');
                     break;
 
                 case 'mobile':
                 case 'emergencyContactNo':
                 case 'loginMobileNo':
-                    // Only allow numbers and limit to 10 digits
-                    processedValue = value.replace(/\D/g, '').slice(0, 10);
+                    processedValue = processedValue.replace(/\D/g, '').slice(0, 10);
                     break;
 
                 case 'accountNo':
-                    // Only allow numbers for account number
-                    processedValue = value.replace(/\D/g, '').slice(0, 18);
+                    processedValue = processedValue.replace(/\D/g, '').slice(0, 18);
                     break;
 
                 case 'ifscCode':
-                    // Convert to uppercase and limit to 11 characters
-                    processedValue = value.toUpperCase().slice(0, 11);
+                    processedValue = processedValue.toUpperCase().slice(0, 11);
                     break;
 
                 case 'bankName':
                 case 'branchName':
-                    // Only allow letters and spaces
-                    processedValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z\s]/g, '');
                     break;
 
                 case 'salary':
-                    // Only allow numbers and decimal point
-                    processedValue = value.replace(/[^0-9.]/g, '');
+                    processedValue = processedValue.replace(/[^0-9.]/g, '');
                     break;
 
                 case 'employeeCode':
-                    // Remove spaces and special characters except hyphen and underscore
-                    processedValue = value.replace(/[^a-zA-Z0-9-_]/g, '');
+                    processedValue = processedValue.replace(/[^a-zA-Z0-9-_]/g, '');
                     break;
             }
 
             setFormData(prev => ({ ...prev, [name]: processedValue }));
         }
     };
+
+    const getValidDate = (value) => {
+        if (!value) return null;
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? null : date;
+    };
+
+
     const validateField = (fieldName, value) => {
         switch (fieldName) {
             case 'name':
@@ -413,8 +425,9 @@ const AddEmployee = () => {
                 return validateName(value);
             case 'mobile':
             case 'emergencyContactNo':
-            case 'loginMobileNo':
                 return validateMobile(value);
+            case 'loginMobileNo':
+                return validateLoginMobile(value);
             case 'email':
                 return validateEmail(value);
             case 'employeeCode':
@@ -512,6 +525,12 @@ const AddEmployee = () => {
             if (!formData.panCard) errors.push('PAN Card is required');
         }
 
+        if (!isEditMode) {
+            if (!formData.aadharCard) errors.push('Aadhar Card is required');
+            if (!formData.panCard) errors.push('PAN Card is required');
+            if (!formData.photo) errors.push('Profile Photo is required');
+        }
+
         // Password validation for new employees
         if (!isEditMode && formData.password) {
             if (formData.password.length < 6) {
@@ -605,7 +624,7 @@ const AddEmployee = () => {
 
             // Handle file uploads
             const fileFields = ['aadharCard', 'drivingLicence', 'panCard', 'photo'];
-            const apiFileFields = ['aadharcard_img', 'dl_img', 'pan_card', 'passport_img'];
+            const apiFileFields = ['aadharcard_img', 'dl_img', 'pan_img', 'passport_img'];
 
             fileFields.forEach((formField, index) => {
                 const apiField = apiFileFields[index];
@@ -659,8 +678,8 @@ const AddEmployee = () => {
                         contactPersonName: '',
                         relation: '',
                         emergencyAddress: '',
-                        dateOfBirth: '',
-                        dateOfJoining: '',
+                        dateOfBirth: null,
+                        dateOfJoining: null,
                         references: [{ name: '', contactNumber: '' }],
                         loginMobileNo: '',
                         password: ''
@@ -780,7 +799,6 @@ const AddEmployee = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Employee' : 'Add New Employee'}
                                     </h1>
-                                  
                                 </div>
                             </div>
                         </div>
@@ -1072,34 +1090,17 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
-                                                                📄 Document uploaded
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Driving Licence</label>
-                                                <input
-                                                    type="file"
-                                                    name="drivingLicence"
-                                                    onChange={handleInputChange}
-                                                    accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                />
-                                                {filePreviews.drivingLicence && (
-                                                    <div className="mt-2">
-                                                        {typeof filePreviews.drivingLicence === 'string' && filePreviews.drivingLicence.startsWith('data:') ? (
-                                                            <img
-                                                                src={filePreviews.drivingLicence}
-                                                                alt="Driving Licence Preview"
-                                                                className="h-20 w-20 object-cover rounded-lg border"
-                                                            />
-                                                        ) : (
-                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
-                                                                📄 Document uploaded
-                                                            </div>
+                                                            isEditMode && typeof filePreviews.aadharCard === 'string' ? (
+                                                                <img
+                                                                    src={filePreviews.aadharCard}
+                                                                    alt="Aadhar Card Preview"
+                                                                    className="h-20 w-20 object-cover rounded-lg border"
+                                                                />
+                                                            ) : (
+                                                                <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
+                                                                    📄 Document uploaded
+                                                                </div>
+                                                            )
                                                         )}
                                                     </div>
                                                 )}
@@ -1125,34 +1126,84 @@ const AddEmployee = () => {
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
-                                                                📄 Document uploaded
-                                                            </div>
+                                                            isEditMode && typeof filePreviews.panCard === 'string' ? (
+                                                                <img
+                                                                    src={filePreviews.panCard}
+                                                                    alt="PAN Card Preview"
+                                                                    className="h-20 w-20 object-cover rounded-lg border"
+                                                                />
+                                                            ) : (
+                                                                <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
+                                                                    📄 Document uploaded
+                                                                </div>
+                                                            )
                                                         )}
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Photo</label>
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Profile Photo {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}</label>
                                                 <input
                                                     type="file"
                                                     name="photo"
                                                     onChange={handleInputChange}
                                                     accept="image/*"
                                                     className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                    {...(!isEditMode && { required: true })}
                                                 />
                                                 {filePreviews.photo && (
                                                     <div className="mt-2">
                                                         {typeof filePreviews.photo === 'string' && filePreviews.photo.startsWith('data:') ? (
                                                             <img
                                                                 src={filePreviews.photo}
-                                                                alt="Photo Preview"
+                                                                alt="Profile Photo Preview"
                                                                 className="h-20 w-20 object-cover rounded-lg border"
                                                             />
                                                         ) : (
-                                                            <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
-                                                                📄 Photo uploaded
-                                                            </div>
+                                                            isEditMode && typeof filePreviews.photo === 'string' ? (
+                                                                <img
+                                                                    src={filePreviews.photo}
+                                                                    alt="Profile Photo Preview"
+                                                                    className="h-20 w-20 object-cover rounded-lg border"
+                                                                />
+                                                            ) : (
+                                                                <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
+                                                                    📄 Document uploaded
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Driving Licence</label>
+                                                <input
+                                                    type="file"
+                                                    name="drivingLicence"
+                                                    onChange={handleInputChange}
+                                                    accept="image/*,.pdf"
+                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                />
+                                                {filePreviews.drivingLicence && (
+                                                    <div className="mt-2">
+                                                        {typeof filePreviews.drivingLicence === 'string' && filePreviews.drivingLicence.startsWith('data:') ? (
+                                                            <img
+                                                                src={filePreviews.drivingLicence}
+                                                                alt="Driving Licence Preview"
+                                                                className="h-20 w-20 object-cover rounded-lg border"
+                                                            />
+                                                        ) : (
+                                                            isEditMode && typeof filePreviews.drivingLicence === 'string' ? (
+                                                                <img
+                                                                    src={filePreviews.drivingLicence}
+                                                                    alt="Driving Licence Preview"
+                                                                    className="h-20 w-20 object-cover rounded-lg border"
+                                                                />
+                                                            ) : (
+                                                                <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)]">
+                                                                    📄 Document uploaded
+                                                                </div>
+                                                            )
                                                         )}
                                                     </div>
                                                 )}
@@ -1216,26 +1267,53 @@ const AddEmployee = () => {
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Birth</label>
-                                                <input
-                                                    type="date"
-                                                    name="dateOfBirth"
-                                                    value={formData.dateOfBirth}
-                                                    onChange={handleInputChange}
+                                                <DatePicker
+                                                    selected={getValidDate(formData.dateOfBirth)}
+                                                    onChange={(date) =>
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: 'dateOfBirth',
+                                                                value: date,
+                                                            },
+                                                        })
+                                                    }
                                                     className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                    dateFormat="dd-MM-yyyy"
+                                                    placeholderText="DD-MM-YYYY"
+                                                    showYearDropdown
+                                                    showMonthDropdown
+                                                    scrollableYearDropdown
+                                                    scrollableMonthDropdown
+                                                    yearDropdownItemNumber={100}
+                                                    maxDate={new Date()}
                                                 />
                                             </div>
+
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Date of Joining</label>
-                                                <input
-                                                    type="date"
-                                                    name="dateOfJoining"
-                                                    value={formData.dateOfJoining}
-                                                    onChange={handleInputChange}
+                                                <DatePicker
+                                                    selected={getValidDate(formData.dateOfJoining)}
+                                                    onChange={(date) =>
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: 'dateOfJoining',
+                                                                value: date,
+                                                            },
+                                                        })
+                                                    }
                                                     className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                    dateFormat="dd-MM-yyyy"
+                                                    placeholderText="DD-MM-YYYY"
+                                                    showYearDropdown
+                                                    showMonthDropdown
+                                                    scrollableYearDropdown
+                                                    scrollableMonthDropdown
+                                                    maxDate={new Date()}
                                                 />
                                             </div>
                                         </div>
                                     )}
+
 
                                     {section.key === 'reference' && (
                                         <div className="p-6">

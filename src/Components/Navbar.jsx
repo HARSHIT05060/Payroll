@@ -114,6 +114,14 @@ const Navbar = () => {
                                         <span>Phone:</span>
                                         <span className="font-mono">{user?.number || 'N/A'}</span>
                                     </div>
+                                    <div className="flex justify-between">
+                                        <span>Sub Status:</span>
+                                        <span className="font-mono">{user?.subscriptions_status || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Expire In:</span>
+                                        <span className="font-mono">{user?.subscriptions_days || 'N/A'}</span>
+                                    </div>
                                     {user?.email && (
                                         <div className="flex justify-between">
                                             <span>Email:</span>

@@ -33,15 +33,11 @@ const AllReports = () => {
             isAvailable: true,
             features: [
                 'Employee profiles with detailed information',
-                'Contact information and communication details',
-                'Department assignments and organizational structure',
-                'Job roles and position hierarchy',
-                'Employment status and current records',
-                'Branch location and office assignments',
-                'Employee ID management and tracking',
-                'Gender demographics and statistics',
+                'Contact and job role details',
+                'Department and branch assignments',
+                'Employee ID and employment status tracking',
                 'Multi-format export (Excel, PDF)',
-                'Professional PDF reports with company branding'
+                'Professional PDF reports with branding'
             ]
         },
         {
@@ -54,16 +50,12 @@ const AllReports = () => {
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Real-time employee attendance status tracking',
-                'Detailed clock in/out timestamps and records',
-                'Automatic working hours calculation and analysis',
-                'Overtime hours tracking and comprehensive analysis',
-                'Late arrival detection and detailed reporting',
-                'Date range filtering and custom period selection',
-                'Department-wise filtering and organizational breakdown',
-                'Status-based color coding and visual indicators',
-                'Multi-format export (Excel, PDF)',
-                'Professional PDF reports with summary statistics'
+                'Daily clock in/out timestamps',
+                'Working hours and overtime tracking',
+                'Late arrival and absence reports',
+                'Department-wise filtering',
+                'Date range selection',
+                'Export as Excel or PDF'
             ]
         },
         {
@@ -76,38 +68,12 @@ const AllReports = () => {
             category: 'attendance',
             isAvailable: true,
             features: [
-                'Complete monthly attendance overview and analysis',
-                'Attendance rate calculations and percentage metrics',
-                'Working days vs. present days detailed analysis',
-                'Week-off and holiday tracking with calendar integration',
-                'Leave days and half-day calculations and summaries',
-                'Late hours and overtime comprehensive summaries',
-                'Department and employee-wise detailed breakdowns',
-                'Visual status indicators and comprehensive legends',
-                'Multi-format export (Excel, PDF)',
-                'Enhanced PDF export with professional styling'
-            ]
-        },
-        {
-            id: 'date-range-report',
-            title: 'Date Range Report',
-            icon: Calendar,
-            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Generate comprehensive attendance reports for selected date range',
-            path: '/reports/daterangereport',
-            category: 'attendance',
-            isAvailable: true,
-            features: [
-                'Employee-wise data organization and smart grouping',
-                'Individual employee attendance patterns and trends',
-                'Comprehensive analytics and performance metrics',
-                'Hours worked tracking and detailed calculations',
-                'Overtime tracking and comprehensive analysis',
-                'Late arrival detection and detailed reporting',
-                'Complete daily attendance records and history',
-                'Detailed clock in/out times with status tracking',
-                'Professional PDF format with clean styling',
-                'Print-ready reports with organized layout'
+                'Monthly attendance overview',
+                'Attendance rate and percentage metrics',
+                'Leave and holiday summaries',
+                'Employee-wise breakdowns',
+                'Visual indicators for status',
+                'Export as Excel or PDF'
             ]
         },
         {
@@ -115,25 +81,38 @@ const AllReports = () => {
             title: 'Monthly Salary Report',
             icon: IndianRupee,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Generate detailed monthly salary reports with breakdowns and analytics',
+            description: 'Generate monthly salary reports with accurate breakdowns, integrations, and professional formatting',
             path: '/reports/monthly-salary',
             category: 'payroll',
             isAvailable: true,
             features: [
-                'Employee-wise salary calculation and grouping',
-                'Breakdown of base salary, allowances, and deductions',
-                'Automatic calculation of monthly payable amount',
-                'Integration with attendance for accurate work-hour based pay',
-                'Support for both hourly and monthly pay structures',
-                'Overtime earnings calculation and inclusion',
-                'Leave deductions and late penalties adjustment',
-                'Professional PDF format with clear salary slips',
-                'Print-ready reports for HR and finance teams',
-                'Summary analytics for total payout and cost tracking'
+                'Monthly employee salary calculations',
+                'Basic, allowance, and deduction breakdown',
+                'Attendance-integrated pay automation',
+                'Overtime and leave deduction handling',
+                'PDF salary slips and export-ready reports',
+                'Summary of total payout'
+            ]
+        },
+        {
+            id: 'date-range-report',
+            title: 'Custom Range Report',
+            icon: Calendar,
+            color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
+            description: 'Generate comprehensive attendance reports for selected date range',
+            path: '/reports/daterangereport',
+            category: 'attendance',
+            isAvailable: true,
+            features: [
+                'Attendance tracking within custom date range',
+                'Employee-wise summaries and trends',
+                'Overtime and late arrival insights',
+                'Clock in/out history with status',
+                'Clean, exportable PDF format'
             ]
         }
-
     ];
+
 
     const comingSoonReports = [
         {

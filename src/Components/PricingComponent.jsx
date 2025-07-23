@@ -374,7 +374,7 @@ const EnhancedPricingComponent = () => {
                     <h2 className="text-4xl font-bold text-[var(--color-text-white)] mb-6">
                         Ready to transform your scheduling?
                     </h2>
-                    <p className="text-xl text-[var(--color-blue-lighter)] mb-8">
+                    <p className="text-xl text-[var(--color-text-white)] mb-8">
                         Join thousands of professionals who've already made the switch
                     </p>
                     <button className="bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[var(--color-bg-gradient-start)] transition-colors inline-flex items-center">

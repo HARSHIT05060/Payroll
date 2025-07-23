@@ -29,9 +29,13 @@ import { createPortal } from 'react-dom';
 import { exportToExcel } from '../../utils/exportUtils/DailyReport/excelExport';
 import { exportToPDF } from '../../utils/exportUtils/DailyReport/pdfExport';
 import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
+import { StatusBadge } from '../../Components/Report/ReportComponents';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const DailyReport = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [attendanceData, setAttendanceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -67,6 +71,18 @@ const DailyReport = () => {
         }
     }, [exportDropdown]);
 
+    const formatDate = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+
+    };
+
     // Fetch daily attendance report
     const fetchDailyReport = useCallback(async (date) => {
         if (!user?.user_id) return;
@@ -97,8 +113,8 @@ const DailyReport = () => {
 
     // Initial load and date change
     useEffect(() => {
-        fetchDailyReport(selectedDate);
-    }, [selectedDate, fetchDailyReport]);
+        fetchDailyReport(formatDate(selectedDate));
+    }, [selectedDate]);
 
     // Filter and search logic
     const filteredData = useMemo(() => {
@@ -129,42 +145,19 @@ const DailyReport = () => {
         return { total, present, absent, weekOff, late, overtime };
     }, [attendanceData]);
 
-    // Get status color and icon
-    const getStatusInfo = (employee) => {
-        const isPresent = employee.status === 'Present';
-        const isWeekOff = employee.status === 'Week Off';
-        const isLate = parseFloat(employee.late_hours || 0) > 0;
-        const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
-
-        if (isWeekOff) {
-            return { color: 'text-purple-600 bg-purple-50', icon: CalendarX, text: 'Week Off' };
-        }
-        if (!isPresent) {
-            return { color: 'text-red-600 bg-red-50', icon: XCircle, text: 'Absent' };
-        }
-        if (isLate) {
-            return { color: 'text-yellow-600 bg-yellow-50', icon: AlertCircle, text: 'Late' };
-        }
-        if (hasOvertime) {
-            return { color: 'text-blue-600 bg-blue-50', icon: TrendingUp, text: 'Overtime' };
-        }
-        return { color: 'text-green-600 bg-green-50', icon: CheckCircle, text: 'Present' };
-    };
-
-    // Get time color based on late/overtime status
     const getTimeColor = (employee) => {
         const isLate = parseFloat(employee.late_hours || 0) > 0;
         const hasOvertime = parseFloat(employee.overtime_hours || 0) > 0;
         const isWeekOff = employee.status === 'Week Off';
 
         if (isWeekOff) {
-            return 'text-purple-600 font-medium';
+            return 'text-[var(--color-text-blue)] font-medium';
         }
         if (isLate) {
-            return 'text-yellow-600 font-medium';
+            return 'text-[var(--color-warning-dark)] font-medium';
         }
         if (hasOvertime) {
-            return 'text-blue-600 font-medium';
+            return 'text-[var(--color-blue-dark)] font-medium';
         }
         return 'text-[var(--color-text-primary)]';
     };
@@ -181,8 +174,34 @@ const DailyReport = () => {
         setIsModalOpen(true);
     };
 
+    const getRowStyling = (status) => {
+        const statusLower = status?.toLowerCase() || '';
+
+        switch (statusLower) {
+            case 'week off':
+            case 'weekoff':
+                return 'bg-[var(--color-blue-lightest)] border-l-4 border-[var(--color-blue-light)]';
+            case 'holiday':
+                return 'bg-[var(--color-warning-light)] border-l-4 border-[var(--color-warning)]';
+            case 'absent':
+                return 'bg-[var(--color-error-light)] border-l-4 border-[var(--color-error)]';
+            case 'leave':
+                return 'bg-[var(--color-yellow-light)] border-l-4 border-[var(--color-yellow-dark)]';
+            case 'half day':
+                return 'bg-[var(--color-blue-lighter)] border-l-4 border-[var(--color-blue-dark)]';
+            default:
+                return '';
+        }
+    };
+
     const handleExportToExcel = useCallback(() => {
         try {
+            if (!filteredData || filteredData.length === 0) {
+                showToast('No data available to export', 'error');
+                return;
+            }
+
+            // Transform the data for Excel export
             const exportData = filteredData.map(emp => ({
                 'S.No': emp.sno,
                 'Employee Name': emp.employee_name,
@@ -198,12 +217,19 @@ const DailyReport = () => {
                 'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
             }));
 
+            // Generate filename with selected date
             const fileName = `daily_attendance_report_${selectedDate}`;
-            exportToExcel(exportData, fileName);
-            showToast('Excel exported successfully', 'success');
+
+            // Export to Excel
+            exportToExcel(exportData, selectedDate, fileName);
+
+            showToast('Excel exported successfully!', 'success');
             setExportDropdown(false);
-        } catch (err) {
-            showToast('Failed to export Excel', err);
+
+        } catch (error) {
+            console.error('Error in handleExportToExcel:', error);
+            showToast('Failed to export Excel: ' + error.message, 'error');
+            setExportDropdown(false);
         }
     }, [filteredData, selectedDate]);
 
@@ -304,10 +330,10 @@ const DailyReport = () => {
                                                 onClick={() => setExportDropdown(false)}
                                             />
                                             <div
-                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                className="fixed z-50 bg-[var(--color-bg-secondary)] rounded-lg shadow-2xl border border-[var(--color-border-secondary)] py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
-                                                    left: buttonPosition.left + buttonPosition.width - 192,
+                                                    left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
                                                 }}
                                             >
                                                 <button
@@ -315,7 +341,7 @@ const DailyReport = () => {
                                                         handleExportToExcel();
                                                         setExportDropdown(false);
                                                     }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileSpreadsheet className="h-4 w-4 text-blue-600" />
                                                     Export to Excel
@@ -325,7 +351,7 @@ const DailyReport = () => {
                                                         handleExportToPDF();
                                                         setExportDropdown(false);
                                                     }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileDown className="h-4 w-4 text-red-600" />
                                                     Export to PDF
@@ -411,13 +437,14 @@ const DailyReport = () => {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-[var(--color-text-white)]" />
-                                    <input
-                                        type="date"
-                                        value={selectedDate}
-                                        onChange={(e) => setSelectedDate(e.target.value)}
-                                        className="px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
+                                <div className="flex items-center space-x-2">
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
+                                    <DatePicker
+                                        selected={selectedDate}
+                                        onChange={(date) => handleDateChange(date)}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="w-full bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
                                     />
                                 </div>
 
@@ -532,10 +559,12 @@ const DailyReport = () => {
                                         </thead>
                                         <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                             {filteredData.map((employee, index) => {
-                                                const statusInfo = getStatusInfo(employee);
                                                 const timeColorClass = getTimeColor(employee);
                                                 return (
-                                                    <tr key={index} className="hover:bg-[var(--color-bg-primary)] transition-colors">
+                                                    <tr
+                                                        key={index}
+                                                        className={`hover:bg-[var(--color-bg-hover)] transition-colors ${getRowStyling(employee.status)}`}
+                                                    >
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.sno}</td>
                                                         <td className="text-center py-4 px-4 text-sm font-medium text-[var(--color-text-primary)]">{employee.employee_name}</td>
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.shift_name}</td>
@@ -551,12 +580,7 @@ const DailyReport = () => {
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.shift_working_hours}h</td>
                                                         <td className="text-center py-4 px-4 text-sm text-[var(--color-text-primary)]">{employee.attandance_hours}h</td>
                                                         <td className="py-4 px-4">
-                                                            <div className="flex items-center justify-center">
-                                                                <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
-                                                                    <statusInfo.icon className="w-3 h-3 mr-1" />
-                                                                    {statusInfo.text}
-                                                                </div>
-                                                            </div>
+                                                            <StatusBadge status={employee.status} />
                                                         </td>
                                                         <td className="py-4 px-4 text-center">
                                                             <button
@@ -725,22 +749,6 @@ const DailyReport = () => {
                                             </div>
                                         </div>
                                     )}
-
-                                    {(() => {
-                                        const statusInfo = getStatusInfo(selectedEmployee);
-                                        const StatusIcon = statusInfo.icon;
-                                        return (
-                                            <div className={`rounded-lg p-4 ${statusInfo.color}`}>
-                                                <div className="flex items-center space-x-2">
-                                                    <StatusIcon className="w-5 h-5" />
-                                                    <div>
-                                                        <p className="text-sm">Status</p>
-                                                        <p className="font-medium">{statusInfo.text}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })()}
                                 </div>
                             </div>
                         </div>

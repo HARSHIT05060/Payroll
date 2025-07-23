@@ -1,204 +1,251 @@
-// excelExport.js
-import * as XLSX from 'xlsx';
+// utils/excelExportEnhanced.js
 
-export const exportToExcel = (reportData, filename, summaryStats = null) => {
-    try {
-        // Create a new workbook
-        const workbook = XLSX.utils.book_new();
-        
-        // Create summary sheet if stats are provided
-        if (summaryStats) {
-            const summaryData = [
-                ['Monthly Attendance Report Summary'],
-                ['Generated on:', `${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`],
-                [''],
-                ['Summary Statistics'],
-                ['Metric', 'Value'],
-                ['Total Days', summaryStats.totalDays],
-                ['Present Days', `${summaryStats.presentDays} (${summaryStats.attendancePercentage}%)`],
-                ['Absent Days', summaryStats.absentDays],
-                ['Late Days', summaryStats.lateDays],
-                ['Overtime Days', summaryStats.overtimeDays],
-                ['Total Working Hours', `${summaryStats.totalWorkingHours}h`],
-                ['Total Overtime Hours', `${summaryStats.totalOvertimeHours}h`],
-                ['Total Late Hours', `${summaryStats.totalLateHours}h`]
-            ];
-            
-            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-            
-            // Style the summary sheet
-            summarySheet['!cols'] = [
-                { width: 25 }, // Column A
-                { width: 30 }  // Column B
-            ];
-            
-            // Add summary sheet to workbook
-            XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
-        }
-        
-        // Create attendance details sheet
-        const attendanceHeaders = [
-            'S.No',
-            'Date',
-            'Employee Name',
-            'Shift Name',
-            'Shift From Time',
-            'Shift To Time',
-            'Clock In Time',
-            'Clock Out Time',
-            'Working Hours',
-            'Overtime Hours',
-            'Late Hours',
-            'Status'
-        ];
-        
-        // Prepare attendance data
-        const attendanceData = [
-            ['Attendance Details'],
-            [''],
-            attendanceHeaders
-        ];
-        
-        // Add data rows
-        reportData.forEach(record => {
-            attendanceData.push([
-                record.sno || '',
-                new Date(record.date).toLocaleDateString('en-GB'),
-                record.employee_name || '',
-                record.shift_name || '',
-                record.shift_from_time || '',
-                record.shift_to_time || '',
-                record.attandance_first_clock_in || 'N/A',
-                record.attandance_last_clock_out || 'N/A',
-                record.attandance_hours || '0',
-                record.overtime_hours || '0',
-                record.late_hours || '0',
-                record.status || 'N/A'
-            ]);
-        });
-        
-        const attendanceSheet = XLSX.utils.aoa_to_sheet(attendanceData);
-        
-        // Set column widths for attendance sheet
-        attendanceSheet['!cols'] = [
-            { width: 8 },  // S.No
-            { width: 12 }, // Date
-            { width: 20 }, // Employee Name
-            { width: 15 }, // Shift Name
-            { width: 15 }, // Shift From Time
-            { width: 15 }, // Shift To Time
-            { width: 15 }, // Clock In Time
-            { width: 15 }, // Clock Out Time
-            { width: 15 }, // Working Hours
-            { width: 15 }, // Overtime Hours
-            { width: 12 }, // Late Hours
-            { width: 12 }  // Status
-        ];
-        
-        // Style the header row (row 3, 0-indexed as row 2)
-        const headerRow = 2;
-        attendanceHeaders.forEach((header, colIndex) => {
-            const cellAddress = XLSX.utils.encode_cell({ r: headerRow, c: colIndex });
-            if (!attendanceSheet[cellAddress]) return;
-            
-            attendanceSheet[cellAddress].s = {
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: "428BCA" } },
-                alignment: { horizontal: "center" }
+// Group data by employee (enhanced version)
+export const groupDataByEmployee = (data) => {
+    const grouped = {};
+
+    data.forEach(record => {
+        const employeeKey = record.employee_code;
+        if (!grouped[employeeKey]) {
+            grouped[employeeKey] = {
+                employee_code: record.employee_code,
+                employee_name: record.employee_name,
+                shift_name: record.shift_name,
+                shift_from_time: record.shift_from_time,
+                shift_to_time: record.shift_to_time,
+                shift_working_hours: record.shift_working_hours,
+                records: []
             };
-        });
-        
-        // Style data rows with alternating colors and status-based coloring
-        for (let rowIndex = 0; rowIndex < reportData.length; rowIndex++) {
-            const dataRowIndex = headerRow + 1 + rowIndex;
-            const record = reportData[rowIndex];
-            
-            // Apply alternating row colors
-            const isEvenRow = rowIndex % 2 === 0;
-            const bgColor = isEvenRow ? "FFFFFF" : "F8F9FA";
-            
-            for (let colIndex = 0; colIndex < attendanceHeaders.length; colIndex++) {
-                const cellAddress = XLSX.utils.encode_cell({ r: dataRowIndex, c: colIndex });
-                if (!attendanceSheet[cellAddress]) continue;
-                
-                let cellStyle = {
-                    fill: { fgColor: { rgb: bgColor } },
-                    alignment: { horizontal: "center" }
-                };
-                
-                // Special styling for status column
-                if (colIndex === 11) { // Status column
-                    const status = record.status?.toLowerCase();
-                    if (status === 'present') {
-                        cellStyle.fill = { fgColor: { rgb: "D4F6DD" } };
-                        cellStyle.font = { color: { rgb: "16A34A" } };
-                    } else if (status === 'absent') {
-                        cellStyle.fill = { fgColor: { rgb: "FEE2E2" } };
-                        cellStyle.font = { color: { rgb: "DC2626" } };
-                    } else if (status === 'late') {
-                        cellStyle.fill = { fgColor: { rgb: "FEF9C3" } };
-                        cellStyle.font = { color: { rgb: "A16207" } };
-                    }
-                }
-                
-                attendanceSheet[cellAddress].s = cellStyle;
-            }
         }
-        
-        // Add attendance sheet to workbook
-        XLSX.utils.book_append_sheet(workbook, attendanceSheet, 'Attendance Details');
-        
-        // Create a detailed analysis sheet
-        const analysisData = [
-            ['Detailed Analysis'],
-            [''],
-            ['Daily Breakdown'],
-            ['Date', 'Status', 'Working Hours', 'Overtime Hours', 'Late Hours', 'Clock In', 'Clock Out']
-        ];
-        
-        reportData.forEach(record => {
-            analysisData.push([
-                new Date(record.date).toLocaleDateString('en-GB'),
-                record.status || 'N/A',
-                record.attandance_hours || '0',
-                record.overtime_hours || '0',
-                record.late_hours || '0',
-                record.attandance_first_clock_in || 'N/A',
-                record.attandance_last_clock_out || 'N/A'
-            ]);
-        });
-        
-        // Add monthly totals
-        if (summaryStats) {
-            analysisData.push(['']);
-            analysisData.push(['Monthly Totals']);
-            analysisData.push(['Total Working Hours', summaryStats.totalWorkingHours]);
-            analysisData.push(['Total Overtime Hours', summaryStats.totalOvertimeHours]);
-            analysisData.push(['Total Late Hours', summaryStats.totalLateHours]);
-            analysisData.push(['Attendance Percentage', `${summaryStats.attendancePercentage}%`]);
-        }
-        
-        const analysisSheet = XLSX.utils.aoa_to_sheet(analysisData);
-        
-        // Set column widths for analysis sheet
-        analysisSheet['!cols'] = [
-            { width: 15 }, // Date
-            { width: 12 }, // Status
-            { width: 15 }, // Working Hours
-            { width: 15 }, // Overtime Hours
-            { width: 12 }, // Late Hours
-            { width: 12 }, // Clock In
-            { width: 12 }  // Clock Out
-        ];
-        
-        // Add analysis sheet to workbook
-        XLSX.utils.book_append_sheet(workbook, analysisSheet, 'Analysis');
-        
-        // Write the workbook to a file
-        XLSX.writeFile(workbook, filename);
-        
-    } catch (error) {
-        console.error('Error generating Excel:', error);
-        alert('Error generating Excel report. Please try again.');
+        grouped[employeeKey].records.push(record);
+    });
+
+    // Calculate summary for each employee
+    Object.keys(grouped).forEach(employeeKey => {
+        const employeeData = grouped[employeeKey];
+        const records = employeeData.records;
+
+        employeeData.summary = {
+            totalDays: records.length,
+            workingDays: records.filter(r => r.shift_status === 'Working Day').length,
+            presentDays: records.filter(r => r.status === 'Present').length,
+            absentDays: records.filter(r => r.status === 'Absent').length,
+            weekOffDays: records.filter(r => r.status === 'Week Off').length,
+            totalHours: records.reduce((sum, r) => sum + parseFloat(r.attandance_hours || 0), 0).toFixed(2),
+            totalOvertimeHours: records.reduce((sum, r) => sum + parseFloat(r.overtime_hours || 0), 0).toFixed(2),
+            totalLateHours: records.reduce((sum, r) => sum + parseFloat(r.late_hours || 0), 0).toFixed(2),
+            attendancePercentage: records.length > 0 ?
+                ((records.filter(r => r.status === 'Present').length / records.filter(r => r.status !== 'Week Off').length) * 100).toFixed(1) : 0
+        };
+    });
+
+    return grouped;
+};
+
+// Calculate summary statistics (enhanced version)
+export const calculateSummary = (data) => {
+    const totalRecords = data.length;
+    const uniqueEmployees = new Set(data.map(r => r.employee_code)).size;
+    const workingDays = data.filter(r => r.shift_status === 'Working Day').length;
+    const presentCount = data.filter(r => r.status === 'Present').length;
+    const absentCount = data.filter(r => r.status === 'Absent').length;
+    const weekOffCount = data.filter(r => r.status === 'Week Off').length;
+    const lateCount = data.filter(r => parseFloat(r.late_hours || 0) > 0).length;
+    const overtimeCount = data.filter(r => parseFloat(r.overtime_hours || 0) > 0).length;
+    const totalHours = data.reduce((sum, r) => sum + parseFloat(r.attandance_hours || 0), 0);
+    const totalOvertimeHours = data.reduce((sum, r) => sum + parseFloat(r.overtime_hours || 0), 0);
+    const totalLateHours = data.reduce((sum, r) => sum + parseFloat(r.late_hours || 0), 0);
+
+    return {
+        totalRecords,
+        uniqueEmployees,
+        workingDays,
+        presentCount,
+        absentCount,
+        weekOffCount,
+        lateCount,
+        overtimeCount,
+        totalHours: totalHours.toFixed(2),
+        totalOvertimeHours: totalOvertimeHours.toFixed(2),
+        totalLateHours: totalLateHours.toFixed(2)
+    };
+};
+
+// Format date helper function
+export const formatDate = (dateInput) => {
+    const date = new Date(dateInput);
+
+    if (Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
+        return 'Invalid Date';
     }
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+};
+
+// Enhanced Export to Excel function with options
+export const exportToExcel = (attendanceData, startDate, endDate, filename = 'attendance_report', options = {}) => {
+    if (!attendanceData || attendanceData.length === 0) {
+        console.error('No data to export');
+        return;
+    }
+
+    // Default options
+    const defaultOptions = {
+        showTitle: true,
+        showSummary: true,
+        showEmployeeDetails: true,
+        reportTitle: 'Employee Attendance Report'
+    };
+    
+    const finalOptions = { ...defaultOptions, ...options };
+
+    const groupedData = groupDataByEmployee(attendanceData);
+    const reportSummary = calculateSummary(attendanceData);
+
+    // Prepare data for Excel export
+    const excelData = [];
+
+    // Add report header if enabled
+    if (finalOptions.showTitle) {
+        excelData.push(['', '', 
+            finalOptions.reportTitle, '', '', ''
+        ]);
+        excelData.push([
+            '',
+            `Period: ${formatDate(startDate)} to ${formatDate(endDate)}`,'',
+            `Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`,
+        ]);
+    }
+
+    // Add empty row
+    excelData.push(['']);
+
+    // Add summary statistics if enabled
+    if (finalOptions.showSummary) {
+        excelData.push(['Summary Statistics', '', '', '', '', '', '', '']);
+        excelData.push(['Present Days', reportSummary.presentCount, '', 'Absent Days', reportSummary.absentCount, '', 'Week Off Days', reportSummary.weekOffCount]);
+        excelData.push(['Working Days', reportSummary.workingDays, '', 'Late Days', reportSummary.lateCount, '', 'Overtime Days', reportSummary.overtimeCount]);
+        excelData.push(['Total Hours', reportSummary.totalHours, '', 'Overtime Hours', reportSummary.totalOvertimeHours, '', 'Late Hours', reportSummary.totalLateHours]);
+    }
+
+    // Add empty row
+    excelData.push(['']);
+    excelData.push(['']);
+
+    // Add detailed attendance data for each employee if enabled
+    if (finalOptions.showEmployeeDetails) {
+        Object.entries(groupedData).forEach(([, employeeData]) => {
+            // Employee header
+            excelData.push([
+                `Employee: ${employeeData.employee_name} (${employeeData.employee_code})`,
+                `Shift: ${employeeData.shift_name}`,
+                `Time: ${employeeData.shift_from_time} - ${employeeData.shift_to_time}`,
+                `Attendance: ${employeeData.summary.attendancePercentage}%`,
+                `Present: ${employeeData.summary.presentDays}`,
+                `Working Days: ${employeeData.summary.workingDays}`,
+                `Hours: ${employeeData.summary.totalHours}`,
+                `Overtime: ${employeeData.summary.totalOvertimeHours}`
+            ]);
+
+            // Attendance table headers
+            excelData.push([
+                'Date',
+                'Status',
+                'Clock In',
+                'Clock Out',
+                'Working Hours',
+                'Overtime Hours',
+                'Late Hours',
+                'Remarks'
+            ]);
+
+            // Employee attendance records
+            employeeData.records.forEach(record => {
+                excelData.push([
+                    formatDate(record.date),
+                    record.status || 'N/A',
+                    record.attandance_first_clock_in || '-',
+                    record.attandance_last_clock_out || '-',
+                    record.attandance_hours || '0',
+                    record.overtime_hours || '0',
+                    record.late_hours || '0',
+                    record.remarks || '-'
+                ]);
+            });
+
+            // Add empty row between employees
+            excelData.push(['']);
+            excelData.push(['']);
+        });
+    }
+
+    // Convert to HTML table format
+    const tableHTML = `
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+            <tbody>
+                ${excelData.map((row, rowIndex) => `
+                    <tr>
+                        ${row.map((cell, cellIndex) => {
+                            // Style for headers and important rows
+                            let cellStyle = "border: 1px solid #ccc; padding: 8px; text-align: center;";
+
+                            // Report title row
+                            if (rowIndex === 0 && cellIndex === 2) {
+                                cellStyle += " background-color: #2563eb; color: white; font-weight: bold; font-size: 25px; text-align: center;";
+                            }
+                            // Summary statistics header
+                            else if (cell === 'Summary Statistics') {
+                                cellStyle += " background-color: #f8fafc; font-weight: bold; color: #2563eb; text-align: center; font-size: 20px;";
+                            }
+                            // Employee header rows
+                            else if (typeof cell === 'string' && cell.startsWith('Employee:')) {
+                                cellStyle += " background-color: #f8fafc; font-weight: bold; color: #2563eb; text-align: center; font-size: 20px;";
+                            }
+                            // Table headers (Date, Status, etc.)
+                            else if (cell === 'Date' || cell === 'Status' || cell === 'Clock In' || cell === 'Clock Out' ||
+                                cell === 'Working Hours' || cell === 'Overtime Hours' || cell === 'Late Hours' || cell === 'Remarks') {
+                                cellStyle += " background-color: #2563eb; color: white; font-weight: bold; text-align: center;";
+                            }
+                            // Summary row labels
+                            else if (cell === 'Present Days' || cell === 'Absent Days' || cell === 'Week Off Days' || 
+                                cell === 'Working Days' || cell === 'Late Days' || cell === 'Overtime Days' ||
+                                cell === 'Total Hours' || cell === 'Overtime Hours' || cell === 'Late Hours') {
+                                cellStyle += " background-color: #e2e8f0; font-weight: bold; text-align: center;";
+                            }
+                            // Status column styling
+                            else if (rowIndex > 0 && excelData[rowIndex - 1] && excelData[rowIndex - 1][1] === 'Status' && cellIndex === 1) {
+                                if (cell === 'Present') {
+                                    cellStyle += " background-color: #dcfce7; color: #166534; font-weight: bold; text-align: center;";
+                                } else if (cell === 'Absent') {
+                                    cellStyle += " background-color: #fef2f2; color: #dc2626; font-weight: bold; text-align: center;";
+                                } else if (cell === 'Week Off') {
+                                    cellStyle += " background-color: #dbeafe; color: #2563eb; font-weight: bold; text-align: center;";
+                                }
+                            }
+
+                            return `<td style="${cellStyle}">${cell}</td>`;
+                        }).join('')}
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+
+    // Create and download file
+    const blob = new Blob([tableHTML], {
+        type: 'application/vnd.ms-excel;charset=utf-8;'
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.xls`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 };

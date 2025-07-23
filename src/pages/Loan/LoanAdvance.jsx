@@ -374,7 +374,7 @@ const LoanAdvance = () => {
     const renderLoanTypeBadge = useCallback((loanType) => {
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${loanType === 'Loan'
-                ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
+                ? 'bg-[var(--color-blue-lighter)] text-[var(--color-twxt-white)]'
                 : 'bg-green-100 text-green-800'
                 }`}>
                 {loanType || 'N/A'}

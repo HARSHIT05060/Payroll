@@ -185,8 +185,9 @@ const EmployeeDetail = () => {
     };
 
     // Handle image preview
+    // Handle image preview
     const handleImagePreview = (imageSrc, title) => {
-        setCurrentImage({ src: imageSrc, title });
+        setCurrentImage({ src: baseUrl + imageSrc, title });
         setShowImageModal(true);
     };
 
@@ -360,8 +361,8 @@ const EmployeeDetail = () => {
                             {/* Profile Header */}
                             <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6 relative">
                                 <div className="text-center">
-                                    <div 
-                                      className={`relative h-40 w-40 mx-auto mb-4 rounded-full border-4 flex items-center justify-center ${employee?.status == "1" ? "border-[var(--color-success)]" : "border-[var(--color-error)]"}`}
+                                    <div
+                                        className={`relative h-40 w-40 mx-auto mb-4 rounded-full border-4 flex items-center justify-center ${employee?.status == "1" ? "border-[var(--color-success)]" : "border-[var(--color-error)]"}`}
                                     >
                                         {employee?.passport_img ? (
                                             <img
@@ -381,7 +382,7 @@ const EmployeeDetail = () => {
                                     <h2 className="text-xl font-bold text-[var(--color-text-white)] mb-1">
                                         {getField('full_name')}
                                     </h2>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm">
+                                    <p className="text-[var(--color-text-white)] text-sm">
                                         Employee ID: {getField('employee_code')}
                                     </p>
                                 </div>
@@ -424,7 +425,7 @@ const EmployeeDetail = () => {
                                         >
                                             <Pencil size={18} className="mr-2" />
                                             Edit
-                                        </button>   
+                                        </button>
                                     }
                                     {permissions['employee_delete'] &&
                                         <button
@@ -575,7 +576,7 @@ const EmployeeDetail = () => {
                             {expandedSections.legal && (
                                 <div className="border-t border-[var(--color-border-primary)] p-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {[{ key: 'aadharcard_img', label: 'Aadhar Card' }, { key: 'pan_img', label: 'PAN Card' }, { key: 'dl_img', label: 'Driving License' }, { key: 'passport_img', label: 'Passport' }].map((doc) => (
+                                        {[{ key: 'aadharcard_img', label: 'Aadhar Card' }, { key: 'pan_img', label: 'PAN Card' }, { key: 'passport_img', label: 'Profile Photo' },{ key: 'dl_img', label: 'Driving License' }].map((doc) => (
                                             <div key={doc.key} className="border border-[var(--color-border-primary)] rounded-lg p-4">
                                                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">{doc.label}</label>
                                                 {getField(doc.key) ? (
@@ -707,7 +708,8 @@ const EmployeeDetail = () => {
                             />
                             <div className="hidden flex-col items-center justify-center text-[var(--color-text-secondary)] p-8">
                                 <AlertCircle size={48} className="mb-4" />
-                                <p>Unable to load image</p>
+                                <p>Document could not be loaded</p>
+                                <p className="text-sm mt-2">No document uploaded</p>
                             </div>
                         </div>
                     </div>

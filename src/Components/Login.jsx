@@ -11,7 +11,6 @@ const Login = () => {
     const { login } = useAuth();
     const [number, setNumber] = useState("8529637411");
     const [password, setPassword] = useState("Test@123");
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -47,6 +46,8 @@ const Login = () => {
                     number: user_data.number,
                     type: user_data.type,
                     user_roles_id: user_data.user_role_id,
+                    subscriptions_status: user_data.subscriptions_status,
+                    subscriptions_days: user_data.subscriptions_days,
                 };
                 login(userData);
                 const formData = new FormData();
@@ -129,10 +130,9 @@ const Login = () => {
             </div>
             {/* Decorative Circles */}
             <svg className="absolute bottom-0 right-0 z-0 hidden md:block" width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="350" cy="350" r="80" stroke="white" dark:stroke-gray-700 strokeWidth="2" fill="none" />
-                <circle cx="350" cy="350" r="120" stroke="white" dark:stroke-gray-700 strokeWidth="1" fill="none" />
+                <circle cx="350" cy="350" r="80" stroke="white" stroke-gray-700 strokeWidth="2" fill="none" />
+                <circle cx="350" cy="350" r="120" stroke="white" stroke-gray-700 strokeWidth="1" fill="none" />
             </svg>
-       
         </div>
     );
 };

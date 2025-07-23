@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Edit, UserPlus, RefreshCw, Save, User, Phone, Mail, Lock, Shield, ChevronDown, AlertCircle, X } from 'lucide-react';
+import { ArrowLeft, Edit, UserPlus, RefreshCw, Save, User, Phone, Mail, Lock, Shield, ChevronDown, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
@@ -31,10 +31,51 @@ const AddUser = () => {
     const [userDataLoading, setUserDataLoading] = useState(false);
     const [toast, setToast] = useState(null);
     const [errors, setErrors] = useState({});
-
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const submitInProgressRef = useRef(false);
+
+    // Validation functions
+    const validateName = (name) => {
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!name.trim()) return 'Full name is required';
+        if (!nameRegex.test(name.trim())) return 'Name should only contain letters and spaces';
+        if (name.trim().length < 2) return 'Name should be at least 2 characters long';
+        if (name.trim().length > 50) return 'Name should not exceed 50 characters';
+        return '';
+    };
+
+    const validateMobile = (mobile) => {
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobile.trim()) return 'Phone number is required';
+        if (!/^\d+$/.test(mobile.trim())) return 'Phone number should only contain numbers';
+        if (!mobileRegex.test(mobile.trim())) return 'Phone number should be 10 digits starting with 6-9';
+        return '';
+    };
+
+    const validateEmail = (email) => {
+        if (!email.trim()) return 'Email is required';
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email.trim())) return 'Please enter a valid email address';
+        if (email.trim().length > 100) return 'Email should not exceed 100 characters';
+        return '';
+    };
+
+    const validatePassword = (password) => {
+        if (!isEditing && !password.trim()) return 'Password is required';
+        if (password.trim() && password.trim().length < 6) return 'Password must be at least 6 characters long';
+        if (password.trim() && password.trim().length > 50) return 'Password should not exceed 50 characters';
+        if (password.trim() && !/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
+        if (password.trim() && !/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
+        if (password.trim() && !/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+        return '';
+    };
+
+    const validateRole = (roleId) => {
+        if (!roleId) return 'Please select a role';
+        return '';
+    };
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -142,7 +183,7 @@ const AddUser = () => {
         }
     }, [user?.user_id, isEditing, editUserId, rolesLoading]);
 
-    // Handle form input changes
+    // Handle form input changes with real-time validation
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -150,61 +191,73 @@ const AddUser = () => {
             [name]: value
         }));
 
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
+        // Real-time validation
+        let error = '';
+        switch (name) {
+            case 'full_name':
+                error = validateName(value);
+                break;
+            case 'number':
+                error = validateMobile(value);
+                break;
+            case 'email':
+                error = validateEmail(value);
+                break;
+            case 'password':
+                error = validatePassword(value);
+                break;
+            case 'user_roles_id':
+                error = validateRole(value);
+                break;
+            default:
+                break;
         }
+
+        setErrors(prev => ({
+            ...prev,
+            [name]: error
+        }));
+    };
+
+    // Toggle password visibility
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     // Validate form
     const validateForm = (e) => {
         e.preventDefault(); // ✅ prevents default form submission
+
         // ✅ PREVENT double click before validation completes
         if (submitInProgressRef.current) return;
+
         const newErrors = {};
+
         if (!user?.user_id) {
-            newErrors.user_id = ('User not authenticated');
+            newErrors.user_id = 'User not authenticated';
         }
 
-        if (!formData.full_name.trim()) {
-            newErrors.full_name = 'Full name is required';
-        }
+        // Validate all fields
+        newErrors.full_name = validateName(formData.full_name);
+        newErrors.number = validateMobile(formData.number);
+        newErrors.email = validateEmail(formData.email);
+        newErrors.password = validatePassword(formData.password);
+        newErrors.user_roles_id = validateRole(formData.user_roles_id);
 
-        if (!formData.number.trim()) {
-            newErrors.number = 'Phone number is required';
+        // Remove empty errors
+        Object.keys(newErrors).forEach(key => {
+            if (!newErrors[key]) {
+                delete newErrors[key];
+            }
+        });
 
-        } else if (!/^\d{10}$/.test(formData.number.trim())) {
-            newErrors.number = 'Phone number must be 10 digits';
-        }
-
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-            newErrors.email = 'Please enter a valid email address';
-        }
-
-        const trimmedPassword = formData.password.trim();
-        if (!isEditing && !trimmedPassword) {
-            newErrors.password = 'Password is required';
-        } else if (trimmedPassword && trimmedPassword.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        }
-
-        if (!formData.user_roles_id) {
-            newErrors.user_roles_id = 'Please select a role';
-        }
-        console.log('Form is valid, submitting...');
+        console.log('Validation errors:', newErrors);
         setErrors(newErrors);
-        console.log(errors, 'Form is valid, submitting...');
 
         if (Object.keys(newErrors).length === 0) {
+            console.log('Form is valid, submitting...');
             handleSubmit(); // Let handleSubmit decide when to set the flag
         }
-
-
     };
 
     // Handle form submission
@@ -216,8 +269,6 @@ const AddUser = () => {
         setLoading(true);
 
         try {
-            setLoading(true);
-
             const submitFormData = new FormData();
             submitFormData.append('user_id', String(user.user_id));
             submitFormData.append('user_roles_id', String(formData.user_roles_id));
@@ -257,7 +308,6 @@ const AddUser = () => {
                 submitInProgressRef.current = false;
                 setLoading(false);
             }, 1500);
-
         }
     };
 
@@ -302,13 +352,13 @@ const AddUser = () => {
                                                 {isEditing ? 'Edit User' : 'Create New User'}
                                             </h2>
                                             {userDataLoading && (
-                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1 flex items-center">
+                                                <p className="text-[var(--color-text-white)] text-sm mt-1 flex items-center">
                                                     <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                                                     Loading user data...
                                                 </p>
                                             )}
                                             {!userDataLoading && (
-                                                <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
+                                                <p className="text-[var(--color-text-white)] text-sm mt-1">
                                                     {isEditing ? 'Update user details below' : 'Fill in the user details below'}
                                                 </p>
                                             )}
@@ -343,8 +393,9 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.full_name ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
-                                        placeholder="Enter your full name"
+                                        placeholder="Enter full name (letters and spaces only)"
                                         disabled={isFormDisabled}
+                                        maxLength={50}
                                     />
                                     <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
@@ -371,8 +422,9 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.number ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
-                                        placeholder="Enter 10-digit phone number"
+                                        placeholder="Enter 10-digit phone number (6-9 starting)"
                                         disabled={isFormDisabled}
+                                        maxLength={10}
                                     />
                                     <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
@@ -399,8 +451,9 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.email ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
-                                        placeholder="Enter your email address"
+                                        placeholder="Enter valid email address"
                                         disabled={isFormDisabled}
+                                        maxLength={100}
                                     />
                                     <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                                 </div>
@@ -416,22 +469,31 @@ const AddUser = () => {
                             <div className="space-y-2">
                                 <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                                     <Lock className="w-4 h-4 text-[var(--color-blue-dark)]" />
-                                    Password {!isEditing && <span className="text-[var(--color-error)]">*</span>}
-                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs ml-2 bg-[var(--color-bg-gradient-start)] px-2 py-1 rounded-full">(Leave blank to keep current password)</span>}
+                                    Password  <span className="text-[var(--color-error)]">*</span>
+                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs bg-[var(--color-bg-gradient-start)] py-1 rounded-full">(Do not Leave blank)</span>}
                                 </label>
                                 <div className="relative">
                                     <input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         id="password"
                                         name="password"
                                         value={formData.password}
                                         onChange={handleInputChange}
-                                        className={`w-full px-4 py-3 pl-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
+                                        className={`w-full px-4 py-3 pl-12 pr-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
-                                        placeholder={isEditing ? "Enter new password (optional)" : "Enter your password"}
+                                        placeholder={isEditing ? "Enter new password" : "Enter strong password"}
                                         disabled={isFormDisabled}
+                                        maxLength={50}
                                     />
                                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+                                    <button
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-blue-dark)] transition-colors"
+                                        disabled={isFormDisabled}
+                                    >
+                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
                                 </div>
                                 {errors.password && (
                                     <p className="mt-2 text-sm text-[var(--color-text-error)] flex items-center gap-2">
@@ -439,6 +501,9 @@ const AddUser = () => {
                                         {errors.password}
                                     </p>
                                 )}
+                                    <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                                        Password must contain: uppercase letter, lowercase letter, number, and be at least 6 characters long
+                                    </p>
                             </div>
 
                             {/* Role Selection */}

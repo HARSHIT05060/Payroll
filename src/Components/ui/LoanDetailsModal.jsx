@@ -38,7 +38,7 @@ export const LoanDetailsModal = ({ isOpen, onClose, loanDetails, loading }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 custom-scrollbar">
             <div className="bg-[var(--color-border-primary)] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
                 {/* Modal Header */}
                 <div className="px-6 py-4 border-b border-[var(--color-border-primary)] flex justify-between items-center">
@@ -74,13 +74,13 @@ export const LoanDetailsModal = ({ isOpen, onClose, loanDetails, loading }) => {
                                     <h3 className="text-sm font-medium text-[var(--color-success-dark)]">Paid Installments</h3>
                                     <p className="text-2xl font-bold text-[var(--color-success-dark)]">{getPaidInstallments()}</p>
                                 </div>
-                                <div className="bg-yellow-50 p-4 rounded-lg">
-                                    <h3 className="text-sm font-medium text-yellow-600">Pending Installments</h3>
-                                    <p className="text-2xl font-bold text-yellow-900">{getPendingInstallments()}</p>
+                                <div className="bg-[var(--color-blue-lightest)] p-4 rounded-lg">
+                                    <h3 className="text-sm font-medium text-[var(--color-blue-dark)]">Pending Installments</h3>
+                                    <p className="text-2xl font-bold text-[var(--color-blue-darkest)]">{getPendingInstallments()}</p>
                                 </div>
-                                <div className="bg-purple-50 p-4 rounded-lg">
+                                <div className="bg-[var(--color-blue-lightest)] p-4 rounded-lg">
                                     <h3 className="text-sm font-medium text-[var(--color-blue-dark)]">Total Amount</h3>
-                                    <p className="text-2xl font-bold text-purple-900">
+                                    <p className="text-2xl font-bold text-[var(--color-blue-darkest)]">
                                         ₹{calculateTotalAmount().toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                     </p>
                                 </div>
@@ -140,16 +140,6 @@ export const LoanDetailsModal = ({ isOpen, onClose, loanDetails, loading }) => {
                             <p className="text-[var(--color-text-secondary)]">There are no installment records for this loan.</p>
                         </div>
                     )}
-                </div>
-
-                {/* Modal Footer */}
-                <div className="px-6 py-4 border-t border-[var(--color-border-primary)] flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md transition-colors"
-                    >
-                        Close
-                    </button>
                 </div>
             </div>
         </div>

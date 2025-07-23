@@ -67,7 +67,7 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
 
             {isOpen && isSourceConfigured && (
                 <div className="absolute right-0 mt-2 w-64 bg-[var(--color-bg-secondary)] rounded-xl shadow-xl border border-[var(--color-border-primary)] z-50 overflow-hidden">
-                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-[var(--color-border-primary)]">
+                    <div className="p-3 bg-gradient-to-r from-[var(--color-blue-light)] to-[var(--color-indigo-light)] border-b border-[var(--color-border-primary)]">
                         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Copy Configuration</h3>
                         <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                             From: {sourceConfig.from_time} - {sourceConfig.to_time}
@@ -79,8 +79,8 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
                             onClick={handleCopyToAll}
                             className="w-full px-4 py-3 text-left text-sm font-medium text-[var(--color-blue-darker)] hover:bg-[var(--color-blue-lightest)] transition-colors flex items-center gap-3"
                         >
-                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-lg flex items-center justify-center">
-                                <Copy className="w-4 h-4 text-[var(--color-blue-dark)]" />
+                            <div className="w-8 h-8 bg-[var(--color-blue)] rounded-lg flex items-center justify-center">
+                                <Copy className="w-4 h-4 text-[var(--color-text-white)]" />
                             </div>
                             <div>
                                 <div className="font-medium">Copy to All Days</div>
@@ -639,7 +639,7 @@ const CreateShift = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Shift Configuration' : 'Create New Shift'}
                                     </h1>
-                                    <p className="text-[var(--color-blue-lighter)] text-sm mt-1">
+                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
                                         {isEditMode ? 'Update shift details below' : 'Fill in the shift details below'}
                                     </p>
                                 </div>
@@ -892,12 +892,10 @@ const CreateShift = () => {
                                     <button
                                         type="button"
                                         onClick={() => navigate('/shift-management')}
-                                        className="px-6 py-3 text-[var(--color-text-secondary)] bg-slate-100 border border-slate-300 rounded-xl hover:bg-slate-200 hover:border-slate-400 transition-all duration-200 font-medium"
+                                        disabled={submitting}
+                                        className="px-6 py-3 border border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-primary)] transition-colors font-medium"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <X className="w-4 h-4" />
-                                            Cancel
-                                        </div>
+                                        Cancel
                                     </button>
 
                                     <button

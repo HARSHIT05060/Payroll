@@ -1,24 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Pagination from '../Pagination';
-import { Toast } from '../ui/Toast';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axiosInstance';
 import {
-    Users,
-    Clock,
-    Calendar,
-    UserX,
-    Coffee,
-    CheckCircle,
-    Timer,
-    Activity,
-    ArrowLeft,
-    XCircle,
-    ChevronDown,
-    ChevronUp,
-    Search,
-    TrendingUp,
+    Users, CheckCircle, UserX, Coffee, TrendingUp, Calendar,
+    Activity, Search, XCircle, ChevronDown, ChevronUp, Clock, Timer
 } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useDashboardData } from '../../context/DashboardContext';
+import { StatusBadge } from '../../Components/Report/ReportComponents';
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -44,9 +33,7 @@ const KEY_MAPPING = {
 };
 
 const AttendanceReport = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [attendanceData, setAttendanceData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [hoveredSegment, setHoveredSegment] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -54,59 +41,30 @@ const AttendanceReport = () => {
         key: null,
         direction: SORT_DIRECTIONS.ASCENDING
     });
-
-    // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
-    // Toast state
-    const [toast, setToast] = useState(null);
+    const { dashboardData, loading } = useDashboardData();
 
-    const { user } = useAuth();
-
-    // Toast helper function
-    const showToast = (message, type = 'info') => {
-        setToast({ message, type });
-    };
-
-    const closeToast = () => {
-        setToast(null);
-    };
-
-    // Fetch daily attendance report
-    const fetchDailyReport = useCallback(async (date) => {
-        if (!user?.user_id) return;
-
-        setLoading(true);
-
-        try {
-            const formData = new FormData();
-            formData.append('user_id', user.user_id);
-            formData.append('date', date);
-
-            const response = await api.post('daily_attendance_report_list', formData);
-
-            if (response.data?.success && response.data.data) {
-                setAttendanceData(response.data.data);
-                setCurrentPage(1);
-            } else {
-                throw new Error(response.data?.message || 'Failed to fetch daily report');
-            }
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'An error occurred while fetching the report';
-            showToast(errorMessage, 'error');
-            console.error('Error fetching attendance data:', err);
-        } finally {
-            setLoading(false);
+    // Extract attendance details from dashboardData
+    const attendanceData = useMemo(() => {
+        if (!dashboardData || !dashboardData.attendance_details) {
+            return [];
         }
-    }, [user?.user_id]);
+        return dashboardData.attendance_details || [];
+    }, [dashboardData]);
 
-    useEffect(() => {
-        fetchDailyReport(selectedDate);
-    }, [selectedDate, fetchDailyReport]);
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        setCurrentPage(1);
+        setSearchQuery('');
+        setStatusFilter('all');
+    };
 
     // Client-side filtering and sorting
     const filteredAndSortedData = useMemo(() => {
+        if (!Array.isArray(attendanceData)) return [];
+
         let filtered = [...attendanceData];
 
         // Apply search filter
@@ -175,7 +133,7 @@ const AttendanceReport = () => {
         });
     }, []);
 
-    // Calculate statistics from attendance data
+    // Calculate statistics from attendance data based on status_id
     const calculateStats = () => {
         if (!attendanceData || attendanceData.length === 0) {
             return {
@@ -202,23 +160,21 @@ const AttendanceReport = () => {
         };
 
         attendanceData.forEach(employee => {
-            // Present employees
-            if (employee.status === 'Present') {
+            const statusId = employee.status_id;
+
+            // Count based on status_id: 1 = Present, 2 = Absent, 3 = Week Off
+            if (statusId === '1' || statusId === 1) {
                 stats.present++;
-            }
-            // Week off employees
-            else if (employee.status === 'Week Off') {
-                stats.weekOff++;
-            }
-            // Absent employees (not present and not week off)
-            else if (employee.status !== 'Present' && employee.status !== 'Week Off') {
+            } else if (statusId === '2' || statusId === 2) {
                 stats.absent++;
+            } else if (statusId === '3' || statusId === 3) {
+                stats.weekOff++;
             }
 
             // Late employees (have late hours > 0)
             if (parseFloat(employee.late_hours || 0) > 0) {
                 stats.late++;
-            } else if (employee.status === 'Present') {
+            } else if (statusId === '1' || statusId === 1) {
                 stats.onTime++;
             }
 
@@ -236,31 +192,23 @@ const AttendanceReport = () => {
 
     const stats = calculateStats();
 
-    // Get attendance status color for table
-    const getAttendanceColor = (status) => {
-        switch (status) {
-            case 'Present':
-                return 'bg-[var(--color-success)]';
-            case 'Absent':
-                return 'bg-[var(--color-error)]';
-            case 'Week Off':
-                return 'bg-[var(--color-warning)]';
-            default:
-                return 'bg-[var(--color-text-muted)]';
-        }
-    };
+    const getRowStyling = (status) => {
+        const statusLower = status?.toLowerCase() || '';
 
-    // Get status badge styling
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'Present':
-                return 'bg-[var(--color-success-light)] text-[var(--color-success-dark)] border-[var(--color-success-lighter)]';
-            case 'Absent':
-                return 'bg-[var(--color-error-light)] text-[var(--color-error-dark)] border-[var(--color-error-lighter)]';
-            case 'Week Off':
-                return 'bg-[var(--color-warning-light)] text-[var(--color-warning-dark)] border-[var(--color-warning-lighter)]';
+        switch (statusLower) {
+            case 'week off':
+            case 'weekoff':
+                return 'bg-[var(--color-blue-lightest)] border-[var(--color-blue-light)]';
+            case 'holiday':
+                return 'bg-[var(--color-warning-light)] border-[var(--color-warning)]';
+            case 'absent':
+                return 'bg-[var(--color-error-light)] border-[var(--color-error)]';
+            case 'leave':
+                return 'bg-[var(--color-yellow-light)] border-[var(--color-yellow-dark)]';
+            case 'half day':
+                return 'bg-[var(--color-blue-lighter)] border-[var(--color-blue-dark)]';
             default:
-                return 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-primary)] border-[var(--color-border-secondary)]';
+                return '';
         }
     };
 
@@ -303,14 +251,6 @@ const AttendanceReport = () => {
         setSearchQuery('');
         setStatusFilter('all');
         setCurrentPage(1);
-    };
-
-    // Handle date change
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-        setCurrentPage(1);
-        setSearchQuery('');
-        setStatusFilter('all');
     };
 
     // Status filter options
@@ -527,11 +467,12 @@ const AttendanceReport = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                             <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={(e) => handleDateChange(e.target.value)}
-                                className="bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
+                            <DatePicker
+                                selected={selectedDate}
+                                onChange={(date) => handleDateChange(date)}
+                                dateFormat="dd-MM-yyyy"
+                                placeholderText="DD-MM-YYYY"
+                                className="w-full bg-[var(--color-bg-secondary-20)] border border-[var(--color-bg-secondary-30)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)]"
                             />
                         </div>
                     </div>
@@ -624,9 +565,7 @@ const AttendanceReport = () => {
                             >
                                 <div className="w-4 h-4 bg-[var(--color-success)] rounded-full shadow-sm"></div>
                                 <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">AT WORK</span>
-                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
-                                    {stats.present}
-                                </span>
+                                <span className="text-sm text-[var(--color-text-primary)] font-bold">{stats.present}</span>
                             </div>
                             <div
                                 className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-error-light)]"
@@ -635,9 +574,7 @@ const AttendanceReport = () => {
                             >
                                 <div className="w-4 h-4 bg-[var(--color-error)] rounded-full shadow-sm"></div>
                                 <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">ABSENT</span>
-                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
-                                    {stats.absent}
-                                </span>
+                                <span className="text-sm text-[var(--color-text-primary)] font-bold">{stats.absent}</span>
                             </div>
                             <div
                                 className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-warning-light)]"
@@ -646,9 +583,7 @@ const AttendanceReport = () => {
                             >
                                 <div className="w-4 h-4 bg-[var(--color-warning)] rounded-full shadow-sm"></div>
                                 <span className="text-sm text-[var(--color-text-secondary)] font-medium flex-1">WEEK OFF</span>
-                                <span className="text-sm text-[var(--color-text-muted)] font-semibold bg-[var(--color-bg-gray-light)] px-2 py-1 rounded">
-                                    {stats.weekOff}
-                                </span>
+                                <span className="text-sm text-[var(--color-text-primary)] font-bold">{stats.weekOff}</span>
                             </div>
                         </div>
                     </div>
@@ -658,130 +593,143 @@ const AttendanceReport = () => {
                 <div className="lg:col-span-2">
                     <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm overflow-hidden">
                         {/* Table Header */}
-                        <div className="px-6 py-4 border-b border-[var(--color-border-divider)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center">
-                                    <Activity className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
-                                    <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                        Employee Attendance Details
-                                    </h3>
-                                </div>
-                                <div className="flex items-center gap-3">
+                        <div className="bg-[var(--color-bg-gray-light)] px-6 py-4 border-b border-[var(--color-border-secondary)]">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Employee Attendance</h3>
+
+                                {/* Search and Filters */}
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    {/* Search Input */}
                                     <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] w-4 h-4" />
                                         <input
                                             type="text"
                                             placeholder="Search employees..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="w-64 pl-10 pr-10 py-2 border border-[var(--color-bg-secondary-20)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)] focus:border-[var(--color-bg-secondary-30)] text-sm bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)] placeholder-[var(--color-text-white-90)]"
+                                            className="pl-10 pr-10 py-2 w-full sm:w-64 border border-[var(--color-border-secondary)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-light)] focus:border-transparent bg-[var(--color-bg-primary)]"
                                         />
-                                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-white-90)]" />
                                         {searchQuery && (
                                             <button
                                                 onClick={handleClearSearch}
-                                                className="absolute right-3 top-2.5 h-4 w-4 text-[var(--color-text-white-90)] hover:text-[var(--color-text-white)]"
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
                                             >
-                                                <XCircle className="h-4 w-4" />
+                                                <XCircle className="w-4 h-4" />
                                             </button>
                                         )}
                                     </div>
+
+                                    {/* Status Filter */}
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => handleFilterChange(e.target.value)}
-                                        className="px-3 py-2 border border-[var(--color-bg-secondary-20)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)] focus:border-[var(--color-bg-secondary-30)] text-sm bg-[var(--color-bg-secondary-20)] text-[var(--color-text-white)]"
+                                        className="px-3 py-2 border border-[var(--color-border-secondary)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-light)] focus:border-transparent bg-[var(--color-bg-primary)]"
                                     >
-                                        {statusOptions.map((option) => (
-                                            <option key={option.value} value={option.value} className="text-[var(--color-text-primary)]">
+                                        {statusOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
                                         ))}
                                     </select>
+
+                                    {/* Clear Filters */}
                                     {(searchQuery || statusFilter !== 'all') && (
                                         <button
                                             onClick={handleClearFilters}
-                                            className="px-3 py-2 bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] text-[var(--color-text-white)] rounded-md text-sm transition-colors"
+                                            className="px-3 py-2 text-sm bg-[var(--color-bg-gray-light)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors"
                                         >
-                                            Clear Filters
+                                            Clear
                                         </button>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Table Content */}
+                        {/* Table */}
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
-                                <thead className="bg-[var(--color-bg-hover)]">
-                                    <tr>
+                            <table className="min-w-full divide-y divide-[var(--color-border-secondary)]">
+                                <thead className="bg-[var(--color-bg-gray-light)]">
+                                    <tr className="text-left">
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.NAME)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Employee Name
                                                 {renderSortIcon(COLUMN_KEYS.NAME)}
                                             </div>
                                         </th>
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.SHIFT)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Shift
                                                 {renderSortIcon(COLUMN_KEYS.SHIFT)}
                                             </div>
                                         </th>
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.CLOCK_IN)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Clock In
                                                 {renderSortIcon(COLUMN_KEYS.CLOCK_IN)}
                                             </div>
                                         </th>
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.CLOCK_OUT)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Clock Out
                                                 {renderSortIcon(COLUMN_KEYS.CLOCK_OUT)}
                                             </div>
                                         </th>
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.WORK_HOURS)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Work Hours
                                                 {renderSortIcon(COLUMN_KEYS.WORK_HOURS)}
                                             </div>
                                         </th>
                                         <th
-                                            scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider cursor-pointer hover:bg-[var(--color-bg-gray-light)]"
+                                            className="px-6 py-3 cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
                                             onClick={() => requestSort(COLUMN_KEYS.STATUS)}
                                         >
-                                            <div className="flex items-center">
+                                            <div className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                 Status
                                                 {renderSortIcon(COLUMN_KEYS.STATUS)}
                                             </div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-secondary)]">
                                     {paginatedData.length > 0 ? (
                                         paginatedData.map((employee, index) => (
-                                            <tr key={employee.employee_id || index} className="hover:bg-[var(--color-bg-hover)]">
+                                            <tr
+                                                key={`${employee.employee_code}-${index}`}
+                                                className={`hover:bg-[var(--color-bg-hover)] transition-colors ${getRowStyling(employee.status)}`}
+                                            >
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-[var(--color-text-primary)]">
-                                                        {employee.employee_name || 'N/A'}
+                                                    <div className="flex items-center">
+                                                        <div className="flex-shrink-0 h-8 w-8">
+                                                            <div className="h-8 w-8 rounded-full bg-[var(--color-blue-light)] flex items-center justify-center">
+                                                                <span className="text-sm font-medium text-[var(--color-blue)]">
+                                                                    {employee.employee_name?.charAt(0)?.toUpperCase() || 'U'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                                                                {employee.employee_name || 'Unknown'}
+                                                            </div>
+                                                            <div className="text-sm text-[var(--color-text-muted)]">
+                                                                {employee.employee_code || 'N/A'}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -790,56 +738,39 @@ const AttendanceReport = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <Clock className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
-                                                        <span className="text-sm text-[var(--color-text-primary)]">
-                                                            {formatTime(employee.attandance_first_clock_in)}
-                                                        </span>
+                                                    <div className="flex items-center text-sm text-[var(--color-text-primary)]">
+                                                        <Clock className="w-4 h-4 mr-1 text-[var(--color-text-muted)]" />
+                                                        {formatTime(employee.attandance_first_clock_in)}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <Clock className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
-                                                        <span className="text-sm text-[var(--color-text-primary)]">
-                                                            {formatTime(employee.attandance_last_clock_out)}
-                                                        </span>
+                                                    <div className="flex items-center text-sm text-[var(--color-text-primary)]">
+                                                        <Timer className="w-4 h-4 mr-1 text-[var(--color-text-muted)]" />
+                                                        {formatTime(employee.attandance_last_clock_out)}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <Timer className="h-4 w-4 text-[var(--color-text-muted)] mr-1" />
-                                                        <span className="text-sm text-[var(--color-text-primary)]">
-                                                            {formatHours(employee.attandance_hours)}
-                                                        </span>
+                                                    <div className="text-sm text-[var(--color-text-primary)]">
+                                                        {formatHours(employee.attandance_hours)}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(employee.status)}`}>
-                                                        <div className={`w-2 h-2 rounded-full mr-1.5 ${getAttendanceColor(employee.status)}`}></div>
-                                                        {employee.status || 'Unknown'}
-                                                    </span>
+                                                    <StatusBadge status={employee.status} />
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
                                             <td colSpan="6" className="px-6 py-12 text-center">
-                                                <div className="text-center">
-                                                    <Users className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-4" />
-                                                    <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No employees found</h3>
-                                                    <p className="text-[var(--color-text-muted)]">
+                                                <div className="flex flex-col items-center justify-center text-[var(--color-text-muted)]">
+                                                    <Activity className="w-12 h-12 mb-4 opacity-50" />
+                                                    <h3 className="text-lg font-medium mb-2">No attendance records found</h3>
+                                                    <p className="text-sm">
                                                         {searchQuery || statusFilter !== 'all'
-                                                            ? 'Try adjusting your search or filter criteria.'
-                                                            : 'No attendance data available for this date.'}
+                                                            ? 'Try adjusting your search or filter criteria'
+                                                            : 'No attendance data available for the selected date'
+                                                        }
                                                     </p>
-                                                    {(searchQuery || statusFilter !== 'all') && (
-                                                        <button
-                                                            onClick={handleClearFilters}
-                                                            className="mt-4 px-4 py-2 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-md hover:bg-[var(--color-blue-dark)] transition-colors"
-                                                        >
-                                                            Clear Filters
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -848,52 +779,14 @@ const AttendanceReport = () => {
                             </table>
                         </div>
 
-                        {/* Pagination */}
-                        {filteredAndSortedData.length > 0 && (
-                            <div className="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-divider)]">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1 flex justify-between sm:hidden">
-                                        <button
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={currentPage === 1}
-                                            className={`relative inline-flex items-center px-4 py-2 border border-[var(--color-border-secondary)] text-sm font-medium rounded-md ${currentPage === 1
-                                                ? 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] cursor-not-allowed'
-                                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'
-                                                }`}
-                                        >
-                                            Previous
-                                        </button>
-                                        <button
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage === totalPages}
-                                            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-[var(--color-border-secondary)] text-sm font-medium rounded-md ${currentPage === totalPages
-                                                ? 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] cursor-not-allowed'
-                                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'
-                                                }`}
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </div>
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                />
-                            </div>
-                        )}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     </div>
                 </div>
             </div>
-
-            {/* Toast */}
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={closeToast}
-                />
-            )}
         </>
     );
 };

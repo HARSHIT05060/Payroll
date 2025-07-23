@@ -371,10 +371,15 @@ const MonthlyReport = () => {
         }
 
         try {
-            exportToExcel(reportData, `attendance_report_${filters.month_year}.xlsx`);
+            exportToExcel(reportData, 'report', {
+                showTitle: true,
+                showSummary: true,
+                showEmployeeDetails: true,
+                reportTitle: 'Monthly Attendance Report'
+            });
             showToast('Excel exported successfully!', 'success');
-        } catch (err) {
-            showToast('Failed to export Excel', err);
+        } catch (error) {
+            showToast('Failed to export Excel', error);
         }
         setExportDropdown(false);
     };
@@ -386,19 +391,20 @@ const MonthlyReport = () => {
         switch (statusLower) {
             case 'week off':
             case 'weekoff':
-                return 'bg-purple-50 border-l-4 border-purple-400';
+                return 'bg-[var(--color-blue-lightest)] border-l-4 border-[var(--color-blue-light)]';
             case 'holiday':
-                return 'bg-orange-50 border-l-4 border-orange-400';
+                return 'bg-[var(--color-warning-light)] border-l-4 border-[var(--color-warning)]';
             case 'absent':
-                return 'bg-red-50 border-l-4 border-red-400';
+                return 'bg-[var(--color-error-light)] border-l-4 border-[var(--color-error)]';
             case 'leave':
-                return 'bg-yellow-50 border-l-4 border-yellow-400';
+                return 'bg-[var(--color-yellow-light)] border-l-4 border-[var(--color-yellow-dark)]';
             case 'half day':
-                return 'bg-blue-50 border-l-4 border-blue-400';
+                return 'bg-[var(--color-blue-lighter)] border-l-4 border-[var(--color-blue-dark)]';
             default:
                 return '';
         }
     };
+
 
     // Pagination logic
     const totalItems = reportData?.length || 0;
@@ -433,7 +439,7 @@ const MonthlyReport = () => {
     const selectedMonth = filters.month_year ? new Date(filters.month_year + '-01') : new Date();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -481,7 +487,7 @@ const MonthlyReport = () => {
                                                 onClick={() => setExportDropdown(false)}
                                             />
                                             <div
-                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                className="fixed z-50 bg-[var(--color-bg-secondary)] rounded-lg shadow-2xl border border-[var(--color-border-secondary)] py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
                                                     left: buttonPosition.left + buttonPosition.width - 192, // 192px = w-48
@@ -489,16 +495,16 @@ const MonthlyReport = () => {
                                             >
                                                 <button
                                                     onClick={handleExportExcel}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
-                                                    <FileSpreadsheet className="h-4 w-4 text-blue-600" />
+                                                    <FileSpreadsheet className="h-4 w-4 text-[var(--color-blue)]" />
                                                     Export to Excel
                                                 </button>
                                                 <button
                                                     onClick={handleExportPDF}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
-                                                    <FileDown className="h-4 w-4 text-red-600" />
+                                                    <FileDown className="h-4 w-4 text-[var(--color-error)]" />
                                                     Export to PDF
                                                 </button>
                                             </div>
@@ -512,15 +518,15 @@ const MonthlyReport = () => {
                 </div>
 
                 {/* Filters Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-6 mb-8">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
+                        <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg">
                             <Filter className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-900">Report Filters</h2>
+                        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Report Filters</h2>
                         <button
                             onClick={resetFilters}
-                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-[var(--color-bg-gray-light)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors text-sm"
                         >
                             <RefreshCw className="h-4 w-4" />
                             Reset
@@ -528,7 +534,7 @@ const MonthlyReport = () => {
                     </div>
 
                     {dropdownLoading && (
-                        <div className="flex items-center gap-2 mb-4 text-gray-600">
+                        <div className="flex items-center gap-2 mb-4 text-[var(--color-text-secondary)]">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span className="text-sm">Loading filter options...</span>
                         </div>
@@ -537,7 +543,7 @@ const MonthlyReport = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Month Year Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <Calendar className="inline h-4 w-4 mr-1" />
                                 Month & Year *
                             </label>
@@ -545,21 +551,21 @@ const MonthlyReport = () => {
                                 type="month"
                                 value={filters.month_year}
                                 onChange={(e) => handleFilterChange('month_year', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent text-[var(--color-text-primary)]"
                                 required
                             />
                         </div>
 
                         {/* Branch Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <Building className="inline h-4 w-4 mr-1" />
                                 Branch
                             </label>
                             <select
                                 value={filters.branch_id}
                                 onChange={(e) => handleFilterChange('branch_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Branches</option>
@@ -573,14 +579,14 @@ const MonthlyReport = () => {
 
                         {/* Department Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <Users className="inline h-4 w-4 mr-1" />
                                 Department
                             </label>
                             <select
                                 value={filters.department_id}
                                 onChange={(e) => handleFilterChange('department_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Departments</option>
@@ -594,14 +600,14 @@ const MonthlyReport = () => {
 
                         {/* Designation Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <Award className="inline h-4 w-4 mr-1" />
                                 Designation
                             </label>
                             <select
                                 value={filters.designation_id}
                                 onChange={(e) => handleFilterChange('designation_id', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent text-[var(--color-text-primary)]"
                                 disabled={dropdownLoading}
                             >
                                 <option value="">All Designations</option>
@@ -615,7 +621,7 @@ const MonthlyReport = () => {
 
                         {/* Employee Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <User className="inline h-4 w-4 mr-1" />
                                 Employee  <span className="text-[var(--color-error)]">*</span>
                             </label>
@@ -635,7 +641,7 @@ const MonthlyReport = () => {
                             <button
                                 onClick={generateReport}
                                 disabled={reportGenerating || !filters.employee_id || !filters.month_year}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-white rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {reportGenerating ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -647,6 +653,7 @@ const MonthlyReport = () => {
                         </div>
                     </div>
                 </div>
+
                 {/* Enhanced Summary Statistics */}
                 {summaryStats && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
@@ -656,7 +663,7 @@ const MonthlyReport = () => {
                                     <p className="text-sm text-[var(--color-text-secondary)]">Total Days</p>
                                     <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.totalDays}</p>
                                 </div>
-                                <Calendar className="h-8 w-8 text-blue-600" />
+                                <Calendar className="h-8 w-8 text-[var(--color-blue)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
@@ -665,48 +672,48 @@ const MonthlyReport = () => {
                                     <p className="text-sm text-[var(--color-text-secondary)]">Working Days</p>
                                     <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.workingDays}</p>
                                 </div>
-                                <Clock className="h-8 w-8 text-indigo-600" />
+                                <Clock className="h-8 w-8 text-[var(--color-blue-darker)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Present Days</p>
-                                    <p className="text-2xl font-bold text-green-600">{summaryStats.presentDays}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-success)]">{summaryStats.presentDays}</p>
                                     {summaryStats.attendancePercentage && (
                                         <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                                             {summaryStats.attendancePercentage}%
                                         </p>
                                     )}
                                 </div>
-                                <CheckCircle className="h-8 w-8 text-green-600" />
+                                <CheckCircle className="h-8 w-8 text-[var(--color-success)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Absent Days</p>
-                                    <p className="text-2xl font-bold text-red-600">{summaryStats.absentDays}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-error)]">{summaryStats.absentDays}</p>
                                 </div>
-                                <XCircle className="h-8 w-8 text-red-600" />
+                                <XCircle className="h-8 w-8 text-[var(--color-error)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Week Offs</p>
-                                    <p className="text-2xl font-bold text-purple-600">{summaryStats.weekoffDays}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-blue-dark)]">{summaryStats.weekoffDays}</p>
                                 </div>
-                                <CalendarX className="h-8 w-8 text-purple-600" />
+                                <CalendarX className="h-8 w-8 text-[var(--color-blue-dark)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Working Hours</p>
-                                    <p className="text-2xl font-bold text-indigo-600">{summaryStats.totalWorkingHours}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-blue-darker)]">{summaryStats.totalWorkingHours}</p>
                                 </div>
-                                <Clock className="h-8 w-8 text-indigo-600" />
+                                <Clock className="h-8 w-8 text-[var(--color-blue-darker)]" />
                             </div>
                         </div>
                     </div>
@@ -714,7 +721,7 @@ const MonthlyReport = () => {
 
                 {/* Report Results */}
                 {reportData && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] overflow-hidden">
                         <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center">
@@ -733,81 +740,65 @@ const MonthlyReport = () => {
                         </div>
 
                         {/* Status Legend */}
-                        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">Status Legend:</h4>
+                        <div className="mb-6 p-4 bg-[var(--color-bg-primary)] rounded-lg">
+                            <h4 className="text-sm font-medium text-[var(--color-text-primary)] mb-3">Status Legend:</h4>
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Present</span>
+                                    <div className="w-4 h-4 bg-[var(--color-success-light)] border border-[var(--color-success-lighter)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Present</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Absent</span>
+                                    <div className="w-4 h-4 bg-[var(--color-error-light)] border border-[var(--color-error-lighter)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Absent</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-purple-100 border border-purple-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Weekoff</span>
+                                    <div className="w-4 h-4 bg-[var(--color-blue-lightest)] border border-[var(--color-blue-lighter)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Weekoff</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Holiday</span>
+                                    <div className="w-4 h-4 bg-[var(--color-warning-light)] border border-[var(--color-warning-lighter)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Holiday</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-yellow-100 border border-yellow-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Leave</span>
+                                    <div className="w-4 h-4 bg-[var(--color-yellow-light)] border border-[var(--color-yellow)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Leave</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
-                                    <span className="text-sm text-gray-600">Half Day</span>
+                                    <div className="w-4 h-4 bg-[var(--color-blue-lightest)] border border-[var(--color-blue-lighter)] rounded"></div>
+                                    <span className="text-sm text-[var(--color-text-secondary)]">Half Day</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Table Container */}
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[800px]">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                            <table className="w-full min-w-[800px] text-sm">
+                                <thead className="bg-[var(--color-bg-primary)] border-b border-[var(--color-border-secondary)]">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Day
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Check In
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Check Out
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Working Hours
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Late Hours
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Overtime
-                                        </th>
+                                        {['Date', 'Day', 'Status', 'Check In', 'Check Out', 'Working Hours', 'Late Hours', 'Overtime'].map((heading) => (
+                                            <th
+                                                key={heading}
+                                                className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider"
+                                            >
+                                                {heading}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-secondary)]">
                                     {currentItems.map((item, index) => (
                                         <tr
                                             key={index}
-                                            className={`hover:bg-gray-50 transition-colors ${getRowStyling(item.status)}`}
+                                            className={`hover:bg-[var(--color-bg-hover)] transition-colors ${getRowStyling(item.status)}`}
                                         >
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                                 {new Date(item.date).toLocaleDateString('en-GB', {
                                                     day: '2-digit',
                                                     month: '2-digit',
                                                     year: 'numeric'
                                                 })}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                                 {new Date(item.date).toLocaleDateString('en-GB', {
                                                     weekday: 'short'
                                                 })}
@@ -815,34 +806,39 @@ const MonthlyReport = () => {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <StatusBadge status={item.status} />
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                                 {item.attandance_first_clock_in || '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                                 {item.attandance_last_clock_out || '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-[var(--color-text-primary)]">
                                                 {item.attandance_hours ? `${parseFloat(item.attandance_hours).toFixed(2)}h` : '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 {item.late_hours && parseFloat(item.late_hours) > 0 ? (
-                                                    <span className="text-red-600 font-medium">
+                                                    <span className="text-[var(--color-error)] font-medium">
                                                         {parseFloat(item.late_hours).toFixed(2)}h
                                                     </span>
-                                                ) : '-'}
+                                                ) : (
+                                                    <span className="text-[var(--color-text-primary)]">-</span>
+                                                )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 {item.overtime_hours && parseFloat(item.overtime_hours) > 0 ? (
-                                                    <span className="text-green-600 font-medium">
+                                                    <span className="text-[var(--color-success)] font-medium">
                                                         {parseFloat(item.overtime_hours).toFixed(2)}h
                                                     </span>
-                                                ) : '-'}
+                                                ) : (
+                                                    <span className="text-[var(--color-text-primary)]">-</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
+
 
                         {/* Pagination */}
                         <Pagination
@@ -856,16 +852,16 @@ const MonthlyReport = () => {
 
                 {/* No Data Message */}
                 {!reportData && !reportGenerating && !error && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-gray-50 rounded-full mb-4">
-                                <BarChart3 className="h-8 w-8 text-gray-400" />
+                            <div className="p-3 bg-[var(--color-bg-primary)] rounded-full mb-4">
+                                <BarChart3 className="h-8 w-8 text-[var(--color-text-muted)]" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No Report Generated</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No Report Generated</h3>
+                            <p className="text-[var(--color-text-secondary)] mb-4">
                                 Select an employee and generate a report to view monthly attendance data.
                             </p>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[var(--color-text-secondary)]">
                                 <p>• Choose a month and year</p>
                                 <p>• Select an employee from the dropdown</p>
                                 <p>• Click "Generate Report" to view attendance details</p>
@@ -876,13 +872,13 @@ const MonthlyReport = () => {
 
                 {/* Loading State */}
                 {reportGenerating && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-secondary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-blue-50 rounded-full mb-4">
-                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                            <div className="p-3 bg-[var(--color-blue-lightest)] rounded-full mb-4">
+                                <Loader2 className="h-8 w-8 text-[var(--color-blue)] animate-spin" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Generating Report</h3>
-                            <p className="text-gray-600">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Generating Report</h3>
+                            <p className="text-[var(--color-text-secondary)]">
                                 Please wait while we prepare your monthly attendance report...
                             </p>
                         </div>

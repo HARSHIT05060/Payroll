@@ -1,4 +1,41 @@
-export const generateSalaryPDFContent = (reportData, title, summaryStats, filterInfo = {}) => {
+// utils/pdfExportSalary.js
+
+// Calculate salary summary statistics
+export const calculateSalarySummary = (reportData) => {
+    const totalEmployees = reportData.length;
+    const totalBaseSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.employee_salary || 0), 0);
+    const totalPaidSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.total_salary || 0), 0);
+    const totalOvertimeSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.overtime_salary || 0), 0);
+    const totalWeekOffSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.week_off_salary || 0), 0);
+    const totalPresentDays = reportData.reduce((sum, emp) => sum + parseInt(emp.present_days || 0), 0);
+    const totalAbsentDays = reportData.reduce((sum, emp) => sum + parseInt(emp.absent_days || 0), 0);
+    const totalWorkingDays = reportData.reduce((sum, emp) => sum + parseInt(emp.working_days || 0), 0);
+    const averageSalary = totalEmployees > 0 ? (totalPaidSalary / totalEmployees) : 0;
+
+    return {
+        totalEmployees,
+        totalBaseSalary: totalBaseSalary.toFixed(2),
+        totalPaidSalary: totalPaidSalary.toFixed(2),
+        totalOvertimeSalary: totalOvertimeSalary.toFixed(2),
+        totalWeekOffSalary: totalWeekOffSalary.toFixed(2),
+        totalPresentDays,
+        totalAbsentDays,
+        totalWorkingDays,
+        averageSalary: averageSalary.toFixed(2)
+    };
+};
+
+// Format date
+export const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
+// Generate PDF content for salary report
+export const generateSalaryPDFContent = (reportData, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
     return `
         <!DOCTYPE html>
         <html>
@@ -51,6 +88,25 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     margin: 0 0 8px 0;
                 }
                 
+                .export-pdf-btn {
+                    background: #fff;
+                    color: #2563eb;
+                    border: 1px solid white;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin: 16px 0px 5px 16px;
+                    vertical-align: middle;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+                    transition: background 0.2s, color 0.2s;
+                }
+                .export-pdf-btn:hover {
+                    background: #2563eb;
+                    color: #fff;
+                }
+                
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
@@ -66,6 +122,15 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                 .header-meta {
                     text-align: right;
                     font-size: 10px;
+                }
+                
+                .page-info {
+                    font-size: 12px;
+                    margin-bottom: 5px;
+                }
+                
+                .generation-info {
+                    opacity: 0.8;
                 }
                 
                 .summary-section {
@@ -205,6 +270,19 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     color: #059669;
                 }
                 
+                .footer {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-size: 8px;
+                    color: #666;
+                    border-top: 1px solid #e2e8f0;
+                    padding: 8px;
+                    background: white;
+                }
+                
                 @media print {
                     body { 
                         margin: 0; 
@@ -217,6 +295,9 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     }
                     .summary-section {
                         page-break-inside: avoid;
+                    }
+                    .export-pdf-btn {
+                        display: none;
                     }
                 }
                 
@@ -234,11 +315,15 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     </div>
                     <div class="header-info">
                         <h1 class="header-title">${title}</h1>
-                        <p class="header-subtitle">Monthly salary breakdown and analysis</p>
+                        <p class="header-subtitle">${employeeInfo.department ? `Department: ${employeeInfo.department}` : 'Monthly salary breakdown and analysis'}</p>
                         <p class="header-period">${filterInfo.month_year ? `Period: ${filterInfo.month_year}` : ''}</p>
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
+                        <button class="export-pdf-btn" onclick="window.print()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                            Export PDF
+                        </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
@@ -254,19 +339,23 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Base Salary</div>
-                            <div class="summary-value">₹${summaryStats.totalBaseSalary.toLocaleString('en-IN')}</div>
+                            <div class="summary-value">₹${parseFloat(summaryStats.totalBaseSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Paid Salary</div>
-                            <div class="summary-value success">₹${summaryStats.totalPaidSalary.toLocaleString('en-IN')}</div>
+                            <div class="summary-value success">₹${parseFloat(summaryStats.totalPaidSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Overtime</div>
-                            <div class="summary-value warning">₹${summaryStats.totalOvertimeSalary.toLocaleString('en-IN')}</div>
+                            <div class="summary-value warning">₹${parseFloat(summaryStats.totalOvertimeSalary).toLocaleString('en-IN')}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Week Off Salary</div>
+                            <div class="summary-value purple">₹${parseFloat(summaryStats.totalWeekOffSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Average Salary</div>
-                            <div class="summary-value purple">₹${summaryStats.averageSalary.toLocaleString('en-IN')}</div>
+                            <div class="summary-value info">₹${parseFloat(summaryStats.averageSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Present Days</div>
@@ -331,23 +420,34 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
     `;
 };
 
-export const exportSalaryReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}) => {
+/**
+ * Enhanced Export Salary Report to PDF
+ * @param {Array} reportData - Array of salary records
+ * @param {string} title - Report title
+ * @param {Object} filterInfo - Applied filters information
+ * @param {Object} employeeInfo - Employee information for header
+ */
+export const exportToPDF = (reportData, title = 'Monthly Salary Report', filterInfo = {}, employeeInfo = {}) => {
     try {
+        // Validate input data
+        if (!reportData || reportData.length === 0) {
+            console.error('No data to export');
+            return {
+                success: false,
+                message: 'No data available to export'
+            };
+        }
+
+        // Calculate summary statistics
+        const summaryStats = calculateSalarySummary(reportData);
+
         // Generate HTML content
-        const htmlContent = generateSalaryPDFContent(reportData, title, summaryStats, filterInfo);
+        const htmlContent = generateSalaryPDFContent(reportData, title, summaryStats, filterInfo, employeeInfo);
 
         // Create a new window for PDF generation
         const printWindow = window.open('', '_blank');
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-
-        // Wait for content to load then print
-        printWindow.onload = () => {
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        };
 
         return {
             success: true,
@@ -361,4 +461,9 @@ export const exportSalaryReportToPDF = (reportData, fileName, title, summaryStat
             message: 'Failed to export PDF: ' + error.message
         };
     }
+};
+
+// Legacy function for backward compatibility
+export const exportSalaryReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
+    return exportToPDF(reportData, title, filterInfo, employeeInfo);
 };

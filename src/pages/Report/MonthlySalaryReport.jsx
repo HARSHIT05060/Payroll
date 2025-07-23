@@ -17,14 +17,14 @@ import {
     Clock,
     FileSpreadsheet,
     IndianRupee,
-    Mail,
-    Phone
+    User,
+    CalendarX, Calculator
 } from 'lucide-react';
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { useRef } from 'react';
 import { exportSalaryReportToPDF } from '../../utils/exportUtils/salary/pdfExportSalary';
-import { handleExportExcel } from '../../utils/exportUtils/salary/exportSalaryReportToExcel';
+import { handlePayrollExportExcel } from '../../utils/exportUtils/salary/exportSalaryReportToExcel';
 
 const MonthlySalaryReport = () => {
     const navigate = useNavigate();
@@ -153,8 +153,10 @@ const MonthlySalaryReport = () => {
             maximumFractionDigits: 0
         }).format(amount || 0);
     };
+
+    
     const handleExportExcelClick = () => {
-        handleExportExcel(
+        handlePayrollExportExcel(
             reportData,
             filters,
             summaryStats,
@@ -234,7 +236,7 @@ const MonthlySalaryReport = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
@@ -280,7 +282,7 @@ const MonthlySalaryReport = () => {
                                                 onClick={() => setExportDropdown(false)}
                                             />
                                             <div
-                                                className="fixed z-50 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 min-w-48"
+                                                className="fixed z-50 bg-[var(--color-bg-secondary)] rounded-lg shadow-2xl border border-[var(--color-border-secondary)] py-2 min-w-48"
                                                 style={{
                                                     top: buttonPosition.top + 10,
                                                     left: buttonPosition.left + buttonPosition.width - 192,
@@ -291,14 +293,14 @@ const MonthlySalaryReport = () => {
                                                         handleExportExcelClick();
                                                         setExportDropdown(false);
                                                     }}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileSpreadsheet className="h-4 w-4 text-blue-600" />
                                                     Export to Excel
                                                 </button>
                                                 <button
                                                     onClick={handleExportPDF}
-                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors text-gray-700"
+                                                    className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-[var(--color-bg-hover)] transition-colors text-[var(--color-text-primary)]"
                                                 >
                                                     <FileDown className="h-4 w-4 text-red-600" />
                                                     Export to PDF
@@ -314,15 +316,15 @@ const MonthlySalaryReport = () => {
                 </div>
 
                 {/* Filters Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] p-6 mb-8">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
+                        <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg">
                             <Filter className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-900">Filter Report</h2>
+                        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Filter Report</h2>
                         <button
                             onClick={resetFilters}
-                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                            className="ml-auto flex items-center gap-2 px-3 py-1 bg-[var(--color-bg-hover)] text-[var(--color-text-secondary)] rounded-lg hover:bg-[var(--color-border-secondary)] transition-colors text-sm"
                         >
                             <RefreshCw className="h-4 w-4" />
                             Reset
@@ -332,7 +334,7 @@ const MonthlySalaryReport = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Month Year Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                 <Calendar className="inline h-4 w-4 mr-1" />
                                 Month & Year
                             </label>
@@ -340,7 +342,7 @@ const MonthlySalaryReport = () => {
                                 type="month"
                                 value={filters.month_year}
                                 onChange={(e) => handleFilterChange('month_year', e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-light)] focus:border-transparent text-[var(--color-text-primary)]"
                                 placeholder="Select month and year"
                             />
                         </div>
@@ -350,7 +352,7 @@ const MonthlySalaryReport = () => {
                             <button
                                 onClick={generateReport}
                                 disabled={reportGenerating || !filters.month_year}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-white rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {reportGenerating ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -372,7 +374,7 @@ const MonthlySalaryReport = () => {
                                     <p className="text-sm text-[var(--color-text-secondary)]">Total Employees</p>
                                     <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.totalEmployees}</p>
                                 </div>
-                                <Users className="h-8 w-8 text-blue-600" />
+                                <Users className="h-8 w-8 text-[var(--color-blue-dark)]" />
                             </div>
                         </div>
                         <div className="bg-[var(--color-bg-secondary)] rounded-xl p-6 shadow-sm border border-[var(--color-border-primary)]">
@@ -407,7 +409,7 @@ const MonthlySalaryReport = () => {
 
                 {/* Salary Report Results */}
                 {reportData && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
                         <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center">
@@ -421,100 +423,125 @@ const MonthlySalaryReport = () => {
 
                         {/* Table Container */}
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                            <table className="w-full divide-y divide-[var(--color-border-divider)]">
+                                <thead className="bg-[var(--color-blue-lightest)]">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
-                                            Employee
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center gap-2">
+                                                <User className="h-4 w-4" />
+                                                Employee
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-                                            Base Salary
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <IndianRupee className="h-4 w-4" />
+                                                Base Salary
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
-                                            Attendance
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Calendar className="h-4 w-4" />
+                                                Attendance
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
-                                            Overtime
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Clock className="h-4 w-4" />
+                                                Overtime
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
-                                            Week Off
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <CalendarX className="h-4 w-4" />
+                                                Week Off
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-                                            Subtotal
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Calculator className="h-4 w-4" />
+                                                Subtotal
+                                            </div>
                                         </th>
-                                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
-                                            Total Salary
+                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <TrendingUp className="h-4 w-4" />
+                                                Total Salary
+                                            </div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                     {currentItems.map((employee, index) => (
-                                        <tr key={employee.employee_code || index} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-4 whitespace-nowrap min-w-[150px]">
+                                        <tr key={employee.employee_code || index} className="hover:bg-[var(--color-bg-hover)] transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div>
-                                                        <div className="text-sm font-medium text-gray-900">
+                                                    <div className="flex-shrink-0 h-10 w-10 bg-[var(--color-blue-lightest)] rounded-full flex items-center justify-center">
+                                                        <User className="h-5 w-5 text-[var(--color-blue-dark)]" />
+                                                    </div>
+                                                    <div className="ml-3">
+                                                        <div className="text-sm font-medium text-[var(--color-text-primary)]">
                                                             {employee.employee_name || 'N/A'}
                                                         </div>
-                                                        <div className="text-sm text-gray-500">
+                                                        <div className="text-xs text-[var(--color-text-secondary)]">
                                                             {employee.employee_code || 'N/A'}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[100px]">
-                                                <div className="font-medium">
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                <div className="text-sm font-semibold text-[var(--color-text-primary)]">
                                                     {formatCurrency(employee.employee_salary)}
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[120px]">
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
                                                 <div className="space-y-1">
-                                                    <div className="text-xs">
-                                                        <span className="text-gray-600">P: </span>
-                                                        <span className="font-medium text-green-600">{employee.present_days || 0}</span>
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                        <span className="text-xs text-[var(--color-text-secondary)]">Present:</span>
+                                                        <span className="text-xs font-medium text-green-600">{employee.present_days || 0}</span>
                                                     </div>
-                                                    <div className="text-xs">
-                                                        <span className="text-gray-600">A: </span>
-                                                        <span className="font-medium text-red-600">{employee.absent_days || 0}</span>
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                                        <span className="text-xs text-[var(--color-text-secondary)]">Absent:</span>
+                                                        <span className="text-xs font-medium text-red-600">{employee.absent_days || 0}</span>
                                                     </div>
-                                                    <div className="text-xs">
-                                                        <span className="text-gray-600">W: </span>
-                                                        <span className="font-medium text-blue-600">{employee.working_days || 0}</span>
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                        <span className="text-xs text-[var(--color-text-secondary)]">Working:</span>
+                                                        <span className="text-xs font-medium text-blue-600">{employee.working_days || 0}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[120px]">
-                                                <div className="space-y-1">
-                                                    <div className="text-xs">
-                                                        <span className="text-gray-600">Days: </span>
-                                                        <span className="font-medium">{employee.overtime_days || 0}</span>
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                <div className="bg-orange-50 rounded-lg p-2 border border-orange-200">
+                                                    <div className="text-xs text-[var(--color-text-secondary)] mb-1">
+                                                        Days: <span className="font-medium text-orange-600">{employee.overtime_days || 0}</span>
                                                     </div>
                                                     <div className="text-xs">
-                                                        <span className="text-gray-600">Amt: </span>
-                                                        <span className="font-medium text-orange-600">{formatCurrency(employee.overtime_salary)}</span>
+                                                        <span className="font-semibold text-orange-600">{formatCurrency(employee.overtime_salary)}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[120px]">
-                                                <div className="space-y-1">
-                                                    <div className="text-xs">
-                                                        <span className="text-gray-600">Days: </span>
-                                                        <span className="font-medium">{employee.week_off_days || 0}</span>
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                <div className="bg-blue-50 rounded-lg p-2 border border-blue-200">
+                                                    <div className="text-xs text-[var(--color-text-secondary)] mb-1">
+                                                        Days: <span className="font-medium text-blue-600">{employee.week_off_days || 0}</span>
                                                     </div>
                                                     <div className="text-xs">
-                                                        <span className="text-gray-600">Amt: </span>
-                                                        <span className="font-medium text-blue-600">{formatCurrency(employee.week_off_salary)}</span>
+                                                        <span className="font-semibold text-blue-600">{formatCurrency(employee.week_off_salary)}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[100px]">
-                                                <div className="font-medium">
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                <div className="text-sm font-semibold text-[var(--color-text-primary)]">
                                                     {formatCurrency(employee.subtotal_salary)}
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 min-w-[120px]">
-                                                <div className="text-base font-bold text-green-600">
-                                                    {formatCurrency(employee.total_salary)}
+                                            <td className="px-4 py-4 whitespace-nowrap text-center">
+                                                <div className="bg-green-50 rounded-lg p-2 border border-green-200">
+                                                    <div className="text-lg font-bold text-green-600">
+                                                        {formatCurrency(employee.total_salary)}
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -535,16 +562,16 @@ const MonthlySalaryReport = () => {
 
                 {/* No Data Message */}
                 {!reportData && !reportGenerating && !error && filters.month_year && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-gray-50 rounded-full mb-4">
-                                <IndianRupee className="h-8 w-8 text-gray-400" />
+                            <div className="p-3 bg-[var(--color-bg-hover)] rounded-full mb-4">
+                                <IndianRupee className="h-8 w-8 text-[var(--color-text-secondary)]" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No Salary Data Found</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No Salary Data Found</h3>
+                            <p className="text-[var(--color-text-secondary)] mb-4">
                                 No salary data available for {getMonthYearDisplay(filters.month_year)}.
                             </p>
-                            <div className="text-sm text-gray-500 space-y-1">
+                            <div className="text-sm text-[var(--color-text-secondary)] space-y-1">
                                 <p>• Try selecting a different month</p>
                                 <p>• Or check if payroll has been processed</p>
                             </div>
@@ -554,16 +581,16 @@ const MonthlySalaryReport = () => {
 
                 {/* Initial Message */}
                 {!reportData && !reportGenerating && !error && !filters.month_year && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-blue-50 rounded-full mb-4">
-                                <Calendar className="h-8 w-8 text-blue-600" />
+                            <div className="p-3 bg-[var(--color-blue-lightest)] rounded-full mb-4">
+                                <Calendar className="h-8 w-8 text-[var(--color-blue-dark)]" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Select Month to Generate Report</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Select Month to Generate Report</h3>
+                            <p className="text-[var(--color-text-secondary)] mb-4">
                                 Please select a month and year to generate the salary report.
                             </p>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[var(--color-text-secondary)]">
                                 <p>Choose the month from the filter above and click "Generate Report"</p>
                             </div>
                         </div>
@@ -572,13 +599,13 @@ const MonthlySalaryReport = () => {
 
                 {/* Loading State */}
                 {reportGenerating && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] p-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                            <div className="p-3 bg-blue-50 rounded-full mb-4">
-                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                            <div className="p-3 bg-[var(--color-blue-lightest)] rounded-full mb-4">
+                                <Loader2 className="h-8 w-8 text-[var(--color-blue-dark)] animate-spin" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Generating Report</h3>
-                            <p className="text-gray-600">
+                            <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">Generating Report</h3>
+                            <p className="text-[var(--color-text-secondary)]">
                                 Please wait while we prepare your monthly salary report...
                             </p>
                         </div>
