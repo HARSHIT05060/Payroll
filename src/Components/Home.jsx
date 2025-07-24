@@ -28,9 +28,9 @@ const HomeContent = () => {
     <div className="min-h-screen p-6 bg-[var(--color-bg-primary)]">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* First Row */}
-        {/* <div className="py-2">
+        <div className="py-2">
           <AttendanceReport />
-        </div> */}
+        </div>
         <div>
           <PayrollSummary />
         </div>

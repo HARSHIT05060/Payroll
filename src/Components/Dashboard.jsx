@@ -6,7 +6,7 @@ import PayrollSummary from './HomeComponents/PayrollSummary';
 
 const MainDashboard = () => (
     <div className="min-h-screen p-6 bg-[var(--color-bg-primary)]">
-        {/* <AttendanceReport /> */}
+        <AttendanceReport />
         <PayrollSummary/>
     </div>
 );

@@ -28,7 +28,7 @@ export const DashboardProvider = ({ children, user, initialDate, initialYearMont
 
         setLoading(true);
         try {
-            const data = new FormData();
+            const formData = new FormData();
             formData.append('user_id', user.user_id);
             formData.append('date', date);
             formData.append('year_month', yearMonth);

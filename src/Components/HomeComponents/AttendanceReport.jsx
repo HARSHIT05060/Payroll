@@ -33,6 +33,7 @@ const KEY_MAPPING = {
 };
 
 const AttendanceReport = () => {
+    
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [hoveredSegment, setHoveredSegment] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
