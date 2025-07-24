@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 
-const PayrollSummary = () => {
+const   PayrollSummary = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
 
   // Sample payroll data with Indian rupee values

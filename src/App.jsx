@@ -9,6 +9,7 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import SubscriptionGuard from './Components/Subscription/SubscriptionGuard';
 import { ThemeProvider } from './context/Themecontext';
 import Unauthorized from './Components/Unauthorized';
+import Dashboard from './Components/Dashboard';
 
 // Lazy Loaded Pages
 const Employee = lazy(() => import('./pages/Employee/Employee'));
@@ -69,6 +70,7 @@ const App = () => {
                   <Route path="/" element={<Login />} />
                   <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                   <Route path="/unauthorized" element={<Unauthorized />} />
+                  <Route path="/dashbord" element={<Dashboard />} />
 
                   {/* ---------------- User ----------------- */}
                   {permissions['user_view'] ? (
