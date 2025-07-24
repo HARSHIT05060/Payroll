@@ -15,30 +15,23 @@ const HomeContent = () => {
     { id: 4, title: "Document Verification", count: 8, priority: "low", dueDate: "Next Week" },
   ];
 
-  const salaryTrendData = [
-    { month: 'Jan', salary: 850000, events: 'New Year Bonus' },
-    { month: 'Feb', salary: 820000, events: 'Regular Month' },
-    { month: 'Mar', salary: 890000, events: 'Annual Increments' },
-    { month: 'Apr', salary: 910000, events: 'Q1 Performance Bonus' },
-    { month: 'May', salary: 930000, events: 'Regular Month' },
-    { month: 'Jun', salary: 950000, events: 'Mid-Year Adjustments' },
-  ];
+
 
   return (
     <div className="min-h-screen p-6 bg-[var(--color-bg-primary)]">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* First Row */}
-        {/* <div className="py-2">
+        <div className="py-2">
           <AttendanceReport />
-        </div> */}
+        </div>
         <div>
           <PayrollSummary />
         </div>
 
         {/* Second Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <SalaryTrend data={salaryTrendData} />
-          <PendingTasks data={pendingTasksData} />
+        <div >
+          <SalaryTrend  />
+          {/* <PendingTasks data={pendingTasksData} /> */}
         </div>
       </div>
     </div>
