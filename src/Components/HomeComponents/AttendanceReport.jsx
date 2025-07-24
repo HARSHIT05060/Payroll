@@ -33,6 +33,7 @@ const KEY_MAPPING = {
 };
 
 const AttendanceReport = () => {
+    
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [hoveredSegment, setHoveredSegment] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +45,7 @@ const AttendanceReport = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
-    const { dashboardData, loading } = useDashboardData();
+    const { dashboardData, loading, setDate, setYearMonth } = useDashboardData();
 
     // Extract attendance details from dashboardData
     const attendanceData = useMemo(() => {
@@ -56,10 +57,15 @@ const AttendanceReport = () => {
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
+        const formattedDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+        const formattedMonth = formattedDate.slice(0, 7); // yyyy-mm
+        setDate(formattedDate);
+        setYearMonth(formattedMonth);
         setCurrentPage(1);
         setSearchQuery('');
         setStatusFilter('all');
     };
+        
 
     // Client-side filtering and sorting
     const filteredAndSortedData = useMemo(() => {

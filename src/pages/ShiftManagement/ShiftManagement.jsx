@@ -24,7 +24,7 @@ const DayStatusLegend = () => {
                         <span className="text-xs text-[var(--color-text-secondary)] font-medium">W</span>
                     </div>
                     <span className="text-xs text-[var(--color-text-secondary)] text-center">Week Off</span>
-                </div
+                </div>
 
                 <div className="flex flex-col items-center gap-1">
                     <div className="w-8 h-8 rounded-full bg-[var(--color-bg-secondary)] border-2 border-[var(--color-blue)]" />

@@ -1,20 +1,30 @@
 // SalaryTrend.jsx
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useDashboardData } from '../../context/DashboardContext';
 
-const SalaryTrend = ({ data }) => {
-  // Calculate stats with error handling
+const SalaryTrend = () => {
+  const { dashboardData, loading } = useDashboardData();
+  // API: dashboardData.monthly_chart, keys: month_name, total_salary (string)
+
+  // Prepare chart data: convert salary to number
+  const data = (dashboardData?.monthly_chart || []).map((d) => ({
+    ...d,
+    total_salary: Number(d.total_salary || 0),
+  }));
+
+  // Calculate stats
   const getStats = () => {
     if (!data || data.length === 0) {
       return { highest: 0, average: 0, growth: 0 };
     }
-
-    const salaries = data.map(d => d.salary);
+    const salaries = data.map(d => d.total_salary);
     const highest = Math.max(...salaries);
-    const average = Math.round(salaries.reduce((acc, salary) => acc + salary, 0) / salaries.length);
-    const growth = data.length > 1 
-      ? (((data[data.length - 1].salary - data[0].salary) / data[0].salary) * 100)
+    const average = salaries.length > 0 ? Math.round(salaries.reduce((acc, s) => acc + s, 0) / salaries.length) : 0;
+    const first = salaries.find(s => s > 0) || 0;
+    const last = salaries.slice().reverse().find(s => s > 0) || 0;
+    const growth = first > 0
+      ? (((last - first) / first) * 100)
       : 0;
-
     return { highest, average, growth };
   };
 
@@ -38,33 +48,30 @@ const SalaryTrend = ({ data }) => {
           <span className="font-medium">Average Salary</span>
         </div>
       </div>
-      
-      {data && data.length > 0 ? (
+
+      {data && data.length > 0 && data.some(d => d.total_salary > 0) ? (
         <>
           <div className="mb-6">
             <ResponsiveContainer width="100%" height={320}>
               <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-divider)" opacity={0.3} />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="var(--color-text-secondary)" 
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
+                <XAxis
+                  dataKey="month_name"
                   stroke="var(--color-text-secondary)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `₹${(value/1000).toFixed(0)}K`}
                 />
-                <Tooltip 
-                  formatter={(value, name) => [`₹${(value/1000).toFixed(1)}K`, 'Average Salary']}
-                  labelFormatter={(label) => {
-                    const item = data.find(d => d.month === label);
-                    return item?.events ? `${label} - ${item.events}` : label;
-                  }}
+                <YAxis
+                  stroke="var(--color-text-secondary)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`}
+                />
+                <Tooltip
+                  formatter={value => [`₹${(value / 1000).toFixed(1)}K`, 'Total Salary']}
+                  labelFormatter={label => label}
                   contentStyle={{
                     backgroundColor: 'var(--color-bg-secondary)',
                     border: '1px solid var(--color-border-secondary)',
@@ -73,16 +80,16 @@ const SalaryTrend = ({ data }) => {
                     color: 'var(--color-text-primary)'
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="salary" 
-                  stroke="var(--color-blue)" 
-                  strokeWidth={4} 
+                <Line
+                  type="monotone"
+                  dataKey="total_salary"
+                  stroke="var(--color-blue)"
+                  strokeWidth={4}
                   dot={{ r: 6, fill: 'var(--color-blue)', strokeWidth: 3, stroke: 'var(--color-bg-secondary)' }}
-                  activeDot={{ 
-                    r: 8, 
-                    fill: 'var(--color-blue-dark)', 
-                    strokeWidth: 4, 
+                  activeDot={{
+                    r: 8,
+                    fill: 'var(--color-blue-dark)',
+                    strokeWidth: 4,
                     stroke: 'var(--color-bg-secondary)',
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))'
                   }}
@@ -90,7 +97,6 @@ const SalaryTrend = ({ data }) => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          
           {/* Summary Stats */}
           <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[var(--color-border-divider)]">
             <div className="text-center p-4 bg-gradient-to-br from-[var(--color-success-light)] to-[var(--color-success-light)] rounded-xl border border-[var(--color-success)] border-opacity-20 hover:shadow-lg transition-all duration-200">
@@ -105,14 +111,14 @@ const SalaryTrend = ({ data }) => {
                 ₹{average.toLocaleString('en-IN')}
               </p>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-[var(--color-warning-light)] to-[var(--color-warning-light)] rounded-xl border border-opacity-20 hover:shadow-lg transition-all duration-200" 
-                 style={{ 
-                   borderColor: growth >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                   backgroundColor: growth >= 0 ? 'var(--color-success-light)' : 'var(--color-error-light)'
-                 }}>
+            <div className="text-center p-4 bg-gradient-to-br from-[var(--color-warning-light)] to-[var(--color-warning-light)] rounded-xl border border-opacity-20 hover:shadow-lg transition-all duration-200"
+              style={{
+                borderColor: growth >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                backgroundColor: growth >= 0 ? 'var(--color-success-light)' : 'var(--color-error-light)'
+              }}>
               <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">Growth</p>
-              <p className="text-xl font-bold" 
-                 style={{ color: growth >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+              <p className="text-xl font-bold"
+                style={{ color: growth >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                 {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
               </p>
             </div>
