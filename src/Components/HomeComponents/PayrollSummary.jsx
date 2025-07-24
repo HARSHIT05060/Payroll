@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Toolti
 const   PayrollSummary = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
 
-  // Sample payroll data with Indian rupee values
+
   const payrollData = [
     {
       month: 'Jan',
