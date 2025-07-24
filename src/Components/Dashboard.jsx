@@ -3,11 +3,16 @@ import dayjs from 'dayjs'; // import dayjs for date formatting
 import { DashboardProvider } from '../context/DashboardContext';
 import AttendanceReport from './HomeComponents/AttendanceReport';
 import PayrollSummary from './HomeComponents/PayrollSummary';
+import SalaryTrend from './HomeComponents/SalaryTrend';
+import PendingTasks from './HomeComponents/PendingTasks';
 
 const MainDashboard = () => (
     <div className="min-h-screen p-6 bg-[var(--color-bg-primary)]">
         <AttendanceReport />
         <PayrollSummary/>
+        <SalaryTrend />
+        <PendingTasks />
+
     </div>
 );
 
