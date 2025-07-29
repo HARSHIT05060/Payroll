@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useDashboardData } from '../../context/DashboardContext';
 
 const SalaryTrend = () => {
-  const { dashboardData, loading } = useDashboardData();
+  const { dashboardData } = useDashboardData();
   // API: dashboardData.monthly_chart, keys: month_name, total_salary (string)
 
   // Prepare chart data: convert salary to number

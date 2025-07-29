@@ -8,12 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 const HomeContent = () => {
   // Static sample data (keep/remove as needed)
-  const pendingTasksData = [
-    { id: 1, title: "Employee Onboarding", count: 5, priority: "high", dueDate: "Tomorrow" },
-    { id: 2, title: "Performance Reviews", count: 12, priority: "medium", dueDate: "This Week" },
-    { id: 3, title: "Leave Approvals", count: 3, priority: "critical", dueDate: "Today" },
-    { id: 4, title: "Document Verification", count: 8, priority: "low", dueDate: "Next Week" },
-  ];
+
 
 
 

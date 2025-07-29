@@ -599,7 +599,7 @@ const AttendanceReport = () => {
                 <div className="lg:col-span-2">
                     <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm overflow-hidden">
                         {/* Table Header */}
-                        <div className="bg-[var(--color-bg-gray-light)] px-6 py-4 border-b border-[var(--color-border-secondary)]">
+                        <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] px-6 py-4 border-b border-[var(--color-border-secondary)]">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Employee Attendance</h3>
 
