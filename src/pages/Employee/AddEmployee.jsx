@@ -215,7 +215,7 @@ const AddEmployee = () => {
                     branch: employee.branch_id || '',
                     department: employee.department_id || '',
                     designation: employee.designation_id || '',
-                    employmentType: employee.employment_type_id || '',
+                    employmentType: employee.employee_type_id || '',
                     salaryType: employee.salary_type_id || '',
                     salary: employee.salary || '',
                     address: employee.address || '',

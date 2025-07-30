@@ -39,7 +39,8 @@ const EmployeeDirectoryReport = () => {
         designation_id: '',
         employee_type_id: '',
         salary_type_id: '',
-        gender_id: ''
+        gender_id: '',
+        status_id: ''
     });
 
     // Dropdown data states
@@ -183,8 +184,8 @@ const EmployeeDirectoryReport = () => {
                     }));
                     setGenders(formattedgenderTypes);
                 }
-                if (data.status_id) {
-                    const formattedStatusTypes = data.status_id.map(type => ({
+                if (data.emp_status_list) {
+                    const formattedStatusTypes = data.emp_status_list.map(type => ({
                         id: type.status_id,
                         name: type.name
                     }));
@@ -223,6 +224,7 @@ const EmployeeDirectoryReport = () => {
             if (filters.employee_type_id) formData.append('employee_type_id', filters.employee_type_id);
             if (filters.salary_type_id) formData.append('salary_type_id', filters.salary_type_id);
             if (filters.gender_id) formData.append('gender_id', filters.gender_id);
+            if (filters.status_id) formData.append('status_id', filters.status_id);
 
             const response = await api.post('employee_list_report', formData);
 
@@ -290,6 +292,11 @@ const EmployeeDirectoryReport = () => {
             if (filters.gender_id) {
                 const gender = genders.find(g => g.id === filters.gender_id);
                 filterInfo.Gender = gender ? gender.name : filters.gender_id;
+            }
+
+            if (filters.status_id) {
+                const statusItem = status.find(s => s.id === filters.status_id);
+                filterInfo.Status = statusItem ? statusItem.name : filters.status_id;
             }
 
             // Generate filename with timestamp
@@ -370,7 +377,8 @@ const EmployeeDirectoryReport = () => {
             designation_id: '',
             employee_type_id: '',
             salary_type_id: '',
-            gender_id: ''
+            gender_id: '',
+            status_id: ''
         });
         setReportData(null);
         setError(null);
@@ -677,7 +685,7 @@ const EmployeeDirectoryReport = () => {
                                 ))}
                             </select>
                         </div>
-                        
+
                         <div>
                             <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 <User className="inline h-4 w-4 mr-1" />
