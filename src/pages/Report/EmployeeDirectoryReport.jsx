@@ -49,6 +49,7 @@ const EmployeeDirectoryReport = () => {
     const [employeeTypes, setEmployeeTypes] = useState([]);
     const [salaryTypes, setSalaryTypes] = useState([]);
     const [genders, setGenders] = useState([]);
+    const [status, setStatus] = useState([]);
 
     const [dropdownLoading, setDropdownLoading] = useState(false);
     const [reportGenerating, setReportGenerating] = useState(false);
@@ -176,11 +177,18 @@ const EmployeeDirectoryReport = () => {
                     setSalaryTypes(formattedSalaryTypes);
                 }
                 if (data.gender_list) {
-                    const formattedSalaryTypes = data.gender_list.map(type => ({
+                    const formattedgenderTypes = data.gender_list.map(type => ({
                         id: type.gender_id,
                         name: type.name
                     }));
-                    setGenders(formattedSalaryTypes);
+                    setGenders(formattedgenderTypes);
+                }
+                if (data.status_id) {
+                    const formattedStatusTypes = data.status_id.map(type => ({
+                        id: type.status_id,
+                        name: type.name
+                    }));
+                    setStatus(formattedStatusTypes);
                 }
 
             } else {
@@ -665,6 +673,26 @@ const EmployeeDirectoryReport = () => {
                                 {genders.map((gender) => (
                                     <option key={gender.id} value={gender.id}>
                                         {gender.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                                <User className="inline h-4 w-4 mr-1" />
+                                Status
+                            </label>
+                            <select
+                                value={filters.status_id}
+                                onChange={(e) => handleFilterChange('status_id', e.target.value)}
+                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-transparent text-[var(--color-text-primary)]"
+                                disabled={dropdownLoading}
+                            >
+                                <option value="">All Status</option>
+                                {status.map((status) => (
+                                    <option key={status.id} value={status.id}>
+                                        {status.name}
                                     </option>
                                 ))}
                             </select>
