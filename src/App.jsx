@@ -34,7 +34,6 @@ const LeaveStatusPage = lazy(() => import('./pages/Leave/LeaveStatus'));
 const LoanAdvance = lazy(() => import('./pages/Loan/LoanAdvance'));
 const AddLoanAdvance = lazy(() => import('./pages/Loan/AddLoanAdvance'));
 
-
 const MonthlyPayroll = lazy(() => import('./pages/Payroll/MonthlyPayroll'));
 const FinalizePayroll = lazy(() => import('./pages/Payroll/FinalizePayroll'));
 
@@ -48,7 +47,6 @@ const MonthlySalaryReport = lazy(() => import('./pages/Report/MonthlySalaryRepor
 const TimeConfigurationComponent = lazy(() => import('./pages/Configuration/Configuration'));
 
 const PricingComponent = lazy(() => import('./Components/PricingComponent'));
-
 
 const App = () => {
   const location = useLocation();
@@ -72,24 +70,30 @@ const App = () => {
                   <Route path="/unauthorized" element={<Unauthorized />} />
                   <Route path="/dashbord" element={<Dashboard />} />
 
-                  {/* ---------------- User ----------------- */}
-                  {permissions['user_view'] ? (
-                    <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+                  {/* ---------------- User Roles ----------------- */}
+                  {permissions['user_roles_view'] ? (
+                    <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
                   ) : (
-                    <Route path="/usermanage" element={<Navigate to="/unauthorized" replace />} />
+                    <Route path="/role" element={<Navigate to="/unauthorized" replace />} />
                   )}
-                  {permissions['user_create'] ? (
-                    <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-user" element={<Navigate to="/unauthorized" replace />} />
-                  )}
-
-                  <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
 
                   {(permissions['user_roles_create'] || permissions['user_roles_edit']) ? (
                     <Route path="/add-role" element={<ProtectedRoute><AddRole /></ProtectedRoute>} />
                   ) : (
                     <Route path="/add-role" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {/* ---------------- User Management ----------------- */}
+                  {permissions['user_view'] ? (
+                    <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/usermanage" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['user_create'] ? (
+                    <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/add-user" element={<Navigate to="/unauthorized" replace />} />
                   )}
 
                   {/* ---------------- Employee ----------------- */}
@@ -142,44 +146,45 @@ const App = () => {
                   ) : (
                     <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
                   )}
+
                   {permissions['shift_assign'] ? (
                     <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
                   ) : (
                     <Route path="/assign-shift" element={<Navigate to="/unauthorized" replace />} />
                   )}
 
-                  {/* ---------------- Leave section ----------------- */}
+                  {/* ---------------- Leave Management ----------------- */}
                   {permissions['leave_create'] ? (
                     <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
                   ) : (
                     <Route path="/leaveapplication" element={<Navigate to="/unauthorized" replace />} />
                   )}
+
                   {permissions['leave_view'] ? (
                     <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
                   ) : (
                     <Route path="/leavestatusPage" element={<Navigate to="/unauthorized" replace />} />
                   )}
 
-                  {/* ---------------- Loan section ----------------- */}
+                  {/* ---------------- Loan Management ----------------- */}
                   {permissions['loan_view'] ? (
                     <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
                   ) : (
                     <Route path="/loans" element={<Navigate to="/unauthorized" replace />} />
                   )}
-                  {permissions['loan_view'] ? (
+
+                  {permissions['loan_create'] ? (
                     <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
                   ) : (
                     <Route path="/add-loan-advance" element={<Navigate to="/unauthorized" replace />} />
                   )}
 
-                  {/* ---------------- Configuration section ----------------- */}
-                  <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
-
-                  {/* ---------------- Payroll section ----------------- */}
+                  {/* ---------------- Salary/Payroll Management ----------------- */}
                   <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
                   <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
 
-                  {/* ---------------- Reports section ----------------- */}
+                  {/* ---------------- Reports Section ----------------- */}
+                  {/* Note: You may want to add specific report permissions if they exist in your system */}
                   <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
                   <Route path="/reports/employee-directory" element={<ProtectedRoute><EmployeeDirectoryReport /></ProtectedRoute>} />
                   <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
@@ -187,8 +192,14 @@ const App = () => {
                   <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
                   <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
 
-                  {/* ---------------- Pricing section ----------------- */}
+                  {/* ---------------- Configuration Section ----------------- */}
+                  {/* Note: Add configuration permissions if they exist in your system */}
+                  <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
+
+                  {/* ---------------- Pricing Section ----------------- */}
                   <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
+
+                  {/* ---------------- Catch All ----------------- */}
                   <Route path="*" element={<Navigate to="/unauthorized" replace />} />
                 </Routes>
               </Suspense>
