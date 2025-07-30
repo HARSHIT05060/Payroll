@@ -34,7 +34,11 @@ const Sidebar = () => {
             path: '/home',
         },
 
-        (permissions?.employee_view) && {
+        // Employee Management - Show if user has any employee-related permissions
+        (permissions?.employee_view || permissions?.employee_create || permissions?.employee_edit || permissions?.employee_delete ||
+            permissions?.department_view || permissions?.department_create || permissions?.department_edit || permissions?.department_delete ||
+            permissions?.branch_view || permissions?.branch_create || permissions?.branch_edit || permissions?.branch_delete ||
+            permissions?.designation_view || permissions?.designation_create || permissions?.designation_edit || permissions?.designation_delete) && {
             id: 'employees',
             label: 'Employees',
             icon: Users,
@@ -42,98 +46,113 @@ const Sidebar = () => {
             path: '/employee',
             submenu: [
                 permissions?.employee_view && { label: 'Employee List', path: '/employee' },
-                (permissions?.employee_create || permissions?.employee_view) && { label: 'Add Employee', path: '/add-employee' },
+                (permissions?.employee_create || permissions?.employee_edit) && { label: 'Add Employee', path: '/add-employee' },
                 permissions?.department_view && { label: 'Department', path: '/departments' },
                 permissions?.designation_view && { label: 'Designation', path: '/designation' },
                 permissions?.branch_view && { label: 'Branch', path: '/branches' },
             ].filter(Boolean)
         },
 
-        (permissions?.shift_view) && {
+        // Shift Management - Show if user has any shift-related permissions
+        (permissions?.shift_view || permissions?.shift_create || permissions?.shift_edit || permissions?.shift_delete || permissions?.shift_assign) && {
             id: 'shift',
             label: 'Shift Management',
             icon: Clock,
             hasSubmenu: true,
             path: "/shift-management",
             submenu: [
-                permissions?.employee_view && { label: 'Shifts', path: '/shift-management' },
-                (permissions?.shift_create) && { label: 'Add Shift', path: '/add-shift' },
+                permissions?.shift_view && { label: 'Shifts', path: '/shift-management' },
+                permissions?.shift_create && { label: 'Add Shift', path: '/add-shift' },
+                permissions?.shift_assign && { label: 'Assign Shift', path: '/assign-shift' },
             ].filter(Boolean)
         },
 
-        (permissions?.leave_view) && {
+        // Leave Management - Show if user has any leave-related permissions
+        (permissions?.leave_view || permissions?.leave_create || permissions?.leave_approved || permissions?.leave_rejected) && {
             id: 'leaves',
             label: 'Leaves & Holidays',
             icon: Calendar,
             hasSubmenu: true,
             path: '/leavestatusPage',
             submenu: [
-                (permissions?.leave_view) && { label: 'Leave Requests', path: '/leavestatusPage' },
-                (permissions?.leave_create) && { label: 'Leave Application', path: '/leaveapplication' },
+                permissions?.leave_view && { label: 'Leave Requests', path: '/leavestatusPage' },
+                permissions?.leave_create && { label: 'Leave Application', path: '/leaveapplication' },
             ].filter(Boolean)
         },
 
-        {
+        // Payroll - Show if user has any salary-related permissions
+        (permissions?.salary_view || permissions?.salary_create || permissions?.salary_edit || permissions?.salary_delete || permissions?.add_salary_payment) && {
             id: 'payroll',
-            label: 'Payroll ',
+            label: 'Payroll',
             icon: DollarSign,
             hasSubmenu: true,
             path: '/monthly-payroll',
             submenu: [
-                { label: 'Monthly Payroll', path: '/monthly-payroll' },
-                { label: 'Finalize Payroll', path: '/Finalize-payroll' },
-            ]
+                (permissions?.salary_view || permissions?.salary_create) && { label: 'Monthly Payroll', path: '/monthly-payroll' },
+                (permissions?.salary_create || permissions?.add_salary_payment) && { label: 'Finalize Payroll', path: '/Finalize-payroll' },
+            ].filter(Boolean)
         },
 
-        (permissions?.loan_view) && {
+        // Loan Management - Show if user has any loan-related permissions
+        (permissions?.loan_view || permissions?.loan_create || permissions?.loan_edit || permissions?.loan_delete) && {
             id: 'loans',
             label: 'Loans & Advances',
             icon: Briefcase,
             hasSubmenu: true,
             path: '/loans',
             submenu: [
-                (permissions?.loan_view) && { label: 'Loans & Advances', path: '/loans' },
-                (permissions?.loan_create) && { label: 'Add Loan/Advance', path: '/add-loan-advance' },
-            ]
+                permissions?.loan_view && { label: 'Loans & Advances', path: '/loans' },
+                permissions?.loan_create && { label: 'Add Loan/Advance', path: '/add-loan-advance' },
+            ].filter(Boolean)
         },
 
-        {
+        // Reports - Show if user has any report-related permissions
+        (permissions?.employee_directory || permissions?.daily_attendance || permissions?.monthly_attendance ||
+            permissions?.monthly_salary || permissions?.custom_range) && {
             id: 'reports',
-            label: 'Reports ',
+            label: 'Reports',
             icon: BarChart2,
             hasSubmenu: true,
             path: '/reports',
             submenu: [
-                { label: 'All Reports', path: '/reports' },
-                { label: 'Employee Directory Report', path: '/reports/employee-directory' },
-                { label: 'Daily Report', path: '/reports/daily-attendance' },
-                { label: 'Monthly Report', path: '/reports/monthly-attendance' },
-                { label: 'Monthly Salary Report', path: '/reports/monthly-salary' },
-                { label: 'Custom Range Report', path: '/reports/daterangereport' },
-            ]
+                // Show "All Reports" if user has any report permission
+                (permissions?.employee_directory || permissions?.daily_attendance || permissions?.monthly_attendance ||
+                    permissions?.monthly_salary || permissions?.custom_range) && { label: 'All Reports', path: '/reports' },
+                permissions?.employee_directory && { label: 'Employee Directory Report', path: '/reports/employee-directory' },
+                permissions?.daily_attendance && { label: 'Daily Report', path: '/reports/daily-attendance' },
+                permissions?.monthly_attendance && { label: 'Monthly Report', path: '/reports/monthly-attendance' },
+                permissions?.monthly_salary && { label: 'Monthly Salary Report', path: '/reports/monthly-salary' },
+                permissions?.custom_range && { label: 'Custom Range Report', path: '/reports/daterangereport' },
+            ].filter(Boolean)
         },
 
-        (permissions?.user_view || permissions?.user_roles_view) && {
+        // User Management - Show if user has any user or role related permissions
+        (permissions?.user_view || permissions?.user_create || permissions?.user_edit || permissions?.user_delete ||
+            permissions?.user_roles_view || permissions?.user_roles_create || permissions?.user_roles_edit || permissions?.user_roles_delete) && {
             id: 'user',
             label: 'User Management',
             icon: User,
             hasSubmenu: true,
             path: '/usermanage',
             submenu: [
-                (permissions?.user_view) && { label: 'Users', path: '/usermanage' },
-                (permissions?.user_roles_view) && { label: 'Roles', path: '/role' },
-            ]
+                permissions?.user_view && { label: 'Users', path: '/usermanage' },
+                permissions?.user_roles_view && { label: 'Roles', path: '/role' },
+            ].filter(Boolean)
         },
 
-        {
+        // Configuration - Show if user has configuration permissions
+        permissions?.configuration_edit && {
             id: 'configuration',
-            label: 'Configuration ',
+            label: 'Configuration',
             icon: Settings,
             hasSubmenu: true,
             path: '/configuration',
             submenu: [
+                { label: 'Time Configuration', path: '/configuration' },
             ]
         },
+
+        // Plans & Pricing - Always show (you can add specific permissions if needed)
         {
             id: 'planspricing',
             label: 'Plans & Pricing',
@@ -141,6 +160,7 @@ const Sidebar = () => {
             hasSubmenu: true,
             path: '/planspricing',
             submenu: [
+                { label: 'View Plans', path: '/planspricing' },
             ]
         }
     ].filter(Boolean);
@@ -254,7 +274,7 @@ const Sidebar = () => {
                                                 ? 'bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] text-[var(--color-text-white)] shadow-lg transform scale-[1.02]'
                                                 : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] hover:shadow-md hover:transform hover:scale-[1.01]'
                                             }
-                                        `} 
+                                        `}
                                         onClick={() => handleMenuClick(item)}
                                     >
                                         <div className="py-3 px-4 flex items-center justify-between">

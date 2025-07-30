@@ -180,21 +180,62 @@ const App = () => {
                   )}
 
                   {/* ---------------- Salary/Payroll Management ----------------- */}
-                  <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
-                  <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
+                  {(permissions['salary_view'] || permissions['salary_create']) ? (
+                    <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/monthly-payroll" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {(permissions['salary_create'] || permissions['add_salary_payment']) ? (
+                    <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/finalize-payroll" element={<Navigate to="/unauthorized" replace />} />
+                  )}
 
                   {/* ---------------- Reports Section ----------------- */}
-                  {/* Note: You may want to add specific report permissions if they exist in your system */}
-                  <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
-                  <Route path="/reports/employee-directory" element={<ProtectedRoute><EmployeeDirectoryReport /></ProtectedRoute>} />
-                  <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
-                  <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
-                  <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
-                  <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
+                  {(permissions['employee_directory'] || permissions['daily_attendance'] || permissions['monthly_attendance'] ||
+                    permissions['monthly_salary'] || permissions['custom_range']) ? (
+                    <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['employee_directory'] ? (
+                    <Route path="/reports/employee-directory" element={<ProtectedRoute><EmployeeDirectoryReport /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports/employee-directory" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['daily_attendance'] ? (
+                    <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports/daily-attendance" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['monthly_attendance'] ? (
+                    <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports/monthly-attendance" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['custom_range'] ? (
+                    <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports/daterangereport" element={<Navigate to="/unauthorized" replace />} />
+                  )}
+
+                  {permissions['monthly_salary'] ? (
+                    <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/reports/monthly-salary" element={<Navigate to="/unauthorized" replace />} />
+                  )}
 
                   {/* ---------------- Configuration Section ----------------- */}
-                  {/* Note: Add configuration permissions if they exist in your system */}
-                  <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
+                  {permissions['configuration_edit'] ? (
+                    <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
+                  ) : (
+                    <Route path="/configuration" element={<Navigate to="/unauthorized" replace />} />
+                  )}
 
                   {/* ---------------- Pricing Section ----------------- */}
                   <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
