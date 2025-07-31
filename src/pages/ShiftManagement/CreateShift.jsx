@@ -16,16 +16,20 @@ const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
 );
 
 // Enhanced Copy Dropdown Component
-const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
+const CopyDropdown = ({ dayList, onCopy, sourceDay }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    // Find the source day configuration
     const sourceConfig = dayList.find(day => day.day_name.toLowerCase() === sourceDay.toLowerCase());
     const isSourceConfigured = sourceConfig && sourceConfig.from_time && sourceConfig.to_time && sourceConfig.shift_type;
 
     const availableDays = dayList.filter(day =>
         day.day_name.toLowerCase() !== sourceDay.toLowerCase()
     );
+
+    // Check if this is Sunday (last day) to adjust dropdown position
+    const isSunday = sourceDay.toLowerCase() === 'sunday';
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -66,7 +70,8 @@ const CopyDropdown = ({ dayList, onCopy, sourceDay = 'monday' }) => {
             </button>
 
             {isOpen && isSourceConfigured && (
-                <div className="absolute right-0 mt-2 w-64 bg-[var(--color-bg-secondary)] rounded-xl shadow-xl border border-[var(--color-border-primary)] z-50 overflow-hidden">
+                <div className={`absolute right-0 w-64 bg-[var(--color-bg-secondary)] rounded-xl shadow-xl border border-[var(--color-border-primary)] z-[999] overflow-hidden ${isSunday ? 'bottom-full mb-2' : 'top-full mt-2'
+                    }`}>
                     <div className="p-3 bg-gradient-to-r from-[var(--color-blue-light)] to-[var(--color-indigo-light)] border-b border-[var(--color-border-primary)]">
                         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Copy Configuration</h3>
                         <p className="text-xs text-[var(--color-text-secondary)] mt-1">
