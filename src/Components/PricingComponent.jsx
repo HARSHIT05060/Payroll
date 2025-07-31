@@ -1,116 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Check, Star, Users, Shield, Zap, Award, Clock, ArrowRight, Gift, X } from 'lucide-react';
+import React from 'react';
+import { Check, Star, Users, Shield, Zap, Award, ArrowRight, Gift, AlertTriangle, Calendar } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-const EnhancedPricingComponent = () => {
-    // eslint-disable-next-line no-unused-vars
-    const [selectedPlan, setSelectedPlan] = useState('teams');
-    const [timeLeft, setTimeLeft] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    });
-
-    // Set expiration date (48 hours from now for demo)
+const PricingComponent = () => {
+    const { user } = useAuth();
+    
+    // Parse subscription data
+    const subscriptionDays = parseInt(user?.subscriptions_days) || 0;
+    const subscriptionStatus = parseInt(user?.subscriptions_status) || 0;
+    
+    // Calculate expiration date
     const expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + (48 * 60 * 60 * 1000));
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = expirationDate.getTime() - now;
-
-            if (distance > 0) {
-                setTimeLeft({
-                    days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-                    hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-                    minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-                    seconds: Math.floor((distance % (1000 * 60)) / 1000)
-                });
-            }
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, []);
-
-    const plans = [
-        {
-            id: 'basic',
-            name: 'Recruit Basic',
-            price: 17,
-            originalPrice: null,
-            period: '/ month (USD)',
-            billedYearly: '$220 billed yearly',
-            description: 'Get started with essential tools to manage your team efficiently. Ideal for small teams with fundamental needs.',
-            status: 'Active',
-            statusColor: 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darker)]',
-            features: [
-                { name: 'Access to core HR features', included: true },
-                { name: 'Employee record management', included: true },
-                { name: 'Basic reporting tools', included: true },
-                { name: 'Manage up to 10 team members', included: true },
-                { name: 'Track employee attendance', included: false },
-                { name: 'Assign and monitor tasks', included: false },
-                { name: 'Email support', included: false },
-                { name: 'Simple onboarding process', included: false },
-                { name: 'Designed user-focused interfaces, optimized user', included: false }
-            ],
-            buttonText: 'Cancel',
-            buttonStyle: 'bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)] hover:border-gray-400 transition-all duration-200',
-            cardStyle: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200 shadow-lg'
-        },
-        {
-            id: 'pro',
-            name: 'Talent Pro',
-            price: 19,
-            originalPrice: 26,
-            period: '/ month (USD)',
-            billedYearly: '$228 billed yearly',
-            description: 'A comprehensive solution for growing teams, offering enhanced features to streamline HR processes.',
-            status: 'Save 27% 🔥',
-            statusColor: 'bg-yellow-400 text-black font-bold',
-            popular: true,
-            features: [
-                { name: 'Access to core HR features', included: true },
-                { name: 'Employee record management', included: true },
-                { name: 'Basic reporting tools', included: true },
-                { name: 'Manage up to 10 team members', included: true },
-                { name: 'Track employee attendance', included: true },
-                { name: 'Assign and monitor tasks', included: true },
-                { name: 'Email support', included: false },
-                { name: 'Simple onboarding process', included: false },
-                { name: 'Designed user-focused interfaces, optimized user', included: false }
-            ],
-            buttonText: 'Start 7-days Free Trial',
-            buttonStyle: 'bg-[var(--color-bg-secondary)] text-gray-800 hover:bg-[var(--color-bg-gradient-start)] border-2 border-[var(--color-border-primary)] font-semibold shadow-md transition-all duration-200',
-            cardStyle: 'bg-gradient-to-br from-gray-800 to-gray-900 text-[var(--color-text-white)] border-2 border-gray-700 shadow-2xl transform scale-105 relative z-10'
-        },
-        {
-            id: 'master',
-            name: 'HR Master',
-            price: 34,
-            originalPrice: null,
-            period: '/ month (USD)',
-            billedYearly: '$408 billed yearly',
-            description: 'Maximize team performance with premium tools and full customization options, perfect for larger organizations.',
-            status: 'Popular ⭐',
-            statusColor: 'bg-[var(--color-blue-lightest)]0 text-[var(--color-text-white)] font-medium',
-            features: [
-                { name: 'Access to core HR features', included: true },
-                { name: 'Employee record management', included: true },
-                { name: 'Basic reporting tools', included: true },
-                { name: 'Manage up to 10 team members', included: true },
-                { name: 'Track employee attendance', included: true },
-                { name: 'Assign and monitor tasks', included: true },
-                { name: 'Email support', included: true },
-                { name: 'Simple onboarding process', included: true },
-                { name: 'Designed user-focused interfaces, optimized user', included: true }
-            ],
-            buttonText: 'Start 7-days Free Trial',
-            buttonStyle: 'bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border-secondary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)] hover:border-gray-400 font-semibold transition-all duration-200',
-            cardStyle: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-[var(--color-blue-light)] shadow-lg'
-        }
-    ];
+    expirationDate.setTime(expirationDate.getTime() + (subscriptionDays * 24 * 60 * 60 * 1000));
 
     const trustIndicators = [
         {
@@ -131,43 +32,119 @@ const EnhancedPricingComponent = () => {
         {
             icon: Award,
             title: 'Award Winning',
-            description: 'Best Scheduling Platform 2024 - G2 Leader'
+            description: 'Best Attendance Platform 2024 - G2 Leader'
         }
     ];
 
-    const TimeUnit = ({ value, label }) => (
-        <div className="text-center">
-            <div className="bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-md border-2 border-[var(--color-border-error)]">
-                <div className="text-2xl font-bold text-[var(--color-text-error)]">{value.toString().padStart(2, '0')}</div>
-            </div>
-            <div className="text-sm text-[var(--color-text-error)] font-medium mt-1">{label}</div>
-        </div>
-    );
+    const getUserInitials = (name) => {
+        if (!name || name === 'Unknown User') return 'U';
+        return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+    };
+
+    const getStatusInfo = (status, days) => {
+        if (status === 1) {
+            if (days <= 0) {
+                return {
+                    text: 'Expired',
+                    bgColor: 'bg-red-100',
+                    textColor: 'text-red-800',
+                    isActive: false,
+                    isExpired: true,
+                    isExpiringSoon: false
+                };
+            } else if (days <= 7) {
+                return {
+                    text: 'Expiring Soon',
+                    bgColor: 'bg-yellow-100',
+                    textColor: 'text-yellow-800',
+                    isActive: true,
+                    isExpired: false,
+                    isExpiringSoon: true
+                };
+            } else {
+                return {
+                    text: 'Active',
+                    bgColor: 'bg-green-100',
+                    textColor: 'text-green-800',
+                    isActive: true,
+                    isExpired: false,
+                    isExpiringSoon: false
+                };
+            }
+        } else {
+            return {
+                text: 'Inactive',
+                bgColor: 'bg-gray-100',
+                textColor: 'text-gray-800',
+                isActive: false,
+                isExpired: false,
+                isExpiringSoon: false
+            };
+        }
+    };
+
+    const statusInfo = getStatusInfo(subscriptionStatus, subscriptionDays);
+
+    const getBannerConfig = () => {
+        if (statusInfo.isExpired) {
+            return {
+                bgClass: 'bg-gradient-to-r from-red-600 to-red-700',
+                icon: AlertTriangle,
+                title: 'Subscription Expired!',
+                description: 'Renew now to continue using our services',
+                textColorClass: 'text-red-100'
+            };
+        } else if (statusInfo.isExpiringSoon) {
+            return {
+                bgClass: 'bg-gradient-to-r from-yellow-600 to-orange-600',
+                icon: Gift,
+                title: 'Subscription Expiring Soon!',
+                description: 'Renew before expiration to avoid interruption',
+                textColorClass: 'text-yellow-100'
+            };
+        } else if (statusInfo.isActive) {
+            return {
+                bgClass: 'bg-gradient-to-r from-green-600 to-green-700',
+                icon: Gift,
+                title: 'Active Subscription',
+                description: 'Your subscription is active and running smoothly',
+                textColorClass: 'text-green-100'
+            };
+        } else {
+            return {
+                bgClass: 'bg-gradient-to-r from-gray-600 to-gray-700',
+                icon: AlertTriangle,
+                title: 'Inactive Subscription',
+                description: 'Activate your subscription to access all features',
+                textColorClass: 'text-gray-100'
+            };
+        }
+    };
+
+    const bannerConfig = getBannerConfig();
+    const BannerIcon = bannerConfig.icon;
+
+    const getDaysColor = () => {
+        if (subscriptionDays <= 0) return 'text-red-400';
+        if (subscriptionDays <= 7) return 'text-yellow-400';
+        return 'text-green-400';
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-blue-lightest)]">
-            {/* Limited Time Offer Banner */}
-            <div className="bg-gradient-to-r from-red-600 to-red-700 text-[var(--color-text-white)] py-6">
+            {/* Subscription Status Banner */}
+            <div className={`${bannerConfig.bgClass} text-[var(--color-text-white)] py-6`}>
                 <div className="max-w-6xl mx-auto px-6">
-                    <div className="flex flex-col lg:flex-row items-center justify-between">
-                        <div className="flex items-center mb-4 lg:mb-0">
-                            <Gift className="w-6 h-6 mr-3" />
-                            <div>
-                                <h3 className="font-bold text-lg">Limited Time Offer - 33% OFF Teams Plan!</h3>
-                                <p className="text-red-100 text-sm">Don't miss out on this exclusive discount</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center space-x-6">
-                            <div className="flex items-center space-x-1">
-                                <Clock className="w-5 h-5" />
-                                <span className="font-medium">Expires in:</span>
-                            </div>
-                            <div className="flex space-x-3">
-                                <TimeUnit value={timeLeft.days} label="Days" />
-                                <TimeUnit value={timeLeft.hours} label="Hours" />
-                                <TimeUnit value={timeLeft.minutes} label="Min" />
-                                <TimeUnit value={timeLeft.seconds} label="Sec" />
+                    <div className="flex items-center justify-center">
+                        <div className="flex items-center">
+                            <BannerIcon className="w-6 h-6 mr-3" />
+                            <div className="text-center">
+                                <h3 className="font-bold text-lg">
+                                    {bannerConfig.title}
+                                </h3>
+                                <p className={`${bannerConfig.textColorClass} text-sm`}>
+                                    {bannerConfig.description}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -176,128 +153,101 @@ const EnhancedPricingComponent = () => {
 
             {/* Header */}
             <div className="max-w-5xl mx-auto px-6 py-20 text-center">
-                <div className="inline-flex items-center bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)] px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <div className="inline-flex items-center bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-4 py-2 rounded-full text-sm font-medium mb-6">
                     <Star className="w-4 h-4 mr-2" />
                     Trusted by 100,000+ professionals worldwide
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold text-[var(--color-text-primary)] mb-6 leading-tight">
-                    Choose Your Perfect
-                    <span className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] bg-clip-text text-transparent"> Scheduling Plan</span>
+                    Your Subscription
+                    <span className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] bg-clip-text text-transparent"> Status</span>
                 </h1>
                 <p className="text-xl text-[var(--color-text-secondary)] mb-8 max-w-3xl mx-auto leading-relaxed">
-                    Transform your scheduling workflow with our powerful platform. Start free and upgrade as your business grows.
+                    Manage your attendance system subscription and stay updated with your account status.
                 </p>
-                <div className="flex items-center justify-center space-x-8 text-sm text-[var(--color-text-secondary)]">
-                    <div className="flex items-center">
-                        <Check className="w-4 h-4 text-green-500 mr-2" />
-                        30-day free trial
-                    </div>
-                    <div className="flex items-center">
-                        <Check className="w-4 h-4 text-green-500 mr-2" />
-                        No credit card required
-                    </div>
-                    <div className="flex items-center">
-                        <Check className="w-4 h-4 text-green-500 mr-2" />
-                        Cancel anytime
-                    </div>
-                </div>
             </div>
 
-            {/* Pricing Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {plans.map((plan) => {
-                    const isSelected = selectedPlan === plan.id;
-                    const isDark = plan.id === 'pro';
-
-                    return (
-                        <div
-                            key={plan.id}
-                            className={`relative rounded-2xl p-5 transition-all duration-200 hover:shadow-md cursor-pointer ${plan.cardStyle} ${isSelected ? 'ring-2 ring-blue-400' : ''
-                                }`}
-                            onClick={() => setSelectedPlan(plan.id)}
-                        >
-                            {/* Status Badge */}
-                            <div className="flex justify-between items-start mb-4">
-                                <div className={`px-3 py-1 rounded-full text-xs font-medium ${plan.statusColor}`}>
-                                    {plan.status}
-                                </div>
-                                {plan.popular && (
-                                    <div className="px-2 py-1 bg-orange-500 text-[var(--color-text-white)] rounded-full text-xs font-bold">
-                                        Popular ⭐
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Plan Name */}
-                            <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-[var(--color-text-white)]' : 'text-[var(--color-text-primary)]'}`}>
-                                {plan.name}
-                            </h3>
-
-                            {/* Price Section */}
-                            <div className="mb-4">
-                                <div className="flex items-baseline mb-1">
-                                    {plan.originalPrice && (
-                                        <span className={`text-lg line-through mr-2 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
-                                            }`}>
-                                            ${plan.originalPrice}
-                                        </span>
-                                    )}
-                                    <span className={`text-3xl font-bold ${isDark ? 'text-[var(--color-text-white)]' : 'text-[var(--color-text-primary)]'}`}>
-                                        ${plan.price}
-                                    </span>
-                                    <span className={`text-sm ml-1 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'}`}>
-                                        {plan.period}
-                                    </span>
-                                </div>
-                                <p className={`text-xs ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'}`}>
-                                    {plan.billedYearly}
-                                </p>
-                                {plan.originalPrice && (
-                                    <p className="text-xs text-[var(--color-success-dark)] font-semibold mt-1">
-                                        Save $7/month
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Description */}
-                            <p className={`text-xs mb-5 leading-relaxed ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
-                                }`}>
-                                {plan.description}
-                            </p>
-
-                            {/* Features List */}
-                            <div className="space-y-2.5 mb-5">
-                                {plan.features.map((feature, index) => (
-                                    <div key={index} className="flex items-start">
-                                        <div className="flex-shrink-0 w-4 h-4 mr-2.5 mt-0.5">
-                                            {feature.included ? (
-                                                <div className="w-4 h-4 bg-[var(--color-success-light)]0 rounded-full flex items-center justify-center">
-                                                    <Check className="w-2.5 h-2.5 text-[var(--color-text-white)]" />
-                                                </div>
-                                            ) : (
-                                                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-600' : 'bg-[var(--color-bg-gray-light)]'
-                                                    }`}>
-                                                    <X className={`w-2.5 h-2.5 ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-muted)]'}`} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className={`text-xs leading-relaxed ${isDark ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-secondary)]'
-                                            } ${!feature.included ? 'opacity-50' : ''}`}>
-                                            {feature.name}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Action Button */}
-                            <button
-                                className={`w-full py-3 px-4 rounded-lg text-xs font-medium ${plan.buttonStyle}`}
-                            >
-                                {plan.buttonText}
-                            </button>
+            {/* User Subscription Card */}
+            <div className="max-w-4xl mx-auto px-6 mb-20">
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 text-[var(--color-text-white)] border-2 border-gray-700 shadow-2xl rounded-2xl p-8 relative">
+                    {/* Status Badge */}
+                    <div className="flex justify-between items-start mb-6">
+                        <div className={`px-4 py-2 rounded-full text-sm font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                            {statusInfo.text} Status
                         </div>
-                    );
-                })}
+                        <div className="px-3 py-1 bg-blue-500 text-[var(--color-text-white)] rounded-full text-sm font-bold">
+                            Current Plan
+                        </div>
+                    </div>
+
+                    {/* User Info Section */}
+                    <div className="flex items-center space-x-4 mb-8">
+                        <div className="w-16 h-16 bg-[var(--color-blue)] rounded-full flex items-center justify-center text-[var(--color-text-white)] text-xl font-bold">
+                            {getUserInitials(user?.full_name)}
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
+                                {user?.full_name || user?.name || user?.username || 'User'}
+                            </h2>
+                            <p className="text-gray-300">
+                                {user?.email || user?.username || user?.number || 'N/A'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Subscription Details - Single Column */}
+                    <div className="mb-8">
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-[var(--color-text-white)] flex items-center">
+                                <Calendar className="w-5 h-5 mr-2" />
+                                Subscription Information
+                            </h3>
+                            <div className="space-y-4 text-sm">
+                                <div className="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
+                                    <span className="text-gray-300">Status:</span>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                                        {statusInfo.text}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
+                                    <span className="text-gray-300">Days Remaining:</span>
+                                    <span className={`font-mono font-bold text-lg ${getDaysColor()}`}>
+                                        {subscriptionDays} days
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
+                                    <span className="text-gray-300">Expires On:</span>
+                                    <span className="font-mono text-[var(--color-text-white)]">
+                                        {expirationDate.toLocaleDateString('en-GB')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        {statusInfo.isExpired ? (
+                            <button className="flex-1 bg-red-600 hover:bg-red-700 text-[var(--color-text-white)] py-3 px-6 rounded-lg font-semibold transition-colors">
+                                Renew Subscription
+                            </button>
+                        ) : statusInfo.isExpiringSoon ? (
+                            <button className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-[var(--color-text-white)] py-3 px-6 rounded-lg font-semibold transition-colors">
+                                Extend Subscription
+                            </button>
+                        ) : statusInfo.isActive ? (
+                            <button className="flex-1 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] text-[var(--color-text-white)] py-3 px-6 rounded-lg font-semibold transition-colors">
+                                Manage Subscription
+                            </button>
+                        ) : (
+                            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-[var(--color-text-white)] py-3 px-6 rounded-lg font-semibold transition-colors">
+                                Activate Subscription
+                            </button>
+                        )}
+                        <button className="flex-1 bg-gray-600 hover:bg-gray-700 text-[var(--color-text-white)] py-3 px-6 rounded-lg font-semibold transition-colors">
+                            View Usage Details
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Trust Indicators */}
@@ -307,7 +257,7 @@ const EnhancedPricingComponent = () => {
                         <h2 className="text-4xl font-bold text-[var(--color-text-primary)] mb-4">
                             Why 100,000+ professionals choose us
                         </h2>
-                        <p className="text-xl text-[var(--color-text-secondary)]">Join the world's most trusted scheduling platform</p>
+                        <p className="text-xl text-[var(--color-text-secondary)]">Join the world's most trusted attendance platform</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {trustIndicators.map((item, index) => (
@@ -330,33 +280,33 @@ const EnhancedPricingComponent = () => {
                         <h2 className="text-4xl font-bold text-[var(--color-text-primary)] mb-4">
                             Frequently Asked Questions
                         </h2>
-                        <p className="text-xl text-[var(--color-text-secondary)]">Everything you need to know about our pricing and features</p>
+                        <p className="text-xl text-[var(--color-text-secondary)]">Everything you need to know about your subscription</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {[
                             {
-                                q: "Can I change my plan anytime?",
-                                a: "Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect immediately for upgrades, or at your next billing cycle for downgrades."
+                                q: "How do I renew my subscription?",
+                                a: "You can easily renew your subscription through your account dashboard. We also send reminder emails before expiration to help you stay on track."
+                            },
+                            {
+                                q: "What happens when my subscription expires?",
+                                a: "When your subscription expires, you'll lose access to premium features but your data remains safe. You can reactivate anytime to restore full access."
+                            },
+                            {
+                                q: "Can I upgrade my subscription plan?",
+                                a: "Yes! You can upgrade your plan at any time. The changes take effect immediately and you'll only pay the prorated difference."
+                            },
+                            {
+                                q: "Is my data secure?",
+                                a: "Absolutely. We use enterprise-grade encryption and are SOC 2 Type II certified. Your attendance data is protected with the highest security standards."
                             },
                             {
                                 q: "Do you offer refunds?",
-                                a: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied, we'll refund your payment, no questions asked."
+                                a: "We offer a 30-day money-back guarantee on all subscriptions. If you're not satisfied, contact our support team for a full refund."
                             },
                             {
-                                q: "How secure is my data?",
-                                a: "Your data security is our top priority. We use enterprise-grade 256-bit encryption, are SOC 2 Type II certified, and comply with GDPR and CCPA regulations."
-                            },
-                            {
-                                q: "What kind of support do you provide?",
-                                a: "All plans include email support with 24-hour response time. Teams get priority support, and Enterprise customers get dedicated 24/7 phone and chat support."
-                            },
-                            {
-                                q: "Is there a setup fee?",
-                                a: "No setup fees ever! We also provide free migration assistance from your current scheduling tool and free onboarding for Teams and Enterprise plans."
-                            },
-                            {
-                                q: "Can I cancel anytime?",
-                                a: "Yes, you can cancel your subscription at any time. There are no cancellation fees, and you'll continue to have access to your plan until the end of your billing period."
+                                q: "How can I contact support?",
+                                a: "Our support team is available 24/7 via email, chat, and phone. Premium subscribers get priority support with faster response times."
                             }
                         ].map((faq, index) => (
                             <div key={index} className="bg-[var(--color-bg-secondary)] rounded-2xl p-8 hover:shadow-lg transition-shadow">
@@ -372,13 +322,13 @@ const EnhancedPricingComponent = () => {
             <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darkest)] py-16">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <h2 className="text-4xl font-bold text-[var(--color-text-white)] mb-6">
-                        Ready to transform your scheduling?
+                        Need help with your subscription?
                     </h2>
                     <p className="text-xl text-[var(--color-text-white)] mb-8">
-                        Join thousands of professionals who've already made the switch
+                        Our support team is here to assist you with any questions or concerns
                     </p>
                     <button className="bg-[var(--color-bg-secondary)] text-[var(--color-blue-dark)] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[var(--color-bg-gradient-start)] transition-colors inline-flex items-center">
-                        Start Your Free Trial Today
+                        Contact Support
                         <ArrowRight className="w-6 h-6 ml-2" />
                     </button>
                 </div>
@@ -387,4 +337,4 @@ const EnhancedPricingComponent = () => {
     );
 };
 
-export default EnhancedPricingComponent;
+export default PricingComponent;
