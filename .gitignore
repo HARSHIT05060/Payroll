@@ -25,3 +25,4 @@ data.json
 *.njsproj
 *.sln
 *.sw?
+.env
