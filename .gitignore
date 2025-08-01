@@ -13,6 +13,7 @@ dist-ssr
 *.local
 data.json
 .env.production
+.env
 
 # Editor directories and files
 .vscode/*
