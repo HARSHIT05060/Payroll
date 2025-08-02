@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './Components/Navbar';
@@ -55,197 +55,248 @@ const App = () => {
   const shouldHideNavigation = isLoginPage || isUnauthorizedPage;
   const permissions = useSelector(state => state.permissions) || {};
 
+  // Sidebar state management
+  const [isCollapsed, setIsCollapsed] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Auto-collapse on mobile
+      if (mobile) {
+        setIsCollapsed(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate main content margin based on sidebar state
+  const getMainContentStyle = () => {
+    if (shouldHideNavigation) return {};
+    
+    return {
+      marginLeft: isCollapsed 
+        ? (isMobile ? '0' : '80px')
+        : '256px',
+      paddingTop: '64px' // Account for navbar height
+    };
+  };
+
   return (
     <ThemeProvider>
       <SubscriptionGuard>
-        <div className="flex flex-col h-screen">
-          {!shouldHideNavigation && <Navbar />}
-          <div className={`flex flex-1 ${!shouldHideNavigation ? "ml-64 pt-16" : ""}`}>
-            {!shouldHideNavigation && <Sidebar />}
-            <main className="flex-1 overflow-y-auto">
-              <Suspense fallback={<div className="text-center mt-20">Loading...</div>}>
-                <Routes>
-                  <Route path="/" element={<Login />} />
-                  <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                  <Route path="/unauthorized" element={<Unauthorized />} />
-                  <Route path="/dashbord" element={<Dashboard />} />
+        <div className="min-h-screen bg-[var(--color-bg-primary)]">
+          {!shouldHideNavigation && (
+            <Navbar 
+              isCollapsed={isCollapsed} 
+              setIsCollapsed={setIsCollapsed} 
+            />
+          )}
+          
+          {!shouldHideNavigation && (
+            <Sidebar 
+              isCollapsed={isCollapsed} 
+              setIsCollapsed={setIsCollapsed} 
+            />
+          )}
+          
+          <main 
+            className="transition-all duration-300 overflow-y-auto"
+            style={getMainContentStyle()}
+          >
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue)] mx-auto mb-4"></div>
+                  <p className="text-[var(--color-text-secondary)]">Loading...</p>
+                </div>
+              </div>
+            }>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/dashbord" element={<Dashboard />} />
 
-                  {/* ---------------- User Roles ----------------- */}
-                  {permissions['user_roles_view'] ? (
-                    <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/role" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- User Roles ----------------- */}
+                {permissions['user_roles_view'] ? (
+                  <Route path="/role" element={<ProtectedRoute><Role /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/role" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {(permissions['user_roles_create'] || permissions['user_roles_edit']) ? (
-                    <Route path="/add-role" element={<ProtectedRoute><AddRole /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-role" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {(permissions['user_roles_create'] || permissions['user_roles_edit']) ? (
+                  <Route path="/add-role" element={<ProtectedRoute><AddRole /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/add-role" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- User Management ----------------- */}
-                  {permissions['user_view'] ? (
-                    <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/usermanage" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- User Management ----------------- */}
+                {permissions['user_view'] ? (
+                  <Route path="/usermanage" element={<ProtectedRoute><Usermanagement /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/usermanage" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['user_create'] ? (
-                    <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-user" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['user_create'] ? (
+                  <Route path="/add-user" element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/add-user" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Employee ----------------- */}
-                  {permissions['employee_view'] ? (
-                    <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/employee" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Employee ----------------- */}
+                {permissions['employee_view'] ? (
+                  <Route path="/employee" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/employee" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['employee_create'] ? (
-                    <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-employee" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['employee_create'] ? (
+                  <Route path="/add-employee" element={<ProtectedRoute><AddEmployee /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/add-employee" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['employee_view'] ? (
-                    <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/employee/details/:employee_id" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['employee_view'] ? (
+                  <Route path="/employee/details/:employee_id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/employee/details/:employee_id" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Department / Branch / Designation ----------------- */}
-                  {permissions['department_view'] ? (
-                    <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/departments" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Department / Branch / Designation ----------------- */}
+                {permissions['department_view'] ? (
+                  <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/departments" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['branch_view'] ? (
-                    <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/branches" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['branch_view'] ? (
+                  <Route path="/branches" element={<ProtectedRoute><BranchesPage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/branches" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['designation_view'] ? (
-                    <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/designation" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['designation_view'] ? (
+                  <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/designation" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Shift Management ----------------- */}
-                  {permissions['shift_view'] ? (
-                    <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/shift-management" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Shift Management ----------------- */}
+                {permissions['shift_view'] ? (
+                  <Route path="/shift-management" element={<ProtectedRoute><ShiftManagement /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/shift-management" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['shift_create'] ? (
-                    <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['shift_create'] ? (
+                  <Route path="/add-shift" element={<ProtectedRoute><CreateShift /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/add-shift" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['shift_assign'] ? (
-                    <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/assign-shift" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['shift_assign'] ? (
+                  <Route path="/assign-shift" element={<ProtectedRoute><AssignShift /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/assign-shift" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Leave Management ----------------- */}
-                  {permissions['leave_create'] ? (
-                    <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/leaveapplication" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Leave Management ----------------- */}
+                {permissions['leave_create'] ? (
+                  <Route path="/leaveapplication" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/leaveapplication" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['leave_view'] ? (
-                    <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/leavestatusPage" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['leave_view'] ? (
+                  <Route path="/leavestatusPage" element={<ProtectedRoute><LeaveStatusPage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/leavestatusPage" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Loan Management ----------------- */}
-                  {permissions['loan_view'] ? (
-                    <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/loans" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Loan Management ----------------- */}
+                {permissions['loan_view'] ? (
+                  <Route path="/loans" element={<ProtectedRoute><LoanAdvance /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/loans" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['loan_create'] ? (
-                    <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/add-loan-advance" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['loan_create'] ? (
+                  <Route path="/add-loan-advance" element={<ProtectedRoute><AddLoanAdvance /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/add-loan-advance" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Salary/Payroll Management ----------------- */}
-                  {(permissions['salary_view'] || permissions['salary_create']) ? (
-                    <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/monthly-payroll" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Salary/Payroll Management ----------------- */}
+                {(permissions['salary_view'] || permissions['salary_create']) ? (
+                  <Route path="/monthly-payroll" element={<ProtectedRoute><MonthlyPayroll /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/monthly-payroll" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {(permissions['salary_create'] || permissions['add_salary_payment']) ? (
-                    <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/finalize-payroll" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {(permissions['salary_create'] || permissions['add_salary_payment']) ? (
+                  <Route path="/finalize-payroll" element={<ProtectedRoute><FinalizePayroll /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/finalize-payroll" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Reports Section ----------------- */}
-                  {(permissions['employee_directory'] || permissions['daily_attendance'] || permissions['monthly_attendance'] ||
-                    permissions['monthly_salary'] || permissions['custom_range']) ? (
-                    <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Reports Section ----------------- */}
+                {(permissions['employee_directory'] || permissions['daily_attendance'] || permissions['monthly_attendance'] ||
+                  permissions['monthly_salary'] || permissions['custom_range']) ? (
+                  <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['employee_directory'] ? (
-                    <Route path="/reports/employee-directory" element={<ProtectedRoute><EmployeeDirectoryReport /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports/employee-directory" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['employee_directory'] ? (
+                  <Route path="/reports/employee-directory" element={<ProtectedRoute><EmployeeDirectoryReport /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports/employee-directory" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['daily_attendance'] ? (
-                    <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports/daily-attendance" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['daily_attendance'] ? (
+                  <Route path="/reports/daily-attendance" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports/daily-attendance" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['monthly_attendance'] ? (
-                    <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports/monthly-attendance" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['monthly_attendance'] ? (
+                  <Route path="/reports/monthly-attendance" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports/monthly-attendance" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['custom_range'] ? (
-                    <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports/daterangereport" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['custom_range'] ? (
+                  <Route path="/reports/daterangereport" element={<ProtectedRoute><DateRangeReport /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports/daterangereport" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {permissions['monthly_salary'] ? (
-                    <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/reports/monthly-salary" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {permissions['monthly_salary'] ? (
+                  <Route path="/reports/monthly-salary" element={<ProtectedRoute><MonthlySalaryReport /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/reports/monthly-salary" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Configuration Section ----------------- */}
-                  {permissions['configuration_edit'] ? (
-                    <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
-                  ) : (
-                    <Route path="/configuration" element={<Navigate to="/unauthorized" replace />} />
-                  )}
+                {/* ---------------- Configuration Section ----------------- */}
+                {permissions['configuration_edit'] ? (
+                  <Route path="/configuration" element={<ProtectedRoute><TimeConfigurationComponent /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/configuration" element={<Navigate to="/unauthorized" replace />} />
+                )}
 
-                  {/* ---------------- Pricing Section ----------------- */}
-                  <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
+                {/* ---------------- Pricing Section ----------------- */}
+                <Route path="/planspricing" element={<ProtectedRoute><PricingComponent /></ProtectedRoute>} />
 
-                  {/* ---------------- Catch All ----------------- */}
-                  <Route path="*" element={<Navigate to="/unauthorized" replace />} />
-                </Routes>
-              </Suspense>
-            </main>
-          </div>
+                {/* ---------------- Catch All ----------------- */}
+                <Route path="*" element={<Navigate to="/unauthorized" replace />} />
+              </Routes>
+            </Suspense>
+          </main>
         </div>
       </SubscriptionGuard>
     </ThemeProvider>

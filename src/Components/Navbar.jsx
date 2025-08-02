@@ -1,18 +1,29 @@
+/* eslint-disable no-unused-vars */
 // src/components/Navbar.jsx
 import { useState, useRef, useEffect } from 'react';
-import { Bell, ChevronDown, User, LogOut, Settings } from 'lucide-react';
+import { Bell, ChevronDown, User, LogOut, Settings, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { clearPermissions } from '../redux/permissionsSlice';
 import { ThemeToggle } from '../context/Themetoggle';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 
-const Navbar = () => {
+const Navbar = ({ isCollapsed, setIsCollapsed }) => {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const dropdownRef = useRef(null);
     const dispatch = useDispatch();
+
+    // Handle window resize
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -51,59 +62,78 @@ const Navbar = () => {
 
     return (
         <>
-            <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-16 px-6 bg-[var(--color-bg-secondary)] border-b border-[var(--color-border-primary)] z-50 shadow-sm">
-                {/* Left side - Logo/Brand */}
-                <div className="flex items-center">
-                    <h1 className="text-xl font-bold text-[var(--color-text-primary)]">Attendance System</h1>
+            <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-16 px-4 md:px-6 bg-gradient-to-r from-[var(--color-bg-secondary)] to-[var(--color-bg-gradient-end)] border-b border-[var(--color-border-primary)] z-50 shadow-lg backdrop-blur-sm">
+                {/* Left side - Mobile Menu Button + Logo/Brand */}
+                <div className="flex items-center space-x-4">
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="md:hidden p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-gradient-start)] rounded-lg transition-all duration-200 hover:shadow-md"
+                    >
+                        {isCollapsed ? <Menu size={20} /> : <X size={20} />}
+                    </button>
+
+                    {/* Logo/Brand */}
+                    <div className="flex items-center">
+                        <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] bg-clip-text text-transparent">
+                            Attendance System
+                        </h1>
+                    </div>
                 </div>
 
-                {/* Right side - User menu */}
-                <div className="flex items-center space-x-4">
-                    <ThemeToggle />
+                {/* Right side - Theme Toggle + Notifications + User menu */}
+                <div className="flex items-center space-x-2 md:space-x-4">
+                    {/* Theme Toggle */}
+                    <div className="hidden sm:block">
+                        <ThemeToggle />
+                    </div>
+
                     {/* Notifications */}
-                    <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] rounded-full transition-colors">
-                        <Bell size={20} />
+                    <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-gradient-start)] rounded-lg transition-all duration-200 hover:shadow-md group">
+                        <Bell size={18} className="group-hover:animate-pulse" />
                         {/* Notification badge */}
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--color-error-light)]0 rounded-full"></span>
+                        <span className="absolute top-1 right-1 w-2 h-2 bg-gradient-to-r from-[var(--color-error)] to-[var(--color-error-light)] rounded-full animate-pulse"></span>
                     </button>
 
                     {/* User Profile Dropdown */}
                     <div className="relative" ref={dropdownRef}>
                         <button
-                            className="flex items-center space-x-2 p-2 rounded-lg hover:bg-[var(--color-bg-gradient-start)] transition-colors"
+                            className="flex items-center space-x-2 p-2 rounded-lg hover:bg-[var(--color-bg-gradient-start)] transition-all duration-200 hover:shadow-md group"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             {/* User Avatar */}
-                            <div className="w-8 h-8 bg-[var(--color-blue)] rounded-full flex items-center justify-center text-[var(--color-text-white)] text-sm font-semibold">
+                            <div className="w-8 h-8 bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-full flex items-center justify-center text-[var(--color-text-white)] text-sm font-semibold shadow-md hover:shadow-lg transition-shadow duration-200">
                                 {getUserInitials(user?.full_name)}
                             </div>
 
-                            {/* User Name */}
-                            <span className="text-[var(--color-text-secondary)] font-medium hidden sm:inline-block max-w-32 truncate">
+                            {/* User Name - Hidden on small screens */}
+                            <span className="text-[var(--color-text-secondary)] font-medium hidden md:inline-block max-w-32 truncate group-hover:text-[var(--color-text-primary)] transition-colors duration-200">
                                 {user?.full_name || user?.name || user?.username || 'User'}
                             </span>
 
                             {/* Dropdown Arrow */}
                             <ChevronDown
                                 size={16}
-                                className={`text-[var(--color-text-secondary)] transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                className={`text-[var(--color-text-secondary)] transition-all duration-300 group-hover:text-[var(--color-text-primary)] ${
+                                    isDropdownOpen ? 'rotate-180' : 'rotate-0'
+                                }`}
                             />
                         </button>
 
                         {/* Dropdown Menu */}
                         {isDropdownOpen && (
-                            <div className="absolute right-0 top-12 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg w-80 overflow-hidden">
+                            <div className="absolute right-0 top-12 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-xl shadow-xl w-80 overflow-hidden backdrop-blur-sm animate-in slide-in-from-top-2 duration-200">
                                 {/* User Info Header */}
-                                <div className="px-4 py-3 bg-[var(--color-bg-primary)] border-b">
+                                <div className="px-4 py-4 bg-gradient-to-r from-[var(--color-bg-primary)] to-[var(--color-bg-gradient-start)] border-b border-[var(--color-border-primary)]">
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-[var(--color-blue)] rounded-full flex items-center justify-center text-[var(--color-text-white)] font-semibold">
+                                        <div className="w-12 h-12 bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] rounded-full flex items-center justify-center text-[var(--color-text-white)] font-bold text-lg shadow-lg">
                                             {getUserInitials(user?.full_name)}
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold text-gray-800">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-[var(--color-text-primary)] truncate">
                                                 {user?.full_name || user?.name || user?.username || 'User'}
                                             </h3>
-                                            <p className="text-sm text-[var(--color-text-secondary)]">
+                                            <p className="text-sm text-[var(--color-text-secondary)] truncate">
                                                 {user?.email || user?.username || user?.number || 'N/A'}
                                             </p>
                                         </div>
@@ -111,50 +141,81 @@ const Navbar = () => {
                                 </div>
 
                                 {/* User Details */}
-                                <div className="px-4 py-3 border-b">
-                                    <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">Account Details</h4>
-                                    <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
-                                        <div className="flex justify-between">
-                                            <span>User ID:</span>
-                                            <span className="font-mono">{user?.user_id || 'N/A'}</span>
+                                <div className="px-4 py-4 border-b border-[var(--color-border-primary)] bg-[var(--color-bg-gradient-start)]">
+                                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 flex items-center">
+                                        <User size={14} className="mr-2" />
+                                        Account Details
+                                    </h4>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between items-center py-1">
+                                            <span className="text-[var(--color-text-secondary)]">User ID:</span>
+                                            <span className="font-mono text-[var(--color-text-primary)] font-medium">
+                                                {user?.user_id || 'N/A'}
+                                            </span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Username:</span>
-                                            <span className="font-mono">{user?.username || 'N/A'}</span>
+                                        <div className="flex justify-between items-center py-1">
+                                            <span className="text-[var(--color-text-secondary)]">Username:</span>
+                                            <span className="font-mono text-[var(--color-text-primary)] font-medium">
+                                                {user?.username || 'N/A'}
+                                            </span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Phone:</span>
-                                            <span className="font-mono">{user?.number || 'N/A'}</span>
+                                        <div className="flex justify-between items-center py-1">
+                                            <span className="text-[var(--color-text-secondary)]">Phone:</span>
+                                            <span className="font-mono text-[var(--color-text-primary)] font-medium">
+                                                {user?.number || 'N/A'}
+                                            </span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Sub Status:</span>
-                                            <span className="font-mono">{user?.subscriptions_status || 'N/A'}</span>
+                                        <div className="flex justify-between items-center py-1">
+                                            <span className="text-[var(--color-text-secondary)]">Sub Status:</span>
+                                            <span className={`font-mono font-medium px-2 py-1 rounded-md text-xs ${
+                                                user?.subscriptions_status === 'active' 
+                                                    ? 'bg-[var(--color-success-light)] text-[var(--color-success-dark)]'
+                                                    : 'bg-[var(--color-error-light)] text-[var(--color-error-dark)]'
+                                            }`}>
+                                                {user?.subscriptions_status || 'N/A'}
+                                            </span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Expire In:</span>
-                                            <span className="font-mono">{user?.subscriptions_days || 'N/A'}</span>
+                                        <div className="flex justify-between items-center py-1">
+                                            <span className="text-[var(--color-text-secondary)]">Expire In:</span>
+                                            <span className="font-mono text-[var(--color-text-primary)] font-medium">
+                                                {user?.subscriptions_days ? `${user.subscriptions_days} days` : 'N/A'}
+                                            </span>
                                         </div>
                                         {user?.email && (
-                                            <div className="flex justify-between">
-                                                <span>Email:</span>
-                                                <span className="font-mono truncate ml-2">{user.email}</span>
+                                            <div className="flex justify-between items-center py-1">
+                                                <span className="text-[var(--color-text-secondary)]">Email:</span>
+                                                <span className="font-mono text-[var(--color-text-primary)] font-medium truncate ml-2 max-w-32">
+                                                    {user.email}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
+                                {/* Theme Toggle for Mobile */}
+                                <div className="sm:hidden px-4 py-3 border-b border-[var(--color-border-primary)]">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-[var(--color-text-primary)]">Theme</span>
+                                        <ThemeToggle />
+                                    </div>
+                                </div>
+
                                 {/* Menu Actions */}
                                 <div className="py-2">
-                                    <button className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] flex items-center space-x-2">
-                                        <Settings size={16} />
+                                    <button className="w-full px-4 py-3 text-left text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-gradient-start)] hover:text-[var(--color-text-primary)] flex items-center space-x-3 transition-all duration-200 group">
+                                        <div className="p-1 rounded-md bg-[var(--color-bg-gradient-start)] group-hover:bg-[var(--color-blue-lighter)] transition-colors duration-200">
+                                            <Settings size={14} className="group-hover:text-[var(--color-blue-dark)]" />
+                                        </div>
                                         <span>Settings</span>
                                     </button>
 
                                     <button
                                         onClick={handleLogoutClick}
-                                        className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-error)] hover:bg-[var(--color-error-light)] flex items-center space-x-2"
+                                        className="w-full px-4 py-3 text-left text-sm text-[var(--color-error)] hover:bg-[var(--color-error-light)] hover:text-[var(--color-error-dark)] flex items-center space-x-3 transition-all duration-200 group"
                                     >
-                                        <LogOut size={16} />
+                                        <div className="p-1 rounded-md bg-[var(--color-error-light)] group-hover:bg-[var(--color-error)] transition-colors duration-200">
+                                            <LogOut size={14} className="group-hover:text-[var(--color-text-white)]" />
+                                        </div>
                                         <span>Logout</span>
                                     </button>
                                 </div>
