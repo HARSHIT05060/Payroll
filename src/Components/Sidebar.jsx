@@ -312,7 +312,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                                 hover:from-[var(--color-bg-gradient-start)] hover:to-[var(--color-bg-gradient-end)]
                                 hover:brightness-110 active:scale-95
                                 relative overflow-hidden
-                                rounded-tr-[20px] 
+                                rounded-tr-[20px]
                                 rounded-br-[20px] 
                             `}
                             style={{
