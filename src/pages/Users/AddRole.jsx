@@ -547,7 +547,9 @@ const AddRole = () => {
             </div>
         );
     }
-
+    if (!permissions['employee_edit'] && isEditMode) {
+        return;
+    }
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">

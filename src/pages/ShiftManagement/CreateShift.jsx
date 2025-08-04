@@ -4,6 +4,7 @@ import { Calendar, Clock, ArrowLeft, Save, X, CheckCircle, AlertCircle, Info, Se
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
+import { useSelector } from 'react-redux';
 
 // Professional Loading Component
 const LoadingSpinner = ({ message = "Loading shift configuration..." }) => (
@@ -146,6 +147,7 @@ const CreateShift = () => {
     const [dayList, setDayList] = useState([]);
     const [shiftTypes, setShiftTypes] = useState([]);
     const [occasionalDayList, setOccasionalDayList] = useState([]);
+    const permissions = useSelector(state => state.permissions) || {};
 
     // Show toast notification
     const showToast = (message, type = 'info') => {
@@ -625,6 +627,9 @@ const CreateShift = () => {
         return <LoadingSpinner message={loadingMessage} />;
     }
 
+    if (!permissions['employee_edit'] && isEditMode) {
+        return;
+    }
     return (
         <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-secondary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">

@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useSelector } from 'react-redux';
 
 const AddEmployee = () => {
     const { employeeId } = useParams(); // Get employee ID from URL params
@@ -17,6 +18,9 @@ const AddEmployee = () => {
     const editEmployeeId = employeeId || queryParams.get('edit');
     const isEditMode = Boolean(editEmployeeId);
     const [toast, setToast] = useState(null);
+    const permissions = useSelector(state => state.permissions) || {};
+
+
 
     const [formData, setFormData] = useState({
         // Basic Details
@@ -779,6 +783,9 @@ const AddEmployee = () => {
         );
     }
 
+    if (!permissions['employee_edit'] && isEditMode) {
+        return;
+    }
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
@@ -1431,6 +1438,7 @@ const AddEmployee = () => {
             )}
         </div>
     );
+
 };
 
 export default AddEmployee;
