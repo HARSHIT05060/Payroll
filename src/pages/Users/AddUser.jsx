@@ -357,11 +357,6 @@ const AddUser = () => {
                                                     Loading user data...
                                                 </p>
                                             )}
-                                            {!userDataLoading && (
-                                                <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                                    {isEditing ? 'Update user details below' : 'Fill in the user details below'}
-                                                </p>
-                                            )}
                                         </div>
                                     </div>
                                 </div>

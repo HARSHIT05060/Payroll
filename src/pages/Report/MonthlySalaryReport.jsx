@@ -257,9 +257,6 @@ const MonthlySalaryReport = () => {
                                         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             Monthly Salary Report
                                         </h1>
-                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
-                                            {getMonthYearDisplay(filters.month_year)} salary breakdown
-                                        </p>
                                     </div>
                                 </div>
                             </div>

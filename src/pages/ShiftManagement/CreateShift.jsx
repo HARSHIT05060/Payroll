@@ -649,9 +649,6 @@ const CreateShift = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {isEditMode ? 'Edit Shift Configuration' : 'Create New Shift'}
                                     </h1>
-                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                        {isEditMode ? 'Update shift details below' : 'Fill in the shift details below'}
-                                    </p>
                                 </div>
                             </div>
                         </div>

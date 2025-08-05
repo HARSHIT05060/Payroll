@@ -100,10 +100,6 @@ const Role = () => {
         }
     };
 
-    const handleRefresh = () => {
-        fetchRoles(1, true);
-    };
-
     const handleCreateRole = () => {
         navigate('/add-role');
     };
@@ -221,14 +217,6 @@ const Role = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <button
-                                        onClick={handleRefresh}
-                                        disabled={loading || paginationLoading}
-                                        className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <RefreshCw size={18} className={`${loading || paginationLoading ? 'animate-spin' : ''}`} />
-                                        Refresh
-                                    </button>
                                     {permissions['user_roles_create'] && (
                                         <button
                                             onClick={handleCreateRole}
@@ -263,13 +251,6 @@ const Role = () => {
                                     <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
                                     <p className="text-[var(--color-error-dark)] text-lg font-medium mb-2">Error Loading Roles</p>
                                     <p className="text-[var(--color-text-error)] mb-4">{error}</p>
-                                    <button
-                                        onClick={handleRefresh}
-                                        className="inline-flex items-center space-x-2 bg-[var(--color-error)] text-[var(--color-text-white)] px-4 py-2 rounded-md hover:bg-[var(--color-error-dark)] transition-colors"
-                                    >
-                                        <RefreshCw className="w-4 h-4" />
-                                        <span>Try Again</span>
-                                    </button>
                                 </div>
                             </div>
                         ) : roles.length === 0 ? (

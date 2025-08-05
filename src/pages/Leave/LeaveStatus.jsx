@@ -410,9 +410,6 @@ const LeaveManagement = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Leave Management
                                     </h1>
-                                    <p className="text-[var(--color-text-white-90)] text-sm">
-                                        Manage employee leave requests and approvals
-                                    </p>
                                 </div>
                             </div>
                         </div>

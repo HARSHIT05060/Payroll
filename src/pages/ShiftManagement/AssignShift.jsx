@@ -179,14 +179,10 @@ const AssignShift = () => {
                                 Back
                             </button>
                             <div className="flex items-center gap-3">
-                                <Calendar size={24} className="text-[var(--color-text-white)]" />
                                 <div>
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {editShiftId ? 'Assign Shift' : 'Assign New Shift'}
                                     </h1>
-                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                        Select an employee and shift to create assignment
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -203,7 +199,6 @@ const AssignShift = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Employee Selection</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Choose the employee for shift assignment</p>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +270,6 @@ const AssignShift = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Shift Selection</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Configure the shift assignment details</p>
                                 </div>
                             </div>
                         </div>

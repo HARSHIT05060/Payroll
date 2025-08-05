@@ -299,14 +299,6 @@ const DailyReport = () => {
                                         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             Daily Attendance Report
                                         </h1>
-                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
-                                            {new Date(selectedDate).toLocaleDateString('en-US', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
-                                        </p>
                                     </div>
                                 </div>
                             </div>

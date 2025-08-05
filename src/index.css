@@ -243,12 +243,12 @@
 
 .custom-datepicker {
     width: 100%;
-    background-color: var(--color-bg-secondary-20);
-    border: 1px solid var(--color-bg-secondary-30);
+    height: 50px;
+    border: 1px solid var(--color-border-primary);
     border-radius: 0.5rem;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
-    color: var(--color-text-white);
+    color: var(--color-text-primary);
 }
 
 .custom-datepicker:focus {
@@ -256,7 +256,7 @@
 }
 
 .custom-datepicker::placeholder {
-    color: var(--color-text-white-90);
+    color: var(--color-text-primary);
 }
 
 .month-picker-input {

@@ -152,9 +152,6 @@ const DateRangeReport = () => {
                                         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             Date Range Report
                                         </h1>
-                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
-                                            Generate comprehensive attendance reports for selected date range
-                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +177,7 @@ const DateRangeReport = () => {
                                     Start Date
                                 </label>
                                 <div className="flex items-center space-x-2 ">
-                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)] " />
+                                    <Calendar className="w-5 h-5 text-[var(--color-bg)] " />
                                     <DatePicker
                                         selected={startDate}
                                         onChange={(date) => setStartDate(date)}
@@ -198,7 +195,7 @@ const DateRangeReport = () => {
                                     End Date
                                 </label>
                                 <div className="flex items-center space-x-2">
-                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
+                                    <Calendar className="w-5 h-5 text-[var(--color-bg)]" />
                                     <DatePicker
                                         selected={endDate}
                                         onChange={(date) => setEndDate(date)}

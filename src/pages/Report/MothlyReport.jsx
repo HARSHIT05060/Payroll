@@ -437,9 +437,6 @@ const MonthlyReport = () => {
 
     const summaryStats = calculateSummaryStats(reportData);
 
-    // Get selected month for display
-    const selectedMonth = filters.month_year ? new Date(filters.month_year + '-01') : new Date();
-
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="p-6 max-w-7xl mx-auto">
@@ -460,12 +457,6 @@ const MonthlyReport = () => {
                                         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             Monthly Attendance Report
                                         </h1>
-                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
-                                            {selectedMonth.toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long'
-                                            })}
-                                        </p>
                                     </div>
                                 </div>
                             </div>

@@ -438,9 +438,6 @@ const EmployeeDirectoryReport = () => {
                                         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             Employee Directory
                                         </h1>
-                                        <p className="text-[var(--color-text-white)] opacity-90 mt-1">
-                                            Complete employee listing with details
-                                        </p>
                                     </div>
                                 </div>
                             </div>

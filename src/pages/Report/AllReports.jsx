@@ -198,9 +198,6 @@ const AllReports = () => {
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         Reports Dashboard
                                     </h1>
-                                    <p className="text-[var(--color-text-white)] opacity-80 text-sm">
-                                        Generate and view comprehensive employee reports
-                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -569,9 +569,6 @@ const AddRole = () => {
                                         <h2 className="text-2xl font-bold text-[var(--color-text-white)]">
                                             {isEditMode ? 'Edit Role' : 'Create New Role'}
                                         </h2>
-                                        <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                            {isEditMode ? 'Update role details and permissions below' : 'Fill in the role details and permissions below'}
-                                        </p>
                                     </div>
                                 </div>
                             </div>

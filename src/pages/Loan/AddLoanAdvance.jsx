@@ -462,9 +462,6 @@ const AddLoanAdvance = ({
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
                                     </h1>
-                                    <p className="text-[var(--color-text-white)] text-sm mt-1">
-                                        {existingLoan ? 'Update existing loan/advance details' : 'Fill in the details to create a new loan/advance'}
-                                    </p>
                                 </div>
                             </div>
                             <div className="ml-auto">
@@ -490,7 +487,6 @@ const AddLoanAdvance = ({
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Employee Information</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Select the employee for this loan/advance</p>
                                 </div>
                             </div>
                         </div>
@@ -559,7 +555,6 @@ const AddLoanAdvance = ({
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Loan/Advance Details</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Configure the loan or advance parameters</p>
                                 </div>
                             </div>
                         </div>
@@ -699,7 +694,6 @@ const AddLoanAdvance = ({
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Dates & Status</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Configure approval status and important dates</p>
                                 </div>
                             </div>
                         </div>
@@ -765,7 +759,6 @@ const AddLoanAdvance = ({
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Guarantor Information</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Optional guarantor details for added security</p>
                                 </div>
                             </div>
                         </div>
@@ -810,7 +803,6 @@ const AddLoanAdvance = ({
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Additional Information</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Provide context and justification for this request</p>
                                 </div>
                             </div>
                         </div>

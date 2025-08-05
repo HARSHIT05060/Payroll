@@ -1186,853 +1186,561 @@ const AddEmployee = () => {
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
-                                                    Aadhar Card {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}
+                                                    Aadhar Card {!isEditMode && <span className="text-[var(--color-error)]">*</span>}
                                                 </label>
-                                                <input
-                                                    type="file"
-                                                    name="aadharCard"
-                                                    onChange={handleInputChange}
-                                                    accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                    {...(!isEditMode && { required: true })}
-                                                />
-                                                {filePreviews.aadharCard && (
-                                                    <div className="mt-2 relative">
-                                                        {/* Check if it's an image (either base64 or URL) */}
-                                                        {(filePreviews.aadharCard.startsWith('data:image') ||
-                                                            filePreviews.aadharCard.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) ? (
-                                                            <div className="relative inline-block group cursor-pointer">
-                                                                <img
-                                                                    src={filePreviews.aadharCard}
-                                                                    alt="Aadhar Card Preview"
-                                                                    className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
-                                                                    onError={(e) => {
-                                                                        console.error('Image failed to load:', filePreviews.aadharCard);
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'block';
-                                                                    }}
-                                                                />
-                                                                {/* Fallback for broken images */}
-                                                                <div
-                                                                    className="h-20 w-20 bg-gray-200 rounded-lg border flex items-center justify-center text-gray-500 text-xs"
-                                                                    style={{ display: 'none' }}
-                                                                >
-                                                                    Image Error
-                                                                </div>
 
-                                                                {/* Close button - top right */}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFileDelete('aadharCard');
-                                                                    }}
-                                                                    className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                    title="Remove file"
-                                                                >
-                                                                    <svg
-                                                                        className="w-3 h-3"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={2}
-                                                                            d="M6 18L18 6M6 6l12 12"
-                                                                        />
+                                                {/* Upload Area */}
+                                                <div className="relative">
+                                                    {!filePreviews.aadharCard ? (
+                                                        /* Upload Button when no file */
+                                                        <label className="flex flex-col items-center justify-center w-full h-25 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl cursor-pointer bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-hover)] transition-all duration-300">
+                                                            <div className="flex flex-col items-center justify-center pt-3 pb-3">
+                                                                {/* Upload Icon */}
+                                                                <div className="w-10 h-10 mb-2 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+                                                                    <svg className="w-5 h-5 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                                                     </svg>
-                                                                </button>
+                                                                </div>
+                                                                <p className="mb-1 text-base font-medium text-[var(--color-text-primary)]">Upload photo</p>
+                                                                <p className="text-xs text-[var(--color-text-muted)]">PNG, JPG up to 5MB</p>
+                                                            </div>
+                                                            <input
+                                                                type="file"
+                                                                name="aadharCard"
+                                                                onChange={handleInputChange}
+                                                                accept="image/*,.pdf"
+                                                                className="hidden"
+                                                                {...(!isEditMode && { required: true })}
+                                                            />
+                                                        </label>
+                                                    ) : (
+                                                        /* Preview when file is uploaded */
+                                                        <div className="relative w-full h-32 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl bg-[var(--color-bg-card)] overflow-hidden">
+                                                            {/* Check if it's an image */}
+                                                            {(filePreviews.aadharCard.startsWith('data:image') ||
+                                                                filePreviews.aadharCard.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) ? (
+                                                                <div className="relative w-full h-full group">
+                                                                    <img
+                                                                        src={filePreviews.aadharCard}
+                                                                        alt="Aadhar Card Preview"
+                                                                        className="w-full h-full object-contain group-hover:opacity-75 transition-opacity duration-200"
+                                                                        onError={(e) => {
+                                                                            console.error('Image failed to load:', filePreviews.aadharCard);
+                                                                            e.target.style.display = 'none';
+                                                                            e.target.nextSibling.style.display = 'flex';
+                                                                        }}
+                                                                    />
+                                                                    {/* Fallback for broken images */}
+                                                                    <div
+                                                                        className="w-full h-full bg-[var(--color-bg-gray-light)] flex items-center justify-center text-[var(--color-text-muted)] text-sm"
+                                                                        style={{ display: 'none' }}
+                                                                    >
+                                                                        Image Error
+                                                                    </div>
 
-                                                                {/* Preview overlay - center */}
-                                                                <div
-                                                                    className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleImagePreview(filePreviews.aadharCard);
-                                                                    }}
-                                                                >
-                                                                    <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                        <svg
-                                                                            className="w-5 h-5"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleImagePreview(filePreviews.aadharCard);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview image"
                                                                         >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                            />
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                            />
-                                                                        </svg>
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('aadharCard');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        ) : (
-                                                            /* Document/PDF preview */
-                                                            <div className="relative inline-block group cursor-pointer">
-                                                                <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)] group-hover:opacity-50 transition-opacity duration-200 h-20 w-20 flex items-center justify-center">
-                                                                    <svg
-                                                                        className="w-8 h-8"
-                                                                        fill="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                                                    </svg>
-                                                                </div>
+                                                            ) : (
+                                                                /* Document/PDF preview */
+                                                                <div className="relative w-full h-full group flex items-center justify-center">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <div className="w-12 h-12 bg-[var(--color-blue)] rounded-xl flex items-center justify-center mb-2">
+                                                                            <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="currentColor" viewBox="0 0 24 24">
+                                                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <p className="text-xs font-medium text-[var(--color-text-primary)]">PDF Document</p>
+                                                                    </div>
 
-                                                                {/* Close button - top right */}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFileDelete('aadharCard');
-                                                                    }}
-                                                                    className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                    title="Remove file"
-                                                                >
-                                                                    <svg
-                                                                        className="w-3 h-3"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={2}
-                                                                            d="M6 18L18 6M6 6l12 12"
-                                                                        />
-                                                                    </svg>
-                                                                </button>
-
-                                                                {/* Preview overlay - center */}
-                                                                <div
-                                                                    className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleDocumentPreview(filePreviews.aadharCard);
-                                                                    }}
-                                                                >
-                                                                    <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                        <svg
-                                                                            className="w-5 h-5"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDocumentPreview(filePreviews.aadharCard);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview document"
                                                                         >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                            />
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                            />
-                                                                        </svg>
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('aadharCard');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
+
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
-                                                    PAN Card {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}
+                                                    PAN Card {!isEditMode && <span className="text-[var(--color-error)]">*</span>}
                                                 </label>
-                                                <input
-                                                    type="file"
-                                                    name="panCard"
-                                                    onChange={handleInputChange}
-                                                    accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                    {...(!isEditMode && { required: true })}
-                                                />
-                                                {filePreviews.panCard && (
-                                                    <div className="mt-2 relative">
-                                                        {typeof filePreviews.panCard === 'string' && filePreviews.panCard.startsWith('data:') ? (
-                                                            <div className="relative inline-block group cursor-pointer">
-                                                                <img
-                                                                    src={filePreviews.panCard}
-                                                                    alt="PAN Card Preview"
-                                                                    className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
-                                                                    onError={(e) => {
-                                                                        console.error('Image failed to load:', filePreviews.panCard);
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'block';
-                                                                    }}
-                                                                />
-                                                                {/* Fallback for broken images */}
-                                                                <div
-                                                                    className="h-20 w-20 bg-gray-200 rounded-lg border flex items-center justify-center text-gray-500 text-xs"
-                                                                    style={{ display: 'none' }}
-                                                                >
-                                                                    Image Error
-                                                                </div>
 
-                                                                {/* Close button - top right */}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFileDelete('panCard');
-                                                                    }}
-                                                                    className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                    title="Remove file"
-                                                                >
-                                                                    <svg
-                                                                        className="w-3 h-3"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={2}
-                                                                            d="M6 18L18 6M6 6l12 12"
-                                                                        />
+                                                {/* Upload Area */}
+                                                <div className="relative">
+                                                    {!filePreviews.panCard ? (
+                                                        /* Upload Button when no file */
+                                                        <label className="flex flex-col items-center justify-center w-full h-25 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl cursor-pointer bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-hover)] transition-all duration-300">
+                                                            <div className="flex flex-col items-center justify-center pt-3 pb-3">
+                                                                {/* Upload Icon */}
+                                                                <div className="w-10 h-10 mb-2 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+                                                                    <svg className="w-5 h-5 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                                                     </svg>
-                                                                </button>
-
-                                                                {/* Preview overlay - center */}
-                                                                <div
-                                                                    className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleImagePreview(filePreviews.panCard);
-                                                                    }}
-                                                                >
-                                                                    <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                        <svg
-                                                                            className="w-5 h-5"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                            />
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                            />
-                                                                        </svg>
-                                                                    </div>
                                                                 </div>
+                                                                <p className="mb-1 text-base font-medium text-[var(--color-text-primary)]">Upload photo</p>
+                                                                <p className="text-xs text-[var(--color-text-muted)]">PNG, JPG up to 5MB</p>
                                                             </div>
-                                                        ) : (
-                                                            isEditMode && typeof filePreviews.panCard === 'string' ? (
-                                                                <div className="relative inline-block group cursor-pointer">
+                                                            <input
+                                                                type="file"
+                                                                name="panCard"
+                                                                onChange={handleInputChange}
+                                                                accept="image/*,.pdf"
+                                                                className="hidden"
+                                                                {...(!isEditMode && { required: true })}
+                                                            />
+                                                        </label>
+                                                    ) : (
+                                                        /* Preview when file is uploaded */
+                                                        <div className="relative w-full h-32 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl bg-[var(--color-bg-card)] overflow-hidden">
+                                                            {/* Check if it's an image */}
+                                                            {(filePreviews.panCard.startsWith('data:image') ||
+                                                                filePreviews.panCard.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) ? (
+                                                                <div className="relative w-full h-full group">
                                                                     <img
                                                                         src={filePreviews.panCard}
                                                                         alt="PAN Card Preview"
-                                                                        className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
+                                                                        className="w-full h-full object-contain group-hover:opacity-75 transition-opacity duration-200"
+                                                                        onError={(e) => {
+                                                                            console.error('Image failed to load:', filePreviews.panCard);
+                                                                            e.target.style.display = 'none';
+                                                                            e.target.nextSibling.style.display = 'flex';
+                                                                        }}
                                                                     />
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('panCard');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
+                                                                    {/* Fallback for broken images */}
                                                                     <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleImagePreview(filePreviews.panCard);
-                                                                        }}
+                                                                        className="w-full h-full bg-[var(--color-bg-gray-light)] flex items-center justify-center text-[var(--color-text-muted)] text-sm"
+                                                                        style={{ display: 'none' }}
                                                                     >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                        Image Error
+                                                                    </div>
+
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleImagePreview(filePreviews.panCard);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                                             </svg>
-                                                                        </div>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('panCard');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ) : (
                                                                 /* Document/PDF preview */
-                                                                <div className="relative inline-block group cursor-pointer">
-                                                                    <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)] group-hover:opacity-50 transition-opacity duration-200 h-20 w-20 flex items-center justify-center">
-                                                                        <svg
-                                                                            className="w-8 h-8"
-                                                                            fill="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                                                        </svg>
-                                                                    </div>
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('panCard');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
-                                                                    <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDocumentPreview(filePreviews.panCard);
-                                                                        }}
-                                                                    >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                <div className="relative w-full h-full group flex items-center justify-center">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <div className="w-12 h-12 bg-[var(--color-blue)] rounded-xl flex items-center justify-center mb-2">
+                                                                            <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="currentColor" viewBox="0 0 24 24">
+                                                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                                                                             </svg>
                                                                         </div>
+                                                                        <p className="text-xs font-medium text-[var(--color-text-primary)]">PDF Document</p>
+                                                                    </div>
+
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDocumentPreview(filePreviews.panCard);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('panCard');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
-                                                    Profile Photo {!isEditMode && <span className="text-red-500"><span className="text-[var(--color-error)]">*</span></span>}
+                                                    Profile Photo {!isEditMode && <span className="text-[var(--color-error)]">*</span>}
                                                 </label>
-                                                <input
-                                                    type="file"
-                                                    name="photo"
-                                                    onChange={handleInputChange}
-                                                    accept="image/*"
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                    {...(!isEditMode && { required: true })}
-                                                />
-                                                {filePreviews.photo && (
-                                                    <div className="mt-2 relative">
-                                                        {typeof filePreviews.photo === 'string' && filePreviews.photo.startsWith('data:') ? (
-                                                            <div className="relative inline-block group cursor-pointer">
-                                                                <img
-                                                                    src={filePreviews.photo}
-                                                                    alt="Profile Photo Preview"
-                                                                    className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
-                                                                    onError={(e) => {
-                                                                        console.error('Image failed to load:', filePreviews.photo);
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'block';
-                                                                    }}
-                                                                />
-                                                                {/* Fallback for broken images */}
-                                                                <div
-                                                                    className="h-20 w-20 bg-gray-200 rounded-lg border flex items-center justify-center text-gray-500 text-xs"
-                                                                    style={{ display: 'none' }}
-                                                                >
-                                                                    Image Error
-                                                                </div>
 
-                                                                {/* Close button - top right */}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFileDelete('photo');
-                                                                    }}
-                                                                    className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                    title="Remove file"
-                                                                >
-                                                                    <svg
-                                                                        className="w-3 h-3"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={2}
-                                                                            d="M6 18L18 6M6 6l12 12"
-                                                                        />
+                                                {/* Upload Area */}
+                                                <div className="relative">
+                                                    {!filePreviews.photo ? (
+                                                        /* Upload Button when no file */
+                                                        <label className="flex flex-col items-center justify-center w-full h-25 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl cursor-pointer bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-hover)] transition-all duration-300">
+                                                            <div className="flex flex-col items-center justify-center pt-3 pb-3">
+                                                                {/* Upload Icon */}
+                                                                <div className="w-10 h-10 mb-2 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+                                                                    <svg className="w-5 h-5 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                                                     </svg>
-                                                                </button>
-
-                                                                {/* Preview overlay - center */}
-                                                                <div
-                                                                    className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleImagePreview(filePreviews.photo);
-                                                                    }}
-                                                                >
-                                                                    <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                        <svg
-                                                                            className="w-5 h-5"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                            />
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                            />
-                                                                        </svg>
-                                                                    </div>
                                                                 </div>
+                                                                <p className="mb-1 text-base font-medium text-[var(--color-text-primary)]">Upload photo</p>
+                                                                <p className="text-xs text-[var(--color-text-muted)]">PNG, JPG up to 5MB</p>
                                                             </div>
-                                                        ) : (
-                                                            isEditMode && typeof filePreviews.photo === 'string' ? (
-                                                                <div className="relative inline-block group cursor-pointer">
+                                                            <input
+                                                                type="file"
+                                                                name="photo"
+                                                                onChange={handleInputChange}
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                {...(!isEditMode && { required: true })}
+                                                            />
+                                                        </label>
+                                                    ) : (
+                                                        /* Preview when file is uploaded */
+                                                        <div className="relative w-full h-32 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl bg-[var(--color-bg-card)] overflow-hidden">
+                                                            {/* Check if it's an image */}
+                                                            {filePreviews.photo.startsWith('data:image') ||
+                                                                filePreviews.photo.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? (
+                                                                <div className="relative w-full h-full group">
                                                                     <img
                                                                         src={filePreviews.photo}
                                                                         alt="Profile Photo Preview"
-                                                                        className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
+                                                                        className="w-full h-full object-contain group-hover:opacity-75 transition-opacity duration-200"
+                                                                        onError={(e) => {
+                                                                            console.error('Image failed to load:', filePreviews.photo);
+                                                                            e.target.style.display = 'none';
+                                                                            e.target.nextSibling.style.display = 'flex';
+                                                                        }}
                                                                     />
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('photo');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
+                                                                    {/* Fallback for broken images */}
                                                                     <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleImagePreview(filePreviews.photo);
-                                                                        }}
+                                                                        className="w-full h-full bg-[var(--color-bg-gray-light)] flex items-center justify-center text-[var(--color-text-muted)] text-sm"
+                                                                        style={{ display: 'none' }}
                                                                     >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                        Image Error
+                                                                    </div>
+
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleImagePreview(filePreviews.photo);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                                             </svg>
-                                                                        </div>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('photo');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ) : (
                                                                 /* Document/PDF preview */
-                                                                <div className="relative inline-block group cursor-pointer">
-                                                                    <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)] group-hover:opacity-50 transition-opacity duration-200 h-20 w-20 flex items-center justify-center">
-                                                                        <svg
-                                                                            className="w-8 h-8"
-                                                                            fill="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                                                        </svg>
-                                                                    </div>
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('photo');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
-                                                                    <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDocumentPreview(filePreviews.photo);
-                                                                        }}
-                                                                    >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                <div className="relative w-full h-full group flex items-center justify-center">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <div className="w-12 h-12 bg-[var(--color-blue)] rounded-xl flex items-center justify-center mb-2">
+                                                                            <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="currentColor" viewBox="0 0 24 24">
+                                                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                                                                             </svg>
                                                                         </div>
+                                                                        <p className="text-xs font-medium text-[var(--color-text-primary)]">PDF Document</p>
                                                                     </div>
-                                                                </div>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Driving Licence</label>
-                                                <input
-                                                    type="file"
-                                                    name="drivingLicence"
-                                                    onChange={handleInputChange}
-                                                    accept="image/*,.pdf"
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                />
-                                                {filePreviews.drivingLicence && (
-                                                    <div className="mt-2 relative">
-                                                        {typeof filePreviews.drivingLicence === 'string' && filePreviews.drivingLicence.startsWith('data:') ? (
-                                                            <div className="relative inline-block group cursor-pointer">
-                                                                <img
-                                                                    src={filePreviews.drivingLicence}
-                                                                    alt="Driving Licence Preview"
-                                                                    className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
-                                                                    onError={(e) => {
-                                                                        console.error('Image failed to load:', filePreviews.drivingLicence);
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'block';
-                                                                    }}
-                                                                />
-                                                                {/* Fallback for broken images */}
-                                                                <div
-                                                                    className="h-20 w-20 bg-gray-200 rounded-lg border flex items-center justify-center text-gray-500 text-xs"
-                                                                    style={{ display: 'none' }}
-                                                                >
-                                                                    Image Error
-                                                                </div>
 
-                                                                {/* Close button - top right */}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFileDelete('drivingLicence');
-                                                                    }}
-                                                                    className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                    title="Remove file"
-                                                                >
-                                                                    <svg
-                                                                        className="w-3 h-3"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={2}
-                                                                            d="M6 18L18 6M6 6l12 12"
-                                                                        />
-                                                                    </svg>
-                                                                </button>
-
-                                                                {/* Preview overlay - center */}
-                                                                <div
-                                                                    className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleImagePreview(filePreviews.drivingLicence);
-                                                                    }}
-                                                                >
-                                                                    <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                        <svg
-                                                                            className="w-5 h-5"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDocumentPreview(filePreviews.photo);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview document"
                                                                         >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                            />
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                            />
-                                                                        </svg>
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('photo');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                    Driving Licence
+                                                </label>
+
+                                                {/* Upload Area */}
+                                                <div className="relative">
+                                                    {!filePreviews.drivingLicence ? (
+                                                        /* Upload Button when no file */
+                                                        <label className="flex flex-col items-center justify-center w-full h-25 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl cursor-pointer bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-hover)] transition-all duration-300">
+                                                            <div className="flex flex-col items-center justify-center pt-3 pb-3">
+                                                                {/* Upload Icon */}
+                                                                <div className="w-10 h-10 mb-2 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+                                                                    <svg className="w-5 h-5 text-[var(--color-text-white)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                                    </svg>
+                                                                </div>
+                                                                <p className="mb-1 text-base font-medium text-[var(--color-text-primary)]">Upload photo</p>
+                                                                <p className="text-xs text-[var(--color-text-muted)]">PNG, JPG up to 5MB</p>
                                                             </div>
-                                                        ) : (
-                                                            isEditMode && typeof filePreviews.drivingLicence === 'string' ? (
-                                                                <div className="relative inline-block group cursor-pointer">
+                                                            <input
+                                                                type="file"
+                                                                name="drivingLicence"
+                                                                onChange={handleInputChange}
+                                                                accept="image/*,.pdf"
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    ) : (
+                                                        /* Preview when file is uploaded */
+                                                        <div className="relative w-full h-32 border-2 border-dashed border-[var(--color-border-primary)] rounded-xl bg-[var(--color-bg-card)] overflow-hidden">
+                                                            {/* Check if it's an image */}
+                                                            {filePreviews.drivingLicence.startsWith('data:image') ||
+                                                                filePreviews.drivingLicence.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? (
+                                                                <div className="relative w-full h-full group">
                                                                     <img
                                                                         src={filePreviews.drivingLicence}
                                                                         alt="Driving Licence Preview"
-                                                                        className="h-20 w-20 object-cover rounded-lg border group-hover:opacity-50 transition-opacity duration-200"
+                                                                        className="w-full h-full object-contain group-hover:opacity-75 transition-opacity duration-200"
+                                                                        onError={(e) => {
+                                                                            console.error('Image failed to load:', filePreviews.drivingLicence);
+                                                                            e.target.style.display = 'none';
+                                                                            e.target.nextSibling.style.display = 'flex';
+                                                                        }}
                                                                     />
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('drivingLicence');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
+                                                                    {/* Fallback for broken images */}
                                                                     <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleImagePreview(filePreviews.drivingLicence);
-                                                                        }}
+                                                                        className="w-full h-full bg-[var(--color-bg-gray-light)] flex items-center justify-center text-[var(--color-text-muted)] text-sm"
+                                                                        style={{ display: 'none' }}
                                                                     >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                        Image Error
+                                                                    </div>
+
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleImagePreview(filePreviews.drivingLicence);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                                             </svg>
-                                                                        </div>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('drivingLicence');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove image"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ) : (
                                                                 /* Document/PDF preview */
-                                                                <div className="relative inline-block group cursor-pointer">
-                                                                    <div className="p-2 bg-[var(--color-blue-lightest)] rounded-lg text-sm text-[var(--color-blue-darker)] group-hover:opacity-50 transition-opacity duration-200 h-20 w-20 flex items-center justify-center">
-                                                                        <svg
-                                                                            className="w-8 h-8"
-                                                                            fill="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                                                                        </svg>
-                                                                    </div>
-
-                                                                    {/* Close button - top right */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleFileDelete('drivingLicence');
-                                                                        }}
-                                                                        className="absolute -top-2 -right-2 bg-gray-800 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 shadow-lg border border-white"
-                                                                        title="Remove file"
-                                                                    >
-                                                                        <svg
-                                                                            className="w-3 h-3"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M6 18L18 6M6 6l12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Preview overlay - center */}
-                                                                    <div
-                                                                        className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDocumentPreview(filePreviews.drivingLicence);
-                                                                        }}
-                                                                    >
-                                                                        <div className="bg-white bg-opacity-95 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-opacity-100 transition-all duration-200">
-                                                                            <svg
-                                                                                className="w-5 h-5"
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                                />
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth={2}
-                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                                                />
+                                                                <div className="relative w-full h-full group flex items-center justify-center">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <div className="w-12 h-12 bg-[var(--color-blue)] rounded-xl flex items-center justify-center mb-2">
+                                                                            <svg className="w-6 h-6 text-[var(--color-text-white)]" fill="currentColor" viewBox="0 0 24 24">
+                                                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                                                                             </svg>
                                                                         </div>
+                                                                        <p className="text-xs font-medium text-[var(--color-text-primary)]">PDF Document</p>
+                                                                    </div>
+
+                                                                    {/* Overlay with buttons */}
+                                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
+                                                                        {/* Preview button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDocumentPreview(filePreviews.drivingLicence);
+                                                                            }}
+                                                                            className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Preview document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Delete button */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleFileDelete('drivingLicence');
+                                                                            }}
+                                                                            className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                                                                            title="Remove document"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
