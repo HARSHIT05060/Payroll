@@ -20,6 +20,8 @@ import {
     User,
     CalendarX, Calculator
 } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { useRef } from 'react';
@@ -154,7 +156,7 @@ const MonthlySalaryReport = () => {
         }).format(amount || 0);
     };
 
-    
+
     const handleExportExcelClick = () => {
         handlePayrollExportExcel(
             reportData,
@@ -334,17 +336,20 @@ const MonthlySalaryReport = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Month Year Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                                <Calendar className="inline h-4 w-4 mr-1" />
-                                Month & Year
-                            </label>
-                            <input
-                                type="month"
-                                value={filters.month_year}
-                                onChange={(e) => handleFilterChange('month_year', e.target.value)}
-                                className="w-full px-3 py-2 bg-[var(--color-bg-primary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-light)] focus:border-transparent text-[var(--color-text-primary)]"
-                                placeholder="Select month and year"
-                            />
+                            <div className="flex items-center space-x-2">
+                                <Calendar className="w-5 h-5 text-[var(--color-text-primary)]" />
+                                <DatePicker
+                                    selected={filters.month_year}
+                                    onChange={(date) => handleFilterChange('month_year', date)}
+                                    dateFormat="MMMM yyyy"
+                                    showMonthYearPicker
+                                    showFullMonthYearPicker
+                                    className="month-picker-input"
+                                    placeholderText="Select month and year"
+                                    maxDate={new Date()}
+                                    showPopperArrow={false}
+                                />
+                            </div>
                         </div>
 
                         {/* Apply Filters Button */}

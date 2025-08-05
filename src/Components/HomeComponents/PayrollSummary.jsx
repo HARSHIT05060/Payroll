@@ -39,15 +39,16 @@ const PayrollSummary = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Month Selector */}
-              <div className="flex gap-2 bg-[var(--color-bg-hover)] p-1 rounded-lg border border-[var(--color-border-secondary)] items-center z-90">
-                <Calendar className="w-5 h-5 mx-2 text-[var(--color-text-)]" />
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-[var(--color-text-primary)]" />
                 <DatePicker
                   selected={selectedMonth}
                   onChange={handleMonthChange}
                   dateFormat="MM-yyyy"
                   showMonthYearPicker
+                  className="month-picker-input"
                   placeholderText="MM-YYYY"
-                  className="w-full bg-[var(--color-bg-gray-light)] border border-[var(--color-bg-secondary)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-)] placeholder-[var(--color-text-white-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-bg-secondary-30)] z-50"
+                  maxDate={new Date()}
                 />
               </div>
 

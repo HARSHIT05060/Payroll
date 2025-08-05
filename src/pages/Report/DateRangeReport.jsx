@@ -18,6 +18,8 @@ import {
     XCircle
 } from 'lucide-react';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 // Import PDF export utilities
 import {
     groupDataByEmployee,
@@ -26,10 +28,10 @@ import {
 } from '../../utils/exportUtils/DateRangeReport/PdfExportDateRange';
 import { exportToExcel } from '../../utils/exportUtils/DateRangeReport/ExcelExportDateRange.jsx';
 
-
 const DateRangeReport = () => {
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+    // Initialize with Date objects instead of strings
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
@@ -47,6 +49,11 @@ const DateRangeReport = () => {
         setToast(null);
     };
 
+    // Helper function to format date for API
+    const formatDateForAPI = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
     // Generate and export PDF directly
     const handleGenerateAndExport = useCallback(async () => {
         if (!startDate || !endDate) {
@@ -54,7 +61,7 @@ const DateRangeReport = () => {
             return;
         }
 
-        if (new Date(startDate) > new Date(endDate)) {
+        if (startDate > endDate) {
             showToast('Start date cannot be after end date', 'error');
             return;
         }
@@ -73,8 +80,8 @@ const DateRangeReport = () => {
 
             const formData = new FormData();
             formData.append('user_id', user.user_id);
-            formData.append('start_date', startDate);
-            formData.append('end_date', endDate);
+            formData.append('start_date', formatDateForAPI(startDate));
+            formData.append('end_date', formatDateForAPI(endDate));
 
             const response = await api.post('data_range_attendance_report_list', formData);
 
@@ -92,11 +99,11 @@ const DateRangeReport = () => {
             // Step 3: Generate export based on selected type
             if (exportType === 'pdf') {
                 showToast('Generating PDF...', 'info');
-                exportToPDF(attendanceData, reportSummary, groupedData, startDate, endDate);
+                exportToPDF(attendanceData, reportSummary, groupedData, formatDateForAPI(startDate), formatDateForAPI(endDate));
                 showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
             } else if (exportType === 'excel') {
                 showToast('Generating Excel file...', 'info');
-                exportToExcel(attendanceData, startDate, endDate);
+                exportToExcel(attendanceData, formatDateForAPI(startDate), formatDateForAPI(endDate));
                 showToast(`Excel file generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
             }
 
@@ -107,8 +114,7 @@ const DateRangeReport = () => {
         } finally {
             setLoading(false);
         }
-    }, [user?.user_id, startDate, endDate, exportType]); // Add exportType to dependencies
-
+    }, [user?.user_id, startDate, endDate, exportType]);
 
     // Handle retry
     const handleRetry = () => {
@@ -118,6 +124,7 @@ const DateRangeReport = () => {
 
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
+
             {/* Toast Component */}
             {toast && (
                 <Toast
@@ -172,12 +179,16 @@ const DateRangeReport = () => {
                                 <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                     Start Date
                                 </label>
-                                <div className="relative">
-                                    <input
-                                        type="date"
-                                        value={startDate}
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                        className="w-full px-4 py-3 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-[var(--color-border-primary)] bg-[var(--color-bg-secondary)]"
+                                <div className="flex items-center space-x-2 ">
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)] " />
+                                    <DatePicker
+                                        selected={startDate}
+                                        onChange={(date) => setStartDate(date)}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="custom-datepicker"
+                                        maxDate={new Date()}
+                                        showPopperArrow={false}
                                     />
                                 </div>
                             </div>
@@ -186,15 +197,21 @@ const DateRangeReport = () => {
                                 <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                     End Date
                                 </label>
-                                <div className="relative">
-                                    <input
-                                        type="date"
-                                        value={endDate}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                        className="w-full px-4 py-3 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-dark)] focus:border-[var(--color-border-primary)] bg-[var(--color-bg-secondary)]"
+                                <div className="flex items-center space-x-2">
+                                    <Calendar className="w-5 h-5 text-[var(--color-text-white)]" />
+                                    <DatePicker
+                                        selected={endDate}
+                                        onChange={(date) => setEndDate(date)}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="custom-datepicker"
+                                        minDate={startDate}
+                                        maxDate={new Date()}
+                                        showPopperArrow={false}
                                     />
                                 </div>
                             </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                                     Export Format
@@ -208,25 +225,26 @@ const DateRangeReport = () => {
                                     <option value="excel">Excel Spreadsheet</option>
                                 </select>
                             </div>
-                            <div className="flex items-end">
-                                <button
-                                    onClick={handleGenerateAndExport}
-                                    disabled={loading}
-                                    className="w-full px-6 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <RefreshCw className="w-5 h-5 animate-spin" />
-                                            Generating {exportType === 'pdf' ? 'PDF' : 'Excel'}...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Download className="w-5 h-5" />
-                                            Generate & Export {exportType === 'pdf' ? 'PDF' : 'Excel'}
-                                        </>
-                                    )}
-                                </button>
-                            </div>
+                        </div>
+
+                        <div className="mt-6">
+                            <button
+                                onClick={handleGenerateAndExport}
+                                disabled={loading}
+                                className="w-full md:w-auto px-6 py-3 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
+                            >
+                                {loading ? (
+                                    <>
+                                        <RefreshCw className="w-5 h-5 animate-spin" />
+                                        Generating {exportType === 'pdf' ? 'PDF' : 'Excel'}...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="w-5 h-5" />
+                                        Generate & Export {exportType === 'pdf' ? 'PDF' : 'Excel'}
+                                    </>
+                                )}
+                            </button>
                         </div>
 
                         {/* Status Messages */}
@@ -356,7 +374,7 @@ const DateRangeReport = () => {
                             </div>
 
                             <div className="flex items-start gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-primary)]">
-                                <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">3</div>
+                                <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">4</div>
                                 <div>
                                     <h4 className="font-medium text-[var(--color-text-primary)] mb-1">Processing</h4>
                                     <p className="text-sm text-[var(--color-text-secondary)]">The system will process the data and automatically open the print dialog in a new window</p>
@@ -364,7 +382,7 @@ const DateRangeReport = () => {
                             </div>
 
                             <div className="flex items-start gap-4 p-4 bg-[var(--color-bg-primary)] rounded-lg border border-[var(--color-border-primary)]">
-                                <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">4</div>
+                                <div className="flex-shrink-0 w-8 h-8 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-full flex items-center justify-center text-sm font-medium">5</div>
                                 <div>
                                     <h4 className="font-medium text-[var(--color-text-primary)] mb-1">Export</h4>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Choose "Save as PDF" or your preferred printer to complete the export process</p>
@@ -384,8 +402,6 @@ const DateRangeReport = () => {
                                 Please ensure pop-ups are enabled for this site to guarantee proper report generation.
                             </p>
                         </div>
-
-
                     </div>
                 </div>
             </div>

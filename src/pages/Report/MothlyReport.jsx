@@ -9,6 +9,8 @@ import Pagination from '../../Components/Pagination';
 import { Toast } from '../../Components/ui/Toast';
 import { exportMonthlyReportToPDF } from '../../utils/exportUtils/MonthlyReport/pdfExportMonthly';
 import { exportToExcel } from '../../utils/exportUtils/MonthlyReport/excelExportMonthly';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const MonthlyReport = () => {
     const navigate = useNavigate();
@@ -547,13 +549,20 @@ const MonthlyReport = () => {
                                 <Calendar className="inline h-4 w-4 mr-1" />
                                 Month & Year *
                             </label>
-                            <input
-                                type="month"
-                                value={filters.month_year}
-                                onChange={(e) => handleFilterChange('month_year', e.target.value)}
-                                className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent text-[var(--color-text-primary)]"
-                                required
-                            />
+                            <div className="flex items-center space-x-2">
+                                <Calendar className="w-5 h-5 text-[var(--color-text-primary)]" />
+                                <DatePicker
+                                    selected={filters.month_year}
+                                    onChange={(date) => handleFilterChange('month_year', date)}
+                                    dateFormat="MMMM yyyy"
+                                    showMonthYearPicker
+                                    showFullMonthYearPicker
+                                    className="month-picker-input"
+                                    placeholderText="Select month and year"
+                                    maxDate={new Date()}
+                                    showPopperArrow={false}
+                                />
+                            </div>
                         </div>
 
                         {/* Branch Filter */}
