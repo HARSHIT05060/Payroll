@@ -127,11 +127,11 @@ const PayrollSummary = () => {
           </div>
 
           {/* Content Section */}
-          <div className={`relative z-10 ${viewType === 'both' ? 'grid grid-cols-1 lg:grid-cols-2 gap-8' : ''}`}>
+          <div className={`relative z-10 ${viewType === 'both' ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-stretch' : ''}`}>
             {/* Employee Payroll Table */}
             {(viewType === 'table' || viewType === 'both') && (
               <div className={viewType === 'table' ? 'w-full' : ''}>
-                <div className="bg-[var(--color-bg-surface)] rounded-2xl shadow-lg border border-[var(--color-border-secondary)] overflow-hidden">
+                <div className="bg-[var(--color-bg-surface)] rounded-2xl shadow-lg border border-[var(--color-border-secondary)] overflow-hidden h-full flex flex-col">
                   <div className="bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] p-6 border-b border-[var(--color-border-secondary)]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -141,8 +141,8 @@ const PayrollSummary = () => {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                  <div className="overflow-x-auto flex-1 flex flex-col">
+                    <table className="min-w-full flex-1">
                       <thead className="bg-[var(--color-bg-hover)]">
                         <tr>
                           <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
@@ -159,7 +159,7 @@ const PayrollSummary = () => {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                      <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)] align-top">
                         {dashboardData?.payroll_details?.length === 0 ? (
                           <tr>
                             <td colSpan={4} className="text-center py-12 text-[var(--color-text-secondary)]">
@@ -173,7 +173,7 @@ const PayrollSummary = () => {
                           dashboardData?.payroll_details?.map((employee) => (
                             <tr key={employee.employee_salary_id} className="hover:bg-[var(--color-bg-hover)] transition-colors duration-200">
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center gap-4">
+                                <div className="flex  items-center gap-4">
                                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-blue-lightest)] to-[var(--color-blue)] flex items-center justify-center text-white font-semibold shadow-md">
                                     {employee.full_name
                                       ? employee.full_name.split(" ").map((n) => n[0]).join("").substring(0, 2).toUpperCase()
@@ -212,7 +212,7 @@ const PayrollSummary = () => {
             {/* Chart Section */}
             {(viewType === 'chart' || viewType === 'both') && (
               <div className={viewType === 'chart' ? 'w-full' : ''}>
-                <div className="bg-[var(--color-bg-surface)] rounded-2xl shadow-lg border border-[var(--color-border-secondary)] overflow-hidden">
+                <div className="bg-[var(--color-bg-surface)] rounded-2xl shadow-lg border border-[var(--color-border-secondary)] overflow-hidden h-full flex flex-col">
                   <div className="bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-hover)] p-6 border-b border-[var(--color-border-secondary)]">
                     <h3 className="text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
                       <BarChart className="w-6 h-6 text-[var(--color-text-secondary)]" />
@@ -220,9 +220,9 @@ const PayrollSummary = () => {
                     </h3>
                   </div>
 
-                  <div className="p-6">
+                  <div className="p-6 flex-1">
                     {dashboardData?.monthly_chart?.length === 0 ? (
-                      <div className="h-80 flex flex-col items-center justify-center text-[var(--color-text-secondary)]">
+                      <div className="h-full flex flex-col items-center justify-center text-[var(--color-text-secondary)]">
                         <BarChart className="w-16 h-16 text-[var(--color-text-muted)] mb-4" />
                         <p className="text-lg font-medium">No chart data available</p>
                         <p className="text-sm">Data will appear here when payroll information is loaded</p>

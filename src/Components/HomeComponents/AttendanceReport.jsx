@@ -33,7 +33,7 @@ const KEY_MAPPING = {
 };
 
 const AttendanceReport = () => {
-    
+
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [hoveredSegment, setHoveredSegment] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +65,7 @@ const AttendanceReport = () => {
         setSearchQuery('');
         setStatusFilter('all');
     };
-        
+
 
     // Client-side filtering and sorting
     const filteredAndSortedData = useMemo(() => {
@@ -545,10 +545,10 @@ const AttendanceReport = () => {
             </div>
 
             {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:items-stretch">
                 {/* Chart Section */}
                 <div className="lg:col-span-1">
-                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6 h-full flex flex-col">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Attendance Overview</h3>
                             <span className="text-sm text-[var(--color-text-muted)] bg-[var(--color-bg-gray-light)] px-3 py-1 rounded-full">
@@ -563,7 +563,7 @@ const AttendanceReport = () => {
                         <DonutChart stats={stats} hoveredSegment={hoveredSegment} setHoveredSegment={setHoveredSegment} />
 
                         {/* Legend */}
-                        <div className="flex flex-col">
+                        <div className="flex flex-col flex-1 justify-center">
                             <div
                                 className="flex items-center space-x-3 cursor-pointer transition-all duration-200 hover:scale-105 p-3 rounded-lg hover:bg-[var(--color-success-light)]"
                                 onMouseEnter={() => setHoveredSegment('present')}
@@ -597,7 +597,7 @@ const AttendanceReport = () => {
 
                 {/* Table Section */}
                 <div className="lg:col-span-2">
-                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm overflow-hidden">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm overflow-hidden h-full flex flex-col">
                         {/* Table Header */}
                         <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] px-6 py-4 border-b border-[var(--color-border-secondary)]">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -652,8 +652,8 @@ const AttendanceReport = () => {
                         </div>
 
                         {/* Table */}
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-[var(--color-border-secondary)]">
+                        <div className="overflow-x-auto flex-1">
+                            <table className="min-w-full divide-y divide-[var(--color-border-secondary)] h-full">
                                 <thead className="bg-[var(--color-bg-gray-light)]">
                                     <tr className="text-left">
                                         <th

@@ -16,14 +16,8 @@ const SubscriptionWarningModal = ({ isOpen, onClose, daysLeft }) => {
         return 'from-[var(--color-yellow)] to-[var(--color-yellow-dark)]';
     };
 
-    const getUrgencyText = () => {
-        if (daysLeft <= 3) return 'Urgent';
-        if (daysLeft <= 7) return 'Important';
-        return 'Notice';
-    };
-
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
             <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-custom-hover max-w-md w-full border border-[var(--color-border-primary)] animate-fadeIn">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-[var(--color-border-primary)]">
@@ -33,11 +27,8 @@ const SubscriptionWarningModal = ({ isOpen, onClose, daysLeft }) => {
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-[var(--color-text-primary)]">
-                                {getUrgencyText()}
+                                Subscription Expiring
                             </h2>
-                            <p className="text-sm text-[var(--color-text-secondary)]">
-                                Subscription Expiring Soon
-                            </p>
                         </div>
                     </div>
                     <button
