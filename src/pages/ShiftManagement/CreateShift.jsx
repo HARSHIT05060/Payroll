@@ -669,7 +669,6 @@ const CreateShift = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900">Basic Information</h2>
-                                    <p className="text-sm text-[var(--color-text-secondary)]">Define the fundamental details of your shift</p>
                                 </div>
                                 {isEditMode && (
                                     <span className="ml-auto px-3 py-1.5 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full border border-orange-200">
@@ -692,9 +691,6 @@ const CreateShift = () => {
                                         placeholder="Enter a descriptive shift name"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        Choose a clear, identifiable name for this shift pattern
-                                    </p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
@@ -704,12 +700,9 @@ const CreateShift = () => {
                                         value={remark}
                                         onChange={(e) => setRemark(e.target.value)}
                                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 shadow-sm bg-[var(--color-bg-secondary)] resize-none"
-                                        rows={2}
+                                        rows={1}
                                         placeholder="Add any additional notes or remarks about this shift"
                                     />
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        Optional notes about special requirements or conditions
-                                    </p>
                                 </div>
                             </div>
                         </div>

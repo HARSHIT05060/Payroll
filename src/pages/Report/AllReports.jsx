@@ -27,7 +27,6 @@ const AllReports = () => {
             title: 'Employee Directory',
             icon: Users,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Complete employee information and records',
             path: '/reports/employee-directory',
             category: 'employees',
             isAvailable: true,
@@ -45,7 +44,6 @@ const AllReports = () => {
             title: 'Daily Attendance Report',
             icon: Calendar,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Comprehensive daily attendance tracking with detailed employee records',
             path: '/reports/daily-attendance',
             category: 'attendance',
             isAvailable: true,
@@ -63,7 +61,6 @@ const AllReports = () => {
             title: 'Monthly Attendance Summary',
             icon: BarChart3,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Detailed monthly attendance analysis with comprehensive statistics',
             path: '/reports/monthly-attendance',
             category: 'attendance',
             isAvailable: true,
@@ -81,7 +78,6 @@ const AllReports = () => {
             title: 'Monthly Salary Report',
             icon: IndianRupee,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Generate monthly salary reports with accurate breakdowns, integrations, and professional formatting',
             path: '/reports/monthly-salary',
             category: 'payroll',
             isAvailable: true,
@@ -99,7 +95,6 @@ const AllReports = () => {
             title: 'Custom Range Report',
             icon: Calendar,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Generate comprehensive attendance reports for selected date range',
             path: '/reports/daterangereport',
             category: 'attendance',
             isAvailable: true,
@@ -120,7 +115,6 @@ const AllReports = () => {
             title: 'Payroll Summary',
             icon: DollarSign,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Comprehensive payroll calculations and summaries',
             category: 'payroll',
             isAvailable: false,
             plannedFeatures: [
@@ -136,7 +130,6 @@ const AllReports = () => {
             title: 'Performance Reports',
             icon: TrendingUp,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
-            description: 'Employee performance analytics and evaluations',
             category: 'performance',
             isAvailable: false,
             plannedFeatures: [
@@ -227,14 +220,13 @@ const AllReports = () => {
                         {availableReports.map((report) => (
                             <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105 flex flex-col h-full">
                                 {/* Report Header - Fixed Height */}
-                                <div className={`bg-gradient-to-r ${report.color} p-6 h-32 flex items-center`}>
+                                <div className={`bg-gradient-to-r ${report.color} p-6 h-25 flex items-center`}>
                                     <div className="flex items-center gap-3 w-full">
                                         <div className="p-2 bg-white/20 rounded-lg flex-shrink-0">
                                             <report.icon className="h-6 w-6 text-white" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h3 className="text-lg font-semibold text-white line-clamp-1">{report.title}</h3>
-                                            <p className="text-white/80 text-sm mt-1 line-clamp-2 leading-relaxed">{report.description}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -301,7 +293,6 @@ const AllReports = () => {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-lg font-semibold text-white">{report.title}</h3>
-                                            <p className="text-white/80 text-sm mt-1">{report.description}</p>
                                         </div>
                                     </div>
                                     <div className="absolute top-3 right-3">

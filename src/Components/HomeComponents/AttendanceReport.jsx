@@ -463,7 +463,7 @@ const AttendanceReport = () => {
     return (
         <>
             {/* Header */}
-            <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+            <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-6 overflow-hidden">
                 <div className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)] p-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -486,7 +486,7 @@ const AttendanceReport = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                 <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border-secondary)] p-4 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
@@ -653,7 +653,7 @@ const AttendanceReport = () => {
 
                         {/* Table */}
                         <div className="overflow-x-auto flex-1">
-                            <table className="min-w-full divide-y divide-[var(--color-border-secondary)] h-full">
+                            <table className="min-w-full divide-y divide-[var(--color-border-primary)] h-full">
                                 <thead className="bg-[var(--color-bg-gray-light)]">
                                     <tr className="text-left">
                                         <th
@@ -784,12 +784,12 @@ const AttendanceReport = () => {
                                 </tbody>
                             </table>
                         </div>
-
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
                         />
+
                     </div>
                 </div>
             </div>

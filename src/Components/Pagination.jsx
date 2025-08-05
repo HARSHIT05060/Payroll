@@ -69,7 +69,7 @@ const Pagination = ({
 
 
     return (
-        <div className={`px-6 py-4 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] ${className}`}>
+        <div className={`px-6 py-4 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-gray)] ${className}`}>
             <div className="flex items-center justify-end flex-wrap gap-4">
                 {/* Pagination Controls */}
                 <div className="flex items-center space-x-2">

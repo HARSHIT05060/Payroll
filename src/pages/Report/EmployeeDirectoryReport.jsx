@@ -510,7 +510,7 @@ const EmployeeDirectoryReport = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Active</p>
-                                    <p className="text-2xl font-bold text-[var(--color-success)]">{summaryStats.activeEmployees}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.activeEmployees}</p>
                                 </div>
                                 <UserCheck className="h-8 w-8 text-[var(--color-success)]" />
                             </div>
@@ -519,7 +519,7 @@ const EmployeeDirectoryReport = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Male</p>
-                                    <p className="text-2xl font-bold text-[var(--color-blue)]">{summaryStats.maleCount}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.maleCount}</p>
                                 </div>
                                 <User className="h-8 w-8 text-[var(--color-blue)]" />
                             </div>
@@ -528,9 +528,9 @@ const EmployeeDirectoryReport = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-[var(--color-text-secondary)]">Female</p>
-                                    <p className="text-2xl font-bold text-pink-600">{summaryStats.femaleCount}</p>
+                                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{summaryStats.femaleCount}</p>
                                 </div>
-                                <User className="h-8 w-8 text-pink-600" />
+                                <User className="h-8 w-8 text-pink-500" />
                             </div>
                         </div>
                     </div>

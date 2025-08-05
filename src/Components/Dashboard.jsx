@@ -11,8 +11,6 @@ const MainDashboard = () => (
         <AttendanceReport />
         <PayrollSummary/>
         <SalaryTrend />
-        {/* <PendingTasks /> */}
-
     </div>
 );
 
