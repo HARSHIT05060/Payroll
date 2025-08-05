@@ -221,10 +221,9 @@ const AllReports = () => {
                             <CheckCircle className="h-5 w-5 text-[var(--color-blue-dark)]" />
                         </div>
                         <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Available Reports</h2>
-
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                         {availableReports.map((report) => (
                             <div key={report.id} className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden hover:shadow-md transition-all duration-300 hover:scale-105 flex flex-col h-full">
                                 {/* Report Header - Fixed Height */}
