@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'; // Adjust path as needed
 import api from '../../api/axiosInstance'; // Adjust path as needed
 import { Toast } from '../../Components/ui/Toast';
+import { useSelector } from 'react-redux';
+
 const AddLoanAdvance = ({
     existingLoan = null,
 }) => {
@@ -36,6 +38,7 @@ const AddLoanAdvance = ({
     const [loanTypes, setLoanTypes] = useState([]);
     const [priorities, setPriorities] = useState([]);
     const [statuses, setStatuses] = useState([]);
+    const permissions = useSelector(state => state.permissions) || {};
 
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [loading, setLoading] = useState(false);
@@ -341,6 +344,11 @@ const AddLoanAdvance = ({
     };
 
     const handleSubmit = async () => {
+        if (existingLoan && !permissions['loan_edit']) {
+            showToast('You don\'t have permission to edit loans/advances', 'error');
+            return;
+        }
+
         if (!validateForm()) {
             showToast('Please fix the validation errors before submitting', 'error');
             return;
@@ -441,7 +449,25 @@ const AddLoanAdvance = ({
         setSelectedEmployee('');
         setErrors({});
     };
-
+    if (!permissions['loan_create']) {
+        return (
+            <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
+                <div className="bg-[var(--color-bg-secondary)] rounded-lg p-8 shadow-lg text-center">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="w-8 h-8 text-red-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+                    <p className="text-gray-600 mb-4">You don't have permission to create loans/advances.</p>
+                    <button
+                        onClick={handleBack}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Go Back
+                    </button>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
@@ -462,6 +488,12 @@ const AddLoanAdvance = ({
                                     <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
                                         {existingLoan ? 'Edit Loan/Advance' : 'Add New Loan/Advance'}
                                     </h1>
+                                    {!permissions['loan_edit'] && existingLoan && (
+                                        <p className="text-sm text-yellow-200 mt-1">
+                                            <Info className="w-4 h-4 inline mr-1" />
+                                            Read-only mode - You don't have edit permissions
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                             <div className="ml-auto">
