@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Trash2, DollarSign, AlertTriangle, X, Search } from "lucide-react";
+import React, { useState } from "react";
+import { Trash2, DollarSign } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import AllowanceForm from "./AllowanceForm";
@@ -7,23 +7,17 @@ import useAllowances from "../../hooks/useAllowances";
 
 const AllowanceList = () => {
     const [deletingId, setDeletingId] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         type: null,
         data: null
     });
-    const permissions = useSelector(state => state.permissions) || {};
-
-    const {
-        allowances,
-        loading,
-        addAllowance,
-        deleteAllowance,
-    } = useAllowances();
 
     // eslint-disable-next-line no-unused-vars
     const [toast, setToast] = useState(null);
+
+    const permissions = useSelector(state => state.permissions) || {};
+    const { allowances, loading, addAllowance, deleteAllowance } = useAllowances();
 
     const showToast = (message, type) => {
         setToast({ message, type });
@@ -31,30 +25,17 @@ const AllowanceList = () => {
     };
 
     const handleAddAllowance = async (name) => {
-        const result = await addAllowance(name);
-        return result;
+        return await addAllowance(name);
     };
 
     const handleDeleteAllowance = async (id) => {
         const result = await deleteAllowance(id);
-        if (result && result.success) {
+        if (result?.success) {
             showToast("Allowance deleted successfully!", "success");
         } else {
             showToast("Failed to delete allowance. Please try again.", "error");
         }
     };
-
-    // Real-time search filtering using useMemo for performance
-    const filteredAllowances = useMemo(() => {
-        if (!allowances || !searchTerm.trim()) {
-            return allowances || [];
-        }
-
-        return allowances.filter(allowance =>
-            allowance.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (allowance.description && allowance.description.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-    }, [allowances, searchTerm]);
 
     const handleDeleteClick = (allowance) => {
         setConfirmModal({
@@ -67,8 +48,10 @@ const AllowanceList = () => {
     const confirmDeleteAllowance = async () => {
         const allowance = confirmModal.data;
         if (!allowance) return;
+
         const allowanceId = allowance.allowance_id || allowance.id;
         setDeletingId(allowanceId);
+
         try {
             await handleDeleteAllowance(allowanceId);
         } catch (error) {
@@ -83,10 +66,6 @@ const AllowanceList = () => {
         if (!deletingId) {
             setConfirmModal({ isOpen: false, type: null, data: null });
         }
-    };
-
-    const clearSearch = () => {
-        setSearchTerm("");
     };
 
     if (loading) {
@@ -113,63 +92,32 @@ const AllowanceList = () => {
         );
     }
 
-    const totalAllowances = allowances ? allowances.length : 0;
-    const filteredCount = filteredAllowances.length;
-
     return (
         <>
-            <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-blue-dark)] overflow-hidden ">
+            <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-blue-dark)] overflow-hidden">
                 <div className="relative">
                     <div className="bg-[var(--color-blue-dark)] px-6 py-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg">
-                                    <DollarSign className="w-5 h-5 text-[var(--color-text-white)]" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
-                                        Allowances
-                                    </h3>
-                                </div>
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg">
+                                <DollarSign className="w-5 h-5 text-[var(--color-text-white)]" />
                             </div>
+                            <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
+                                Allowances
+                            </h3>
                         </div>
                     </div>
                 </div>
 
                 <div className="p-6 bg-[var(--color-bg-secondary)] flex flex-col gap-4">
-                    {permissions['allowance_create'] &&
+                    {permissions['allowance_create'] && (
                         <AllowanceForm
                             onSubmit={handleAddAllowance}
                             loading={loading}
                             showToast={showToast}
                         />
-                    }
-
-                    {/* Search Bar */}
-                    {totalAllowances > 0 && (
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-4 w-4 text-[var(--color-text-secondary)]" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search allowances..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-10 py-3 border border-[var(--color-border-secondary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 placeholder-gray-400 bg-[var(--color-bg-secondary)]"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={clearSearch}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            )}
-                        </div>
                     )}
 
-                    {totalAllowances === 0 ? (
+                    {!allowances || allowances.length === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center mb-4">
                                 <DollarSign className="w-8 h-8 text-[var(--color-blue)]" />
@@ -184,28 +132,9 @@ const AllowanceList = () => {
                                 Use the form above to create a new allowance
                             </p>
                         </div>
-                    ) : filteredCount === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="mx-auto w-16 h-16 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center mb-4">
-                                <Search className="w-8 h-8 text-[var(--color-blue)]" />
-                            </div>
-                            <h4 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">
-                                No allowances match your search
-                            </h4>
-                            <p className="text-[var(--color-text-secondary)] mb-4">
-                                Try adjusting your search terms or
-                            </p>
-                            <button
-                                onClick={clearSearch}
-                                className="inline-flex items-center px-4 py-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] font-medium rounded-lg hover:bg-[var(--color-blue-darker)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-blue)] transition-colors"
-                            >
-                                <X className="w-4 h-4 mr-2" />
-                                Clear Search
-                            </button>
-                        </div>
                     ) : (
                         <div className="grid gap-4">
-                            {filteredAllowances.map((allowance) => {
+                            {allowances.map((allowance) => {
                                 const allowanceId = allowance.allowance_id || allowance.id;
                                 const isDeleting = deletingId === allowanceId;
 
@@ -239,16 +168,17 @@ const AllowanceList = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            {permissions['allowance_delete'] &&
+
+                                            {permissions['allowance_delete'] && (
                                                 <button
                                                     onClick={() => handleDeleteClick(allowance)}
                                                     disabled={isDeleting}
-                                                    className="ml-4 p-2 text-[var(--color-text-error)] hover:text-[var(--color-error-dark)] hover:bg-[var(--color-error-light)] rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                                                    className="ml-4 p-2 text-[var(--color-text-error)] hover:text-[var(--color-error-dark)] hover:bg-[var(--color-error-light)] rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                                     title="Delete allowance"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
-                                            }
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -256,18 +186,18 @@ const AllowanceList = () => {
                         </div>
                     )}
                 </div>
-
-                <ConfirmDialog
-                    isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
-                    onClose={closeModal}
-                    onConfirm={confirmDeleteAllowance}
-                    title="Delete Allowance"
-                    message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Allowance'}"? This action cannot be undone.`}
-                    confirmText="Delete"
-                    cancelText="Cancel"
-                    type="danger"
-                />
             </div>
+
+            <ConfirmDialog
+                isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
+                onClose={closeModal}
+                onConfirm={confirmDeleteAllowance}
+                title="Delete Allowance"
+                message={`Are you sure you want to delete "${confirmModal.data?.name || 'this Allowance'}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                type="danger"
+            />
         </>
     );
 };
