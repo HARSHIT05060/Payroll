@@ -50,7 +50,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         (permissions?.employee_view || permissions?.employee_create || permissions?.employee_edit || permissions?.employee_delete ||
             permissions?.department_view || permissions?.department_create || permissions?.department_edit || permissions?.department_delete ||
             permissions?.branch_view || permissions?.branch_create || permissions?.branch_edit || permissions?.branch_delete ||
-            permissions?.designation_view || permissions?.designation_create || permissions?.designation_edit || permissions?.designation_delete) && {
+            permissions?.designation_view || permissions?.designation_create || permissions?.designation_edit || permissions?.designation_delete ||
+            permissions?.deduction_view || permissions?.deduction_create || permissions?.deduction_edit || permissions?.deduction_delete ||
+            permissions?.allowance_view || permissions?.allowance_create || permissions?.allowance_edit || permissions?.allowance_delete) && {
             id: 'employees',
             label: 'Employees',
             icon: Users,
@@ -59,9 +61,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
             submenu: [
                 permissions?.employee_view && { label: 'Employee List', path: '/employee' },
                 (permissions?.employee_create || permissions?.employee_edit) && { label: 'Add Employee', path: '/add-employee' },
+                permissions?.branch_view && { label: 'Branch', path: '/branches' },
                 permissions?.department_view && { label: 'Department', path: '/departments' },
                 permissions?.designation_view && { label: 'Designation', path: '/designation' },
-                permissions?.branch_view && { label: 'Branch', path: '/branches' },
+                permissions?.deduction_view && { label: 'Deductions', path: '/deductions' },
+                permissions?.allowance_view && { label: 'Allowances', path: '/allowances' },
             ].filter(Boolean)
         },
 
@@ -286,17 +290,16 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         <>
             {/* Mobile Overlay */}
             {!isCollapsed && isMobile && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
                     onClick={() => setIsCollapsed(true)}
                 />
             )}
 
             {/* Sidebar */}
-            <div 
-                className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)] border-r border-[var(--color-border-primary)] shadow-lg transition-all duration-300 z-50 ${
-                    isMobile && isCollapsed ? '-translate-x-full' : 'translate-x-0'
-                }`}
+            <div
+                className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)] border-r border-[var(--color-border-primary)] shadow-lg transition-all duration-300 z-50 ${isMobile && isCollapsed ? '-translate-x-full' : 'translate-x-0'
+                    }`}
                 style={{ width: sidebarWidth }}
             >
                 {/* Enhanced Toggle Button - Desktop Only */}
@@ -324,13 +327,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                             {/* Icon */}
                             <div className="relative z-10">
                                 {isCollapsed ? (
-                                    <ChevronRight 
-                                        size={16} 
+                                    <ChevronRight
+                                        size={16}
                                         className="transform transition-all duration-300"
                                     />
                                 ) : (
-                                    <ChevronLeft 
-                                        size={16} 
+                                    <ChevronLeft
+                                        size={16}
                                         className="transform transition-all duration-300"
                                     />
                                 )}

@@ -18,6 +18,8 @@ const AddEmployee = lazy(() => import('./pages/Employee/AddEmployee'));
 const DepartmentsPage = lazy(() => import('./pages/Employee/Departments'));
 const BranchesPage = lazy(() => import('./pages/Employee/Branches'));
 const DesignationPage = lazy(() => import('./pages/Employee/Designations'));
+const DeductionPage = lazy(() => import('./pages/Employee/Deduction'));
+const AllowancePage = lazy(() => import('./pages/Employee/Allowance'));
 
 const Role = lazy(() => import('./pages/Users/Role'));
 const AddRole = lazy(() => import('./pages/Users/AddRole'));
@@ -77,9 +79,9 @@ const App = () => {
   // Calculate main content margin based on sidebar state
   const getMainContentStyle = () => {
     if (shouldHideNavigation) return {};
-    
+
     return {
-      marginLeft: isCollapsed 
+      marginLeft: isCollapsed
         ? (isMobile ? '0' : '80px')
         : '256px',
       paddingTop: '64px' // Account for navbar height
@@ -91,20 +93,20 @@ const App = () => {
       <SubscriptionGuard>
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
           {!shouldHideNavigation && (
-            <Navbar 
-              isCollapsed={isCollapsed} 
-              setIsCollapsed={setIsCollapsed} 
+            <Navbar
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
             />
           )}
-          
+
           {!shouldHideNavigation && (
-            <Sidebar 
-              isCollapsed={isCollapsed} 
-              setIsCollapsed={setIsCollapsed} 
+            <Sidebar
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
             />
           )}
-          
-          <main 
+
+          <main
             className="transition-all duration-300 overflow-y-auto"
             style={getMainContentStyle()}
           >
@@ -184,6 +186,18 @@ const App = () => {
                   <Route path="/designation" element={<ProtectedRoute><DesignationPage /></ProtectedRoute>} />
                 ) : (
                   <Route path="/designation" element={<Navigate to="/unauthorized" replace />} />
+                )}
+
+                {permissions['deduction_view'] ? (
+                  <Route path="/deductions" element={<ProtectedRoute><DeductionPage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/deductions" element={<Navigate to="/unauthorized" replace />} />
+                )}
+
+                {permissions['allowance_view'] ? (
+                  <Route path="/allowances" element={<ProtectedRoute><AllowancePage /></ProtectedRoute>} />
+                ) : (
+                  <Route path="/allowances" element={<Navigate to="/unauthorized" replace />} />
                 )}
 
                 {/* ---------------- Shift Management ----------------- */}
