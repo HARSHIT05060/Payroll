@@ -22,6 +22,7 @@ import {
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
+import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 
@@ -43,6 +44,7 @@ const MonthlyPayroll = () => {
   const [toast, setToast] = useState(null);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
   const navigate = useNavigate();
+  const permissions = useSelector(state => state.permissions) || {};
 
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -354,6 +356,26 @@ const MonthlyPayroll = () => {
   // Redirect if not authenticated
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
+  }
+  if (!permissions['salary_view']) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-secondary)]">
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="bg-[var(--color-error-light)] border border-[var(--color-border-error)] rounded-lg p-8 text-center">
+            <XCircle className="w-12 h-12 text-[var(--color-error)] mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-[var(--color-error-dark)] mb-2">Access Denied</h3>
+            <p className="text-[var(--color-text-error)] mb-4">You don't have permission to access payroll data.</p>
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center space-x-2 bg-[var(--color-error-light)] text-[var(--color-error-dark)] px-4 py-2 rounded-md hover:bg-[var(--color-error-lighter)] transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Go Back</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const overtimeAndWeekoffSummary = calculateOvertimeAndWeekoffSummary();
@@ -675,7 +697,7 @@ const MonthlyPayroll = () => {
                     <div>
                       <h3 className="text-lg font-semibold text-[var(--color-blue-darkest)] mb-2">Total Payable Amount</h3>
                       <div className="flex items-center gap-4">
-                        {isEditingPayable ? (
+                        {isEditingPayable && permissions['salary_edit'] ? (
                           <div className="flex items-center gap-2">
                             <input
                               type="number"
@@ -701,25 +723,29 @@ const MonthlyPayroll = () => {
                         ) : (
                           <div className="flex items-center gap-2">
                             <span className="text-2xl font-bold text-[var(--color-blue-darkest)]">₹{parseFloat(editablePayable || payrollData.pay_salary || 0).toLocaleString()}</span>
-                            <button
-                              onClick={handleEditPayable}
-                              className="p-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
+                            {permissions['salary_edit'] && (
+                              <button
+                                onClick={handleEditPayable}
+                                className="p-2 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] rounded-lg hover:bg-[var(--color-blue-darker)] transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <button
-                        onClick={handleSubmitPayroll}
-                        disabled={submitting || isEditingPayable}
-                        className="px-6 py-3 bg-[var(--color-success-medium)] hover:bg-[var(--color-success-dark)] disabled:bg-gray-400 text-[var(--color-text-white)] rounded-lg transition-colors flex items-center gap-2 font-medium"
-                      >
-                        <CheckCircle className="w-5 h-5" />
-                        {submitting ? 'Submitting...' : 'Submit Payroll'}
-                      </button>
+                      {permissions['add_salary_payment'] && (
+                        <button
+                          onClick={handleSubmitPayroll}
+                          disabled={submitting || isEditingPayable}
+                          className="px-6 py-3 bg-[var(--color-success-medium)] hover:bg-[var(--color-success-dark)] disabled:bg-gray-400 text-[var(--color-text-white)] rounded-lg transition-colors flex items-center gap-2 font-medium"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                          {submitting ? 'Submitting...' : 'Submit Payroll'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

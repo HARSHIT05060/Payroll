@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
-  AlertCircle ,
+  AlertCircle,
   Users,
   Calendar,
   RefreshCw,
@@ -19,6 +19,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
+import { useSelector } from 'react-redux';
 import Pagination from '../../Components/Pagination';
 
 const SORT_DIRECTIONS = {
@@ -70,6 +71,7 @@ export default function FinalizePayroll() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  const permissions = useSelector(state => state.permissions) || {};
 
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
@@ -541,7 +543,7 @@ export default function FinalizePayroll() {
                     className="w-full pl-10 pr-4 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
-                  
+
                 </div>
               </div>
             </div>
@@ -608,9 +610,11 @@ export default function FinalizePayroll() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                         Mobile
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
-                        Actions
-                      </th>
+                      {(permissions?.add_salary_payment || permissions?.salary_delete || permissions?.salary_view) && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                          Actions
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
@@ -655,33 +659,39 @@ export default function FinalizePayroll() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
                             {record.mobile_number || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                            <div className="flex items-center space-x-2">
-                              {record.payment_status === PAYMENT_STATUS.UNPAID && (
-                                <button
-                                  onClick={() => openPaymentModal(record)}
-                                  className="inline-flex items-center space-x-1 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-blue-darker)] transition-colors"
-                                >
-                                  <CreditCard className="w-4 h-4" />
-                                  <span>Pay</span>
-                                </button>
-                              )}
-                              <button
-                                onClick={() => openDeleteModal(record)}
-                                className="inline-flex items-center space-x-1 bg-[var(--color-error)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-error-dark)] transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                <span>Delete</span>
-                              </button>
-                              <button
-                                onClick={() => openViewModal(record)}
-                                className="inline-flex items-center space-x-1 bg-[var(--color-success-medium)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-success-dark)] transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                                <span>View</span>
-                              </button>
-                            </div>
-                          </td>
+                          {(permissions?.add_salary_payment || permissions?.salary_delete || permissions?.salary_view) && (
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                              <div className="flex items-center space-x-2">
+                                {permissions?.add_salary_payment && record.payment_status === PAYMENT_STATUS.UNPAID && (
+                                  <button
+                                    onClick={() => openPaymentModal(record)}
+                                    className="inline-flex items-center space-x-1 bg-[var(--color-blue-dark)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-blue-darker)] transition-colors"
+                                  >
+                                    <CreditCard className="w-4 h-4" />
+                                    <span>Pay</span>
+                                  </button>
+                                )}
+                                {permissions?.salary_delete && (
+                                  <button
+                                    onClick={() => openDeleteModal(record)}
+                                    className="inline-flex items-center space-x-1 bg-[var(--color-error)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-error-dark)] transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </button>
+                                )}
+                                {permissions?.salary_view && (
+                                  <button
+                                    onClick={() => openViewModal(record)}
+                                    className="inline-flex items-center space-x-1 bg-[var(--color-success-medium)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-success-dark)] transition-colors"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    <span>View</span>
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
