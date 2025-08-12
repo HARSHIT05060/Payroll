@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Eye, Edit, Search, RefreshCw, XCircle, CreditCard, ChevronDown, ChevronUp, Users, DollarSign, ArrowLeft, Trash2 } from 'lucide-react';
+import { Plus, Eye, Edit, Search, RefreshCw, XCircle, CreditCard, ChevronDown, ChevronUp, Users, IndianRupee, ArrowLeft, Trash2 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
@@ -452,7 +452,7 @@ const LoanAdvance = () => {
                             <div className="flex items-center">
                                 <CreditCard className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
                                 <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                    Total Loans/Advances 
+                                    Total Loans/Advances
                                 </h3>
                                 {(loading || dropdownLoading) && (
                                     <div className="flex items-center gap-2 text-[var(--color-text-white)] ml-4">
@@ -528,7 +528,7 @@ const LoanAdvance = () => {
                         <div className="px-6 py-12 text-center">
                             <div className="bg-[var(--color-bg-primary)] border border-[var(--color-border-primary)] rounded-lg p-8">
                                 <div className="w-16 h-16 bg-[var(--color-bg-gray-light)] rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <DollarSign className="w-8 h-8 text-[var(--color-text-muted)]" />
+                                    <IndianRupee className="w-8 h-8 text-[var(--color-text-muted)]" />
                                 </div>
                                 <p className="text-[var(--color-text-secondary)] text-lg font-medium mb-2">No Loans Found</p>
                                 <p className="text-[var(--color-text-secondary)] text-sm mb-4">
@@ -547,7 +547,7 @@ const LoanAdvance = () => {
                         </div>
                     ) : sortedLoans.length === 0 ? (
                         <div className="px-6 py-8 text-center text-[var(--color-text-secondary)]">
-                            <DollarSign className="h-12 w-12 mx-auto mb-4 text-[var(--color-text-muted)]" />
+                            <IndianRupee className="h-12 w-12 mx-auto mb-4 text-[var(--color-text-muted)]" />
                             <p className="text-lg font-medium">No loans found for the selected filter</p>
                             <p className="text-sm">Try adjusting your search or filter criteria</p>
                         </div>

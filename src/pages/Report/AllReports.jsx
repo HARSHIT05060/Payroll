@@ -11,9 +11,8 @@ import {
     Eye,
     ArrowLeft,
     Target,
-    DollarSign,
-    AlertCircle,
-    IndianRupee
+    IndianRupee,
+    AlertCircle
 } from 'lucide-react';
 import { Toast } from '../../Components/ui/Toast'; // Adjust import path as needed
 
@@ -113,7 +112,7 @@ const AllReports = () => {
         {
             id: 'payroll-summary',
             title: 'Payroll Summary',
-            icon: DollarSign,
+            icon: IndianRupee,
             color: 'from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]',
             category: 'payroll',
             isAvailable: false,

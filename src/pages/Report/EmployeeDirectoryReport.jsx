@@ -18,7 +18,7 @@ import {
     Download,
     ChevronDown,
     Briefcase,
-    DollarSign,
+    IndianRupee,
     FileDown,
     FileSpreadsheet
 } from 'lucide-react';
@@ -644,7 +644,7 @@ const EmployeeDirectoryReport = () => {
                         {/* Salary Type Filter */}
                         <div>
                             <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                                <DollarSign className="inline h-4 w-4 mr-1" />
+                                <IndianRupee className="inline h-4 w-4 mr-1" />
                                 Salary Type
                             </label>
                             <select

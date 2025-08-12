@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2, DollarSign } from "lucide-react";
+import { Trash2, IndianRupee } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import AllowanceForm from "./AllowanceForm";
@@ -75,7 +75,7 @@ const AllowanceList = () => {
                     <div className="bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] px-6 py-4">
                         <div className="flex items-center space-x-3">
                             <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg">
-                                <DollarSign className="w-5 h-5 text-[var(--color-text-white)]" />
+                                <IndianRupee className="w-5 h-5 text-[var(--color-text-white)]" />
                             </div>
                             <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
                                 Allowances
@@ -99,7 +99,7 @@ const AllowanceList = () => {
                     <div className="bg-[var(--color-blue-dark)] px-6 py-4">
                         <div className="flex items-center space-x-3">
                             <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg">
-                                <DollarSign className="w-5 h-5 text-[var(--color-text-white)]" />
+                                <IndianRupee className="w-5 h-5 text-[var(--color-text-white)]" />
                             </div>
                             <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
                                 Allowances
@@ -120,7 +120,7 @@ const AllowanceList = () => {
                     {!allowances || allowances.length === 0 ? (
                         <div className="text-center py-12">
                             <div className="mx-auto w-16 h-16 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center mb-4">
-                                <DollarSign className="w-8 h-8 text-[var(--color-blue)]" />
+                                <IndianRupee className="w-8 h-8 text-[var(--color-blue)]" />
                             </div>
                             <h4 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">
                                 No allowances found
@@ -147,7 +147,7 @@ const AllowanceList = () => {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center space-x-2 mb-2">
                                                     <div className="p-1.5 bg-green-100 rounded-md">
-                                                        <DollarSign className="w-4 h-4 text-green-600" />
+                                                        <IndianRupee className="w-4 h-4 text-green-600" />
                                                     </div>
                                                     <h4 className="text-lg font-semibold text-[var(--color-text-primary)] truncate">
                                                         {allowance.name}

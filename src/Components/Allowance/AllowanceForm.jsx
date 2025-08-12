@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, DollarSign } from "lucide-react";
+import { Plus } from "lucide-react";
 
 const AllowanceForm = ({ onSubmit, loading = false, showToast }) => {
     const [name, setName] = useState("");

@@ -5,18 +5,14 @@ import {
     Users,
     Clock,
     Calendar,
-    CheckSquare,
-    DollarSign,
+    IndianRupee,
     Briefcase,
     BarChart2,
-    FileText,
     User,
     Settings,
     Phone,
     ChevronRight,
     Star,
-    Menu,
-    X,
     ChevronLeft
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
@@ -100,7 +96,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         (permissions?.salary_view || permissions?.salary_create || permissions?.salary_edit || permissions?.salary_delete || permissions?.add_salary_payment) && {
             id: 'payroll',
             label: 'Payroll',
-            icon: DollarSign,
+            icon: IndianRupee,
             hasSubmenu: true,
             path: '/monthly-payroll',
             submenu: [

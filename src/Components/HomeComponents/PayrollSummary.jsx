@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { Calendar, Users, TrendingUp, DollarSign, Clock, Award, Eye } from 'lucide-react';
+import { Calendar, Users, TrendingUp, IndianRupee, Clock, Award, Eye } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDashboardData } from '../../context/DashboardContext';
@@ -95,7 +95,7 @@ const PayrollSummary = () => {
                   <p className="text-3xl font-bold text-[var(--color-blue)] mb-1">₹{dashboardData?.totals?.total_salary || 0}</p>
                 </div>
                 <div className="w-14 h-14 bg-[var(--color-blue)] rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <DollarSign className="w-8 h-8 text-[var(--color-text-white)]" />
+                  <IndianRupee className="w-8 h-8 text-[var(--color-text-white)]" />
                 </div>
               </div>
             </div>
