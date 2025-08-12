@@ -42,14 +42,14 @@ const AddEmployee = () => {
             {
                 allowance_id: '',
                 allowance_value: '',
-                allowance_type: 'amount' // Add this field
+                allowance_type: 2 // Add this field
             }
         ],
         deductions: [
             {
                 deduction_id: '',
                 deduction_value: '',
-                deduction_type: 'amount' // Add this field
+                deduction_type: 2 // Add this field
             }
         ],
         address: '',
@@ -257,17 +257,17 @@ const AddEmployee = () => {
                         ? allowances.map(allowance => ({
                             allowance_id: allowance.allowance_id || '',
                             allowance_value: allowance.allowance_value || '',
-                            allowance_type: allowance.allowance_type || 'amount'
+                            allowance_type: allowance.allowance_type || 2
                         }))
-                        : [{ allowance_id: '', allowance_value: '', allowance_type: 'amount' }],
+                        : [{ allowance_id: '', allowance_value: '', allowance_type: 2 }],
 
                     deductions: deductions.length > 0
                         ? deductions.map(deduction => ({
                             deduction_id: deduction.deduction_id || '',
                             deduction_value: deduction.deduction_value || '',
-                            deduction_type: deduction.deduction_type || 'amount'
+                            deduction_type: deduction.deduction_type || 2
                         }))
-                        : [{ deduction_id: '', deduction_value: '', deduction_type: 'amount' }],
+                        : [{ deduction_id: '', deduction_value: '', deduction_type: 2 }],
 
 
                     address: employee.address || '',
@@ -411,14 +411,14 @@ const AddEmployee = () => {
     const addAllowance = () => {
         setFormData(prev => ({
             ...prev,
-            allowances: [...prev.allowances, { allowance_id: '', allowance_value: '', allowance_type: 'amount' }]
+            allowances: [...prev.allowances, { allowance_id: '', allowance_value: '', allowance_type: 2 }] // Changed from 'amount' to 2
         }));
     };
 
     const addDeduction = () => {
         setFormData(prev => ({
             ...prev,
-            deductions: [...prev.deductions, { deduction_id: '', deduction_value: '', deduction_type: 'amount' }]
+            deductions: [...prev.deductions, { deduction_id: '', deduction_value: '', deduction_type: 2 }] // Changed from 'amount' to 2
         }));
     };
 
@@ -869,8 +869,8 @@ const AddEmployee = () => {
                         employmentType: '',
                         salaryType: '',
                         salary: '',
-                        allowances: [{ allowance_id: '', allowance_value: '', allowance_type: 'amount' }],
-                        deductions: [{ deduction_id: '', deduction_value: '', deduction_type: 'amount' }],
+                        allowances: [{ allowance_id: '', allowance_value: '', allowance_type: 2 }],
+                        deductions: [{ deduction_id: '', deduction_value: '', deduction_type: 2 }],
                         address: '',
                         bankName: '',
                         branchName: '',
@@ -1287,27 +1287,27 @@ const AddEmployee = () => {
                                                                 <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Type <span className="text-[var(--color-error)]">*</span></label>
                                                                 <select
                                                                     value={allowance.allowance_type}
-                                                                    onChange={(e) => handleAllowanceChange(index, 'allowance_type', e.target.value)}
+                                                                    onChange={(e) => handleAllowanceChange(index, 'allowance_type', parseInt(e.target.value))} // Parse to integer
                                                                     className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                                 >
-                                                                    <option value="amount">Amount</option>
-                                                                    <option value="percentage">Percentage</option>
+                                                                    <option value={2}>Amount</option>
+                                                                    <option value={1}>Percentage</option>
                                                                 </select>
                                                             </div>
 
                                                             <div className="space-y-2">
                                                                 <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
-                                                                    {allowance.allowance_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
+                                                                    {allowance.allowance_type === 1 ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
                                                                 </label>
                                                                 <input
                                                                     type="number"
                                                                     value={allowance.allowance_value}
                                                                     onChange={(e) => handleAllowanceChange(index, 'allowance_value', e.target.value)}
                                                                     className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                                    placeholder={allowance.allowance_type === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                                                                    placeholder={allowance.allowance_type === 1 ? 'Enter percentage' : 'Enter amount'}
                                                                     min="0"
-                                                                    max={allowance.allowance_type === 'percentage' ? "100" : undefined}
-                                                                    step={allowance.allowance_type === 'percentage' ? "0.01" : "0.01"}
+                                                                    max={allowance.allowance_type === 1 ? "100" : undefined}
+                                                                    step={allowance.allowance_type === 1 ? "0.01" : "0.01"}
                                                                 />
                                                             </div>
                                                         </div>
@@ -1369,27 +1369,27 @@ const AddEmployee = () => {
                                                                 <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Type <span className="text-[var(--color-error)]">*</span></label>
                                                                 <select
                                                                     value={deduction.deduction_type}
-                                                                    onChange={(e) => handleDeductionChange(index, 'deduction_type', e.target.value)}
+                                                                    onChange={(e) => handleDeductionChange(index, 'deduction_type', parseInt(e.target.value))} // Parse to integer
                                                                     className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
                                                                 >
-                                                                    <option value="amount">Amount</option>
-                                                                    <option value="percentage">Percentage</option>
+                                                                    <option value={2}>Amount</option>
+                                                                    <option value={1}>Percentage</option>
                                                                 </select>
                                                             </div>
 
                                                             <div className="space-y-2">
                                                                 <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
-                                                                    {deduction.deduction_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
+                                                                    {deduction.deduction_type === 1 ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
                                                                 </label>
                                                                 <input
                                                                     type="number"
                                                                     value={deduction.deduction_value}
                                                                     onChange={(e) => handleDeductionChange(index, 'deduction_value', e.target.value)}
                                                                     className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                                    placeholder={deduction.deduction_type === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                                                                    placeholder={deduction.deduction_type === 1 ? 'Enter percentage' : 'Enter amount'}
                                                                     min="0"
-                                                                    max={deduction.deduction_type === 'percentage' ? "100" : undefined}
-                                                                    step={deduction.deduction_type === 'percentage' ? "0.01" : "0.01"}
+                                                                    max={deduction.deduction_type === 1 ? "100" : undefined}
+                                                                    step={deduction.deduction_type === 1 ? "0.01" : "0.01"}
                                                                 />
                                                             </div>
                                                         </div>
@@ -1416,7 +1416,7 @@ const AddEmployee = () => {
                                                                         .reduce((sum, item) => {
                                                                             const value = parseFloat(item.allowance_value || 0);
                                                                             const baseSalary = parseFloat(formData.salary || 0);
-                                                                            return sum + (item.allowance_type === 'percentage'
+                                                                            return sum + (item.allowance_type === 1
                                                                                 ? (baseSalary * value / 100)
                                                                                 : value);
                                                                         }, 0)
@@ -1432,7 +1432,7 @@ const AddEmployee = () => {
                                                                         .reduce((sum, item) => {
                                                                             const value = parseFloat(item.deduction_value || 0);
                                                                             const baseSalary = parseFloat(formData.salary || 0);
-                                                                            return sum + (item.deduction_type === 'percentage'
+                                                                            return sum + (item.deduction_type === 1
                                                                                 ? (baseSalary * value / 100)
                                                                                 : value);
                                                                         }, 0)
