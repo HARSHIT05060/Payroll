@@ -238,9 +238,27 @@ const AddEmployee = () => {
 
                 const employee = data.employee;
                 const baseUrl = data.base_url || '';
-                const references = data.employee_reference || [];
-                const allowances = data.allowances || [];
-                const deductions = data.deductions || [];
+
+                // Map allowances correctly from the API response
+                const allowances = data.employee_allowance?.map(allowance => ({
+                    allowance_id: allowance.allowance_id || '',
+                    allowance_value: allowance.allowance_value || '',
+                    allowance_type: parseInt(allowance.allowance_type) || 2
+                })) || [];
+
+                // Map deductions correctly from the API response
+                const deductions = data.employee_deduction?.map(deduction => ({
+                    deduction_id: deduction.deduction_id || '',
+                    deduction_value: deduction.deduction_value || '',
+                    deduction_type: parseInt(deduction.deduction_type) || 2
+                })) || [];
+
+                // Map references correctly from the API response
+                const references = data.employee_reference?.map(ref => ({
+                    name: ref.name || '',
+                    contactNumber: ref.number || ''
+                })) || [];
+
                 const mappedFormData = {
                     employeeCode: employee.employee_code || '',
                     name: employee.full_name || '',
@@ -253,22 +271,16 @@ const AddEmployee = () => {
                     employmentType: employee.employee_type_id || '',
                     salaryType: employee.salary_type_id || '',
                     salary: employee.salary || '',
+
+                    // Use mapped allowances or default empty array with one item
                     allowances: allowances.length > 0
-                        ? allowances.map(allowance => ({
-                            allowance_id: allowance.allowance_id || '',
-                            allowance_value: allowance.allowance_value || '',
-                            allowance_type: allowance.allowance_type || 2
-                        }))
+                        ? allowances
                         : [{ allowance_id: '', allowance_value: '', allowance_type: 2 }],
 
+                    // Use mapped deductions or default empty array with one item
                     deductions: deductions.length > 0
-                        ? deductions.map(deduction => ({
-                            deduction_id: deduction.deduction_id || '',
-                            deduction_value: deduction.deduction_value || '',
-                            deduction_type: deduction.deduction_type || 2
-                        }))
+                        ? deductions
                         : [{ deduction_id: '', deduction_value: '', deduction_type: 2 }],
-
 
                     address: employee.address || '',
 
@@ -285,11 +297,9 @@ const AddEmployee = () => {
                     dateOfBirth: employee.dob || '',
                     dateOfJoining: employee.date_of_joining || '',
 
-                    references: references.length
-                        ? references.map(ref => ({
-                            name: ref.name || '',
-                            contactNumber: ref.number || ''
-                        }))
+                    // Use mapped references or default empty array with one item
+                    references: references.length > 0
+                        ? references
                         : [{ name: '', contactNumber: '' }],
 
                     aadharCard: null,
@@ -316,7 +326,7 @@ const AddEmployee = () => {
                 }, 3000);
             } catch (error) {
                 setMessage({
-                    type: error,
+                    type:   error,
                     text: 'Failed to fetch employee data. Please try again.'
                 });
             } finally {
