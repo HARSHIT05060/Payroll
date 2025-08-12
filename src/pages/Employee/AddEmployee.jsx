@@ -38,6 +38,20 @@ const AddEmployee = () => {
         employmentType: '',
         salaryType: '',
         salary: '',
+        allowances: [
+            {
+                allowance_id: '',
+                allowance_value: '',
+                allowance_type: 'amount' // Add this field
+            }
+        ],
+        deductions: [
+            {
+                deduction_id: '',
+                deduction_value: '',
+                deduction_type: 'amount' // Add this field
+            }
+        ],
         address: '',
 
         // Bank Details
@@ -74,6 +88,7 @@ const AddEmployee = () => {
 
     const [expandedSections, setExpandedSections] = useState({
         basicDetails: true,
+        salaryStructure: false,
         bankDetails: false,
         legalDocuments: false,
         contactInformation: false,
@@ -101,7 +116,9 @@ const AddEmployee = () => {
         designationOptions: [],
         employmentTypeOptions: [],
         salaryTypeOptions: [],
-        relationOptions: []
+        relationOptions: [],
+        allowanceOptions: [],
+        deductionOptions: []
     });
 
     // Fetch dropdown data
@@ -160,6 +177,16 @@ const AddEmployee = () => {
                         relationOptions: data.relation_list?.map(item => ({
                             value: item.relation_id,
                             label: item.name
+                        })) || [],
+                        allowanceOptions: data.allowance_list?.map(item => ({
+                            value: item.allowance_id,
+                            label: item.name,
+                            base_amount: item.base_amount || 0
+                        })) || [],
+                        deductionOptions: data.deduction_list?.map(item => ({
+                            value: item.deduction_id,
+                            label: item.name,
+                            base_amount: item.base_amount || 0
                         })) || []
                     };
 
@@ -212,7 +239,8 @@ const AddEmployee = () => {
                 const employee = data.employee;
                 const baseUrl = data.base_url || '';
                 const references = data.employee_reference || [];
-
+                const allowances = data.allowances || [];
+                const deductions = data.deductions || [];
                 const mappedFormData = {
                     employeeCode: employee.employee_code || '',
                     name: employee.full_name || '',
@@ -225,6 +253,23 @@ const AddEmployee = () => {
                     employmentType: employee.employee_type_id || '',
                     salaryType: employee.salary_type_id || '',
                     salary: employee.salary || '',
+                    allowances: allowances.length > 0
+                        ? allowances.map(allowance => ({
+                            allowance_id: allowance.allowance_id || '',
+                            allowance_value: allowance.allowance_value || '',
+                            allowance_type: allowance.allowance_type || 'amount'
+                        }))
+                        : [{ allowance_id: '', allowance_value: '', allowance_type: 'amount' }],
+
+                    deductions: deductions.length > 0
+                        ? deductions.map(deduction => ({
+                            deduction_id: deduction.deduction_id || '',
+                            deduction_value: deduction.deduction_value || '',
+                            deduction_type: deduction.deduction_type || 'amount'
+                        }))
+                        : [{ deduction_id: '', deduction_value: '', deduction_type: 'amount' }],
+
+
                     address: employee.address || '',
 
                     bankName: employee.bank_name || '',
@@ -351,6 +396,45 @@ const AddEmployee = () => {
         if (isNaN(salary) || parseFloat(salary) < 0) return 'Salary should be a valid positive number';
         return '';
     };
+    const handleAllowanceChange = (index, field, value) => {
+        const updatedAllowances = [...formData.allowances];
+        updatedAllowances[index][field] = value;
+        setFormData(prev => ({ ...prev, allowances: updatedAllowances }));
+    };
+
+    const handleDeductionChange = (index, field, value) => {
+        const updatedDeductions = [...formData.deductions];
+        updatedDeductions[index][field] = value;
+        setFormData(prev => ({ ...prev, deductions: updatedDeductions }));
+    };
+
+    const addAllowance = () => {
+        setFormData(prev => ({
+            ...prev,
+            allowances: [...prev.allowances, { allowance_id: '', allowance_value: '', allowance_type: 'amount' }]
+        }));
+    };
+
+    const addDeduction = () => {
+        setFormData(prev => ({
+            ...prev,
+            deductions: [...prev.deductions, { deduction_id: '', deduction_value: '', deduction_type: 'amount' }]
+        }));
+    };
+
+    const removeAllowance = (index) => {
+        if (formData.allowances.length > 1) {
+            const updatedAllowances = formData.allowances.filter((_, i) => i !== index);
+            setFormData(prev => ({ ...prev, allowances: updatedAllowances }));
+        }
+    };
+
+    const removeDeduction = (index) => {
+        if (formData.deductions.length > 1) {
+            const updatedDeductions = formData.deductions.filter((_, i) => i !== index);
+            setFormData(prev => ({ ...prev, deductions: updatedDeductions }));
+        }
+    };
 
 
 
@@ -403,10 +487,6 @@ const AddEmployee = () => {
                 case 'bankName':
                 case 'branchName':
                     processedValue = processedValue.replace(/[^a-zA-Z\s]/g, '');
-                    break;
-
-                case 'salary':
-                    processedValue = processedValue.replace(/[^0-9.]/g, '');
                     break;
 
                 case 'employeeCode':
@@ -468,6 +548,7 @@ const AddEmployee = () => {
         updatedReferences[index][field] = value;
         setFormData(prev => ({ ...prev, references: updatedReferences }));
     };
+
 
     const addReference = () => {
         setFormData(prev => ({
@@ -702,8 +783,6 @@ const AddEmployee = () => {
             formDataToSend.append('department_id', formData.department);
             formDataToSend.append('designation_id', formData.designation);
             formDataToSend.append('employee_type_id', formData.employmentType);
-            formDataToSend.append('salary_type_id', formData.salaryType);
-            formDataToSend.append('salary', formData.salary);
             formDataToSend.append('address', formData.address);
 
             // Bank details
@@ -722,13 +801,35 @@ const AddEmployee = () => {
             formDataToSend.append('dob', formData.dateOfBirth);
             formDataToSend.append('date_of_joining', formData.dateOfJoining);
 
-            // References - append as arrays
-            formData.references.forEach((reference) => {
-                if (reference.name && reference.contactNumber) {
-                    formDataToSend.append('reference_name[]', reference.name);
-                    formDataToSend.append('reference_number[]', reference.contactNumber);
-                }
-            });
+            formDataToSend.append('salary_type_id', formData.salaryType);
+            formDataToSend.append('salary', formData.salary);
+
+            // Handle allowances - FIXED: Convert arrays to JSON strings
+            const validAllowances = formData.allowances.filter(allowance =>
+                allowance.allowance_id && allowance.allowance_value
+            );
+
+            if (validAllowances.length > 0) {
+                formDataToSend.append('allowances', JSON.stringify(validAllowances));
+            }
+
+            // Handle deductions - FIXED: Convert arrays to JSON strings
+            const validDeductions = formData.deductions.filter(deduction =>
+                deduction.deduction_id && deduction.deduction_value
+            );
+
+            if (validDeductions.length > 0) {
+                formDataToSend.append('deductions', JSON.stringify(validDeductions));
+            }
+
+            // Handle references - FIXED: Convert arrays to JSON strings
+            const validReferences = formData.references.filter(reference =>
+                reference.name && reference.contactNumber
+            );
+
+            if (validReferences.length > 0) {
+                formDataToSend.append('references', JSON.stringify(validReferences));
+            }
 
             // Credentials 
             formDataToSend.append('login_mobile_number', formData.loginMobileNo || '');
@@ -746,10 +847,8 @@ const AddEmployee = () => {
                 }
             });
 
-
-
             // Choose the appropriate API endpoint
-            const apiEndpoint = '/employee_create';
+            const apiEndpoint = isEditMode ? '/employee_update' : '/employee_create';
 
             const response = await api.post(apiEndpoint, formDataToSend, {
                 headers: {
@@ -777,6 +876,8 @@ const AddEmployee = () => {
                         employmentType: '',
                         salaryType: '',
                         salary: '',
+                        allowances: [{ allowance_id: '', allowance_value: '', allowance_type: 'amount' }],
+                        deductions: [{ deduction_id: '', deduction_value: '', deduction_type: 'amount' }],
                         address: '',
                         bankName: '',
                         branchName: '',
@@ -838,6 +939,12 @@ const AddEmployee = () => {
             key: 'basicDetails',
             title: 'Employement Information',
             icon: User,
+            color: 'blue'
+        },
+        {
+            key: 'salaryStructure',
+            title: 'Salary Structure',
+            icon: CreditCard,
             color: 'blue'
         },
         {
@@ -1085,32 +1192,6 @@ const AddEmployee = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Salary Type</label>
-                                                <select
-                                                    name="salaryType"
-                                                    value={formData.salaryType}
-                                                    onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                >
-                                                    <option value="">Select Salary Type</option>
-                                                    {dropdownOptions.salaryTypeOptions.map(option => (
-                                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Salary</label>
-                                                <input
-                                                    type="number"
-                                                    name="salary"
-                                                    value={formData.salary}
-                                                    onChange={handleInputChange}
-                                                    onBlur={handleFieldBlur}
-                                                    className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
-                                                    placeholder="Enter salary amount"
-                                                />
-                                            </div>
                                             <div className="space-y-2 md:col-span-2">
                                                 <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Address</label>
                                                 <textarea
@@ -1124,6 +1205,281 @@ const AddEmployee = () => {
                                             </div>
                                         </div>
                                     )}
+
+                                    {section.key === 'salaryStructure' && (
+                                        <div className="p-6 space-y-6">
+                                            {/* Salary Type and Base Salary */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Salary Type</label>
+                                                    <select
+                                                        name="salaryType"
+                                                        value={formData.salaryType}
+                                                        onChange={handleInputChange}
+                                                        className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                    >
+                                                        <option value="">Select Salary Type</option>
+                                                        {dropdownOptions.salaryTypeOptions.map(option => (
+                                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)]">Base Salary <span className="text-[var(--color-error)]">*</span></label>
+                                                    <input
+                                                        type="number"
+                                                        name="salary"
+                                                        value={formData.salary}
+                                                        onChange={handleInputChange}
+                                                        onBlur={handleFieldBlur}
+                                                        className="w-full px-4 py-3 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                        placeholder="Enter base salary amount"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Allowances Section */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                                                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                                        Allowances
+                                                    </h4>
+                                                    <button
+                                                        type="button"
+                                                        onClick={addAllowance}
+                                                        className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] font-medium transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-blue-lighter)]"
+                                                    >
+                                                        <Plus size={16} />
+                                                        Add Allowance
+                                                    </button>
+                                                </div>
+
+                                                {formData.allowances && formData.allowances.map((allowance, index) => (
+                                                    <div key={index} className="border border-[var(--color-border-primary)] rounded-lg p-4 bg-[var(--color-bg-card)]">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <h4 className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                                Allowance {index + 1}
+                                                            </h4>
+                                                            {formData.allowances.length > 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeAllowance(index)}
+                                                                    className="text-[var(--color-error)] hover:text-[var(--color-error-dark)] p-2 rounded-full hover:bg-[var(--color-error-light)] transition-colors"
+                                                                    title="Remove this allowance"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Allowance Type <span className="text-[var(--color-error)]">*</span></label>
+                                                                <select
+                                                                    value={allowance.allowance_id}
+                                                                    onChange={(e) => handleAllowanceChange(index, 'allowance_id', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                >
+                                                                    <option value="">Select Allowance</option>
+                                                                    {dropdownOptions.allowanceOptions && dropdownOptions.allowanceOptions.map(option => (
+                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Type <span className="text-[var(--color-error)]">*</span></label>
+                                                                <select
+                                                                    value={allowance.allowance_type}
+                                                                    onChange={(e) => handleAllowanceChange(index, 'allowance_type', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                >
+                                                                    <option value="amount">Amount</option>
+                                                                    <option value="percentage">Percentage</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
+                                                                    {allowance.allowance_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={allowance.allowance_value}
+                                                                    onChange={(e) => handleAllowanceChange(index, 'allowance_value', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                    placeholder={allowance.allowance_type === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                                                                    min="0"
+                                                                    max={allowance.allowance_type === 'percentage' ? "100" : undefined}
+                                                                    step={allowance.allowance_type === 'percentage' ? "0.01" : "0.01"}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Deductions Section */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                                                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                                        Deductions
+                                                    </h4>
+                                                    <button
+                                                        type="button"
+                                                        onClick={addDeduction}
+                                                        className="flex items-center gap-2 text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] font-medium transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-blue-lighter)]"
+                                                    >
+                                                        <Plus size={16} />
+                                                        Add Deduction
+                                                    </button>
+                                                </div>
+
+                                                {formData.deductions && formData.deductions.map((deduction, index) => (
+                                                    <div key={index} className="border border-[var(--color-border-primary)] rounded-lg p-4 bg-[var(--color-bg-card)]">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <h4 className="text-sm font-semibold text-[var(--color-text-secondary)]">
+                                                                Deduction {index + 1}
+                                                            </h4>
+                                                            {formData.deductions.length > 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeDeduction(index)}
+                                                                    className="text-[var(--color-error)] hover:text-[var(--color-error-dark)] p-2 rounded-full hover:bg-[var(--color-error-light)] transition-colors"
+                                                                    title="Remove this deduction"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Deduction Type <span className="text-[var(--color-error)]">*</span></label>
+                                                                <select
+                                                                    value={deduction.deduction_id}
+                                                                    onChange={(e) => handleDeductionChange(index, 'deduction_id', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                >
+                                                                    <option value="">Select Deduction</option>
+                                                                    {dropdownOptions.deductionOptions && dropdownOptions.deductionOptions.map(option => (
+                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">Type <span className="text-[var(--color-error)]">*</span></label>
+                                                                <select
+                                                                    value={deduction.deduction_type}
+                                                                    onChange={(e) => handleDeductionChange(index, 'deduction_type', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                >
+                                                                    <option value="amount">Amount</option>
+                                                                    <option value="percentage">Percentage</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-[var(--color-text-secondary)]">
+                                                                    {deduction.deduction_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'} <span className="text-[var(--color-error)]">*</span>
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={deduction.deduction_value}
+                                                                    onChange={(e) => handleDeductionChange(index, 'deduction_value', e.target.value)}
+                                                                    className="w-full px-3 py-2 border border-[var(--color-border-primary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)] focus:border-transparent transition-all"
+                                                                    placeholder={deduction.deduction_type === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                                                                    min="0"
+                                                                    max={deduction.deduction_type === 'percentage' ? "100" : undefined}
+                                                                    step={deduction.deduction_type === 'percentage' ? "0.01" : "0.01"}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+
+                                            {/* Summary */}
+                                            {formData.salary && (formData.allowances.some(item => item.allowance_id && item.allowance_value) ||
+                                                formData.deductions.some(item => item.deduction_id && item.deduction_value)) && (
+                                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-6">
+                                                        <h4 className="text-lg font-semibold text-blue-800 mb-3">Salary Summary</h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                                            <div className="text-center p-3 bg-white rounded-lg border border-blue-100">
+                                                                <div className="font-medium text-gray-600">Base Salary</div>
+                                                                <div className="text-xl font-bold text-blue-600">₹{parseFloat(formData.salary || 0).toFixed(2)}</div>
+                                                            </div>
+                                                            <div className="text-center p-3 bg-white rounded-lg border border-green-100">
+                                                                <div className="font-medium text-gray-600">Total Allowances</div>
+                                                                <div className="text-xl font-bold text-green-600">
+                                                                    ₹{formData.allowances
+                                                                        .filter(item => item.allowance_id && item.allowance_value)
+                                                                        .reduce((sum, item) => {
+                                                                            const value = parseFloat(item.allowance_value || 0);
+                                                                            const baseSalary = parseFloat(formData.salary || 0);
+                                                                            return sum + (item.allowance_type === 'percentage'
+                                                                                ? (baseSalary * value / 100)
+                                                                                : value);
+                                                                        }, 0)
+                                                                        .toFixed(2)
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-center p-3 bg-white rounded-lg border border-red-100">
+                                                                <div className="font-medium text-gray-600">Total Deductions</div>
+                                                                <div className="text-xl font-bold text-red-600">
+                                                                    ₹{formData.deductions
+                                                                        .filter(item => item.deduction_id && item.deduction_value)
+                                                                        .reduce((sum, item) => {
+                                                                            const value = parseFloat(item.deduction_value || 0);
+                                                                            const baseSalary = parseFloat(formData.salary || 0);
+                                                                            return sum + (item.deduction_type === 'percentage'
+                                                                                ? (baseSalary * value / 100)
+                                                                                : value);
+                                                                        }, 0)
+                                                                        .toFixed(2)
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="mt-4 pt-3 border-t border-blue-200">
+                                                            <div className="text-center">
+                                                                <div className="font-medium text-gray-600">Net Salary</div>
+                                                                <div className="text-2xl font-bold text-indigo-600">
+                                                                    ₹{(() => {
+                                                                        const baseSalary = parseFloat(formData.salary || 0);
+                                                                        const totalAllowances = formData.allowances
+                                                                            .filter(item => item.allowance_id && item.allowance_value)
+                                                                            .reduce((sum, item) => {
+                                                                                const value = parseFloat(item.allowance_value || 0);
+                                                                                return sum + (item.allowance_type === 'percentage'
+                                                                                    ? (baseSalary * value / 100)
+                                                                                    : value);
+                                                                            }, 0);
+                                                                        const totalDeductions = formData.deductions
+                                                                            .filter(item => item.deduction_id && item.deduction_value)
+                                                                            .reduce((sum, item) => {
+                                                                                const value = parseFloat(item.deduction_value || 0);
+                                                                                return sum + (item.deduction_type === 'percentage'
+                                                                                    ? (baseSalary * value / 100)
+                                                                                    : value);
+                                                                            }, 0);
+                                                                        return (baseSalary + totalAllowances - totalDeductions).toFixed(2);
+                                                                    })()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    )}
+
 
                                     {section.key === 'bankDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
