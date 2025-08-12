@@ -803,33 +803,28 @@ const AddEmployee = () => {
 
             formDataToSend.append('salary_type_id', formData.salaryType);
             formDataToSend.append('salary', formData.salary);
+            formData.allowances.forEach((allowance) => {
+                if (allowance.allowance_id && allowance.allowance_value) {
+                    formDataToSend.append('allowance_id[]', allowance.allowance_id);
+                    formDataToSend.append('allowance_value[]', allowance.allowance_value);
+                    formDataToSend.append('allowance_type[]', allowance.allowance_type);
+                }
+            });
+            formData.deductions.forEach((deduction) => {
+                if (deduction.deduction_id && deduction.deduction_value) {
+                    formDataToSend.append('deduction_id[]', deduction.deduction_id);
+                    formDataToSend.append('deduction_value[]', deduction.deduction_value);
+                    formDataToSend.append('deduction_type[]', deduction.deduction_type);
+                }
+            });
 
-            // Handle allowances - FIXED: Convert arrays to JSON strings
-            const validAllowances = formData.allowances.filter(allowance =>
-                allowance.allowance_id && allowance.allowance_value
-            );
-
-            if (validAllowances.length > 0) {
-                formDataToSend.append('allowances', JSON.stringify(validAllowances));
-            }
-
-            // Handle deductions - FIXED: Convert arrays to JSON strings
-            const validDeductions = formData.deductions.filter(deduction =>
-                deduction.deduction_id && deduction.deduction_value
-            );
-
-            if (validDeductions.length > 0) {
-                formDataToSend.append('deductions', JSON.stringify(validDeductions));
-            }
-
-            // Handle references - FIXED: Convert arrays to JSON strings
-            const validReferences = formData.references.filter(reference =>
-                reference.name && reference.contactNumber
-            );
-
-            if (validReferences.length > 0) {
-                formDataToSend.append('references', JSON.stringify(validReferences));
-            }
+            // References - append as arrays
+            formData.references.forEach((reference) => {
+                if (reference.name && reference.contactNumber) {
+                    formDataToSend.append('reference_name[]', reference.name);
+                    formDataToSend.append('reference_number[]', reference.contactNumber);
+                }
+            });
 
             // Credentials 
             formDataToSend.append('login_mobile_number', formData.loginMobileNo || '');
@@ -846,16 +841,14 @@ const AddEmployee = () => {
                     formDataToSend.append(apiField, file);
                 }
             });
-
             // Choose the appropriate API endpoint
-            const apiEndpoint = isEditMode ? '/employee_update' : '/employee_create';
+            const apiEndpoint = '/employee_create';
 
             const response = await api.post(apiEndpoint, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
             if (response.data.success) {
                 setMessage({
                     type: 'success',
