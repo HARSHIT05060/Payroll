@@ -104,7 +104,6 @@ const AddEmployee = () => {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
     const [isLoadingDropdowns, setIsLoadingDropdowns] = useState(true);
     const [isLoadingEmployeeData, setIsLoadingEmployeeData] = useState(false);
 
@@ -127,9 +126,9 @@ const AddEmployee = () => {
             try {
                 // Check if user is authenticated and has user_id
                 if (!isAuthenticated() || !user?.user_id) {
-                    setMessage({
-                        type: 'error',
-                        text: 'User authentication required. Please login again.'
+                    setToast({
+                        message: 'User authentication required. Please login again.',
+                        type: 'error'
                     });
                     setIsLoadingDropdowns(false);
                     return;
@@ -192,16 +191,16 @@ const AddEmployee = () => {
 
                     setDropdownOptions(dropdownData);
                 } else {
-                    setMessage({
-                        type: 'error',
-                        text: response.data.message || 'Failed to load dropdown options.'
+                    setToast({
+                        message: response.data.message || 'Failed to load dropdown options.',
+                        type: 'error'
                     });
                 }
             } catch (error) {
                 console.error('Error fetching dropdown data:', error);
-                setMessage({
-                    type: 'error',
-                    text: 'Failed to load dropdown options. Please refresh the page.'
+                setToast({
+                    message: 'Failed to load dropdown options. Please refresh the page.',
+                    type: 'error'
                 });
             } finally {
                 setIsLoadingDropdowns(false);
@@ -229,9 +228,9 @@ const AddEmployee = () => {
                 const { data, success } = response.data;
 
                 if (!success || !data || typeof data !== 'object' || !data.employee) {
-                    setMessage({
-                        type: 'error',
-                        text: 'Failed to load employee data properly.'
+                    setToast({
+                        message: 'Failed to load employee data properly.',
+                        type: 'error'
                     });
                     return;
                 }
@@ -320,14 +319,10 @@ const AddEmployee = () => {
                 };
 
                 setFilePreviews(filePreviews);
-
-                setTimeout(() => {
-                    setMessage({ type: '', text: '' });
-                }, 3000);
             } catch (error) {
-                setMessage({
-                    type:   error,
-                    text: 'Failed to fetch employee data. Please try again.'
+                setToast({
+                    message: 'Failed to fetch employee data. Please try again.',
+                    type: error
                 });
             } finally {
                 setIsLoadingEmployeeData(false);
@@ -405,6 +400,44 @@ const AddEmployee = () => {
         if (!salary) return ''; // Salary is optional
         if (isNaN(salary) || parseFloat(salary) < 0) return 'Salary should be a valid positive number';
         return '';
+    };
+
+    const validateAllowancesAndDeductions = () => {
+        const errors = [];
+
+        // Validate allowances
+        formData.allowances.forEach((allowance, index) => {
+            if (allowance.allowance_id && !allowance.allowance_value) {
+                errors.push(`Allowance ${index + 1}: Amount/Percentage is required when allowance type is selected`);
+            }
+            if (allowance.allowance_id && allowance.allowance_value) {
+                const value = parseFloat(allowance.allowance_value);
+                if (isNaN(value) || value <= 0) {
+                    errors.push(`Allowance ${index + 1}: Please enter a valid positive amount/percentage`);
+                }
+                if (allowance.allowance_type === 1 && value > 100) {
+                    errors.push(`Allowance ${index + 1}: Percentage cannot be more than 100%`);
+                }
+            }
+        });
+
+        // Validate deductions
+        formData.deductions.forEach((deduction, index) => {
+            if (deduction.deduction_id && !deduction.deduction_value) {
+                errors.push(`Deduction ${index + 1}: Amount/Percentage is required when deduction type is selected`);
+            }
+            if (deduction.deduction_id && deduction.deduction_value) {
+                const value = parseFloat(deduction.deduction_value);
+                if (isNaN(value) || value <= 0) {
+                    errors.push(`Deduction ${index + 1}: Please enter a valid positive amount/percentage`);
+                }
+                if (deduction.deduction_type === 1 && value > 100) {
+                    errors.push(`Deduction ${index + 1}: Percentage cannot be more than 100%`);
+                }
+            }
+        });
+
+        return errors;
     };
     const handleAllowanceChange = (index, field, value) => {
         const updatedAllowances = [...formData.allowances];
@@ -741,13 +774,15 @@ const AddEmployee = () => {
             }
         }
 
+        const allowanceDeductionErrors = validateAllowancesAndDeductions();
+        errors.push(...allowanceDeductionErrors);
+
         return errors;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        setMessage({ type: '', text: '' });
 
         // Validate form
         const validationErrors = validateForm();
@@ -764,9 +799,9 @@ const AddEmployee = () => {
         try {
             // Check if user is authenticated and has user_id
             if (!isAuthenticated() || !user?.user_id) {
-                setMessage({
-                    type: 'error',
-                    text: 'User authentication required. Please login again.'
+                setToast({
+                    message: 'User authentication required. Please login again.',
+                    type: 'error'
                 });
                 setIsSubmitting(false);
                 return;
@@ -860,9 +895,9 @@ const AddEmployee = () => {
                 },
             });
             if (response.data.success) {
-                setMessage({
-                    type: 'success',
-                    text: isEditMode ? 'Employee updated successfully!' : 'Employee added successfully!'
+                setToast({
+                    message: isEditMode ? 'Employee updated successfully!' : 'Employee added successfully!',
+                    type: 'success'
                 });
 
                 // Reset form only for add mode
@@ -912,22 +947,17 @@ const AddEmployee = () => {
                     }, 2000);
                 }
             } else {
-                setMessage({
-                    type: 'error',
-                    text: response.data.message || `Failed to ${isEditMode ? 'update' : 'add'} employee.`
+                setToast({
+                    message: response.data.message || `Failed to ${isEditMode ? 'update' : 'add'} employee.`,
+                    type: 'error'
                 });
             }
-
-            // Scroll to top to show the success/error message
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error('Error saving employee:', error);
-            setMessage({
-                type: 'error',
-                text: error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'add'} employee. Please try again.`
+            setToast({
+                message: error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'add'} employee. Please try again.`,
+                type: 'error'
             });
-            // Scroll to top to show the error message
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         } finally {
             setIsSubmitting(false);
         }
@@ -1028,19 +1058,6 @@ const AddEmployee = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Message */}
-                    {message.text && (
-                        <div className={`mx-6 mt-6 p-4 rounded-xl border-l-4 ${message.type === 'success'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-400'
-                            : 'bg-[var(--color-error-light)] text-red-800 border-red-400'
-                            }`}>
-                            <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-emerald-400' : 'bg-red-400'}`}></div>
-                                {message.text}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {/* Form */}
@@ -1406,83 +1423,8 @@ const AddEmployee = () => {
                                                     </div>
                                                 ))}
                                             </div>
-
-
-                                            {/* Summary */}
-                                            {formData.salary && (formData.allowances.some(item => item.allowance_id && item.allowance_value) ||
-                                                formData.deductions.some(item => item.deduction_id && item.deduction_value)) && (
-                                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-6">
-                                                        <h4 className="text-lg font-semibold text-blue-800 mb-3">Salary Summary</h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                                            <div className="text-center p-3 bg-white rounded-lg border border-blue-100">
-                                                                <div className="font-medium text-gray-600">Base Salary</div>
-                                                                <div className="text-xl font-bold text-blue-600">₹{parseFloat(formData.salary || 0).toFixed(2)}</div>
-                                                            </div>
-                                                            <div className="text-center p-3 bg-white rounded-lg border border-green-100">
-                                                                <div className="font-medium text-gray-600">Total Allowances</div>
-                                                                <div className="text-xl font-bold text-green-600">
-                                                                    ₹{formData.allowances
-                                                                        .filter(item => item.allowance_id && item.allowance_value)
-                                                                        .reduce((sum, item) => {
-                                                                            const value = parseFloat(item.allowance_value || 0);
-                                                                            const baseSalary = parseFloat(formData.salary || 0);
-                                                                            return sum + (item.allowance_type === 1
-                                                                                ? (baseSalary * value / 100)
-                                                                                : value);
-                                                                        }, 0)
-                                                                        .toFixed(2)
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-center p-3 bg-white rounded-lg border border-red-100">
-                                                                <div className="font-medium text-gray-600">Total Deductions</div>
-                                                                <div className="text-xl font-bold text-red-600">
-                                                                    ₹{formData.deductions
-                                                                        .filter(item => item.deduction_id && item.deduction_value)
-                                                                        .reduce((sum, item) => {
-                                                                            const value = parseFloat(item.deduction_value || 0);
-                                                                            const baseSalary = parseFloat(formData.salary || 0);
-                                                                            return sum + (item.deduction_type === 1
-                                                                                ? (baseSalary * value / 100)
-                                                                                : value);
-                                                                        }, 0)
-                                                                        .toFixed(2)
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="mt-4 pt-3 border-t border-blue-200">
-                                                            <div className="text-center">
-                                                                <div className="font-medium text-gray-600">Net Salary</div>
-                                                                <div className="text-2xl font-bold text-indigo-600">
-                                                                    ₹{(() => {
-                                                                        const baseSalary = parseFloat(formData.salary || 0);
-                                                                        const totalAllowances = formData.allowances
-                                                                            .filter(item => item.allowance_id && item.allowance_value)
-                                                                            .reduce((sum, item) => {
-                                                                                const value = parseFloat(item.allowance_value || 0);
-                                                                                return sum + (item.allowance_type === 'percentage'
-                                                                                    ? (baseSalary * value / 100)
-                                                                                    : value);
-                                                                            }, 0);
-                                                                        const totalDeductions = formData.deductions
-                                                                            .filter(item => item.deduction_id && item.deduction_value)
-                                                                            .reduce((sum, item) => {
-                                                                                const value = parseFloat(item.deduction_value || 0);
-                                                                                return sum + (item.deduction_type === 'percentage'
-                                                                                    ? (baseSalary * value / 100)
-                                                                                    : value);
-                                                                            }, 0);
-                                                                        return (baseSalary + totalAllowances - totalDeductions).toFixed(2);
-                                                                    })()}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
                                         </div>
                                     )}
-
 
                                     {section.key === 'bankDetails' && (
                                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
