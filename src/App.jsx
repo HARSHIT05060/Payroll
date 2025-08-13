@@ -9,7 +9,6 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import SubscriptionGuard from './Components/Subscription/SubscriptionGuard';
 import { ThemeProvider } from './context/Themecontext';
 import Unauthorized from './Components/Unauthorized';
-import Dashboard from './Components/Dashboard';
 
 // Landing Page Components (for better performance, keep these non-lazy)
 import LandingPage from './Components/Landing/LandingPage';
@@ -182,7 +181,6 @@ const App = () => {
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
                 {/* Protected Dashboard Route */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
                 {/* User Management Routes */}
@@ -378,7 +376,7 @@ const App = () => {
                 {/* Fallback Routes */}
                 <Route path="*" element={
                   isAuthenticated ?
-                    <Navigate to="/dashboard" replace /> :
+                    <Navigate to="/home" replace /> :
                     <Navigate to="/login" replace />
                 } />
               </Routes>

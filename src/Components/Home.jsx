@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import AttendanceReport from './HomeComponents/AttendanceReport';
 import PayrollSummary from './HomeComponents/PayrollSummary';
-import PendingTasks from './HomeComponents/PendingTasks';
 import SalaryTrend from './HomeComponents/SalaryTrend';
 import { DashboardProvider } from '../context/DashboardContext';
 import { useAuth } from '../context/AuthContext';
@@ -26,7 +25,6 @@ const HomeContent = () => {
         {/* Second Row */}
         <div >
           <SalaryTrend  />
-          {/* <PendingTasks data={pendingTasksData} /> */}
         </div>
       </div>
     </div>
