@@ -9,7 +9,9 @@ import {
     ArrowLeft,
     RefreshCw,
     XCircle,
-    Eye
+    Eye,
+    Smartphone,
+    Fingerprint
 } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -26,14 +28,21 @@ const COLUMN_KEYS = {
     ID: 'id',
     NAME: 'name',
     DEPARTMENT: 'department',
-    DESIGNATION: 'designation'
+    DESIGNATION: 'designation',
+    ATTENDANCE_TYPE: 'attendance_type'
 };
 
 const KEY_MAPPING = {
     [COLUMN_KEYS.ID]: 'employee_code',
     [COLUMN_KEYS.NAME]: 'full_name',
     [COLUMN_KEYS.DEPARTMENT]: 'department_name',
-    [COLUMN_KEYS.DESIGNATION]: 'designation_name'
+    [COLUMN_KEYS.DESIGNATION]: 'designation_name',
+    [COLUMN_KEYS.ATTENDANCE_TYPE]: 'attendance_type'
+};
+
+const ATTENDANCE_TYPES = {
+    MOBILE: 1,
+    BIOMETRIC: 2
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -54,6 +63,9 @@ export default function EmployeeManagement() {
     const [totalEmployees, setTotalEmployees] = useState(0);
     const [paginationLoading, setPaginationLoading] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
+
+    // Attendance type change loading state
+    const [attendanceChangingIds, setAttendanceChangingIds] = useState(new Set());
 
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
@@ -135,6 +147,43 @@ export default function EmployeeManagement() {
         }
     }, [user, logout, searchQuery]);
 
+    // Handle attendance type change
+    const handleAttendanceTypeChange = useCallback(async (employeeId, newAttendanceType) => {
+        try {
+            setAttendanceChangingIds(prev => new Set(prev.add(employeeId)));
+
+            const formData = new FormData();
+            formData.append('employee_id', employeeId.toString());
+            formData.append('attendance_type', newAttendanceType.toString());
+
+            const response = await api.post('attendance_type_change', formData);
+
+            if (response.data?.success) {
+                // Update the employee's attendance type in local state
+                setEmployees(prevEmployees =>
+                    prevEmployees.map(emp =>
+                        emp.employee_id === employeeId
+                            ? { ...emp, attendance_type: newAttendanceType.toString() }
+                            : emp
+                    )
+                );
+            } else {
+                throw new Error(response.data?.message || 'Failed to update attendance type');
+            }
+
+        } catch (error) {
+            console.error("Attendance type change error:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to update attendance type";
+            alert(errorMessage); // You might want to use a better notification system
+        } finally {
+            setAttendanceChangingIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(employeeId);
+                return newSet;
+            });
+        }
+    }, []);
+
     // Debounced search functionality
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
@@ -212,12 +261,112 @@ export default function EmployeeManagement() {
     // Render sort icon
     const renderSortIcon = useCallback((key) => {
         if (sortConfig.key !== key) {
-            return <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-text-muted)]" />;
+            return <ChevronDown className="ml-1 h-4 w-4 text-white/70" />;
         }
         return sortConfig.direction === SORT_DIRECTIONS.ASCENDING ?
-            <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
-            <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
+            <ChevronUp className="ml-1 h-4 w-4 text-white" /> :
+            <ChevronDown className="ml-1 h-4 w-4 text-white" />;
     }, [sortConfig]);
+
+    // Render attendance type display - UPDATED TO SHOW ONLY ACTIVE TYPE
+    const renderAttendanceTypeDisplay = useCallback((employee) => {
+        const employeeId = employee.employee_id;
+        const currentType = parseInt(employee.attendance_type);
+        const isChanging = attendanceChangingIds.has(employeeId);
+        const isMobile = currentType === ATTENDANCE_TYPES.MOBILE;
+        const isBiometric = currentType === ATTENDANCE_TYPES.BIOMETRIC;
+
+        // Check if user has permission to change attendance type
+        const hasPermission = permissions['attendance_type_change'];
+
+        if (!hasPermission) {
+            // Read-only display - show only active type
+            return (
+                <div className="flex items-center justify-center">
+                    {isMobile ? (
+                        <div className="flex items-center space-x-2 px-3 py-1 bg-[var(--color-blue-lightest)] rounded-full">
+                            <Smartphone className="w-4 h-4 text-[var(--color-blue)]" />
+                            <span className="text-sm text-[var(--color-text-blue)] font-medium">Mobile</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center space-x-2 px-3 py-1 bg-[var(--color-success-light)] rounded-full">
+                            <Fingerprint className="w-4 h-4 text-[var(--color-success)]" />
+                            <span className="text-sm text-[var(--color-text-success)] font-medium">Biometric</span>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Interactive toggle for users with permission
+        return (
+            <div className="flex items-center justify-center relative">
+                <div className="flex items-center">
+                    <input
+                        type="checkbox"
+                        id={`toggle-${employeeId}`}
+                        checked={isBiometric}
+                        onChange={(e) => {
+                            if (!isChanging) {
+                                const newType = e.target.checked ? ATTENDANCE_TYPES.BIOMETRIC : ATTENDANCE_TYPES.MOBILE;
+                                handleAttendanceTypeChange(employeeId, newType);
+                            }
+                        }}
+                        disabled={isChanging || paginationLoading || searchLoading}
+                        className="sr-only"
+                    />
+                    <label
+                        htmlFor={`toggle-${employeeId}`}
+                        className={`relative inline-flex items-center h-7 w-14 rounded-full transition-all duration-300 ease-in-out focus-within:ring-2 focus-within:ring-offset-2 ${
+                            isBiometric 
+                                ? 'bg-[var(--color-success)] focus-within:ring-[var(--color-success)]' 
+                                : 'bg-[var(--color-blue)] focus-within:ring-[var(--color-blue)]'
+                        } ${
+                            isChanging || paginationLoading || searchLoading 
+                                ? 'opacity-50 cursor-not-allowed' 
+                                : 'cursor-pointer hover:shadow-md'
+                        }`}
+                    >
+                        {/* Toggle Circle with Icon */}
+                        <span
+                            className={`inline-block h-6 w-6 rounded-full bg-[var(--color-bg-secondary)] shadow-lg transform transition-all duration-300 ease-in-out flex items-center justify-center ${
+                                isBiometric ? 'translate-x-7' : 'translate-x-0.5'
+                            }`}
+                        >
+                            {isBiometric ? (
+                                <Fingerprint className="w-3.5 h-3.5 text-[var(--color-success)]" />
+                            ) : (
+                                <Smartphone className="w-3.5 h-3.5 text-[var(--color-blue)]" />
+                            )}
+                        </span>
+                    </label>
+                    
+                    {/* Active Type Label */}
+                    <div className="ml-3 flex items-center">
+                        <span className={`text-sm font-medium ${
+                            isBiometric ? 'text-[var(--color-text-success)]' : 'text-[var(--color-text-blue)]'
+                        }`}>
+                            {isBiometric ? 'Biometric' : 'Mobile'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Loading overlay */}
+                {isChanging && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg-secondary)]/80 rounded-lg">
+                        <RefreshCw className="w-4 h-4 animate-spin text-[var(--color-blue-dark)]" />
+                    </div>
+                )}
+            </div>
+        );
+    }, [attendanceChangingIds, permissions, handleAttendanceTypeChange, paginationLoading, searchLoading]);
+
+    // Function to truncate text with ellipsis
+    const truncateText = useCallback((text, maxLength = 12) => {
+        if (!text) return 'Unnamed Employee';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }, []);
 
     // Redirect if not authenticated
     if (!isAuthenticated()) {
@@ -266,7 +415,7 @@ export default function EmployeeManagement() {
                                         placeholder="Search employees..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm"
+                                        className="w-full pl-10 pr-10 py-2 border border-[var(--color-border-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-text-white)] focus:border-[var(--color-border-primary)] text-sm text-[var(--color-text-primary)]"
                                     />
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-[var(--color-text-muted)]" />
                                     {searchQuery && (
@@ -277,10 +426,7 @@ export default function EmployeeManagement() {
                                             <XCircle className="h-4 w-4" />
                                         </button>
                                     )}
-                                   
                                 </div>
-
-                            
 
                                 {permissions['employee_create'] && (
                                     <button
@@ -358,19 +504,19 @@ export default function EmployeeManagement() {
                     ) : (
                         <>
                             {/* Table */}
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
-                                    <thead className="bg-[var(--color-blue-lightest)]">
+                            <div className="overflow-hidden">
+                                <table className="w-full">
+                                    <thead className="bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
                                         <tr>
                                             {[
-                                                { key: COLUMN_KEYS.ID, label: 'Employee ID' },
-                                                { key: COLUMN_KEYS.NAME, label: 'Full Name' },
-                                                { key: COLUMN_KEYS.DEPARTMENT, label: 'Department' },
-                                                { key: COLUMN_KEYS.DESIGNATION, label: 'Designation' }
-                                            ].map(({ key, label }) => (
-                                                <th key={`header-${key}`} className="px-6 py-3 text-left">
+                                                { key: COLUMN_KEYS.ID, label: 'Employee ID', width: 'w-[10%]' },
+                                                { key: COLUMN_KEYS.NAME, label: 'Full Name', width: 'w-[15%]' },
+                                                { key: COLUMN_KEYS.DEPARTMENT, label: 'Department', width: 'w-[10%]' },
+                                                { key: COLUMN_KEYS.DESIGNATION, label: 'Designation', width: 'w-[10%]' },
+                                            ].map(({ key, label, width }) => (
+                                                <th key={`header-${key}`} className={`${width} px-3 py-4 text-center`}>
                                                     <button
-                                                        className="flex items-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider hover:text-[var(--color-text-secondary)]"
+                                                        className="flex items-center justify-center w-full text-xs font-semibold text-white uppercase tracking-wider hover:text-gray-200 transition-colors"
                                                         onClick={() => requestSort(key)}
                                                     >
                                                         {label}
@@ -378,58 +524,99 @@ export default function EmployeeManagement() {
                                                     </button>
                                                 </th>
                                             ))}
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <th className="w-[20%] px-3 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
                                                 Email
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                            <th className="w-[12%] px-3 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
                                                 Mobile
                                             </th>
+                                            {/* Attendance Permission Column */}
+                                            <th className="w-[18%] px-3 py-4 text-center">
+                                                <button
+                                                    className="flex items-center justify-center w-full text-xs font-semibold text-white uppercase tracking-wider hover:text-gray-200 transition-colors"
+                                                    onClick={() => requestSort(COLUMN_KEYS.ATTENDANCE_TYPE)}
+                                                >
+                                                    Attendance Permission
+                                                    {renderSortIcon(COLUMN_KEYS.ATTENDANCE_TYPE)}
+                                                </button>
+                                            </th>
                                             {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                <th className="w-[5%] px-3 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
                                                     Actions
                                                 </th>
                                             )}
                                         </tr>
                                     </thead>
                                     <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                                        {/* Render actual employee rows */}
                                         {sortedEmployees.map((employee, index) => {
                                             const employeeId = employee.employee_id || `employee-${index}`;
+                                            const fullName = employee.full_name || 'Unnamed Employee';
+                                            const truncatedName = truncateText(fullName, 12);
+                                            
                                             return (
                                                 <tr
                                                     key={`emp-${employeeId}`}
-                                                    className={`hover:bg-[var(--color-bg-primary)] transition-colors ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
+                                                    className={`h-[60px] hover:bg-[var(--color-blue-lightest)] transition-colors border-b border-[var(--color-border-divider)] ${(paginationLoading || searchLoading) ? 'opacity-50' : ''}`}
                                                 >
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
-                                                        {employee.employee_code || '-'}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-[var(--color-text-blue)]">
+                                                            {employee.employee_code || '-'}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-primary)]">
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="w-8 h-8 bg-[var(--color-blue-lighter)] rounded-full flex items-center justify-center">
-                                                                <Users className="w-4 h-4 text-[var(--color-blue-dark)]" />
-                                                            </div>
-                                                            <span>{employee.full_name || 'Unnamed Employee'}</span>
+                                                    
+                                                    {/* Full Name */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <div 
+                                                            className="text-sm font-medium text-[var(--color-text-primary)] cursor-help truncate max-w-[120px] mx-auto" 
+                                                            title={fullName}
+                                                        >
+                                                            {truncatedName}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                        {employee.department_name || 'N/A'}
+                                                    
+                                                    {/* Department */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-[var(--color-text-success)] max-w-[80px] truncate">
+                                                            {employee.department_name || 'N/A'}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                        {employee.designation_name || 'N/A'}
+                                                    
+                                                    {/* Designation */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-[var(--color-text-blue)] max-w-[80px] truncate">
+                                                            {employee.designation_name || 'N/A'}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                        {employee.email || 'N/A'}
+                                                    
+                                                    {/* Email */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <div className="text-sm text-[var(--color-text-secondary)] truncate max-w-[160px] mx-auto" title={employee.email}>
+                                                            {employee.email || 'N/A'}
+                                                        </div>
                                                     </td>
-                                                    <td className="px-6 py-2 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                        {employee.mobile_number || 'N/A'}
+                                                    
+                                                    {/* Mobile */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        <div className="text-sm font-mono text-[var(--color-text-primary)]">
+                                                            {employee.mobile_number || 'N/A'}
+                                                        </div>
                                                     </td>
+                                                    
+                                                    {/* Attendance Permission */}
+                                                    <td className="px-3 py-4 text-center">
+                                                        {renderAttendanceTypeDisplay(employee)}
+                                                    </td>
+                                                    
+                                                    {/* Actions */}
                                                     {(permissions?.employee_edit || permissions?.employee_view) && (
-                                                        <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
-                                                            <div className="flex space-x-2">
+                                                        <td className="px-3 py-4 text-center">
+                                                            <div className="flex justify-center space-x-1">
                                                                 {permissions['employee_edit'] && (
                                                                     <button
                                                                         onClick={() => handleEditEmployee(employee.employee_id)}
                                                                         disabled={paginationLoading || searchLoading}
-                                                                        className="p-2 rounded-md transition-colors text-[var(--color-blue-dark)] hover:text-[var(--color-blue-darkest)] hover:bg-[var(--color-blue-lightest)] disabled:opacity-50"
+                                                                        className="p-2 rounded-lg transition-all duration-200 text-[var(--color-blue)] hover:text-[var(--color-blue-dark)] hover:bg-[var(--color-blue-lightest)] disabled:opacity-50 transform hover:scale-105"
                                                                         title="Edit Employee"
                                                                     >
                                                                         <Pencil className="w-4 h-4" />
@@ -439,7 +626,7 @@ export default function EmployeeManagement() {
                                                                     <button
                                                                         onClick={() => handleViewDetails(employee.employee_id)}
                                                                         disabled={paginationLoading || searchLoading}
-                                                                        className="p-2 rounded-md transition-colors text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-primary)] disabled:opacity-50"
+                                                                        className="p-2 rounded-lg transition-all duration-200 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-gray-light)] disabled:opacity-50 transform hover:scale-105"
                                                                         title="View Details"
                                                                     >
                                                                         <Eye className="w-4 h-4" />
@@ -451,6 +638,22 @@ export default function EmployeeManagement() {
                                                 </tr>
                                             );
                                         })}
+                                        
+                                        {/* Fill empty rows to maintain consistent height for 10 rows */}
+                                        {Array.from({ length: Math.max(0, ITEMS_PER_PAGE - sortedEmployees.length) }).map((_, index) => (
+                                            <tr key={`empty-${index}`} className="h-[60px] border-b border-[var(--color-border-divider)]">
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                {(permissions?.employee_edit || permissions?.employee_view) && (
+                                                    <td className="px-3 py-4 text-center">&nbsp;</td>
+                                                )}
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
