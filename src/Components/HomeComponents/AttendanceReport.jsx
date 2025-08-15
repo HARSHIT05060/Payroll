@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import Pagination from '../Pagination';
 import {
     Users, CheckCircle, UserX, Coffee, TrendingUp, Calendar,
     Activity, Search, XCircle, ChevronDown, ChevronUp, Clock, Timer
 } from 'lucide-react';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDashboardData } from '../../context/DashboardContext';
@@ -267,181 +268,52 @@ const AttendanceReport = () => {
         { value: 'Week Off', label: 'Week Off' }
     ];
 
+
     const DonutChart = ({ stats, hoveredSegment }) => {
-        const [isLoaded, setIsLoaded] = useState(false);
-        const [animationProgress, setAnimationProgress] = useState(0);
+        const data = [
+            { name: 'Present', value: stats.present, color: 'var(--color-success)', key: 'present' },
+            { name: 'Absent', value: stats.absent, color: 'var(--color-error)', key: 'absent' },
+            { name: 'Week Off', value: stats.weekOff, color: 'var(--color-warning)', key: 'weekoff' },
+        ];
+        const { totalEmployees } = stats;
 
-        const { totalEmployees, present, absent, weekOff } = stats;
-        const total = totalEmployees;
-
-        // Animation effect on mount
-        useEffect(() => {
-            const timer = setTimeout(() => {
-                setIsLoaded(true);
-
-                // Animate progress from 0 to 100
-                const animationDuration = 1500; // 1.5 seconds
-                const steps = 60; // 60 steps for smooth animation
-                const stepDuration = animationDuration / steps;
-                let currentStep = 0;
-
-                const interval = setInterval(() => {
-                    currentStep++;
-                    const progress = (currentStep / steps) * 100;
-                    setAnimationProgress(progress);
-
-                    if (currentStep >= steps) {
-                        clearInterval(interval);
-                        setAnimationProgress(100);
-                    }
-                }, stepDuration);
-
-                return () => clearInterval(interval);
-            }, 200); // Small delay before starting animation
-
-            return () => clearTimeout(timer);
-        }, [stats]);
-
-        if (total === 0) {
+        if (totalEmployees === 0) {
             return (
-                <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
+                <div className="flex items-center justify-center h-48 text-[var(--color-text-muted)]">
                     <div className="text-center">
-                        <div className="text-2xl font-bold text-[var(--color-text-muted)]">No Data</div>
-                        <div className="text-sm text-[var(--color-text-muted)]">No employees found</div>
+                        <Users size={32} className="mx-auto mb-2 opacity-50" />
+                        <p className="font-medium">No Data</p>
+                        <p className="text-sm">No attendance records for this day.</p>
                     </div>
                 </div>
             );
         }
 
-        const presentPercent = (present / total) * 100;
-        const absentPercent = (absent / total) * 100;
-        const weekOffPercent = (weekOff / total) * 100;
-
-        const radius = 55;
-        const circumference = 2 * Math.PI * radius;
-
-        // Apply animation progress to stroke calculations
-        const animationMultiplier = animationProgress / 100;
-        const presentStroke = (presentPercent / 100) * circumference * animationMultiplier;
-        const absentStroke = (absentPercent / 100) * circumference * animationMultiplier;
-        const weekOffStroke = (weekOffPercent / 100) * circumference * animationMultiplier;
-
-        const segments = [
-            {
-                id: 'present',
-                stroke: presentStroke,
-                offset: 0,
-                color: 'var(--color-success)',
-                label: 'AT WORK',
-                count: present,
-                percentage: presentPercent
-            },
-            {
-                id: 'absent',
-                stroke: absentStroke,
-                offset: -presentStroke,
-                color: 'var(--color-error)',
-                label: 'ABSENT',
-                count: absent,
-                percentage: absentPercent
-            },
-            {
-                id: 'weekoff',
-                stroke: weekOffStroke,
-                offset: -(presentStroke + absentStroke),
-                color: 'var(--color-warning)',
-                label: 'WEEK OFF',
-                count: weekOff,
-                percentage: weekOffPercent
-            }
-        ];
-
         return (
-            <div className="relative w-48 h-48 mx-auto mb-6">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                    {/* Background circle */}
-                    <circle
-                        cx="60"
-                        cy="60"
-                        r={radius}
-                        fill="none"
-                        stroke="var(--color-bg-gray-light)"
-                        strokeWidth="8"
-                    />
-
-                    {/* Animated segments */}
-                    {segments.map((segment) => (
-                        segment.stroke > 0 && (
-                            <circle
-                                key={segment.id}
-                                cx="60"
-                                cy="60"
-                                r={radius}
-                                fill="none"
-                                stroke={segment.color}
-                                strokeWidth={hoveredSegment === segment.id ? "10" : "8"}
-                                strokeDasharray={`${segment.stroke} ${circumference}`}
-                                strokeDashoffset={segment.offset}
-                                strokeLinecap="round"
-                                className="transition-all duration-300 ease-in-out cursor-pointer"
-                                style={{
-                                    opacity: hoveredSegment && hoveredSegment !== segment.id ? 0.6 : 1,
-                                    transition: 'stroke-dasharray 0.1s ease-out, stroke-dashoffset 0.1s ease-out, stroke-width 0.3s ease-in-out, opacity 0.3s ease-in-out'
-                                }}
-                            />
-                        )
-                    ))}
-
-                    {/* Loading indicator */}
-                    {!isLoaded && (
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r={radius}
-                            fill="none"
-                            stroke="var(--color-text-muted)"
-                            strokeWidth="8"
-                            strokeDasharray="10 10"
-                            strokeLinecap="round"
-                            className="animate-spin"
-                            style={{
-                                transformOrigin: '60px 60px'
-                            }}
-                        />
-                    )}
-                </svg>
-
-                {/* Center content */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                        {!isLoaded ? (
-                            <div className="animate-pulse">
-                                <div className="text-4xl font-bold text-[var(--color-text-muted)]">...</div>
-                                <div className="text-sm text-[var(--color-text-muted)]">Loading</div>
-                            </div>
-                        ) : hoveredSegment ? (
-                            <div className="transition-all duration-300 transform scale-110">
-                                <div className="text-3xl font-bold text-[var(--color-text-primary)]">
-                                    {segments.find(s => s.id === hoveredSegment)?.count || 0}
-                                </div>
-                                <div className="text-xs font-semibold text-[var(--color-text-secondary)]">
-                                    {segments.find(s => s.id === hoveredSegment)?.label}
-                                </div>
-                                <div className="text-xs mt-1 text-[var(--color-text-muted)]">
-                                    {(segments.find(s => s.id === hoveredSegment)?.percentage || 0).toFixed(1)}%
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="transition-all duration-300">
-                                <div className="text-4xl font-bold text-[var(--color-text-primary)]">{total}</div>
-                                <div className="text-sm text-[var(--color-text-secondary)]">Total Employees</div>
-                            </div>
-                        )}
-                    </div>
+            <div className="relative w-48 h-48 mx-auto">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="value" paddingAngle={5}>
+                            {data.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={entry.color}
+                                    stroke={entry.color}
+                                    opacity={hoveredSegment && hoveredSegment !== entry.key ? 0.3 : 1}
+                                    strokeWidth={hoveredSegment === entry.key ? 3 : 1}
+                                />
+                            ))}
+                        </Pie>
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-[var(--color-text-primary)]">{totalEmployees}</span>
+                    <span className="text-sm text-[var(--color-text-secondary)]">Employees</span>
                 </div>
             </div>
         );
     };
+
 
     if (loading) {
         return (
