@@ -157,11 +157,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
             id: 'configuration',
             label: 'Configuration',
             icon: Settings,
-            hasSubmenu: true,
+            hasSubmenu: false,
             path: '/configuration',
-            submenu: [
-                { label: 'Time Configuration', path: '/configuration' },
-            ]
         },
 
         // Plans & Pricing - Always show (you can add specific permissions if needed)
@@ -169,11 +166,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
             id: 'planspricing',
             label: 'Plans & Pricing',
             icon: Settings,
-            hasSubmenu: true,
+            hasSubmenu: false,
             path: '/planspricing',
-            submenu: [
-                { label: 'View Plans', path: '/planspricing' },
-            ]
         }
     ].filter(Boolean);
 
