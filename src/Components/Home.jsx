@@ -7,10 +7,6 @@ import { useAuth } from '../context/AuthContext';
 
 const HomeContent = () => {
   // Static sample data (keep/remove as needed)
-
-
-
-
   return (
     <div className="min-h-screen p-6 bg-[var(--color-bg-primary)]">
       <div className="max-w-7xl mx-auto space-y-6">
