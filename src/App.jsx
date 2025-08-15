@@ -13,6 +13,7 @@ import Unauthorized from './Components/Unauthorized';
 // Landing Page Components (for better performance, keep these non-lazy)
 import LandingPage from './Components/Landing/LandingPage';
 import LandingNavbar from './Components/Landing/LandingNavbar';
+import LoadingSpinner from './Components/Loader/LoadingSpinner';
 
 // Lazy Loaded Employee Management Pages
 const Employee = lazy(() => import('./pages/Employee/Employee'));
@@ -61,23 +62,6 @@ const TimeConfigurationComponent = lazy(() => import('./pages/Configuration/Conf
 // Lazy Loaded Pricing Component
 const PricingComponent = lazy(() => import('./Components/PricingComponent'));
 
-// Loading Component for better UX
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <div className="text-center">
-      <div className="relative">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
-        <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-transparent border-t-blue-400 animate-pulse mx-auto"></div>
-      </div>
-      <p className="text-gray-600 font-medium animate-pulse">Loading...</p>
-      <div className="mt-2 flex space-x-1 justify-center">
-        <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce"></div>
-        <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-        <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-      </div>
-    </div>
-  </div>
-);
 
 const App = () => {
   const location = useLocation();

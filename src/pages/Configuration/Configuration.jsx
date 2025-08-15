@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Clock, Save, Building, Upload, X, Settings, ArrowLeft, Eye, Trash2 } from 'lucide-react';
+import { Clock, Save, Building, Upload, X, Settings, ArrowLeft, Eye, Trash2, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
@@ -13,6 +13,7 @@ const SettingsComponent = () => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Preview Modal State
   const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -326,20 +327,20 @@ const SettingsComponent = () => {
 
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">{label}</label>
         <div className="relative">
           {!preview ? (
             /* Upload Button when no file */
             <label
               htmlFor={fieldId}
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-300"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[var(--color-border-secondary)] rounded-xl cursor-pointer bg-[var(--color-bg-gray-light)] hover:bg-[var(--color-bg-hover)] transition-all duration-300"
             >
               <div className="flex flex-col items-center justify-center pt-3 pb-3">
-                <div className="w-10 h-10 mb-2 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 mb-2 bg-[var(--color-blue)] rounded-full flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-[var(--color-text-white)]" />
                 </div>
-                <p className="mb-1 text-base font-medium text-gray-900">Upload {label}</p>
-                <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                <p className="mb-1 text-base font-medium text-[var(--color-text-primary)]">Upload {label}</p>
+                <p className="text-xs text-[var(--color-text-muted)]">PNG, JPG up to 5MB</p>
               </div>
               <input
                 id={fieldId}
@@ -351,7 +352,7 @@ const SettingsComponent = () => {
             </label>
           ) : (
             /* Preview when file is uploaded */
-            <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 overflow-hidden">
+            <div className="relative w-full h-32 border-2 border-dashed border-[var(--color-border-secondary)] rounded-xl bg-[var(--color-bg-gray-light)] overflow-hidden">
               <div className="relative w-full h-full group">
                 <img
                   src={preview}
@@ -365,7 +366,7 @@ const SettingsComponent = () => {
                 />
                 {/* Fallback for broken images */}
                 <div
-                  className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
+                  className="w-full h-full bg-[var(--color-bg-hover)] flex items-center justify-center text-[var(--color-text-muted)] text-sm"
                   style={{ display: 'none' }}
                 >
                   Image Error
@@ -380,7 +381,7 @@ const SettingsComponent = () => {
                       e.stopPropagation();
                       handleImagePreview(preview, label);
                     }}
-                    className="bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                    className="bg-[var(--color-bg-secondary)] bg-opacity-90 hover:bg-opacity-100 text-[var(--color-text-primary)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
                     title="Preview image"
                   >
                     <Eye className="w-4 h-4" />
@@ -393,7 +394,7 @@ const SettingsComponent = () => {
                       e.stopPropagation();
                       handleFileDelete(field);
                     }}
-                    className="bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
+                    className="bg-[var(--color-error)] hover:bg-[var(--color-error-dark)] text-[var(--color-text-white)] rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-200"
                     title="Remove image"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -413,42 +414,38 @@ const SettingsComponent = () => {
 
     return (
       <div
-        className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50"
+        className="fixed inset-0 bg-[var(--color-modal-overlay)] backdrop-blur-sm flex items-center justify-center z-50"
         onClick={closePreviewModal}
       >
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl max-h-[85vh] m-4 overflow-hidden">
+        <div className="relative bg-[var(--color-modal-bg)] rounded-2xl shadow-2xl max-w-2xl max-h-[85vh] m-4 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-              <Eye className="w-5 h-5 mr-2 text-blue-600" />
+          <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-divider)] bg-[var(--color-blue-lightest)]">
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center">
+              <Eye className="w-5 h-5 mr-2 text-[var(--color-blue)]" />
               {previewTitle}
             </h3>
             <button
               onClick={closePreviewModal}
-              className="p-2 hover:bg-gray-200 rounded-full transition-all duration-200 group"
+              className="p-2 hover:bg-[var(--color-bg-hover)] rounded-full transition-all duration-200 group"
               title="Close preview"
             >
-              <X className="w-5 h-5 text-gray-500 group-hover:text-gray-700 group-hover:rotate-90 transition-all duration-200" />
+              <X className="w-5 h-5 text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] group-hover:rotate-90 transition-all duration-200" />
             </button>
           </div>
 
           {/* Image Content */}
-          <div className="p-6 flex items-center justify-center bg-gray-50 min-h-[300px]">
+          <div className="p-6 flex items-center justify-center bg-[var(--color-bg-gray-light)] min-h-[300px]">
             <img
               src={previewImage}
               alt="Preview"
-              className="max-w-full max-h-[65vh] object-contain rounded-lg shadow-lg border border-gray-200"
+              className="max-w-full max-h-[65vh] object-contain rounded-lg shadow-lg border border-[var(--color-border-secondary)]"
               onClick={(e) => e.stopPropagation()}
-              onError={(e) => {
-                console.error('Image failed to load:', previewImage);
-                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2IiBzdHJva2U9IiNkMWQ1ZGIiIHN0cm9rZS13aWR0aD0iMiIgcng9IjgiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNTAsIDEwMCkiPjxzdmcgY2xhc3M9InctOCBoLTgiIGZpbGw9IiM5Y2EzYWYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48cGF0aCBkPSJNMTIgOXYybTAgNGguMDFtLTYuOTM4IDRoMTMuODU2YzEuNTQgMCAyLjUwMi0xLjY2NyAxLjczMi0yLjVMMTMuNzMyIDRjLS43Ny0uODMzLTEuOTY0LS44MzMtMi43MzIgMEw0LjczMiAxNS41Yy0uNzcuODMzLjE5MiAyLjUgMS43MzIgMi41eiIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+PC9nPjx0ZXh0IHg9IjUwJSIgeT0iNzAlIiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCBTZWdvZSBVSSwgUm9ib3RvLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNmI3MjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==';
-              }}
             />
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">Click outside to close or use the × button</p>
+          <div className="px-4 py-2 bg-[var(--color-bg-gray-light)] border-t border-[var(--color-border-divider)]">
+            <p className="text-xs text-[var(--color-text-muted)] text-center">Click outside to close or use the × button</p>
           </div>
         </div>
       </div>
@@ -457,17 +454,17 @@ const SettingsComponent = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue)] mx-auto mb-4"></div>
+          <p className="text-[var(--color-text-secondary)]">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--color-bg-primary)]">
       {/* Toast Component */}
       {toast && (
         <Toast
@@ -482,32 +479,32 @@ const SettingsComponent = () => {
 
       <div className="p-6 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+        <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl mb-8 overflow-hidden">
+          <div className="bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] p-6">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg backdrop-blur-sm"
+                className="flex items-center gap-2 text-[var(--color-text-white)] hover:text-[var(--color-text-white-90)] transition-colors bg-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-30)] px-4 py-2 rounded-lg backdrop-blur-sm"
               >
                 <ArrowLeft size={18} />
                 Back
               </button>
               <div className="flex items-center gap-3">
-                <Settings className="w-8 h-8 text-white" />
+                <Settings className="w-8 h-8 text-[var(--color-text-white)]" />
                 <div>
-                  <h1 className="text-2xl font-bold text-white">Settings</h1>
+                  <h1 className="text-2xl font-bold text-[var(--color-text-white)]">Settings</h1>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-[var(--color-border-divider)]">
             <button
               onClick={() => setActiveTab('company')}
               className={`px-6 py-4 font-medium ${activeTab === 'company'
-                ? 'border-b-2 border-blue-600 text-blue-600'
-                : 'text-gray-600 hover:text-blue-600'
+                ? 'border-b-2 border-[var(--color-blue)] text-[var(--color-blue)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-blue)]'
                 }`}
             >
               <Building className="w-4 h-4 inline mr-2" />
@@ -516,8 +513,8 @@ const SettingsComponent = () => {
             <button
               onClick={() => setActiveTab('time')}
               className={`px-6 py-4 font-medium ${activeTab === 'time'
-                ? 'border-b-2 border-blue-600 text-blue-600'
-                : 'text-gray-600 hover:text-blue-600'
+                ? 'border-b-2 border-[var(--color-blue)] text-[var(--color-blue)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-blue)]'
                 }`}
             >
               <Clock className="w-4 h-4 inline mr-2" />
@@ -528,70 +525,84 @@ const SettingsComponent = () => {
 
         {/* Company Info Tab */}
         {activeTab === 'company' && (
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Company Name</label>
                 <input
                   type="text"
                   value={companyData.company_name}
                   onChange={(e) => handleInputChange('company_name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
                   placeholder="Enter company name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company Number</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Company Number</label>
                 <input
                   type="text"
                   value={companyData.company_number}
                   onChange={(e) => handleInputChange('company_number', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
                   placeholder="Enter company number"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Company Address</label>
                 <textarea
                   value={companyData.company_address}
                   onChange={(e) => handleInputChange('company_address', e.target.value)}
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
                   placeholder="Enter company address"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Biometric API Key</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Biometric API Key</label>
                 <input
                   type="text"
                   value={companyData.biomatric_api_key}
                   onChange={(e) => handleInputChange('biomatric_api_key', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
                   placeholder="Enter API key"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Biometric API Password</label>
-                <input
-                  type="password"
-                  value={companyData.biomatric_api_password}
-                  onChange={(e) => handleInputChange('biomatric_api_password', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter API password"
-                />
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Biometric API Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={companyData.biomatric_api_password}
+                    onChange={(e) => handleInputChange('biomatric_api_password', e.target.value)}
+                    className="w-full px-3 py-2 pr-10 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
+                    placeholder="Enter API password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Salary Slip Policy</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Salary Slip Policy</label>
                 <textarea
                   value={companyData.salary_slip_policy}
                   onChange={(e) => handleInputChange('salary_slip_policy', e.target.value)}
                   rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
                   placeholder="Enter salary slip policy"
                 />
               </div>
@@ -618,24 +629,32 @@ const SettingsComponent = () => {
         {activeTab === 'time' && (
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { key: 'early_clock_in', title: 'Early Clock-In', desc: 'Maximum time employees can clock in early', color: 'green' },
-              { key: 'late_arrival', title: 'Late Arrival', desc: 'Grace period for late arrivals', color: 'yellow' },
+              { key: 'early_clock_in', title: 'Early Clock-In', desc: 'Maximum time employees can clock in early', color: 'success' },
+              { key: 'late_arrival', title: 'Late Arrival', desc: 'Grace period for late arrivals', color: 'warning' },
               { key: 'overtime', title: 'Overtime', desc: 'Minimum extra time for overtime compensation', color: 'blue' }
             ].map(({ key, title, desc, color }) => (
-              <div key={key} className="bg-white rounded-lg shadow-sm p-6">
+              <div key={key} className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
                 <div className={`flex items-center gap-3 mb-4`}>
-                  <div className={`p-2 bg-${color}-100 rounded-lg`}>
-                    <Clock className={`w-5 h-5 text-${color}-600`} />
+                  <div className={`p-2 ${
+                    color === 'success' ? 'bg-[var(--color-success-light)]' :
+                    color === 'warning' ? 'bg-[var(--color-warning-light)]' :
+                    'bg-[var(--color-blue-lightest)]'
+                  } rounded-lg`}>
+                    <Clock className={`w-5 h-5 ${
+                      color === 'success' ? 'text-[var(--color-success)]' :
+                      color === 'warning' ? 'text-[var(--color-warning-dark)]' :
+                      'text-[var(--color-blue)]'
+                    }`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{title}</h3>
                 </div>
 
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-blue-600">{formatTime(timeConfig[key])}</div>
+                  <div className="text-3xl font-bold text-[var(--color-blue)]">{formatTime(timeConfig[key])}</div>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Minutes</label>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Minutes</label>
                   <input
                     type="number"
                     min="0"
@@ -645,15 +664,15 @@ const SettingsComponent = () => {
                     onKeyDown={(e) => {
                       if (['-', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                     }}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors[key] ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)] ${errors[key] ? 'border-[var(--color-border-error)]' : 'border-[var(--color-border-secondary)]'
                       }`}
                   />
                   {errors[key] && (
-                    <div className="text-red-500 text-sm mt-1">{errors[key]}</div>
+                    <div className="text-[var(--color-text-error)] text-sm mt-1">{errors[key]}</div>
                   )}
                 </div>
 
-                <p className="text-xs text-gray-500">{desc}</p>
+                <p className="text-xs text-[var(--color-text-muted)]">{desc}</p>
               </div>
             ))}
           </div>
@@ -665,13 +684,13 @@ const SettingsComponent = () => {
             onClick={updateSettings}
             disabled={Object.keys(errors).length > 0 || updateLoading}
             className={`flex items-center gap-2 px-6 py-2 rounded-md font-medium transition-colors ${Object.keys(errors).length > 0 || updateLoading
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+              ? 'bg-[var(--color-bg-gray-light)] text-[var(--color-text-muted)] cursor-not-allowed'
+              : 'bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] text-[var(--color-text-white)]'
               }`}
           >
             {updateLoading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--color-text-white)]"></div>
                 Saving...
               </>
             ) : (

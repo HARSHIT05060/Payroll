@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import AllowanceForm from "./AllowanceForm";
 import useAllowances from "../../hooks/useAllowances";
+import LoadingSpinner from "../Loader/LoadingSpinner"
 
 const AllowanceList = () => {
     const [deletingId, setDeletingId] = useState(null);
@@ -70,24 +71,8 @@ const AllowanceList = () => {
 
     if (loading) {
         return (
-            <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-sm border border-[var(--color-border-primary)] overflow-hidden">
-                <div className="relative">
-                    <div className="bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] px-6 py-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg">
-                                <IndianRupee className="w-5 h-5 text-[var(--color-text-white)]" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-[var(--color-text-white)]">
-                                Allowances
-                            </h3>
-                        </div>
-                    </div>
-                    <div className="h-1 bg-[var(--color-blue-darker)]"></div>
-                </div>
-                <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-blue-dark)]"></div>
-                    <span className="ml-3 text-[var(--color-text-secondary)]">Loading allowances...</span>
-                </div>
+            <div>
+                <LoadingSpinner />
             </div>
         );
     }

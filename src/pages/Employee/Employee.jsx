@@ -18,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { useSelector } from 'react-redux';
 import Pagination from '../../Components/Pagination'; // Adjust path as needed
+import LoadingSpinner from '../../Components/Loader/LoadingSpinner';
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -317,21 +318,18 @@ export default function EmployeeManagement() {
                     />
                     <label
                         htmlFor={`toggle-${employeeId}`}
-                        className={`relative inline-flex items-center h-7 w-14 rounded-full transition-all duration-300 ease-in-out focus-within:ring-2 focus-within:ring-offset-2 ${
-                            isBiometric 
-                                ? 'bg-[var(--color-success)] focus-within:ring-[var(--color-success)]' 
+                        className={`relative inline-flex items-center h-7 w-14 rounded-full transition-all duration-300 ease-in-out focus-within:ring-2 focus-within:ring-offset-2 ${isBiometric
+                                ? 'bg-[var(--color-success)] focus-within:ring-[var(--color-success)]'
                                 : 'bg-[var(--color-blue)] focus-within:ring-[var(--color-blue)]'
-                        } ${
-                            isChanging || paginationLoading || searchLoading 
-                                ? 'opacity-50 cursor-not-allowed' 
+                            } ${isChanging || paginationLoading || searchLoading
+                                ? 'opacity-50 cursor-not-allowed'
                                 : 'cursor-pointer hover:shadow-md'
-                        }`}
+                            }`}
                     >
                         {/* Toggle Circle with Icon */}
                         <span
-                            className={`inline-block h-6 w-6 rounded-full bg-[var(--color-bg-secondary)] shadow-lg transform transition-all duration-300 ease-in-out flex items-center justify-center ${
-                                isBiometric ? 'translate-x-7' : 'translate-x-0.5'
-                            }`}
+                            className={`inline-block h-6 w-6 rounded-full bg-[var(--color-bg-secondary)] shadow-lg transform transition-all duration-300 ease-in-out flex items-center justify-center ${isBiometric ? 'translate-x-7' : 'translate-x-0.5'
+                                }`}
                         >
                             {isBiometric ? (
                                 <Fingerprint className="w-3.5 h-3.5 text-[var(--color-success)]" />
@@ -340,12 +338,11 @@ export default function EmployeeManagement() {
                             )}
                         </span>
                     </label>
-                    
+
                     {/* Active Type Label */}
                     <div className="ml-3 flex items-center">
-                        <span className={`text-sm font-medium ${
-                            isBiometric ? 'text-[var(--color-text-success)]' : 'text-[var(--color-text-blue)]'
-                        }`}>
+                        <span className={`text-sm font-medium ${isBiometric ? 'text-[var(--color-text-success)]' : 'text-[var(--color-text-blue)]'
+                            }`}>
                             {isBiometric ? 'Biometric' : 'Mobile'}
                         </span>
                     </div>
@@ -443,11 +440,8 @@ export default function EmployeeManagement() {
 
                     {/* Content section */}
                     {loading ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                <RefreshCw className="w-5 h-5 animate-spin" />
-                                <span>Loading employees...</span>
-                            </div>
+                        <div>
+                            <LoadingSpinner />
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">
@@ -553,7 +547,7 @@ export default function EmployeeManagement() {
                                             const employeeId = employee.employee_id || `employee-${index}`;
                                             const fullName = employee.full_name || 'Unnamed Employee';
                                             const truncatedName = truncateText(fullName, 12);
-                                            
+
                                             return (
                                                 <tr
                                                     key={`emp-${employeeId}`}
@@ -564,50 +558,50 @@ export default function EmployeeManagement() {
                                                             {employee.employee_code || '-'}
                                                         </span>
                                                     </td>
-                                                    
+
                                                     {/* Full Name */}
                                                     <td className="px-3 py-4 text-center">
-                                                        <div 
-                                                            className="text-sm font-medium text-[var(--color-text-primary)] cursor-help truncate max-w-[120px] mx-auto" 
+                                                        <div
+                                                            className="text-sm font-medium text-[var(--color-text-primary)] cursor-help truncate max-w-[120px] mx-auto"
                                                             title={fullName}
                                                         >
                                                             {truncatedName}
                                                         </div>
                                                     </td>
-                                                    
+
                                                     {/* Department */}
                                                     <td className="px-3 py-4 text-center">
                                                         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-[var(--color-text-success)] max-w-[80px] truncate">
                                                             {employee.department_name || 'N/A'}
                                                         </span>
                                                     </td>
-                                                    
+
                                                     {/* Designation */}
                                                     <td className="px-3 py-4 text-center">
                                                         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-[var(--color-text-blue)] max-w-[80px] truncate">
                                                             {employee.designation_name || 'N/A'}
                                                         </span>
                                                     </td>
-                                                    
+
                                                     {/* Email */}
                                                     <td className="px-3 py-4 text-center">
                                                         <div className="text-sm text-[var(--color-text-secondary)] truncate max-w-[160px] mx-auto" title={employee.email}>
                                                             {employee.email || 'N/A'}
                                                         </div>
                                                     </td>
-                                                    
+
                                                     {/* Mobile */}
                                                     <td className="px-3 py-4 text-center">
                                                         <div className="text-sm font-mono text-[var(--color-text-primary)]">
                                                             {employee.mobile_number || 'N/A'}
                                                         </div>
                                                     </td>
-                                                    
+
                                                     {/* Attendance Permission */}
                                                     <td className="px-3 py-4 text-center">
                                                         {renderAttendanceTypeDisplay(employee)}
                                                     </td>
-                                                    
+
                                                     {/* Actions */}
                                                     {(permissions?.employee_edit || permissions?.employee_view) && (
                                                         <td className="px-3 py-4 text-center">
@@ -638,7 +632,7 @@ export default function EmployeeManagement() {
                                                 </tr>
                                             );
                                         })}
-                                        
+
                                         {/* Fill empty rows to maintain consistent height for 10 rows */}
                                         {Array.from({ length: Math.max(0, ITEMS_PER_PAGE - sortedEmployees.length) }).map((_, index) => (
                                             <tr key={`empty-${index}`} className="h-[60px] border-b border-[var(--color-border-divider)]">

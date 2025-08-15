@@ -7,6 +7,7 @@ import { Toast } from '../../Components/ui/Toast';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useSelector } from 'react-redux';
+import LoadingSpinner from '../../Components/Loader/LoadingSpinner';
 
 const AddEmployee = () => {
     const { employeeId } = useParams(); // Get employee ID from URL params
@@ -1020,17 +1021,11 @@ const AddEmployee = () => {
 
     if (isLoadingDropdowns || isLoadingEmployeeData) {
         return (
-            <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
-                <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-xl p-8 text-center">
-                    <div className="w-8 h-8 border-4 border-[var(--color-blue-dark)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-[var(--color-text-secondary)]">
-                        {isLoadingDropdowns ? 'Loading form data...' : 'Loading employee data...'}
-                    </p>
-                </div>
+            <div className="">
+                <LoadingSpinner />
             </div>
         );
     }
-
     if (!permissions['employee_edit'] && isEditMode) {
         return;
     }

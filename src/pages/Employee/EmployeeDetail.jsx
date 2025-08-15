@@ -4,22 +4,14 @@ import {
     User,
     Pencil,
     Trash2,
-    Briefcase,
     Mail,
     Phone,
     CreditCard,
-    Tag,
-    Clock,
-    Activity,
     FileText,
-    Shield,
-    Fingerprint,
     ArrowLeft,
     Loader2,
     AlertCircle,
-    MapPin,
     Calendar,
-    Building,
     Eye,
     X,
     CheckCircle,
@@ -32,6 +24,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 
 const EmployeeDetail = () => {
@@ -262,11 +255,8 @@ const EmployeeDetail = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[var(--color-bg-primary)] flex justify-center items-center">
-                <div className="text-center">
-                    <Loader2 size={40} className="animate-spin text-[var(--color-blue-dark)] mx-auto mb-4" />
-                    <p className="text-[var(--color-text-secondary)]">Loading employee details...</p>
-                </div>
+            <div>
+                <LoadingSpinner />
             </div>
         );
     }
