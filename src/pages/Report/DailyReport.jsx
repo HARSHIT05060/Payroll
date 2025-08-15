@@ -32,6 +32,8 @@ import { Toast } from '../../Components/ui/Toast'; // Adjust path as needed
 import { StatusBadge } from '../../Components/Report/ReportComponents';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
+
 
 
 const DailyReport = () => {
@@ -477,11 +479,8 @@ const DailyReport = () => {
 
                     {/* Loading State */}
                     {loading && (
-                        <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                <RefreshCw className="w-5 h-5 animate-spin" />
-                                <span>Loading attendance data...</span>
-                            </div>
+                        <div className="">
+                            <LoadingSpinner />
                         </div>
                     )}
 

@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import Pagination from '../../Components/Pagination';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const ITEMS_PER_PAGE = 10;
 
@@ -248,11 +249,8 @@ const UserManagement = () => {
                         </div>
 
                         {loading ? (
-                            <div className="px-6 py-12 text-center">
-                                <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                    <RefreshCw className="w-5 h-5 animate-spin" />
-                                    <span>Loading users...</span>
-                                </div>
+                            <div className="">
+                                <LoadingSpinner />
                             </div>
                         ) : error ? (
                             <div className="px-6 py-12 text-center">

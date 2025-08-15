@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const SettingsComponent = () => {
   const { user, logout } = useAuth();
@@ -454,11 +455,8 @@ const SettingsComponent = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue)] mx-auto mb-4"></div>
-          <p className="text-[var(--color-text-secondary)]">Loading settings...</p>
-        </div>
+      <div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -635,16 +633,14 @@ const SettingsComponent = () => {
             ].map(({ key, title, desc, color }) => (
               <div key={key} className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
                 <div className={`flex items-center gap-3 mb-4`}>
-                  <div className={`p-2 ${
-                    color === 'success' ? 'bg-[var(--color-success-light)]' :
-                    color === 'warning' ? 'bg-[var(--color-warning-light)]' :
-                    'bg-[var(--color-blue-lightest)]'
-                  } rounded-lg`}>
-                    <Clock className={`w-5 h-5 ${
-                      color === 'success' ? 'text-[var(--color-success)]' :
-                      color === 'warning' ? 'text-[var(--color-warning-dark)]' :
-                      'text-[var(--color-blue)]'
-                    }`} />
+                  <div className={`p-2 ${color === 'success' ? 'bg-[var(--color-success-light)]' :
+                      color === 'warning' ? 'bg-[var(--color-warning-light)]' :
+                        'bg-[var(--color-blue-lightest)]'
+                    } rounded-lg`}>
+                    <Clock className={`w-5 h-5 ${color === 'success' ? 'text-[var(--color-success)]' :
+                        color === 'warning' ? 'text-[var(--color-warning-dark)]' :
+                          'text-[var(--color-blue)]'
+                      }`} />
                   </div>
                   <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{title}</h3>
                 </div>

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSelector } from 'react-redux';
 import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 // Lucide React Icons
 import {
@@ -82,41 +83,6 @@ const STATUS_CONFIG = {
         borderColor: 'border-red-300 '
     }
 };
-
-// Updated DetailCard component with better dark/light mode support
-const DetailCard = ({ icon, label, value, colorClass = 'bg-blue-100 ' }) => (
-    <div className="bg-[var(--color-bg-card)] rounded-xl p-5 border border-[var(--color-border-primary)] hover:shadow-custom transition-all duration-300">
-        <div className="flex items-center space-x-3 mb-3">
-            <div className={`w-10 h-10 ${colorClass} rounded-full flex items-center justify-center`}>
-                {icon}
-            </div>
-            <h4 className="text-sm font-medium text-[var(--color-text-secondary)]">{label}</h4>
-        </div>
-        <p className="text-lg font-semibold text-[var(--color-text-primary)] ml-13">{value}</p>
-    </div>
-);
-
-// Updated NoteCard component with proper dark/light mode styling
-const NoteCard = ({
-    icon,
-    title,
-    content,
-    colorClass = 'border-blue-300 ',
-    textColorClass = 'text-blue-800 ',
-    bgColorClass = 'bg-blue-50 '
-}) => (
-    <div className={`${bgColorClass} border ${colorClass} rounded-xl p-5 mb-6 transition-all duration-300`}>
-        <div className="flex items-start space-x-3">
-            <div className={`w-8 h-8 ${bgColorClass} border ${colorClass} rounded-full flex items-center justify-center mt-0.5`}>
-                {icon}
-            </div>
-            <div className="flex-1">
-                <h4 className={`text-sm font-semibold ${textColorClass} mb-2`}>{title}</h4>
-                <p className={`text-sm ${textColorClass} leading-relaxed opacity-90`}>{content}</p>
-            </div>
-        </div>
-    </div>
-);
 
 // Updated StatusChip component for better visibility
 const StatusChip = ({ status }) => {
@@ -473,10 +439,7 @@ const LeaveManagement = () => {
                     {/* Content section */}
                     {loading ? (
                         <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                <RefreshCw className="w-5 h-5 animate-spin text-[var(--color-blue)]" />
-                                <span>Loading leave requests...</span>
-                            </div>
+                            <LoadingSpinner />
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">

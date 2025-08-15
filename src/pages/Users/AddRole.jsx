@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import { useRef } from 'react';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const AddRole = () => {
     const navigate = useNavigate();
@@ -520,11 +521,8 @@ const AddRole = () => {
 
     if (loading) {
         return (
-            <div className="max-w-4xl mx-auto bg-[var(--color-bg-secondary)] min-h-screen">
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)]"></div>
-                    <span className="ml-3 text-[var(--color-text-secondary)]">Loading...</span>
-                </div>
+            <div>
+                <LoadingSpinner />
             </div>
         );
     }

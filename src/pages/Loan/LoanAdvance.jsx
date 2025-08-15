@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Toast } from '../../Components/ui/Toast';
 import { LoanDetailsModal } from '../../Components/ui/LoanDetailsModal';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const SORT_DIRECTIONS = {
     ASCENDING: 'ascending',
@@ -454,14 +455,6 @@ const LoanAdvance = () => {
                                 <h3 className="text-lg font-medium text-[var(--color-text-white)]">
                                     Total Loans/Advances
                                 </h3>
-                                {(loading || dropdownLoading) && (
-                                    <div className="flex items-center gap-2 text-[var(--color-text-white)] ml-4">
-                                        <RefreshCw className="w-4 h-4 animate-spin" />
-                                        <span className="text-sm">
-                                            {dropdownLoading ? 'Loading filters...' : 'Loading...'}
-                                        </span>
-                                    </div>
-                                )}
                             </div>
 
                             <div className="flex items-center gap-3">
@@ -503,11 +496,8 @@ const LoanAdvance = () => {
 
                     {/* Content section */}
                     {loading ? (
-                        <div className="px-6 py-12 text-center">
-                            <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                                <RefreshCw className="w-5 h-5 animate-spin" />
-                                <span>Loading loans...</span>
-                            </div>
+                        <div className="">
+                            <LoadingSpinner />
                         </div>
                     ) : error ? (
                         <div className="px-6 py-12 text-center">

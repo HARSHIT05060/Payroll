@@ -21,6 +21,7 @@ import api from '../../api/axiosInstance';
 import { Toast } from '../../Components/ui/Toast';
 import { useSelector } from 'react-redux';
 import Pagination from '../../Components/Pagination';
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const SORT_DIRECTIONS = {
   ASCENDING: 'ascending',
@@ -547,11 +548,8 @@ export default function FinalizePayroll() {
 
           {/* Content section */}
           {loading ? (
-            <div className="px-6 py-12 text-center">
-              <div className="inline-flex items-center space-x-2 text-[var(--color-text-secondary)]">
-                <RefreshCw className="w-5 h-5 animate-spin" />
-                <span>Loading salary records...</span>
-              </div>
+            <div className="">
+              <LoadingSpinner />
             </div>
           ) : error ? (
             <div className="px-6 py-12 text-center">

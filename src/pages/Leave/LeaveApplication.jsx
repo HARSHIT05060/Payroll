@@ -4,6 +4,7 @@ import api from '../../api/axiosInstance';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 // import { format } from "date-fns";
+import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
 
 const LeaveApplication = () => {
     const { user } = useAuth();
@@ -237,16 +238,8 @@ const LeaveApplication = () => {
 
     if (isLoadingData) {
         return (
-            <div className="max-w-2xl mx-auto px-4 py-8 w-full">
-                <div className="bg-[var(--color-bg-secondary)] shadow-lg rounded-lg overflow-hidden">
-                    <div className="bg-[var(--color-blue-dark)] py-4 px-6">
-                        <h2 className="text-xl font-bold text-[var(--color-text-white)]">Apply for Leave</h2>
-                    </div>
-                    <div className="p-6 text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue-dark)] mx-auto"></div>
-                        <p className="mt-4 text-[var(--color-text-secondary)]">Loading...</p>
-                    </div>
-                </div>
+            <div>
+                <LoadingSpinner />
             </div>
         );
     }
