@@ -140,10 +140,22 @@ const MonthlySalaryReport = () => {
 
     // Handle filter changes
     const handleFilterChange = (filterName, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [filterName]: value
-        }));
+        if (filterName === 'month_year' && value) {
+            // Convert Date object to YYYY-MM format
+            const year = value.getFullYear();
+            const month = String(value.getMonth() + 1).padStart(2, '0');
+            const formattedDate = `${year}-${month}`;
+
+            setFilters(prev => ({
+                ...prev,
+                [filterName]: formattedDate
+            }));
+        } else {
+            setFilters(prev => ({
+                ...prev,
+                [filterName]: value
+            }));
+        }
     };
 
     // Format currency with Indian Rupee symbol
@@ -336,7 +348,7 @@ const MonthlySalaryReport = () => {
                             <div className="flex items-center space-x-2">
                                 <Calendar className="w-5 h-5 text-[var(--color-text-primary)]" />
                                 <DatePicker
-                                    selected={filters.month_year}
+                                    selected={filters.month_year ? new Date(filters.month_year + '-01') : null}
                                     onChange={(date) => handleFilterChange('month_year', date)}
                                     dateFormat="MMMM yyyy"
                                     showMonthYearPicker
@@ -411,138 +423,178 @@ const MonthlySalaryReport = () => {
 
                 {/* Salary Report Results */}
                 {reportData && (
-                    <div className="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-blue-dark)] overflow-hidden shadow-sm">
-                        <div className="px-6 py-4 border-b border-[var(--color-blue-light)] bg-[var(--color-blue-dark)]">
+                    <div className="bg-[var(--color-bg-secondary)] rounded-xl shadow-lg border border-[var(--color-border-primary)] overflow-hidden">
+                        {/* Header */}
+                        <div className="px-6 py-5 border-b border-[var(--color-border-primary)] bg-gradient-to-r from-[var(--color-blue-dark)] to-[var(--color-blue-darker)]">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center">
-                                    <IndianRupee className="h-6 w-6 text-[var(--color-text-white)] mr-2" />
-                                    <h3 className="text-lg font-medium text-[var(--color-text-white)]">
-                                        Monthly Salary Report - {getMonthYearDisplay(filters.month_year)}
-                                    </h3>
+                                    <div className="p-2 bg-[var(--color-bg-secondary-20)] rounded-lg mr-3">
+                                        <IndianRupee className="h-6 w-6 text-[var(--color-text-white)]" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-[var(--color-text-white)]">
+                                            Monthly Salary Report
+                                        </h3>
+                                        <p className="text-sm text-[var(--color-text-white)] opacity-80">
+                                            {getMonthYearDisplay(filters.month_year)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-sm text-[var(--color-text-white)] opacity-80">Total Records</div>
+                                    <div className="text-2xl font-bold text-[var(--color-text-white)]">{reportData.length}</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Table Container */}
                         <div className="overflow-x-auto">
-                            <table className="w-full divide-y divide-[var(--color-border-divider)]">
-                                <thead className="bg-[var(--color-blue-lightest)]">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="bg-[var(--color-bg-primary)] border-b border-[var(--color-border-primary)]">
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center gap-2">
                                                 <User className="h-4 w-4" />
-                                                Employee
+                                                Employee Details
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <IndianRupee className="h-4 w-4" />
                                                 Base Salary
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Calendar className="h-4 w-4" />
-                                                Attendance
+                                                Attendance Summary
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Clock className="h-4 w-4" />
-                                                Overtime
+                                                Overtime Details
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <CalendarX className="h-4 w-4" />
                                                 Week Off
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Calculator className="h-4 w-4" />
                                                 Subtotal
                                             </div>
                                         </th>
-                                        <th className="px-4 py-4 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                        <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--color-text-primary)]">
                                             <div className="flex items-center justify-center gap-2">
                                                 <TrendingUp className="h-4 w-4" />
-                                                Total Salary
+                                                Final Salary
                                             </div>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
+                                <tbody className="divide-y divide-[var(--color-border-primary)]">
                                     {currentItems.map((employee, index) => (
-                                        <tr key={employee.employee_code || index} className="hover:bg-[var(--color-bg-hover)] transition-colors">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={employee.employee_code || index} className="bg-[var(--color-bg-secondary)]">
+                                            {/* Employee Details */}
+                                            <td className="px-6 py-5">
                                                 <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-10 w-10 bg-[var(--color-blue-lightest)] rounded-full flex items-center justify-center">
-                                                        <User className="h-5 w-5 text-[var(--color-blue-dark)]" />
-                                                    </div>
-                                                    <div className="ml-3">
-                                                        <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
                                                             {employee.employee_name || 'N/A'}
                                                         </div>
-                                                        <div className="text-xs text-[var(--color-text-secondary)]">
+                                                        <div className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-bg-primary)] px-2 py-1 rounded-md inline-block">
                                                             {employee.employee_code || 'N/A'}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="text-sm font-semibold text-[var(--color-text-primary)]">
-                                                    {formatCurrency(employee.employee_salary)}
+
+                                            {/* Base Salary */}
+                                            <td className="px-4 py-5 text-center">
+                                                <div className="bg-[var(--color-bg-primary)] rounded-lg p-3 border border-[var(--color-border-primary)]">
+                                                    <div className="text-lg font-bold text-[var(--color-blue-dark)]">
+                                                        {formatCurrency(employee.employee_salary)}
+                                                    </div>
+                                                    <div className="text-xs text-[var(--color-text-secondary)] mt-1">
+                                                        Monthly Base
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="space-y-1">
+
+                                            {/* Attendance Summary */}
+                                            <td className="px-4 py-5">
+                                                <div className="bg-[var(--color-bg-primary)] rounded-lg p-3 border border-[var(--color-border-primary)] space-y-2">
+                                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                                        <div className="text-center">
+                                                            <div className="text-[var(--color-text-secondary)]">Working</div>
+                                                            <div className="font-semibold text-[var(--color-blue-dark)]">{employee.working_days || 0}</div>
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <div className="text-[var(--color-text-secondary)]">Present</div>
+                                                            <div className="font-semibold text-green-600">{employee.present_days || 0}</div>
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <div className="text-[var(--color-text-secondary)]">Absent</div>
+                                                            <div className="font-semibold text-red-600">{employee.absent_days || 0}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            {/* Overtime Details */}
+                                            <td className="px-4 py-5 text-center">
+                                                <div className="bg-[var(--color-bg-primary)] rounded-lg p-3 border border-[var(--color-border-primary)]">
+                                                    <div className="text-sm font-bold text-orange-600 mb-2">
+                                                        {formatCurrency(employee.overtime_salary)}
+                                                    </div>
                                                     <div className="flex items-center justify-center gap-1">
-                                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                                        <span className="text-xs text-[var(--color-text-secondary)]">Present:</span>
-                                                        <span className="text-xs font-medium text-green-600">{employee.present_days || 0}</span>
+                                                        <Clock className="h-3 w-3 text-orange-600" />
+                                                        <span className="text-xs text-[var(--color-text-secondary)]">
+                                                            {employee.overtime_days || 0} days
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            {/* Week Off */}
+                                            <td className="px-4 py-5 text-center">
+                                                <div className="bg-[var(--color-bg-primary)] rounded-lg p-3 border border-[var(--color-border-primary)]">
+                                                    <div className="text-sm font-bold text-[var(--color-blue-dark)] mb-2">
+                                                        {formatCurrency(employee.week_off_salary)}
                                                     </div>
                                                     <div className="flex items-center justify-center gap-1">
-                                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                                        <span className="text-xs text-[var(--color-text-secondary)]">Absent:</span>
-                                                        <span className="text-xs font-medium text-red-600">{employee.absent_days || 0}</span>
-                                                    </div>
-                                                    <div className="flex items-center justify-center gap-1">
-                                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                                        <span className="text-xs text-[var(--color-text-secondary)]">Working:</span>
-                                                        <span className="text-xs font-medium text-blue-600">{employee.working_days || 0}</span>
+                                                        <CalendarX className="h-3 w-3 text-[var(--color-blue-dark)]" />
+                                                        <span className="text-xs text-[var(--color-text-secondary)]">
+                                                            {employee.week_off_days || 0} days
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="bg-orange-50 rounded-lg p-2 border border-orange-200">
-                                                    <div className="text-xs text-[var(--color-text-secondary)] mb-1">
-                                                        Days: <span className="font-medium text-orange-600">{employee.overtime_days || 0}</span>
+
+                                            {/* Subtotal */}
+                                            <td className="px-4 py-5 text-center">
+                                                <div className="bg-[var(--color-bg-primary)] rounded-lg p-3 border border-[var(--color-border-primary)]">
+                                                    <div className="text-lg font-bold text-[var(--color-text-primary)]">
+                                                        {formatCurrency(employee.subtotal_salary)}
                                                     </div>
-                                                    <div className="text-xs">
-                                                        <span className="font-semibold text-orange-600">{formatCurrency(employee.overtime_salary)}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="bg-blue-50 rounded-lg p-2 border border-blue-200">
-                                                    <div className="text-xs text-[var(--color-text-secondary)] mb-1">
-                                                        Days: <span className="font-medium text-blue-600">{employee.week_off_days || 0}</span>
-                                                    </div>
-                                                    <div className="text-xs">
-                                                        <span className="font-semibold text-blue-600">{formatCurrency(employee.week_off_salary)}</span>
+                                                    <div className="text-xs text-[var(--color-text-secondary)] mt-1">
+                                                        Before Final
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="text-sm font-semibold text-[var(--color-text-primary)]">
-                                                    {formatCurrency(employee.subtotal_salary)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-center">
-                                                <div className="bg-green-50 rounded-lg p-2 border border-green-200">
-                                                    <div className="text-lg font-bold text-green-600">
+
+                                            {/* Final Salary */}
+                                            <td className="px-4 py-5 text-center">
+                                                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border-2 border-green-200 shadow-sm">
+                                                    <div className="text-xl font-bold text-green-700 mb-1">
                                                         {formatCurrency(employee.total_salary)}
+                                                    </div>
+                                                    <div className="text-xs text-green-600 font-medium">
+                                                        Net Payable
                                                     </div>
                                                 </div>
                                             </td>
@@ -553,12 +605,14 @@ const MonthlySalaryReport = () => {
                         </div>
 
                         {/* Pagination */}
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            loading={reportGenerating}
-                        />
+                        <div className="border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)]">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                loading={reportGenerating}
+                            />
+                        </div>
                     </div>
                 )}
 
