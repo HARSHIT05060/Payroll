@@ -60,7 +60,6 @@ export default function FinalizePayroll() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [paymentData, setPaymentData] = useState({
     payment_mode: '1',
@@ -379,6 +378,15 @@ export default function FinalizePayroll() {
     setSelectedRecord(null);
   }, []);
 
+  // Handle view salary slip - open in new tab
+  const handleViewSalarySlip = useCallback((record) => {
+    if (record.salary_slip) {
+      window.open(record.salary_slip, '_blank');
+    } else {
+      showToast('Salary slip URL not available', 'error');
+    }
+  }, [showToast]);
+
   // Get payment status display
   const getPaymentStatusDisplay = useCallback((status) => {
     if (status === PAYMENT_STATUS.PAID) {
@@ -440,18 +448,6 @@ export default function FinalizePayroll() {
       <ChevronUp className="ml-1 h-4 w-4 text-[var(--color-blue)]" /> :
       <ChevronDown className="ml-1 h-4 w-4 text-[var(--color-blue)]" />;
   }, [sortConfig]);
-
-  // Open view modal
-  const openViewModal = useCallback((record) => {
-    setSelectedRecord(record);
-    setShowViewModal(true);
-  }, []);
-
-  // Close view modal
-  const closeViewModal = useCallback(() => {
-    setShowViewModal(false);
-    setSelectedRecord(null);
-  }, []);
 
   // Redirect if not authenticated
   if (!isAuthenticated()) {
@@ -567,7 +563,7 @@ export default function FinalizePayroll() {
                   Unable to Load Salary Records
                 </p>
                 <p className="text-[var(--color-text-secondary)] text-sm mb-4">
-                  {error || "We couldn’t retrieve the salary records at this time. Please try again later or select a different month."}
+                  {error || "We couldn't retrieve the salary records at this time. Please try again later or select a different month."}
                 </p>
               </div>
             </div>
@@ -680,9 +676,9 @@ export default function FinalizePayroll() {
                                     <span>Delete</span>
                                   </button>
                                 )}
-                                {permissions?.salary_view && (
+                                {permissions?.salary_view && record.payment_status === PAYMENT_STATUS.PAID && (
                                   <button
-                                    onClick={() => openViewModal(record)}
+                                    onClick={() => handleViewSalarySlip(record)}
                                     className="inline-flex items-center space-x-1 bg-[var(--color-success-medium)] text-[var(--color-text-white)] px-3 py-1 rounded-md text-xs font-medium hover:bg-[var(--color-success-dark)] transition-colors"
                                   >
                                     <Eye className="w-4 h-4" />
@@ -710,164 +706,6 @@ export default function FinalizePayroll() {
           )}
         </div>
       </div>
-
-      {/* View Salary Slip Modal */}
-      {showViewModal && selectedRecord && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[var(--color-bg-secondary)] rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Salary Slip Details</h3>
-              <button
-                onClick={closeViewModal}
-                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {/* Header Section */}
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">SALARY SLIP</h2>
-                <p className="text-[var(--color-text-secondary)]">Pay Period: {formatMonthYear(selectedRecord.month_year)}</p>
-              </div>
-
-              {/* Employee Information */}
-              <div className="bg-[var(--color-bg-primary)] p-6 rounded-lg mb-6">
-                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Employee Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Employee Name:</span>
-                      <span className="font-semibold">{selectedRecord.full_name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Employee Code:</span>
-                      <span className="font-semibold">{selectedRecord.employee_code}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Department:</span>
-                      <span className="font-semibold">{selectedRecord.department_name}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Mobile Number:</span>
-                      <span className="font-semibold">{selectedRecord.mobile_number || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Pay Period:</span>
-                      <span className="font-semibold">{formatMonthYear(selectedRecord.month_year)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--color-text-secondary)] font-medium">Payment Status:</span>
-                      <span className={`font-semibold ${selectedRecord.payment_status === PAYMENT_STATUS.PAID ? 'text-[var(--color-success-dark)]' : 'text-[var(--color-text-error)]'}`}>
-                        {selectedRecord.payment_status === PAYMENT_STATUS.PAID ? 'Paid' : 'Unpaid'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Salary Breakdown */}
-              <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg mb-6">
-                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] p-4 border-b">Salary Breakdown</h4>
-                <div className="p-4">
-                  <div className="space-y-4">
-                    {/* Earnings */}
-                    <div>
-                      <h5 className="font-medium text-[var(--color-text-secondary)] mb-3">Earnings</h5>
-                      <div className="space-y-2">
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Base Salary:</span>
-                          <span className="font-semibold">{formatCurrency(selectedRecord.total_salary)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Allowances:</span>
-                          <span className="font-semibold">{formatCurrency(selectedRecord.allowances || 0)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Overtime:</span>
-                          <span className="font-semibold">{formatCurrency(selectedRecord.overtime || 0)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Bonus:</span>
-                          <span className="font-semibold">{formatCurrency(selectedRecord.bonus || 0)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Deductions */}
-                    <div>
-                      <h5 className="font-medium text-[var(--color-text-secondary)] mb-3">Deductions</h5>
-                      <div className="space-y-2">
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Tax Deduction:</span>
-                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.tax_deduction || 0)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">PF Deduction:</span>
-                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.pf_deduction || 0)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-[var(--color-border-primary)]">
-                          <span className="text-[var(--color-text-secondary)]">Other Deductions:</span>
-                          <span className="font-semibold text-[var(--color-text-error)]">-{formatCurrency(selectedRecord.other_deductions || 0)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Net Pay */}
-                    <div className="bg-[var(--color-blue-lightest)] p-4 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-[var(--color-text-primary)]">Net Pay:</span>
-                        <span className="text-2xl font-bold text-[var(--color-blue-dark)]">{formatCurrency(selectedRecord.total_pay_salary)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Information */}
-              {selectedRecord.payment_status === PAYMENT_STATUS.PAID && (
-                <div className="bg-[var(--color-success-light)] p-6 rounded-lg">
-                  <h4 className="text-lg font-semibold text-green-800 mb-4">Payment Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Payment Mode:</span>
-                      <span className="font-semibold text-green-800">{PAYMENT_MODES[selectedRecord.payment_mode] || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-700 font-medium">Payment Date:</span>
-                      <span className="font-semibold text-green-800">{selectedRecord.payment_date || 'N/A'}</span>
-                    </div>
-                    {selectedRecord.payment_remark && (
-                      <div className="col-span-full">
-                        <span className="text-green-700 font-medium">Remark:</span>
-                        <p className="font-semibold text-green-800 mt-1">{selectedRecord.payment_remark}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end space-x-3 p-6 border-t">
-              <button
-                onClick={closeViewModal}
-                className="px-6 py-2 text-sm font-medium text-[var(--color-text-secondary)] bg-[var(--color-bg-gradient-start)] hover:bg-[var(--color-bg-gray-light)] rounded-md transition-colors"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="px-6 py-2 text-sm font-medium text-[var(--color-text-white)] bg-[var(--color-blue-dark)] hover:bg-[var(--color-blue-darker)] rounded-md transition-colors"
-              >
-                Print Slip
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Payment Modal */}
       {showPaymentModal && selectedRecord && (
@@ -1058,6 +896,7 @@ export default function FinalizePayroll() {
           </div>
         </div>
       )}
+      
       {/* Toast Notification */}
       {toast && (
         <Toast
