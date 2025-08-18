@@ -14,6 +14,14 @@ import Unauthorized from './Components/Unauthorized';
 import LandingPage from './Components/Landing/LandingPage';
 import LandingNavbar from './Components/Landing/LandingNavbar';
 import LoadingSpinner from './Components/Loader/LoadingSpinner';
+import Footer from './Components/Landing/components/Footer'; // Import Footer
+
+// Landing Page Components - Add these new components
+import AboutPage from './Components/Landing/components/AboutSection';
+import ServicesPage from './Components/Landing/components/ServicesSection';
+import FeaturesPage from './Components/Landing/components/FeaturesSection';
+import PostsPage from './Components/Landing/components/PostsPage';
+import ContactPage from './Components/Landing/components/ContactPage';
 
 // Lazy Loaded Employee Management Pages
 const Employee = lazy(() => import('./pages/Employee/Employee'));
@@ -62,14 +70,13 @@ const TimeConfigurationComponent = lazy(() => import('./pages/Configuration/Conf
 // Lazy Loaded Pricing Component
 const PricingComponent = lazy(() => import('./Components/PricingComponent'));
 
-
 const App = () => {
   const location = useLocation();
   const isAuthenticated = useSelector(state => state.auth?.isAuthenticated) || false;
   const permissions = useSelector(state => state.permissions) || {};
 
-  // Route categorization for better performance
-  const isLandingRoute = location.pathname === "/";
+  // Route categorization for better performance - Updated to include new landing routes
+  const isLandingRoute = ["/", "/about", "/services", "/features", "/posts", "/contact"].includes(location.pathname);
   const isLoginRoute = location.pathname === "/login";
   const isUnauthorizedRoute = location.pathname === "/unauthorized";
   const isPublicRoute = isLandingRoute || isLoginRoute || isUnauthorizedRoute;
@@ -130,11 +137,18 @@ const App = () => {
     ) : fallback;
   };
 
+  // Simplified wrapper component for landing pages WITHOUT Footer (since Footer is added globally)
+  const LandingPageWrapper = ({ children }) => (
+    <div className="min-h-screen bg-background">
+      {children}
+    </div>
+  );
+
   return (
     <ThemeProvider>
       <SubscriptionGuard>
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
-          {/* Landing Page Navbar */}
+          {/* Landing Page Navbar - Show on all landing routes */}
           {isLandingRoute && <LandingNavbar />}
 
           {/* Application Navbar */}
@@ -159,8 +173,35 @@ const App = () => {
           >
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
-                {/* Public Routes */}
+                {/* Public Landing Routes */}
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/about" element={
+                  <LandingPageWrapper>
+                    <AboutPage />
+                  </LandingPageWrapper>
+                } />
+                <Route path="/services" element={
+                  <LandingPageWrapper>
+                    <ServicesPage />
+                  </LandingPageWrapper>
+                } />
+                <Route path="/features" element={
+                  <LandingPageWrapper>
+                    <FeaturesPage />
+                  </LandingPageWrapper>
+                } />
+                <Route path="/posts" element={
+                  <LandingPageWrapper>
+                    <PostsPage />
+                  </LandingPageWrapper>
+                } />
+                <Route path="/contact" element={
+                  <LandingPageWrapper>
+                    <ContactPage />
+                  </LandingPageWrapper>
+                } />
+
+                {/* Auth Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -366,6 +407,9 @@ const App = () => {
               </Routes>
             </Suspense>
           </main>
+
+          {/* Footer for Landing Pages - Show only on landing routes (SINGLE FOOTER) */}
+          {isLandingRoute && <Footer />}
         </div>
       </SubscriptionGuard>
     </ThemeProvider>
