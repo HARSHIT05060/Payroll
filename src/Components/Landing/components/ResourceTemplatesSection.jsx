@@ -8,49 +8,49 @@ const resourceCategories = [
     icon: Users,
     title: "Recruitment & Onboarding",
     description: "Hire the right talent and onboard employees seamlessly with structured workflows and checklists.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: TrendingUp,
     title: "Performance Management",
     description: "Set goals, track progress, and run performance reviews to boost employee productivity.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: Heart,
     title: "Employee Relations",
     description: "Build a positive workplace culture and resolve employee concerns with transparency.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: FileText,
     title: "HR Policies & Compliance",
     description: "Maintain updated policies and ensure your business stays compliant with labor regulations.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: DollarSign,
     title: "Payroll & Compensation",
     description: "Automate payroll processing, manage benefits, and ensure accurate salary disbursement.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: GraduationCap,
     title: "Training & Development",
     description: "Empower employees with skill development programs and track learning progress.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: Clock,
     title: "Time & Attendance",
     description: "Track employee working hours, leaves, and shifts with accurate time management tools.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   },
   {
     icon: UserMinus,
     title: "Offboarding Management",
     description: "Handle resignations and exits smoothly with structured offboarding checklists.",
-    iconBg: "bg-[var(--color-blue-dark)]"
+    iconBg: "bg-[var(--color-blue-darker)]"
   }
 ];
 

@@ -9,21 +9,21 @@ const services = [
     icon: Users,
     title: "Automated Payroll Management",
     description: "Process salaries, deductions, and taxes accurately with just a few clicks — reducing errors and saving time.",
-    iconBg: "bg-[var(--color-blue)]",
+    iconBg: "bg-[var(--color-blue-darker)]",
     link: "#"
   },
   {
     icon: UserCheck,
     title: "Leave & Attendance Integration",
     description: "Seamlessly sync employee attendance and leave records to ensure payroll is always accurate and compliant.",
-    iconBg: "bg-[var(--color-blue-dark)]",
+    iconBg: "bg-[var(--color-blue-darker)]",
     link: "#"
   },
   {
     icon: BarChart3,
     title: "Real-Time Payroll Insights",
     description: "Track expenses, monitor compliance, and generate payroll reports with actionable insights in real time.",
-    iconBg: "bg-[var(--color-success)]",
+    iconBg: "bg-[var(--color-blue-darker)]",
     link: "#"
   }
 ];
@@ -46,11 +46,6 @@ const ServicesSection = () => {
               Future-Ready Payroll<br />Management Platform
             </h2>
           </div>
-          <Button 
-            className="bg-[var(--color-text-primary)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-dark)] rounded-full px-6 py-2 text-sm transition-colors duration-300"
-          >
-            See More →
-          </Button>
         </motion.div>
 
         {/* Services Grid with Staggered Animation */}
@@ -100,7 +95,7 @@ const ServicesSection = () => {
                         transition={{ duration: 0.2 }}
                       >
                         <Button 
-                          className="bg-[var(--color-blue)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-dark)] text-sm px-6 py-2 rounded-full transition-all duration-300"
+                          className="bg-[var(--color-blue-darker)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-darkest)] text-sm px-6 py-2 rounded-full transition-all duration-300"
                         >
                           See Detail →
                         </Button>

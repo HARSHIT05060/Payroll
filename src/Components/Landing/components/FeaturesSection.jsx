@@ -77,7 +77,7 @@ const FeaturesSection = () => {
                 >
                   <div className="flex-shrink-0 mt-1">
                     <motion.div 
-                      className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
+                      className="w-12 h-12 bg-[var(--color-blue-darker)] hover:bg-[var(--color-blue-darkest)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
                       whileHover={{ 
                         scale: 1.15,
                         rotate: 10,
@@ -201,7 +201,7 @@ const FeaturesSection = () => {
                 >
                   <div className="flex-shrink-0 mt-1">
                     <motion.div 
-                      className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
+                      className="w-12 h-12 bg-[var(--color-blue-darker)] hover:bg-[var(--color-blue-darkest)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
                       whileHover={{ 
                         scale: 1.15,
                         rotate: -10,

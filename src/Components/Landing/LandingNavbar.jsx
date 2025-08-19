@@ -19,8 +19,8 @@ const LandingNavbar = () => {
     // Enhanced navLinkClasses function that includes onClick handler
     const navLinkClasses = ({ isActive }) =>
         `px-4 py-2 rounded-full transition-colors ${isActive
-            ? "bg-[var(--color-blue)] text-[var(--color-text-white)]"
-            : "text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue-dark)]"
+            ? "bg-[var(--color-blue-darker)] text-[var(--color-text-white)]"
+            : "text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-darker)] hover:text-[var(--color-text-white)]"
         }`;
 
     return (
@@ -56,38 +56,6 @@ const LandingNavbar = () => {
                             About Us
                         </NavLink>
 
-                        {/* Posts Dropdown */}
-                        {/* <div
-                            className="relative"
-                            onMouseEnter={() => setIsPostsOpen(true)}
-                            onMouseLeave={() => setIsPostsOpen(false)}
-                        >
-                            <button className="flex items-center space-x-1 px-4 py-2 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue-dark)] transition-colors">
-                                <span>Posts</span>
-                                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPostsOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            <div className={`absolute top-full left-0 mt-2 w-52 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPostsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
-                                <NavLink 
-                                    to="/blog" 
-                                    className={({ isActive }) =>
-                                        `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
-                                    }
-                                    onClick={scrollToTop}
-                                >
-                                    Blog
-                                </NavLink>
-                                <NavLink 
-                                    to="/single-post" 
-                                    className={({ isActive }) =>
-                                        `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
-                                    }
-                                    onClick={scrollToTop}
-                                >
-                                    Single Post
-                                </NavLink>
-                            </div>
-                        </div> */}
 
                         <NavLink
                             to="/services"
@@ -103,13 +71,13 @@ const LandingNavbar = () => {
                             onMouseEnter={() => setIsPagesOpen(true)}
                             onMouseLeave={() => setIsPagesOpen(false)}
                         >
-                            <button className="flex items-center space-x-1 px-4 py-2 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue-dark)] transition-colors">
+                            <button className="flex items-center space-x-1 px-4 py-2 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-blue-darker)] hover:text-[var(--color-text-white)] transition-colors">
                                 <span>Pages</span>
                                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPagesOpen ? 'rotate-180' : ''}`} />
                             </button>
 
                             <div
-                                className={`absolute top-full left-0 mt-2 w-60 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPagesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                                className={`absolute top-full left-0 mt-2 w-60 bg-[var(--color-blue-darker)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-darker)] hover:text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPagesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
                                     }`}
                             >
                                 {[

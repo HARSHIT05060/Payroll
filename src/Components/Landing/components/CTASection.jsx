@@ -12,7 +12,7 @@ const benefits = [
 
 const CTASection = () => {
   return (
-    <section className="py-20 bg-[var(--color-blue)] text-[var(--color-text-white)] relative overflow-hidden">
+    <section className="py-20 bg-[var(--color-blue-darker)] text-[var(--color-text-white)] relative overflow-hidden">
       {/* Animated Background Pattern */}
       <motion.div
         className="absolute inset-0 opacity-10"

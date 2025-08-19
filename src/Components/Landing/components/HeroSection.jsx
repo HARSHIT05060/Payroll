@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="py-20 lg:py-32 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <section className="py-20 lg:py-32 bg-gradient-to-br from-[var(--color-bg-gradient-start)] via-[var(--color-blue-lightest)] to-[var(--color-blue-lighter)]">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -15,7 +15,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center px-4 py-2 bg-white/70 text-gray-800 rounded-full text-sm font-medium border border-gray-200 backdrop-blur-sm"
+              className="inline-flex items-center px-4 py-2 bg-[var(--color-bg-secondary-30)] text-[var(--color-text-primary)] rounded-full text-sm font-medium border border-[var(--color-border-primary)] backdrop-blur-sm"
             >
               Payroll Made Simple
             </motion.div>
@@ -25,10 +25,10 @@ const HeroSection = () => {
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-4xl lg:text-6xl font-bold leading-tight text-gray-800"
+                className="text-4xl lg:text-6xl font-bold leading-tight text-[var(--color-text-primary)]"
               >
                 SyncWage –{" "}
-                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
+                <span className="bg-[var(--color-blue-darker)] bg-clip-text text-transparent">
                   An Ultimate Payroll Software
                 </span>
               </motion.h1>
@@ -37,7 +37,7 @@ const HeroSection = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-lg text-gray-600 leading-relaxed max-w-lg"
+                className="text-lg text-[var(--color-text-secondary)] leading-relaxed max-w-lg"
               >
                 Automate and simplify payroll — from salary calculations and tax compliance
                 to attendance, leave, and employee benefits — with a secure, scalable, and
@@ -59,7 +59,7 @@ const HeroSection = () => {
                 <Button
                   variant="hero"
                   size="lg"
-                  className="px-8 py-6 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
+                  className="px-8 py-6 text-base bg-[var(--color-blue-darker)] hover:bg-[var(--color-blue-darkest)] text-[var(--color-text-white)] shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Get Started Now
                   <motion.div
@@ -80,7 +80,7 @@ const HeroSection = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="px-8 py-6 text-base border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-blue-600 hover:text-blue-600"
+                  className="px-8 py-6 text-base border-[var(--color-border-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] hover:border-[var(--color-border-focus)] hover:text-[var(--color-text-blue)] transition-all duration-300"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Learn More
@@ -108,7 +108,6 @@ const HeroSection = () => {
                 alt="Payroll software dashboard showcasing salary, compliance, and workforce insights"
                 className="w-full h-auto object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent"></div>
             </motion.div>
 
             {/* Floating Stats */}
@@ -125,7 +124,7 @@ const HeroSection = () => {
                 y: -5,
                 transition: { duration: 0.3 }
               }}
-              className="absolute -bottom-6 -left-6 bg-white/90 border border-gray-200 rounded-xl p-4 shadow-lg backdrop-blur-sm"
+              className="absolute -bottom-6 -left-6 bg-[var(--color-bg-card)] border border-[var(--color-border-primary)] rounded-xl p-4 shadow-lg backdrop-blur-sm"
             >
               <div className="flex items-center space-x-3">
                 <motion.div
@@ -137,16 +136,16 @@ const HeroSection = () => {
                     type: "spring",
                     stiffness: 200
                   }}
-                  className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center"
+                  className="w-12 h-12 bg-[var(--color-blue-lightest)] rounded-full flex items-center justify-center"
                 >
-                  <span className="text-blue-600 font-bold text-lg">100+</span>
+                  <span className="text-[var(--color-blue)] font-bold text-lg">100+</span>
                 </motion.div>
                 <div>
                   <motion.p
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 1.1 }}
-                    className="font-semibold text-gray-800"
+                    className="font-semibold text-[var(--color-text-primary)]"
                   >
                     Businesses Empowered
                   </motion.p>
@@ -154,53 +153,13 @@ const HeroSection = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 1.2 }}
-                    className="text-sm text-gray-600"
+                    className="text-sm text-[var(--color-text-secondary)]"
                   >
                     With Smarter Payroll
                   </motion.p>
                 </div>
               </div>
             </motion.div>
-
-            {/* Additional floating element for visual interest */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 1.3,
-                type: "spring",
-                stiffness: 150
-              }}
-              animate={{
-                y: [0, -10, 0],
-                transition: {
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              }}
-              className="absolute top-6 right-6 w-4 h-4 bg-blue-500 rounded-full opacity-60"
-            />
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 1.5,
-                type: "spring",
-                stiffness: 150
-              }}
-              animate={{
-                y: [0, -15, 0],
-                transition: {
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1
-                }
-              }}
-              className="absolute top-20 right-20 w-3 h-3 bg-purple-400 rounded-full opacity-40"
-            />
           </motion.div>
         </div>
       </div>
