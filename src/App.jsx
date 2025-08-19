@@ -17,10 +17,10 @@ import LoadingSpinner from './Components/Loader/LoadingSpinner';
 import Footer from './Components/Landing/components/Footer'; // Import Footer
 
 // Landing Page Components - Add these new components
-import AboutPage from './Components/Landing/components/AboutSection';
+// Landing Page Components - Add these new components  
+import AboutPage from './Components/Landing/pages/AboutPage'; 
 import ServicesPage from './Components/Landing/components/ServicesSection';
 import FeaturesPage from './Components/Landing/components/FeaturesSection';
-import PostsPage from './Components/Landing/components/PostsPage';
 import ContactPage from './Components/Landing/components/ContactPage';
 
 // Lazy Loaded Employee Management Pages
@@ -76,7 +76,7 @@ const App = () => {
   const permissions = useSelector(state => state.permissions) || {};
 
   // Route categorization for better performance - Updated to include new landing routes
-  const isLandingRoute = ["/", "/about", "/services", "/features", "/posts", "/contact"].includes(location.pathname);
+  const isLandingRoute = ["/", "/about", "/services", "/features", "/contact"].includes(location.pathname);
   const isLoginRoute = location.pathname === "/login";
   const isUnauthorizedRoute = location.pathname === "/unauthorized";
   const isPublicRoute = isLandingRoute || isLoginRoute || isUnauthorizedRoute;
@@ -188,11 +188,6 @@ const App = () => {
                 <Route path="/features" element={
                   <LandingPageWrapper>
                     <FeaturesPage />
-                  </LandingPageWrapper>
-                } />
-                <Route path="/posts" element={
-                  <LandingPageWrapper>
-                    <PostsPage />
                   </LandingPageWrapper>
                 } />
                 <Route path="/contact" element={

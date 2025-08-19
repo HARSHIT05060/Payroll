@@ -1,3 +1,5 @@
+import React from "react";
+import { motion } from "framer-motion";
 import { Users, Calendar, DollarSign, BarChart3, Shield, Zap } from "lucide-react";
 
 const benefits = [
@@ -37,8 +39,14 @@ const FeaturesSection = () => {
   return (
     <section className="py-16 bg-[var(--color-bg-gradient-start)]">
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-16">
+        {/* Header with Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
           <p className="text-sm text-[var(--color-text-blue)] uppercase tracking-wider mb-3 font-medium">Benefits</p>
           <h2 className="text-4xl lg:text-5xl font-bold text-[var(--color-text-primary)] mb-4">
             Smarter Payroll, Better Business Outcomes
@@ -46,7 +54,7 @@ const FeaturesSection = () => {
           <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">
             Drive efficiency, compliance, and employee satisfaction with intelligent, automated payroll management tools.
           </p>
-        </div>
+        </motion.div>
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-12 items-start">
@@ -55,11 +63,29 @@ const FeaturesSection = () => {
             {benefits.slice(0, 3).map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index} className="flex items-start gap-4 group">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.8, 
+                    delay: index * 0.2,
+                    ease: "easeOut"
+                  }}
+                  viewport={{ once: true }}
+                  className="flex items-start gap-4 group"
+                >
                   <div className="flex-shrink-0 mt-1">
-                    <div className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 border border-[var(--color-border-primary)]">
+                    <motion.div 
+                      className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
+                      whileHover={{ 
+                        scale: 1.15,
+                        rotate: 10,
+                        transition: { duration: 0.3 }
+                      }}
+                    >
                       <IconComponent className="h-5 w-5 text-[var(--color-text-white)]" />
-                    </div>
+                    </motion.div>
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold text-[var(--color-text-primary)] group-hover:text-[var(--color-text-blue)] transition-colors duration-300">
@@ -69,44 +95,121 @@ const FeaturesSection = () => {
                       {benefit.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
 
-          {/* Center Column - Professional Photo */}
-          <div className="flex justify-center">
+          {/* Center Column - Professional Photo with Animation */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
             <div className="relative">
-              {/* Background decorative elements */}
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-[var(--color-blue-lighter)] rounded-full opacity-60 animate-pulse"></div>
-              <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-[var(--color-blue-light)] rounded-full opacity-60 animate-pulse delay-1000"></div>
+              {/* Background decorative elements with animation */}
+              <motion.div 
+                className="absolute -top-4 -left-4 w-24 h-24 bg-[var(--color-blue-lighter)] rounded-full opacity-60"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [0.6, 0.8, 0.6]
+                }}
+                transition={{ 
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div 
+                className="absolute -bottom-6 -right-6 w-16 h-16 bg-[var(--color-blue-light)] rounded-full opacity-60"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.6, 0.9, 0.6]
+                }}
+                transition={{ 
+                  duration: 3,
+                  delay: 1,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
               
               {/* Main image container */}
-              <div className="relative w-80 h-96 bg-[var(--color-bg-card)] rounded-2xl overflow-hidden shadow-2xl border border-[var(--color-border-primary)]">
+              <motion.div 
+                className="relative w-80 h-96 bg-[var(--color-bg-card)] rounded-2xl overflow-hidden shadow-2xl border border-[var(--color-border-primary)]"
+                whileHover={{ 
+                  scale: 1.02,
+                  rotateY: 5,
+                  transition: { duration: 0.4 }
+                }}
+              >
                 <img 
                   src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80"
                   alt="Payroll software professional dashboard"
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-blue-darkest)] via-transparent to-transparent opacity-30"></div>
-              </div>
+              </motion.div>
               
-              {/* Floating elements */}
-              <div className="absolute top-12 -right-8 w-6 h-6 bg-[var(--color-blue)] rounded opacity-70 animate-bounce"></div>
-              <div className="absolute bottom-20 -left-6 w-4 h-4 bg-[var(--color-blue-light)] rounded opacity-70 animate-bounce delay-500"></div>
+              {/* Floating elements with animation */}
+              <motion.div 
+                className="absolute top-12 -right-8 w-6 h-6 bg-[var(--color-blue)] rounded opacity-70"
+                animate={{ 
+                  y: [-5, 5, -5],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div 
+                className="absolute bottom-20 -left-6 w-4 h-4 bg-[var(--color-blue-light)] rounded opacity-70"
+                animate={{ 
+                  y: [5, -5, 5],
+                  x: [-2, 2, -2]
+                }}
+                transition={{ 
+                  duration: 3,
+                  delay: 0.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - Benefits 4-6 */}
           <div className="space-y-8">
             {benefits.slice(3, 6).map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index + 3} className="flex items-start gap-4 group">
+                <motion.div
+                  key={index + 3}
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.8, 
+                    delay: index * 0.2,
+                    ease: "easeOut"
+                  }}
+                  viewport={{ once: true }}
+                  className="flex items-start gap-4 group"
+                >
                   <div className="flex-shrink-0 mt-1">
-                    <div className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 border border-[var(--color-border-primary)]">
+                    <motion.div 
+                      className="w-12 h-12 bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-[var(--color-border-primary)]"
+                      whileHover={{ 
+                        scale: 1.15,
+                        rotate: -10,
+                        transition: { duration: 0.3 }
+                      }}
+                    >
                       <IconComponent className="h-5 w-5 text-[var(--color-text-white)]" />
-                    </div>
+                    </motion.div>
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold text-[var(--color-text-primary)] group-hover:text-[var(--color-text-blue)] transition-colors duration-300">
@@ -116,7 +219,7 @@ const FeaturesSection = () => {
                       {benefit.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

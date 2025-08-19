@@ -1,77 +1,207 @@
 import { Button } from "../ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import heroImage from "../assets/hero-image.jpg";
+import React from "react";
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="py-20 lg:py-32 bg-[var(--color-bg-gradient-start)] bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-gradient-end)]">
+    <section className="py-20 lg:py-32 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center px-4 py-2 bg-[var(--color-bg-secondary-20)] text-[var(--color-text-primary)] rounded-full text-sm font-medium border border-[var(--color-border-secondary)]">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 bg-white/70 text-gray-800 rounded-full text-sm font-medium border border-gray-200 backdrop-blur-sm"
+            >
               Payroll Made Simple
-            </div>
+            </motion.div>
 
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight text-[var(--color-text-primary)]">
+              <motion.h1
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-4xl lg:text-6xl font-bold leading-tight text-gray-800"
+              >
                 SyncWage –{" "}
-                <span className="bg-gradient-to-r from-[var(--color-blue)] via-[var(--color-blue-dark)] to-[var(--color-blue-darker)] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
                   An Ultimate Payroll Software
                 </span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-lg text-[var(--color-text-secondary)] leading-relaxed max-w-lg">
-                Automate and simplify payroll — from salary calculations and tax compliance 
-                to attendance, leave, and employee benefits — with a secure, scalable, and 
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-lg text-gray-600 leading-relaxed max-w-lg"
+              >
+                Automate and simplify payroll — from salary calculations and tax compliance
+                to attendance, leave, and employee benefits — with a secure, scalable, and
                 user-friendly cloud platform built for modern businesses and growing teams.
-              </p>
+              </motion.p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                variant="hero"
-                size="lg"
-                className="px-8 py-6 text-base bg-[var(--color-blue)] hover:bg-[var(--color-blue-dark)] text-[var(--color-text-white)]"
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                Get Started Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-8 py-6 text-base border-[var(--color-border-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
+                <Button
+                  variant="hero"
+                  size="lg"
+                  className="px-8 py-6 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
+                >
+                  Get Started Now
+                  <motion.div
+                    initial={{ x: 0 }}
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </motion.div>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                <Play className="mr-2 h-5 w-5" />
-                Learn More
-              </Button>
-            </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-8 py-6 text-base border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-blue-600 hover:text-blue-600"
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Learn More
+                </Button>
+              </motion.div>
+            </motion.div>
           </div>
 
           {/* Right Content - Hero Image */}
-          <div className="relative">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="relative"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+              className="relative rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300"
+            >
               <img
                 src={heroImage}
                 alt="Payroll software dashboard showcasing salary, compliance, and workforce insights"
                 className="w-full h-auto object-cover"
               />
-              <div className="absolute inset-0 bg-gradient from-[var(--color-blue)]/20 to-transparent"></div>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent"></div>
+            </motion.div>
 
             {/* Floating Stats */}
-            <div className="absolute -bottom-6 -left-6 bg-[var(--color-bg-card)] border border-[var(--color-border-primary)] rounded-xl p-4 shadow-lg backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                duration: 0.8,
+                delay: 0.8,
+                type: "spring",
+                stiffness: 100
+              }}
+              whileHover={{
+                y: -5,
+                transition: { duration: 0.3 }
+              }}
+              className="absolute -bottom-6 -left-6 bg-white/90 border border-gray-200 rounded-xl p-4 shadow-lg backdrop-blur-sm"
+            >
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-[var(--color-blue-lightest)] rounded-full flex items-center justify-center">
-                  <span className="text-[var(--color-blue)] font-bold text-lg">100+</span>
-                </div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 1,
+                    type: "spring",
+                    stiffness: 200
+                  }}
+                  className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center"
+                >
+                  <span className="text-blue-600 font-bold text-lg">100+</span>
+                </motion.div>
                 <div>
-                  <p className="font-semibold text-[var(--color-text-primary)]">Businesses Empowered</p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">With Smarter Payroll</p>
+                  <motion.p
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1.1 }}
+                    className="font-semibold text-gray-800"
+                  >
+                    Businesses Empowered
+                  </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1.2 }}
+                    className="text-sm text-gray-600"
+                  >
+                    With Smarter Payroll
+                  </motion.p>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+
+            {/* Additional floating element for visual interest */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              transition={{
+                duration: 0.6,
+                delay: 1.3,
+                type: "spring",
+                stiffness: 150
+              }}
+              animate={{
+                y: [0, -10, 0],
+                transition: {
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
+              className="absolute top-6 right-6 w-4 h-4 bg-blue-500 rounded-full opacity-60"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              transition={{
+                duration: 0.6,
+                delay: 1.5,
+                type: "spring",
+                stiffness: 150
+              }}
+              animate={{
+                y: [0, -15, 0],
+                transition: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }
+              }}
+              className="absolute top-20 right-20 w-3 h-3 bg-purple-400 rounded-full opacity-40"
+            />
+          </motion.div>
         </div>
       </div>
     </section>

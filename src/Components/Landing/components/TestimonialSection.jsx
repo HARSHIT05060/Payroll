@@ -1,3 +1,5 @@
+import React from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "../ui/card";
 import { Star, Quote } from "lucide-react";
 
@@ -29,45 +31,124 @@ const TestimonialSection = () => {
   return (
     <section className="py-20 bg-[var(--color-bg-secondary)]">
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-16">
+        {/* Header Section with Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center space-y-4 mb-16"
+        >
           <h2 className="text-3xl lg:text-4xl font-bold text-[var(--color-text-primary)]">
             What Our Clients Say
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
             Discover how companies are transforming their HR processes with Hurevo
           </p>
-        </div>
+        </motion.div>
 
+        {/* Testimonials Grid with Staggered Animation */}
         <div className="grid lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card 
-              key={index} 
-              className="border-[var(--color-border-primary)] hover:border-[var(--color-border-focus)] transition-all duration-300 relative overflow-hidden bg-[var(--color-bg-card)]"
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 0.8, 
+                delay: index * 0.2,
+                ease: "easeOut"
+              }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -10,
+                transition: { duration: 0.3 }
+              }}
             >
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center space-x-1">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-[var(--color-warning)] text-[var(--color-warning)]" />
-                  ))}
-                </div>
+              <Card 
+                className="border-[var(--color-border-primary)] hover:border-[var(--color-border-focus)] transition-all duration-300 relative overflow-hidden bg-[var(--color-bg-card)] h-full"
+              >
+                <CardContent className="p-6 space-y-4">
+                  {/* Star Rating with Sequential Animation */}
+                  <div className="flex items-center space-x-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ 
+                          duration: 0.4, 
+                          delay: (index * 0.2) + (i * 0.1) + 0.5
+                        }}
+                        viewport={{ once: true }}
+                        whileHover={{ 
+                          scale: 1.2,
+                          rotate: 15,
+                          transition: { duration: 0.2 }
+                        }}
+                      >
+                        <Star className="w-5 h-5 fill-[var(--color-warning)] text-[var(--color-warning)]" />
+                      </motion.div>
+                    ))}
+                  </div>
 
-                <div className="relative">
-                  <Quote className="absolute -top-2 -left-2 w-8 h-8 text-[var(--color-blue-lighter)]" />
-                  <p className="text-[var(--color-text-secondary)] leading-relaxed pl-6">
-                    "{testimonial.quote}"
-                  </p>
-                </div>
+                  {/* Quote Section with Animation */}
+                  <div className="relative">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                      whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: (index * 0.2) + 0.3,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      viewport={{ once: true }}
+                    >
+                      <Quote className="absolute -top-2 -left-2 w-8 h-8 text-[var(--color-blue-lighter)]" />
+                    </motion.div>
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: (index * 0.2) + 0.4
+                      }}
+                      viewport={{ once: true }}
+                      className="text-[var(--color-text-secondary)] leading-relaxed pl-6"
+                    >
+                      "{testimonial.quote}"
+                    </motion.p>
+                  </div>
 
-                <div className="pt-4 border-t border-[var(--color-border-primary)]">
-                  <p className="font-semibold text-[var(--color-text-primary)]">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">
-                    {testimonial.role} at {testimonial.company}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Author Section with Animation */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: (index * 0.2) + 0.6
+                    }}
+                    viewport={{ once: true }}
+                    className="pt-4 border-t border-[var(--color-border-primary)]"
+                  >
+                    <p className="font-semibold text-[var(--color-text-primary)]">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      {testimonial.role} at {testimonial.company}
+                    </p>
+                  </motion.div>
+                </CardContent>
+
+                {/* Animated Background Gradient on Hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-[var(--color-blue-lighter)] via-transparent to-[var(--color-blue-light)] opacity-0 pointer-events-none"
+                  whileHover={{ opacity: 0.05 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
