@@ -6,62 +6,67 @@ const services = [
   {
     icon: Users,
     title: "Automated Payroll Management",
-    description: "Streamline salary calculations, tax compliance, and payslip distribution — all in just a few clicks.",
+    description: "Process salaries, deductions, and taxes accurately with just a few clicks — reducing errors and saving time.",
+    iconBg: "bg-[var(--color-blue)]",
     link: "#"
   },
   {
     icon: UserCheck,
-    title: "Recruitment & Applicant Tracking",
-    description: "Streamline salary calculations, tax compliance, and payslip distribution — all in just a few clicks.",
+    title: "Leave & Attendance Integration",
+    description: "Seamlessly sync employee attendance and leave records to ensure payroll is always accurate and compliant.",
+    iconBg: "bg-[var(--color-blue-dark)]",
     link: "#"
   },
   {
     icon: BarChart3,
-    title: "Employee Performance Monitoring",
-    description: "Streamline salary calculations, tax compliance, and payslip distribution — all in just a few clicks.",
+    title: "Real-Time Payroll Insights",
+    description: "Track expenses, monitor compliance, and generate payroll reports with actionable insights in real time.",
+    iconBg: "bg-[var(--color-success)]",
     link: "#"
   }
 ];
 
 const ServicesSection = () => {
   return (
-    <section className="py-20 bg-[var(--color-bg-primary)]">
+    <section className="py-20" style={{ backgroundColor: "var(--color-bg-primary)" }}>
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl lg:text-5xl font-bold text-[var(--color-text-primary)]">
-            Our Service
-          </h2>
-          <h3 className="text-2xl lg:text-4xl font-bold text-[var(--color-text-primary)]">
-            Future-Ready{" "}
-            <span className="bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-darker)] bg-clip-text text-transparent">
-              HR Services Platform
-            </span>
-          </h3>
-          <div className="pt-4">
-            <Button variant="outline" size="lg" className="border-[var(--color-border-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]">
-              See More
-            </Button>
+        <div className="flex justify-between items-start mb-16">
+          <div className="text-left">
+            <p className="text-[var(--color-text-secondary)] text-sm font-medium mb-2">Our Services</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-[var(--color-text-primary)]">
+              Future-Ready Payroll<br />Management Platform
+            </h2>
           </div>
+          <Button 
+            className="bg-[var(--color-text-primary)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-dark)] rounded-full px-6 py-2 text-sm transition-colors duration-300"
+          >
+            See More →
+          </Button>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {services.map((service, index) => {
             const IconComponent = service.icon;
             return (
-              <Card key={index} className="border-[var(--color-border-primary)]/50 hover:border-[var(--color-blue)]/30 transition-all duration-300 group hover:shadow-lg text-center bg-[var(--color-bg-card)]">
+              <Card 
+                key={index} 
+                className="border-[var(--color-border-primary)] hover:shadow-lg transition-all duration-300 group text-left bg-[var(--color-bg-card)]"
+              >
                 <CardContent className="p-8 space-y-6">
-                  <div className="w-16 h-16 bg-[var(--color-blue-lightest)] rounded-xl flex items-center justify-center mx-auto group-hover:bg-[var(--color-blue-lighter)] transition-colors">
-                    <IconComponent className="h-8 w-8 text-[var(--color-blue)]" />
+                  <div className={`w-16 h-16 ${service.iconBg} rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-105`}>
+                    <IconComponent className="h-8 w-8 text-[var(--color-text-white)]" />
                   </div>
                   <div className="space-y-4">
                     <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">
                       {service.title}
                     </h3>
-                    <p className="text-[var(--color-text-secondary)] leading-relaxed">
+                    <p className="text-[var(--color-text-secondary)] leading-relaxed text-sm">
                       {service.description}
                     </p>
-                    <Button variant="link" className="text-[var(--color-blue)] p-0">
-                      See Detail
+                    <Button 
+                      className="bg-[var(--color-blue)] text-[var(--color-text-white)] hover:bg-[var(--color-blue-dark)] text-sm px-6 py-2 rounded-full transition-all duration-300 group-hover:scale-105"
+                    >
+                      See Detail →
                     </Button>
                   </div>
                 </CardContent>

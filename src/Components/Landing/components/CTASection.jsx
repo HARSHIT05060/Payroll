@@ -35,7 +35,7 @@ const CTASection = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-center space-x-2 justify-center sm:justify-start">
-                <CheckCircle className="w-5 h-5 text-[var(--color-success)] flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 text-[var(--color-text-white)] flex-shrink-0" />
                 <span className="text-[var(--color-text-white-90)]">{benefit}</span>
               </div>
             ))}
@@ -54,7 +54,7 @@ const CTASection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 text-base border-[var(--color-text-white)] border-opacity-30 text-[var(--color-text-white)] hover:bg-[var(--color-text-white)] hover:text-[var(--color-blue)]"
+              className="px-8 py-6 text-base border-[var(--color-border-primary)] text-[var(--color-text-white)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-blue)]"
             >
               Schedule Demo
             </Button>

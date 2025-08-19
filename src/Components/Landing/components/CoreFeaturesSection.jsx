@@ -3,64 +3,66 @@ import { Card, CardContent } from "../ui/card";
 
 const coreFeatures = [
   {
-    title: "Automated Payroll Calculation",
-    description: "Accurately process salaries, deductions, and taxes with minimal manual input",
-    image: "https://kit.createbigsupply.com/hurevo/wp-content/uploads/sites/56/2025/06/business-people-with-laptop-in-modern-office-build-2024-10-30-23-05-48-utc-1024x665.jpg"
+    title: "Automated Payroll Processing",
+    description: "Eliminate manual errors with precise salary, deduction, and compliance calculations.",
+    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80"
   },
   {
     title: "Digital Payslip Distribution",
-    description: "Accurately process salaries, deductions, and taxes with minimal manual input",
-    image: "https://kit.createbigsupply.com/hurevo/wp-content/uploads/sites/56/2025/06/young-couple-with-a-problem-consult-with-psycholog-2024-10-14-17-10-31-utc-1024x683.jpg"
+    description: "Deliver payslips instantly and securely to employees with one-click access.",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80"
   },
   {
-    title: "Tax Compliance Management",
-    description: "Accurately process salaries, deductions, and taxes with minimal manual input",
-    image: "https://kit.createbigsupply.com/hurevo/wp-content/uploads/sites/56/2025/06/professional-businessman-partner-person-success-te-2025-03-25-14-27-48-utc-1024x681.jpg"
+    title: "Leave & Attendance Integration",
+    description: "Seamlessly sync attendance and leave data for accurate payroll every cycle.",
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80"
   }
 ];
 
 const CoreFeaturesSection = () => {
   return (
-    <section className="py-20 bg-[var(--color-bg-secondary)]">
+    <section className="py-20 bg-[var(--color-blue-darker)] text-[var(--color-text-white)]">
       <div className="container mx-auto px-4">
+        {/* Main Header Section */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div className="space-y-6">
-            <h2 className="text-3xl lg:text-5xl font-bold text-[var(--color-text-primary)]">
+            <div className="inline-block bg-[var(--color-blue-dark)] px-4 py-2 rounded-full text-sm font-medium">
               Core Features
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold leading-tight">
+              Smart Payroll. Zero Hassle. Maximum Accuracy.
             </h2>
-            <h3 className="text-2xl lg:text-4xl font-bold leading-tight text-[var(--color-text-primary)]">
-              Automate Payroll, Simplify Benefits, Empower{" "}
-              <span className="text-[var(--color-blue)]">
-                Your People
-              </span>
-            </h3>
-            <p className="text-lg text-[var(--color-text-secondary)] leading-relaxed">
-              Key features designed to streamline pay, manage benefits, and ensure total compliance every cycle.
-              Key features designed to streamline pay, manage benefits, and ensure total compliance every cycle.
+            <p className="text-[var(--color-text-white-90)] leading-relaxed">
+              Explore the powerful features of SyncWage designed to automate payroll, 
+              ensure compliance, and give employees a seamless experience every pay cycle.
             </p>
-            <Button variant="hero" size="lg" className="px-8">
+            <Button className="bg-[var(--color-bg-secondary)] text-[var(--color-blue-darker)] hover:bg-[var(--color-bg-hover)] px-6 py-3 rounded-full font-medium">
               Get Started Now
             </Button>
           </div>
 
-          <div className="text-center">
-            <div className="text-4xl lg:text-6xl font-bold mb-4">
-              <span className="text-[var(--color-blue)]">
-                $0
-              </span>{" "}
-              <span className="text-[var(--color-text-primary)] text-2xl lg:text-3xl">
-                in Payroll Errors
-              </span>
+          <div className="flex justify-center">
+            <div className="bg-[var(--color-bg-secondary-10)] backdrop-blur-sm rounded-2xl p-8 text-center border border-[var(--color-bg-secondary-20)]">
+              <img
+                src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80"
+                alt="Payroll automation dashboard"
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
             </div>
-            <p className="text-lg text-[var(--color-text-secondary)]">Last 12 Months</p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Stats Section */}
+        <div className="text-center mb-12">
+          <h3 className="text-2xl font-bold mb-8">Zero Payroll Errors in the Last 12 Months</h3>
+        </div>
+
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-3 gap-6">
           {coreFeatures.map((feature, index) => (
             <Card 
               key={index} 
-              className="border-[var(--color-border-primary)] hover:border-[var(--color-border-focus)] transition-all duration-300 group hover:shadow-lg overflow-hidden bg-[var(--color-bg-card)]"
+              className="bg-[var(--color-bg-secondary-10)] backdrop-blur-sm border border-[var(--color-bg-secondary-20)] hover:bg-[var(--color-bg-secondary-15)] transition-all duration-300 group overflow-hidden"
             >
               <div className="aspect-video overflow-hidden">
                 <img
@@ -70,12 +72,22 @@ const CoreFeaturesSection = () => {
                 />
               </div>
               <CardContent className="p-6 space-y-3">
-                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-blue)] transition-colors cursor-pointer">
+                <h4 className="text-lg font-semibold text-[var(--color-text-white)] group-hover:text-[var(--color-blue-lighter)] transition-colors">
                   {feature.title}
                 </h4>
-                <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
+                <p className="text-[var(--color-text-white-90)] text-sm leading-relaxed">
                   {feature.description}
                 </p>
+                <div className="flex justify-end pt-2">
+                  <svg 
+                    className="w-5 h-5 text-[var(--color-blue-lighter)] group-hover:translate-x-1 transition-transform" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </div>
               </CardContent>
             </Card>
           ))}

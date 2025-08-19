@@ -13,7 +13,7 @@ const LandingPage = () => {
         <div className="min-h-screen bg-background">
             <main>
                 <HeroSection />
-                <StatsSection />
+                {/* <StatsSection /> */}
                 <AboutSection />
                 <ServicesSection />
                 <ResourceTemplatesSection />

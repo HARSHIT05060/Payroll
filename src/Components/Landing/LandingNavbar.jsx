@@ -2,12 +2,21 @@ import { Button } from "./ui/button";
 import { Menu, ChevronDown } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import Logo from "../../assets/logo.png"
+import Logo from "../../assets/logo.png";
 
 const LandingNavbar = () => {
     const [isPagesOpen, setIsPagesOpen] = useState(false);
-    const [isPostsOpen, setIsPostsOpen] = useState(false);
+    // const [isPostsOpen, setIsPostsOpen] = useState(false);
 
+    // Function to scroll to top
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    // Enhanced navLinkClasses function that includes onClick handler
     const navLinkClasses = ({ isActive }) =>
         `px-4 py-2 rounded-full transition-colors ${isActive
             ? "bg-[var(--color-blue)] text-[var(--color-text-white)]"
@@ -24,21 +33,30 @@ const LandingNavbar = () => {
                         <img
                             src={Logo}
                             alt="Hurevo Logo"
-                            className="h-12 w-auto object-contain max-w-[200px]"
+                            className="h-12 w-auto object-contain max-w-[200px] cursor-pointer"
+                            onClick={scrollToTop}
                         />
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-4">
-                        <NavLink to="/" className={navLinkClasses}>
+                        <NavLink
+                            to="/"
+                            className={navLinkClasses}
+                            onClick={scrollToTop}
+                        >
                             Home
                         </NavLink>
-                        <NavLink to="/about" className={navLinkClasses}>
+                        <NavLink
+                            to="/about"
+                            className={navLinkClasses}
+                            onClick={scrollToTop}
+                        >
                             About Us
                         </NavLink>
 
                         {/* Posts Dropdown */}
-                        <div
+                        {/* <div
                             className="relative"
                             onMouseEnter={() => setIsPostsOpen(true)}
                             onMouseLeave={() => setIsPostsOpen(false)}
@@ -49,20 +67,32 @@ const LandingNavbar = () => {
                             </button>
 
                             <div className={`absolute top-full left-0 mt-2 w-52 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPostsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
-                                <NavLink to="/blog" className={({ isActive }) =>
-                                    `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
-                                }>
+                                <NavLink 
+                                    to="/blog" 
+                                    className={({ isActive }) =>
+                                        `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
+                                    }
+                                    onClick={scrollToTop}
+                                >
                                     Blog
                                 </NavLink>
-                                <NavLink to="/single-post" className={({ isActive }) =>
-                                    `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
-                                }>
+                                <NavLink 
+                                    to="/single-post" 
+                                    className={({ isActive }) =>
+                                        `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
+                                    }
+                                    onClick={scrollToTop}
+                                >
                                     Single Post
                                 </NavLink>
                             </div>
-                        </div>
+                        </div> */}
 
-                        <NavLink to="/services" className={navLinkClasses}>
+                        <NavLink
+                            to="/services"
+                            className={navLinkClasses}
+                            onClick={scrollToTop}
+                        >
                             Service
                         </NavLink>
 
@@ -77,29 +107,35 @@ const LandingNavbar = () => {
                                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPagesOpen ? 'rotate-180' : ''}`} />
                             </button>
 
-                            <div className={`absolute top-full left-0 mt-2 w-60 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPagesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
+                            <div
+                                className={`absolute top-full left-0 mt-2 w-60 bg-[var(--color-blue)] text-[var(--color-text-white)] rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isPagesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                                    }`}
+                            >
                                 {[
-                                    { to: "/talent-acquisition", label: "Talent Acquisition" },
+                                    { to: "/dashboard", label: "Dashboard" },
                                     { to: "/employee-management", label: "Employee Management" },
                                     { to: "/payroll-benefits", label: "Payroll & Benefits" },
+                                    { to: "/attendance-leave", label: "Attendance & Leave" },
                                     { to: "/performance-appraisal", label: "Performance & Appraisal" },
+                                    { to: "/compliance-reports", label: "Compliance & Reports" },
                                     { to: "/hr-resources", label: "HR Resources & Templates" },
-                                    { to: "/book-appointment", label: "Book Appointment" },
-                                    { to: "/404", label: "404 Error" },
-                                    { to: "/coming-soon", label: "Coming Soon" },
+                                    { to: "/book-appointment", label: "Book Appointment / Demo" },
                                 ].map((item) => (
                                     <NavLink
                                         key={item.to}
                                         to={item.to}
                                         className={({ isActive }) =>
-                                            `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"}`
+                                            `block px-4 py-3 ${isActive ? "bg-[var(--color-blue-dark)]" : "hover:bg-[var(--color-blue-dark)]"
+                                            }`
                                         }
+                                        onClick={scrollToTop}
                                     >
                                         {item.label}
                                     </NavLink>
                                 ))}
                             </div>
                         </div>
+
                     </div>
 
                     {/* Auth Buttons */}
