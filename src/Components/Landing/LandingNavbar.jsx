@@ -3,6 +3,7 @@ import { Menu, ChevronDown } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import Logo from "../../assets/logo.png";
+import { ThemeToggle } from "../../context/Themetoggle";
 
 const LandingNavbar = () => {
     const [isPagesOpen, setIsPagesOpen] = useState(false);
@@ -104,11 +105,12 @@ const LandingNavbar = () => {
                                 ))}
                             </div>
                         </div>
-
                     </div>
 
                     {/* Auth Buttons */}
                     <div className="hidden md:flex items-center space-x-3">
+                        <ThemeToggle />
+
                         <NavLink to="/login">
                             <Button variant="ghost" className="text-[var(--color-text-primary)]">
                                 Log In
