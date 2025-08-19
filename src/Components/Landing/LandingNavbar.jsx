@@ -30,12 +30,13 @@ const LandingNavbar = () => {
 
                     {/* Logo */}
                     <div className="flex items-center space-x-2">
-                        <img
-                            src={Logo}
-                            alt="Hurevo Logo"
-                            className="h-12 w-auto object-contain max-w-[200px] cursor-pointer"
-                            onClick={scrollToTop}
-                        />
+                        <NavLink to="/">
+                            <img
+                                src={Logo}
+                                alt="Hurevo Logo"
+                                className="h-12 w-auto object-contain max-w-[200px] cursor-pointer"
+                            />
+                        </NavLink>
                     </div>
 
                     {/* Desktop Navigation */}
@@ -140,12 +141,16 @@ const LandingNavbar = () => {
 
                     {/* Auth Buttons */}
                     <div className="hidden md:flex items-center space-x-3">
-                        <Button variant="ghost" className="text-[var(--color-text-primary)]">
-                            Log In
-                        </Button>
-                        <Button variant="hero" className="px-6">
-                            Sign Up
-                        </Button>
+                        <NavLink to="/login">
+                            <Button variant="ghost" className="text-[var(--color-text-primary)]">
+                                Log In
+                            </Button>
+                        </NavLink>
+                        <NavLink to="/contact">
+                            <Button variant="hero" className="px-6">
+                                Contact Us
+                            </Button>
+                        </NavLink>
                     </div>
 
                     {/* Mobile Menu Button */}
