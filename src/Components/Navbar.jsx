@@ -225,17 +225,30 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
                 </div>
             </div>
 
-            {/* Logout Confirmation Dialog */}
-            <ConfirmDialog
-                isOpen={showLogoutDialog}
-                onClose={handleLogoutCancel}
-                onConfirm={handleLogoutConfirm}
-                title="Confirm Logout"
-                message="Are you sure you want to logout? You will need to sign in again to access your account."
-                confirmText="Yes, Logout"
-                cancelText="Cancel"
-                type="danger"
-            />
+            {/* Modal Backdrop and Logout Confirmation Dialog */}
+            {showLogoutDialog && (
+                <>
+                    {/* Modal Backdrop */}
+                    <div 
+                        className="fixed inset-0 bg-black bg-opacity-50 z-[9998] backdrop-blur-sm"
+                        onClick={handleLogoutCancel}
+                    />
+                    
+                    {/* Logout Confirmation Dialog */}
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                        <ConfirmDialog
+                            isOpen={showLogoutDialog}
+                            onClose={handleLogoutCancel}
+                            onConfirm={handleLogoutConfirm}
+                            title="Confirm Logout"
+                            message="Are you sure you want to logout? You will need to sign in again to access your account."
+                            confirmText="Yes, Logout"
+                            cancelText="Cancel"
+                            type="danger"
+                        />
+                    </div>
+                </>
+            )}
         </>
     );
 };
