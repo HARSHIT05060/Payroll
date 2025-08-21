@@ -10,8 +10,8 @@ import Logo from "../assets/logo.png";
 
 const Login = () => {
     const { login } = useAuth();
-    const [number, setNumber] = useState("");
-    const [password, setPassword] = useState("");
+    const [number, setNumber] = useState("8529637411");
+    const [password, setPassword] = useState("Test@123");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();

@@ -2,15 +2,65 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ATTENDANCE SYSTEM</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <title>Syncwage | An Ultimate Payroll Software</title>
+
+    <!-- ✅ Basic SEO -->
+    <meta
+      name="description"
+      content="Syncwage is a SaaS-based payroll and attendance management software. Automate salary processing, employee attendance, and compliance with ease."
+    />
+    <meta
+      name="keywords"
+      content="Syncwage, Payroll Software, SaaS Payroll, Attendance Management, Salary Automation, Employee Management, Workforce Management, HR Tech"
+    />
+    <meta name="author" content="Syncwage Technologies" />
+
+    <!-- ✅ Open Graph (Social Sharing) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Syncwage" />
+    <meta property="og:title" content="Syncwage | An Ultimate Payroll Software" />
+    <meta
+      property="og:description"
+      content="Automate payroll and attendance with Syncwage. A modern SaaS platform for businesses to streamline salary, compliance, and employee management."
+    />
+    <meta property="og:url" content="https://syncwage.com" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- ✅ Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Syncwage | Payroll SaaS" />
+    <meta
+      name="twitter:description"
+      content="Syncwage simplifies payroll & attendance with automation, compliance, and smart reporting."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <!-- ✅ Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/src/assets/logo.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+
+    <!-- ✅ Robots -->
+    <meta name="robots" content="index, follow" />
   </head>
   <body>
+    <noscript>
+      You need to enable JavaScript to run Syncwage Payroll Software.
+    </noscript>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx">
-            if (import.meta.env.PROD) {
-        for (const method of ['log', 'warn', 'error', 'info', 'debug']) {
+
+    <!-- ✅ Vite Script -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- ✅ Disable console logs in PROD -->
+    <script>
+      if (import.meta.env && import.meta.env.PROD) {
+        for (const method of ["log", "warn", "error", "info", "debug"]) {
           console[method] = () => {};
         }
       }
