@@ -1,5 +1,6 @@
 // src/components/Login.jsx
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Smartphone, Lock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance";
@@ -101,128 +102,224 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex bg-[var(--color-bg-primary)]">
-
+        <div className="min-h-screen w-full flex bg-[var(--color-bg-primary)] overflow-hidden">
             {/* Left Side - Blue Section with Image */}
-            <div className="hidden lg:flex w-1/2 bg-[var(--color-blue)] items-center justify-center p-12 relative overflow-hidden">
-
+            <motion.div 
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="hidden lg:flex w-1/2 bg-[var(--color-blue)] items-center justify-center p-12 relative overflow-hidden"
+            >
                 {/* Back Button */}
-                <button
+                <motion.button
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    whileHover={{ scale: 1.05, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleBackClick}
                     className="absolute top-8 left-8 flex items-center gap-2 text-[var(--color-text-white-90)] hover:text-[var(--color-text-white)] transition-colors duration-200 z-20"
                 >
                     <ArrowLeft className="w-5 h-5" />
                     <span className="text-sm font-medium">Back</span>
-                </button>
+                </motion.button>
 
                 <div className="text-center text-[var(--color-text-white)] z-10 max-w-lg">
-                    <h2 className="text-4xl font-bold mb-4">
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                        className="text-4xl font-bold mb-4"
+                    >
                         Effortlessly manage your team and operations.
-                    </h2>
-                    <p className="text-xl mb-8 text-[var(--color-blue-lightest)]">
+                    </motion.h2>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="text-xl mb-8 text-[var(--color-blue-lightest)]"
+                    >
                         Log in to access your CRM dashboard and manage your team.
-                    </p>
+                    </motion.p>
 
                     {/* Dashboard Preview Image */}
-                    <div className="relative">
+                    <motion.div 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 1, delay: 0.8 }}
+                        whileHover={{ scale: 1.05 }}
+                        className="relative"
+                    >
                         <img
                             src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                             alt="Dashboard Preview"
                             className="w-full max-w-md mx-auto rounded-xl shadow-2xl border-4 border-white/20"
                         />
-                        <div className="absolute -top-4 -right-4 bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-lg">
+                        <motion.div 
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 1.2 }}
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            className="absolute -top-4 -right-4 bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-lg"
+                        >
                             <div className="text-sm font-semibold text-[var(--color-text-primary)]">6,248 Units</div>
                             <div className="text-xs text-[var(--color-text-muted)]">Sales Categories</div>
-                        </div>
-                        <div className="absolute -bottom-4 -left-4 bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-lg">
+                        </motion.div>
+                        <motion.div 
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 1.4 }}
+                            whileHover={{ scale: 1.1, rotate: -5 }}
+                            className="absolute -bottom-4 -left-4 bg-[var(--color-bg-secondary)] rounded-lg p-3 shadow-lg"
+                        >
                             <div className="text-sm font-semibold text-[var(--color-text-primary)]">$189,374</div>
                             <div className="text-xs text-[var(--color-text-muted)]">Total Sales</div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
 
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-20 left-20 w-32 h-32 bg-[var(--color-text-white)] rounded-full"></div>
-                    <div className="absolute bottom-32 right-16 w-24 h-24 bg-[var(--color-text-white)] rounded-full"></div>
-                    <div className="absolute top-1/2 left-8 w-16 h-16 bg-[var(--color-text-white)] rounded-full"></div>
+                    <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.1 }}
+                        transition={{ duration: 2, delay: 0.5, repeat: Infinity, repeatType: "reverse" }}
+                        className="absolute top-20 left-20 w-32 h-32 bg-[var(--color-text-white)] rounded-full"
+                    ></motion.div>
+                    <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.1 }}
+                        transition={{ duration: 2.5, delay: 1, repeat: Infinity, repeatType: "reverse" }}
+                        className="absolute bottom-32 right-16 w-24 h-24 bg-[var(--color-text-white)] rounded-full"
+                    ></motion.div>
+                    <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.1 }}
+                        transition={{ duration: 1.8, delay: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                        className="absolute top-1/2 left-8 w-16 h-16 bg-[var(--color-text-white)] rounded-full"
+                    ></motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Right Side - Login Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
+            <motion.div 
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="w-full lg:w-1/2 flex items-center justify-center p-8 relative"
+            >
                 <div className="w-full max-w-md">
-
                     {/* Logo */}
-                    <div className="flex items-center justify-center gap-2 mb-12">
+                    <motion.div 
+                        initial={{ opacity: 0, y: -30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="flex items-center justify-center gap-2 mb-12"
+                    >
                         <img
                             src={Logo}
                             alt="SyncWage Logo"
                             className="w-40 h-20 object-contain"
                         />
-                    </div>
+                    </motion.div>
 
                     {/* Heading */}
-                    <div className="mb-8">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="mb-8"
+                    >
                         <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
                             Welcome Back
                         </h1>
-                    </div>
+                    </motion.div>
 
                     {/* Error */}
                     {error && (
-                        <div className="mb-6 p-3 bg-[var(--color-error-light)] border border-[var(--color-error)] rounded-lg text-[var(--color-text-error)] text-sm text-center">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="mb-6 p-3 bg-[var(--color-error-light)] border border-[var(--color-error)] rounded-lg text-[var(--color-text-error)] text-sm text-center"
+                        >
                             {error}
-                        </div>
+                        </motion.div>
                     )}
 
                     {/* Form */}
-                    <form onSubmit={handleLogin} className="space-y-4">
+                    <motion.form 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.6 }}
+                        onSubmit={handleLogin} 
+                        className="space-y-4"
+                    >
                         {/* Mobile Number */}
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.7 }}
+                        >
                             <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 Mobile Number
                             </label>
-                            <div className="relative">
+                            <motion.div 
+                                whileFocus={{ scale: 1.02 }}
+                                className="relative"
+                            >
                                 <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] w-5 h-5" />
                                 <input
                                     type="text"
                                     placeholder="Enter your mobile number"
                                     className="w-full pl-11 pr-4 py-3 border border-[var(--color-border-primary)] rounded-lg 
-                             focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue-lightest)] 
-                             text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] 
-                             bg-[var(--color-bg-secondary)] transition-all duration-200"
+                                     focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue-lightest)] 
+                                     text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] 
+                                     bg-[var(--color-bg-secondary)] transition-all duration-200"
                                     value={number}
                                     onChange={handleNumberChange}
                                     disabled={isLoading}
                                     maxLength={10}
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
 
                         {/* Password */}
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.8 }}
+                        >
                             <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                                 Password
                             </label>
-                            <div className="relative">
+                            <motion.div 
+                                whileFocus={{ scale: 1.02 }}
+                                className="relative"
+                            >
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-text-muted)] w-5 h-5" />
                                 <input
                                     type="password"
                                     placeholder="Enter your password"
                                     className="w-full pl-11 pr-4 py-3 border border-[var(--color-border-primary)] rounded-lg 
-                             focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue-lightest)] 
-                             text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] 
-                             bg-[var(--color-bg-secondary)] transition-all duration-200"
+                                     focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue-lightest)] 
+                                     text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] 
+                                     bg-[var(--color-bg-secondary)] transition-all duration-200"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     disabled={isLoading}
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
 
                         {/* Remember Me */}
-                        <div className="flex items-center justify-between">
+                        <motion.div 
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.9 }}
+                            className="flex items-center justify-between"
+                        >
                             <label className="flex items-center">
                                 <input
                                     type="checkbox"
@@ -230,26 +327,43 @@ const Login = () => {
                                 />
                                 <span className="ml-2 text-sm text-[var(--color-text-secondary)]">Remember Me</span>
                             </label>
-                        </div>
+                        </motion.div>
 
                         {/* Login Button */}
-                        <button
+                        <motion.button
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 1.0 }}
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
                             type="submit"
                             disabled={isLoading}
                             className="w-full bg-[var(--color-blue)] text-[var(--color-text-white)] py-3 rounded-lg font-semibold 
-                         hover:bg-[var(--color-blue-dark)] transition-all duration-200 shadow-md 
-                         disabled:opacity-70 disabled:cursor-not-allowed mt-6"
+                                     hover:bg-[var(--color-blue-dark)] transition-all duration-200 shadow-md 
+                                     disabled:opacity-70 disabled:cursor-not-allowed mt-6"
                         >
-                            {isLoading ? "Logging in..." : "Log In"}
-                        </button>
-                    </form>
+                            <motion.span
+                                key={isLoading ? "loading" : "login"}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {isLoading ? "Logging in..." : "Log In"}
+                            </motion.span>
+                        </motion.button>
+                    </motion.form>
 
                     {/* Footer */}
-                    <p className="text-xs text-center text-[var(--color-text-muted)] mt-8">
+                    <motion.p 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 1.2 }}
+                        className="text-xs text-center text-[var(--color-text-muted)] mt-8"
+                    >
                         Copyright © {new Date().getFullYear()} SyncWage Enterprises LTD.
-                    </p>
+                    </motion.p>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };
