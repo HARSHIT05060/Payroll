@@ -14,7 +14,6 @@ const SettingsComponent = () => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [toast, setToast] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
 
   // Preview Modal State
   const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -27,8 +26,6 @@ const SettingsComponent = () => {
     company_address: '',
     company_number: '',
     salary_slip_policy: '',
-    biomatric_api_key: '',
-    biomatric_api_password: '',
     company_logo: null,
     authorized_signatory: null
   });
@@ -131,8 +128,6 @@ const SettingsComponent = () => {
           company_address: settingsData.company_address || '',
           company_number: settingsData.company_number || '',
           salary_slip_policy: settingsData.salary_slip_policy || '',
-          biomatric_api_key: settingsData.biomatric_api_key || '',
-          biomatric_api_password: settingsData.biomatric_api_password || '',
           company_logo: null, // Keep as null for file object
           authorized_signatory: null // Keep as null for file object
         });
@@ -168,8 +163,6 @@ const SettingsComponent = () => {
           company_address: response.data.company_address || '',
           company_number: response.data.company_number || '',
           salary_slip_policy: response.data.salary_slip_policy || '',
-          biomatric_api_key: response.data.biomatric_api_key || '',
-          biomatric_api_password: response.data.biomatric_api_password || '',
           company_logo: null,
           authorized_signatory: null
         });
@@ -235,8 +228,6 @@ const SettingsComponent = () => {
       formData.append('company_address', companyData.company_address);
       formData.append('company_number', companyData.company_number);
       formData.append('salary_slip_policy', companyData.salary_slip_policy);
-      formData.append('biomatric_api_key', companyData.biomatric_api_key);
-      formData.append('biomatric_api_password', companyData.biomatric_api_password);
 
       // Images - only append if new files are selected
       if (companyData.company_logo instanceof File) {
@@ -558,42 +549,6 @@ const SettingsComponent = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Biometric API Key</label>
-                <input
-                  type="text"
-                  value={companyData.biomatric_api_key}
-                  onChange={(e) => handleInputChange('biomatric_api_key', e.target.value)}
-                  className="w-full px-3 py-2 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
-                  placeholder="Enter API key"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Biometric API Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={companyData.biomatric_api_password}
-                    onChange={(e) => handleInputChange('biomatric_api_password', e.target.value)}
-                    className="w-full px-3 py-2 pr-10 border border-[var(--color-border-secondary)] rounded-md focus:ring-2 focus:ring-[var(--color-blue)] focus:border-[var(--color-border-focus)]"
-                    placeholder="Enter API password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Salary Slip Policy</label>
                 <textarea
@@ -634,12 +589,12 @@ const SettingsComponent = () => {
               <div key={key} className="bg-[var(--color-bg-secondary)] rounded-lg shadow-sm p-6">
                 <div className={`flex items-center gap-3 mb-4`}>
                   <div className={`p-2 ${color === 'success' ? 'bg-[var(--color-success-light)]' :
-                      color === 'warning' ? 'bg-[var(--color-warning-light)]' :
-                        'bg-[var(--color-blue-lightest)]'
+                    color === 'warning' ? 'bg-[var(--color-warning-light)]' :
+                      'bg-[var(--color-blue-lightest)]'
                     } rounded-lg`}>
                     <Clock className={`w-5 h-5 ${color === 'success' ? 'text-[var(--color-success)]' :
-                        color === 'warning' ? 'text-[var(--color-warning-dark)]' :
-                          'text-[var(--color-blue)]'
+                      color === 'warning' ? 'text-[var(--color-warning-dark)]' :
+                        'text-[var(--color-blue)]'
                       }`} />
                   </div>
                   <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{title}</h3>

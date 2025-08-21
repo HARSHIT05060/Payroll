@@ -89,11 +89,10 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
                     </div>
 
                     {/* Notifications */}
-                    <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-gradient-start)] rounded-lg transition-all duration-200 hover:shadow-md group">
+                    {/* <button className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-gradient-start)] rounded-lg transition-all duration-200 hover:shadow-md group">
                         <Bell size={18} className="group-hover:animate-pulse" />
-                        {/* Notification badge */}
                         <span className="absolute top-1 right-1 w-2 h-2 bg-gradient-to-r from-[var(--color-error)] to-[var(--color-error-light)] rounded-full animate-pulse"></span>
-                    </button>
+                    </button> */}
 
                     {/* User Profile Dropdown */}
                     <div className="relative" ref={dropdownRef}>
@@ -114,9 +113,8 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
                             {/* Dropdown Arrow */}
                             <ChevronDown
                                 size={16}
-                                className={`text-[var(--color-text-secondary)] transition-all duration-300 group-hover:text-[var(--color-text-primary)] ${
-                                    isDropdownOpen ? 'rotate-180' : 'rotate-0'
-                                }`}
+                                className={`text-[var(--color-text-secondary)] transition-all duration-300 group-hover:text-[var(--color-text-primary)] ${isDropdownOpen ? 'rotate-180' : 'rotate-0'
+                                    }`}
                             />
                         </button>
 
@@ -167,11 +165,10 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
                                         </div>
                                         <div className="flex justify-between items-center py-1">
                                             <span className="text-[var(--color-text-secondary)]">Sub Status:</span>
-                                            <span className={`font-mono font-medium px-2 py-1 rounded-md text-xs ${
-                                                user?.subscriptions_status === 'active' 
+                                            <span className={`font-mono font-medium px-2 py-1 rounded-md text-xs ${user?.subscriptions_status === 'active'
                                                     ? 'bg-[var(--color-success-light)] text-[var(--color-success-dark)]'
                                                     : 'bg-[var(--color-error-light)] text-[var(--color-error-dark)]'
-                                            }`}>
+                                                }`}>
                                                 {user?.subscriptions_status || 'N/A'}
                                             </span>
                                         </div>
@@ -229,11 +226,11 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
             {showLogoutDialog && (
                 <>
                     {/* Modal Backdrop */}
-                    <div 
+                    <div
                         className="fixed inset-0 bg-black bg-opacity-50 z-[9998] backdrop-blur-sm"
                         onClick={handleLogoutCancel}
                     />
-                    
+
                     {/* Logout Confirmation Dialog */}
                     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                         <ConfirmDialog
