@@ -63,6 +63,7 @@ const AddUser = () => {
     };
 
     const validatePassword = (password) => {
+        // ✅ REMOVED required validation for edit mode
         if (!isEditing && !password.trim()) return 'Password is required';
         if (password.trim() && password.trim().length < 6) return 'Password must be at least 6 characters long';
         if (password.trim() && password.trim().length > 50) return 'Password should not exceed 50 characters';
@@ -125,8 +126,6 @@ const AddUser = () => {
             requestFormData.append('user_id', String(user.user_id));
             requestFormData.append('edit_user_id', String(userId));
 
-            console.log('Fetching user data for userId:', userId);
-
             let res;
             try {
                 res = await api.post('/user_list', requestFormData);
@@ -134,8 +133,6 @@ const AddUser = () => {
                 console.log(err);
                 throw new Error('Unable to fetch user details from any endpoint');
             }
-
-            console.log('User data response:', res.data);
 
             if (res.data?.success && Array.isArray(res.data.data)) {
                 // Find the user that matches the edit_user_id
@@ -148,13 +145,12 @@ const AddUser = () => {
                     return;
                 }
 
-                console.log('Setting form data:', userData);
-
                 setFormData({
                     full_name: userData.full_name || userData.name || '',
                     number: userData.number || userData.phone || userData.mobile || '',
                     email: userData.email || '',
-                    password: '', // Don't populate password for security
+                    // ✅ POPULATE password field in edit mode
+                    password: userData.password || '',
                     // Fixed: Use user_role_id from API response instead of user_roles_id
                     user_roles_id: String(userData.user_role_id || userData.user_roles_id || '')
                 });
@@ -464,8 +460,7 @@ const AddUser = () => {
                             <div className="space-y-2">
                                 <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                                     <Lock className="w-4 h-4 text-[var(--color-blue-dark)]" />
-                                    Password  <span className="text-[var(--color-error)]">*</span>
-                                    {isEditing && <span className="text-[var(--color-text-secondary)] text-xs bg-[var(--color-bg-gradient-start)] py-1 rounded-full">(Do not Leave blank)</span>}
+                                    Password {!isEditing && <span className="text-[var(--color-error)]">*</span>}
                                 </label>
                                 <div className="relative">
                                     <input
@@ -476,7 +471,7 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         className={`w-full px-4 py-3 pl-12 pr-12 border rounded-xl shadow-sm focus:outline-none focus:ring-3 focus:ring-[var(--color-blue)] focus:border-[var(--color-blue)] transition-all duration-200 ${errors.password ? 'border-red-300 bg-[var(--color-error-light)]' : 'border-[var(--color-border-secondary)] hover:border-[var(--color-blue-medium)]'
                                             }`}
-                                        placeholder={isEditing ? "Enter new password" : "Enter strong password"}
+                                        placeholder={isEditing ? "Enter new password (optional)" : "Enter strong password"}
                                         disabled={isFormDisabled}
                                         maxLength={50}
                                     />
@@ -496,9 +491,12 @@ const AddUser = () => {
                                         {errors.password}
                                     </p>
                                 )}
-                                    <p className="text-xs text-[var(--color-text-muted)] mt-1">
-                                        Password must contain: uppercase letter, lowercase letter, number, and be at least 6 characters long
-                                    </p>
+                                <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                                    {isEditing 
+                                        ? "Leave empty to keep current password. If filled, must contain: uppercase letter, lowercase letter, number, and be at least 6 characters long"
+                                        : "Password must contain: uppercase letter, lowercase letter, number, and be at least 6 characters long"
+                                    }
+                                </p>
                             </div>
 
                             {/* Role Selection */}

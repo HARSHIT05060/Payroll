@@ -331,7 +331,7 @@ const AddRole = () => {
         };
 
         loadData();
-    }, [isEditMode, currentRoleId, user?.user_id]); // Added user.user_id as dependency
+    }, [isEditMode, currentRoleId, user?.user_id]); 
 
     // Function to get active checkbox count for a section
     const getActiveCheckboxCount = (sectionKey) => {
@@ -545,9 +545,7 @@ const AddRole = () => {
             </div>
         );
     }
-    if (!permissions['employee_edit'] && isEditMode) {
-        return;
-    }
+    
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
