@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { clearPermissions } from '../redux/permissionsSlice';
 import { ThemeToggle } from '../context/Themetoggle';
 import { ConfirmDialog } from './ui/ConfirmDialog';
-
+import Logo from '../assets/logo.png'
 const Navbar = ({ isCollapsed, setIsCollapsed }) => {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -75,9 +75,11 @@ const Navbar = ({ isCollapsed, setIsCollapsed }) => {
 
                     {/* Logo/Brand */}
                     <div className="flex items-center">
-                        <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-[var(--color-blue)] to-[var(--color-blue-dark)] bg-clip-text text-transparent">
-                            Attendance System
-                        </h1>
+                        <img 
+                            src={Logo} 
+                            alt="SyncWage" 
+                            className="h-10 md:h-12 w-auto"
+                        />
                     </div>
                 </div>
 
