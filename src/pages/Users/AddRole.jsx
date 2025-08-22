@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
     ArrowLeft,
     Edit,
@@ -18,35 +18,31 @@ import { Toast } from '../../Components/ui/Toast';
 import { ConfirmDialog } from '../../Components/ui/ConfirmDialog';
 import { useRef } from 'react';
 import LoadingSpinner from "../../Components/Loader/LoadingSpinner"
+import { useSelector } from 'react-redux';
 
 const AddRole = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { roleId } = useParams();
-    const location = useLocation();
+    const [searchParams] = useSearchParams();
 
-    // Get role data from navigation state
-    const roleDataFromState = location.state?.roleData;
-    const roleIdFromState = location.state?.roleId;
+    // Get role ID from query parameter 'edit'
+    const editRoleId = searchParams.get('edit');
 
     const [name, setName] = useState('');
     const [permissionConfig, setPermissionConfig] = useState({});
-    const [permissions, setPermissions] = useState({});
+    const [permission, setPermission] = useState({});
     const [expandedSections, setExpandedSections] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', data: null });
     const submitInProgressRef = useRef(false);
+    const permissions = useSelector(state => state.permissions) || {};
 
     // Determine if we're in edit mode and get the current role ID
-    const isEditMode = Boolean(roleId) || Boolean(roleIdFromState);
-    const currentRoleId = roleId || roleIdFromState;
-
-    console.log('Edit Mode:', isEditMode);
-    console.log('Current Role ID:', currentRoleId);
-    console.log('Role ID from params:', roleId);
-    console.log('Role ID from state:', roleIdFromState);
+    const isEditMode = Boolean(roleId) || Boolean(editRoleId);
+    const currentRoleId = roleId || editRoleId;
 
     // Toast helper functions
     const showToast = (message, type = 'info') => {
@@ -62,7 +58,7 @@ const AddRole = () => {
         const subsection = permissionConfig[sectionKey]?.subsections[subsectionKey];
         if (!subsection) return null;
 
-        return subsection.permissions.find(perm =>
+        return subsection.permission.find(perm =>
             perm.key.toLowerCase().includes('view') ||
             perm.key.toLowerCase().includes('list') ||
             perm.title.toLowerCase().includes('view') ||
@@ -70,7 +66,7 @@ const AddRole = () => {
         );
     };
 
-    // Fetch permissions from API
+    // Fetch permission from API
     const fetchPermissions = async () => {
         try {
             setLoading(true);
@@ -81,37 +77,28 @@ const AddRole = () => {
                 setPermissionConfig(config);
                 return config;
             } else {
-                throw new Error(response.data.message || 'Failed to fetch permissions');
+                throw new Error(response.data.message || 'Failed to fetch permission');
             }
         } catch (err) {
             setError(err.response?.data?.message || err.message);
-            showToast('Failed to load permissions', 'error');
+            showToast('Failed to load permission', 'error');
             return null;
         }
     };
 
-    // Fetch role permissions using user_role_id - FIXED VERSION
+    // Fetch role permission using user_role_id - FIXED VERSION
     const fetchRolePermissions = async (roleId) => {
         try {
-            console.log('Fetching role permissions for roleId:', roleId);
-
             // Create FormData correctly
             const formData = new FormData();
             formData.append('user_roles_id', String(roleId));
             formData.append('user_id', String(user.user_id));
-
-            console.log('Sending request with:', {
-                user_roles_id: String(roleId),
-                user_id: String(user.user_id)
-            });
 
             const response = await api.post('permission_list', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
             });
-
-            console.log('Role permissions response:', response.data);
 
             if (response.data?.success && response.data.data) {
                 const rolePermissionIds = [];
@@ -132,15 +119,13 @@ const AddRole = () => {
                     }
                 });
 
-                console.log('Extracted role permission IDs:', rolePermissionIds);
                 return rolePermissionIds;
             }
 
-            console.warn('No valid role permissions data found');
+            showToast('No role permission found', 'warning');
             return [];
         } catch (error) {
-            console.error('Error fetching role permissions:', error);
-            showToast('Failed to load role permissions', 'error');
+            showToast('Failed to load role permission: ' + (error.response?.data?.message || error.message), 'error');
             return [];
         }
     };
@@ -148,16 +133,7 @@ const AddRole = () => {
     // Fetch role data for editing (basic info only) - IMPROVED VERSION
     const fetchRoleData = async (roleId) => {
         try {
-            console.log('Fetching role data for roleId:', roleId);
-
-            // First try to use role data from state if it matches
-            if (roleDataFromState &&
-                (roleDataFromState.user_roles_id == roleId || roleDataFromState.id == roleId)) {
-                console.log('Using role data from state:', roleDataFromState);
-                return roleDataFromState;
-            }
-
-            // If no state data or it doesn't match, fetch from API
+            // Fetch from API
             const formData = new FormData();
             formData.append('user_id', String(user.user_id));
 
@@ -167,8 +143,6 @@ const AddRole = () => {
                 }
             });
 
-            console.log('Roles list response:', response.data);
-
             if (response.data?.success && response.data.data) {
                 const roleData = response.data.data.find(role => {
                     // Try different possible ID fields
@@ -177,22 +151,18 @@ const AddRole = () => {
                         role.id == roleId ||
                         role.id === parseInt(roleId);
 
-                    console.log('Comparing role:', role, 'with roleId:', roleId, 'matches:', matchesId);
                     return matchesId;
                 });
 
                 if (roleData) {
-                    console.log('Found role data:', roleData);
                     return roleData;
                 } else {
-                    console.error('Role not found in the list. Available roles:', response.data.data);
                     throw new Error('Role not found in the list');
                 }
             } else {
                 throw new Error(response.data?.message || 'Failed to fetch role data');
             }
         } catch (err) {
-            console.error('Error fetching role data:', err);
             setError(err.response?.data?.message || err.message);
             showToast('Failed to load role data', 'error');
             return null;
@@ -213,7 +183,7 @@ const AddRole = () => {
                 subsections: {
                     main: {
                         title: section.permission_name_title.toUpperCase(),
-                        permissions: section.permission_name_items.map(item => ({
+                        permission: section.permission_name_items.map(item => ({
                             key: item.items_name_input,
                             title: item.main_permission_items_title,
                             id: parseInt(item.main_permission_items_id)
@@ -226,24 +196,23 @@ const AddRole = () => {
         return config;
     };
 
-    // Initialize permissions state based on config
+    // Initialize permission state based on config
     const initializePermissions = (config) => {
-        const permissions = {};
+        const newPermissions = {};
         Object.entries(config).forEach(([sectionKey, section]) => {
-            permissions[sectionKey] = {};
+            newPermissions[sectionKey] = {};
             Object.entries(section.subsections).forEach(([subsectionKey, subsection]) => {
-                permissions[sectionKey][subsectionKey] = { selectAll: false };
-                subsection.permissions.forEach(permission => {
-                    permissions[sectionKey][subsectionKey][permission.key] = false;
+                newPermissions[sectionKey][subsectionKey] = { selectAll: false };
+                subsection.permission.forEach(perm => {
+                    newPermissions[sectionKey][subsectionKey][perm.key] = false;
                 });
             });
         });
-        return permissions;
+        return newPermissions;
     };
 
-    // Apply role permissions using permission_items_id array - IMPROVED VERSION
+    // Apply role permission using permission_items_id array - IMPROVED VERSION
     const applyRolePermissions = (rolePermissionIds, config) => {
-        console.log('Applying role permissions:', rolePermissionIds);
         const userPermissions = initializePermissions(config);
 
         if (rolePermissionIds && rolePermissionIds.length > 0) {
@@ -251,23 +220,19 @@ const AddRole = () => {
                 Object.entries(section.subsections).forEach(([subsectionKey, subsection]) => {
                     let sectionSelectedCount = 0;
 
-                    subsection.permissions.forEach(permission => {
-                        if (rolePermissionIds.includes(permission.id)) {
-                            console.log(`Setting permission ${permission.key} to true for section ${sectionKey}`);
-                            userPermissions[sectionKey][subsectionKey][permission.key] = true;
+                    subsection.permission.forEach(perm => {
+                        if (rolePermissionIds.includes(perm.id)) {
+                            userPermissions[sectionKey][subsectionKey][perm.key] = true;
                             sectionSelectedCount++;
                         }
                     });
 
-                    const totalPermissions = subsection.permissions.length;
+                    const totalPermissions = subsection.permission.length;
                     userPermissions[sectionKey][subsectionKey].selectAll = sectionSelectedCount === totalPermissions;
-
-                    console.log(`Section ${sectionKey}: ${sectionSelectedCount}/${totalPermissions} permissions selected`);
                 });
             });
         }
 
-        console.log('Final applied permissions:', userPermissions);
         return userPermissions;
     };
 
@@ -278,51 +243,42 @@ const AddRole = () => {
                 setLoading(true);
                 setError(null);
 
-                console.log('Loading data... Edit mode:', isEditMode, 'Role ID:', currentRoleId);
-
                 // First, always fetch the permission configuration
                 const config = await fetchPermissions();
                 if (!config) {
-                    console.error('Failed to load permission config');
+                    setError('Failed to load permission configuration');
                     return;
                 }
 
-                console.log('Permission config loaded:', config);
-
                 if (isEditMode && currentRoleId) {
-                    console.log('Loading data for edit mode');
-
                     // Fetch role data
                     const roleData = await fetchRoleData(currentRoleId);
                     if (!roleData) {
-                        console.error('Failed to load role data');
                         setError('Failed to load role data');
                         return;
                     }
 
                     // Set the role name
                     const roleName = roleData.name || roleData.role_name || '';
-                    console.log('Setting role name:', roleName);
                     setName(roleName);
 
-                    // Fetch and apply role permissions
+                    // Fetch and apply role permission
                     const rolePermissionIds = await fetchRolePermissions(currentRoleId);
-                    console.log('Fetched role permission IDs:', rolePermissionIds);
 
                     if (rolePermissionIds && rolePermissionIds.length > 0) {
                         const rolePermissions = applyRolePermissions(rolePermissionIds, config);
-                        setPermissions(rolePermissions);
+                        setPermission(rolePermissions);
+                        showToast('Role data loaded successfully', 'success');
                     } else {
-                        console.log('No role permissions found, initializing empty permissions');
-                        setPermissions(initializePermissions(config));
+                        setPermission(initializePermissions(config));
+                        showToast('Role loaded with no permission set', 'info');
                     }
                 } else {
-                    console.log('Loading data for create mode');
-                    // Create mode - initialize empty permissions
-                    setPermissions(initializePermissions(config));
+                    // Create mode - initialize empty permission
+                    setPermission(initializePermissions(config));
+                    showToast('Ready to create new role', 'info');
                 }
             } catch (error) {
-                console.error('Error loading data:', error);
                 setError('Failed to load data: ' + error.message);
                 showToast('Failed to load data: ' + error.message, 'error');
             } finally {
@@ -331,19 +287,19 @@ const AddRole = () => {
         };
 
         loadData();
-    }, [isEditMode, currentRoleId, user?.user_id]); 
+    }, [isEditMode, currentRoleId, user?.user_id]);
 
     // Function to get active checkbox count for a section
     const getActiveCheckboxCount = (sectionKey) => {
-        const section = permissions[sectionKey];
+        const section = permission[sectionKey];
         let activeCount = 0;
         let totalCount = 0;
 
         if (section && permissionConfig[sectionKey]) {
             Object.entries(permissionConfig[sectionKey].subsections).forEach(([subsectionKey, subsection]) => {
-                subsection.permissions.forEach(permission => {
+                subsection.permission.forEach(perm => {
                     totalCount++;
-                    if (section[subsectionKey] && section[subsectionKey][permission.key]) {
+                    if (section[subsectionKey] && section[subsectionKey][perm.key]) {
                         activeCount++;
                     }
                 });
@@ -357,38 +313,38 @@ const AddRole = () => {
         setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
     };
 
-    const handlePermissionChange = (section, subsection, permission) => {
-        setPermissions(prev => {
+    const handlePermissionChange = (section, subsection, permissionKey) => {
+        setPermission(prev => {
             const newPermissions = { ...prev };
             const subsectionPerms = newPermissions[section][subsection];
 
-            if (permission === 'selectAll') {
-                const allSelected = !subsectionPerms[permission];
-                permissionConfig[section].subsections[subsection].permissions.forEach(p => {
+            if (permissionKey === 'selectAll') {
+                const allSelected = !subsectionPerms[permissionKey];
+                permissionConfig[section].subsections[subsection].permission.forEach(p => {
                     subsectionPerms[p.key] = allSelected;
                 });
-                subsectionPerms[permission] = allSelected;
+                subsectionPerms[permissionKey] = allSelected;
             } else {
-                const isCurrentlySelected = subsectionPerms[permission];
+                const isCurrentlySelected = subsectionPerms[permissionKey];
 
-                // 🛡️ Prevent unchecking "view" if other permissions are selected
+                // 🛡️ Prevent unchecking "view" if other permission are selected
                 const viewPermission = findViewPermission(section, subsection);
                 if (
                     viewPermission &&
-                    permission === viewPermission.key &&
+                    permissionKey === viewPermission.key &&
                     isCurrentlySelected
                 ) {
                     // check if any other permission is still true
-                    const otherSelected = permissionConfig[section].subsections[subsection].permissions.some(p =>
-                        p.key !== permission && subsectionPerms[p.key]
+                    const otherSelected = permissionConfig[section].subsections[subsection].permission.some(p =>
+                        p.key !== permissionKey && subsectionPerms[p.key]
                     );
                     if (otherSelected) {
-                        showToast('Cannot deselect view while other permissions are active', 'warning');
+                        showToast('Cannot deselect view while other permission are active', 'warning');
                         return prev;
                     }
                 }
 
-                subsectionPerms[permission] = !isCurrentlySelected;
+                subsectionPerms[permissionKey] = !isCurrentlySelected;
 
                 // ✅ Auto-select view if selecting another permission
                 if (!isCurrentlySelected) {
@@ -398,7 +354,7 @@ const AddRole = () => {
                 }
 
                 // ✅ Update selectAll status
-                const allPermissions = permissionConfig[section].subsections[subsection].permissions.map(p => p.key);
+                const allPermissions = permissionConfig[section].subsections[subsection].permission.map(p => p.key);
                 subsectionPerms.selectAll = allPermissions.every(p => subsectionPerms[p]);
             }
 
@@ -433,20 +389,19 @@ const AddRole = () => {
 
         try {
             setLoading(true);
+            showToast('Saving role...', 'info');
 
             const permissionItemsIds = [];
 
             Object.entries(permissionConfig).forEach(([sectionKey, section]) => {
                 Object.entries(section.subsections).forEach(([subsectionKey, subsection]) => {
-                    subsection.permissions.forEach(permission => {
-                        if (permissions[sectionKey][subsectionKey][permission.key]) {
-                            permissionItemsIds.push(parseInt(permission.id));
+                    subsection.permission.forEach(perm => {
+                        if (permission[sectionKey]?.[subsectionKey]?.[perm.key]) {
+                            permissionItemsIds.push(parseInt(perm.id));
                         }
                     });
                 });
             });
-
-            console.log('Saving with permission IDs:', permissionItemsIds);
 
             const formData = new FormData();
             formData.append('name', name.trim());
@@ -460,13 +415,6 @@ const AddRole = () => {
             // Add role ID for edit mode
             if (isEditMode && currentRoleId) {
                 formData.append('user_roles_id', String(currentRoleId));
-                console.log('Edit mode: Adding user_roles_id:', currentRoleId);
-            }
-
-            // Log the FormData contents
-            console.log('FormData contents:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
             }
 
             const response = await api.post('user_roles_create', formData, {
@@ -474,8 +422,6 @@ const AddRole = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
-            console.log('Save response:', response.data);
 
             if (response.data.success) {
                 showToast(
@@ -489,7 +435,6 @@ const AddRole = () => {
                 throw new Error(response.data.message || 'Failed to save role');
             }
         } catch (err) {
-            console.error('Save error:', err);
             showToast(
                 'Error saving role: ' + (err.response?.data?.message || err.message),
                 'error'
@@ -519,6 +464,13 @@ const AddRole = () => {
         return permissionTitle;
     };
 
+    // Check permissions before rendering
+    useEffect(() => {
+        if (!loading && !permissions['user_roles_edit'] && isEditMode) {
+            navigate('/unauthorized');
+        }
+    }, [loading, permissions, isEditMode, navigate]);
+
     if (loading) {
         return (
             <div>
@@ -545,7 +497,7 @@ const AddRole = () => {
             </div>
         );
     }
-    
+
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">
             <div className="max-w-5xl mx-auto px-4 py-8">
@@ -646,7 +598,7 @@ const AddRole = () => {
                                         <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                                             <div className="p-6 space-y-6 bg-[var(--color-bg-primary)] border-t border-[var(--color-border-primary)]">
                                                 {Object.entries(config.subsections).map(([subsectionKey, subsection]) => {
-                                                    const subsectionPerms = permissions[sectionKey]?.[subsectionKey] || {};
+                                                    const subsectionPerms = permission[sectionKey]?.[subsectionKey] || {};
 
                                                     return (
                                                         <div key={subsectionKey} className="border border-blue-100 rounded-lg p-4 bg-[var(--color-bg-secondary)]">
@@ -664,19 +616,19 @@ const AddRole = () => {
                                                             </div>
 
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                                {subsection.permissions.map(permission => (
+                                                                {subsection.permission.map(perm => (
                                                                     <label
-                                                                        key={permission.key}
+                                                                        key={perm.key}
                                                                         className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg hover:bg-[var(--color-blue-lightest)] transition-colors duration-150 border border-transparent hover:border-[var(--color-blue-light)]"
                                                                     >
                                                                         <input
                                                                             type="checkbox"
-                                                                            checked={subsectionPerms[permission.key] || false}
-                                                                            onChange={() => handlePermissionChange(sectionKey, subsectionKey, permission.key)}
+                                                                            checked={subsectionPerms[perm.key] || false}
+                                                                            onChange={() => handlePermissionChange(sectionKey, subsectionKey, perm.key)}
                                                                             className="w-4 h-4 text-[var(--color-blue-dark)] border-2 border-[var(--color-border-secondary)] rounded focus:ring-[var(--color-blue)] focus:ring-2 transition-colors duration-150"
                                                                         />
                                                                         <span className="text-sm text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors duration-150 font-medium">
-                                                                            {formatPermissionName(permission.title)}
+                                                                            {formatPermissionName(perm.title)}
                                                                         </span>
                                                                     </label>
                                                                 ))}

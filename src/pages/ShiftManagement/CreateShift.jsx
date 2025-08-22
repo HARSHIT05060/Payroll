@@ -627,8 +627,8 @@ const CreateShift = () => {
         return <LoadingSpinner message={loadingMessage} />;
     }
 
-    if (!permissions['employee_edit'] && isEditMode) {
-        return;
+    if (!permissions['shift_edit'] && isEditMode) {
+        navigate('/unauthorized')
     }
     return (
         <div className="min-h-screen bg-gradient-to-br from-[var(--color-bg-gradient-start)] to-[var(--color-bg-secondary)]">

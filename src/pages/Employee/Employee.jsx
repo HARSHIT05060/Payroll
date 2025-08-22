@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
-    Pencil,
+    Edit,
     ChevronDown,
     ChevronUp,
     Users,
@@ -613,7 +613,7 @@ export default function EmployeeManagement() {
                                                                         className="p-2 rounded-lg transition-all duration-200 text-[var(--color-blue)] hover:text-[var(--color-blue-dark)] hover:bg-[var(--color-blue-lightest)] disabled:opacity-50 transform hover:scale-105"
                                                                         title="Edit Employee"
                                                                     >
-                                                                        <Pencil className="w-4 h-4" />
+                                                                        <Edit className="w-4 h-4" />
                                                                     </button>
                                                                 )}
                                                                 {permissions['employee_view'] && (

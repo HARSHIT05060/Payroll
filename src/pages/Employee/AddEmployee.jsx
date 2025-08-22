@@ -1027,7 +1027,7 @@ const AddEmployee = () => {
         );
     }
     if (!permissions['employee_edit'] && isEditMode) {
-        return;
+        navigate('/unauthorized')
     }
     return (
         <div className="min-h-screen bg-[var(--color-bg-primary)]">

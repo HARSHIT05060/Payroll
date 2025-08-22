@@ -121,15 +121,9 @@ const Role = () => {
     // Edit role 
     const confirmEditRole = () => {
         const role = confirmModal.data;
-        navigate('/add-role', {
-            state: {
-                roleId: role.user_roles_id,
-                roleName: role.name
-            }
-        });
+        navigate(`/add-role?edit=${role.user_roles_id}`);
         setConfirmModal({ isOpen: false, type: '', data: null });
     };
-
     // Delete role handler
     const handleDeleteRole = (role) => {
         if (!canModifyRole(role)) {
