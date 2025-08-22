@@ -1,478 +1,265 @@
-// utils/pdfExportSalary.js
+// utils/payrollExcelExport.js - Black & White Theme
 
-// Calculate salary summary statistics
-export const calculateSalarySummary = (reportData) => {
-    const totalEmployees = reportData.length;
-    const totalBaseSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.employee_salary || 0), 0);
-    const totalPaidSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.total_salary || 0), 0);
-    const totalOvertimeSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.overtime_salary || 0), 0);
-    const totalWeekOffSalary = reportData.reduce((sum, emp) => sum + parseFloat(emp.week_off_salary || 0), 0);
-    const totalPresentDays = reportData.reduce((sum, emp) => sum + parseInt(emp.present_days || 0), 0);
-    const totalAbsentDays = reportData.reduce((sum, emp) => sum + parseInt(emp.absent_days || 0), 0);
-    const totalWorkingDays = reportData.reduce((sum, emp) => sum + parseInt(emp.working_days || 0), 0);
-    const averageSalary = totalEmployees > 0 ? (totalPaidSalary / totalEmployees) : 0;
+// Group data by employee (if needed for payroll)
+export const groupPayrollDataByEmployee = (data) => {
+    const grouped = {};
+
+    data.forEach(record => {
+        const employeeKey = record.employee_code || record.id;
+        if (!grouped[employeeKey]) {
+            grouped[employeeKey] = {
+                employee_code: record.employee_code || record.id,
+                employee_name: record.employee_name || record.name || record.Name,
+                department: record.department || '',
+                designation: record.designation || '',
+                records: []
+            };
+        }
+        grouped[employeeKey].records.push(record);
+    });
+
+    return grouped;
+};
+
+// Calculate payroll summary statistics
+export const calculatePayrollSummary = (data) => {
+    const totalEmployees = data.length;
+    const totalBaseSalary = data.reduce((sum, r) => sum + parseFloat(r.employee_salary || 0), 0);
+    const totalWorkingDays = data.reduce((sum, r) => sum + parseFloat(r.working_days || 0), 0);
+    const totalWeekOffDays = data.reduce((sum, r) => sum + parseFloat(r.week_off_days || 0), 0);
+    const totalPresentDays = data.reduce((sum, r) => sum + parseFloat(r.present_days || 0), 0);
+    const totalAbsentDays = data.reduce((sum, r) => sum + parseFloat(r.absent_days || 0), 0);
+    const totalOvertimeDays = data.reduce((sum, r) => sum + parseFloat(r.overtime_days || 0), 0);
+    const totalSubtotalSalary = data.reduce((sum, r) => sum + parseFloat(r.subtotal_salary || 0), 0);
+    const totalOvertimeSalary = data.reduce((sum, r) => sum + parseFloat(r.overtime_salary || 0), 0);
+    const totalWeekOffSalary = data.reduce((sum, r) => sum + parseFloat(r.week_off_salary || 0), 0);
+    const totalNetSalary = data.reduce((sum, r) => sum + parseFloat(r.total_salary || 0), 0);
 
     return {
         totalEmployees,
         totalBaseSalary: totalBaseSalary.toFixed(2),
-        totalPaidSalary: totalPaidSalary.toFixed(2),
+        totalWorkingDays: totalWorkingDays.toFixed(0),
+        totalWeekOffDays: totalWeekOffDays.toFixed(0),
+        totalPresentDays: totalPresentDays.toFixed(0),
+        totalAbsentDays: totalAbsentDays.toFixed(0),
+        totalOvertimeDays: totalOvertimeDays.toFixed(0),
+        totalSubtotalSalary: totalSubtotalSalary.toFixed(2),
         totalOvertimeSalary: totalOvertimeSalary.toFixed(2),
         totalWeekOffSalary: totalWeekOffSalary.toFixed(2),
-        totalPresentDays,
-        totalAbsentDays,
-        totalWorkingDays,
-        averageSalary: averageSalary.toFixed(2)
+        totalNetSalary: totalNetSalary.toFixed(2)
     };
 };
 
-// Format date
-export const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
+// Format currency for display
+export const formatCurrency = (amount) => {
+    return parseFloat(amount || 0).toFixed(2);
 };
 
-// Generate PDF content for salary report - BLACK & WHITE THEME
-export const generateSalaryPDFContent = (reportData, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
-    return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>${title}</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    color: #000;
-                    line-height: 1.2;
-                    font-size: 12px;
-                    background: white;
-                }
-                
-                .header {
-                    background: white;
-                    color: black;
-                    padding: 15px 20px;
-                    margin-bottom: 20px;
-                    position: relative;
-                    min-height: 70px;
-                    border: 1px solid #ccc;
-                }
-                
-                .header-content {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-                
-                .logo-area {
-                    width: 60px;
-                    height: 60px;
-                    background: white;
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-right: 20px;
-                }
-                
-                .header-info {
-                    flex: 1;
-                }
-                
-                .header-title {
-                    font-size: 22px;
-                    font-weight: bold;
-                    margin: 0 0 8px 0;
-                    display: inline-block;
-                    color: black;
-                }
-                
-                .export-pdf-btn {
-                    background: #fff;
-                    color: #000;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    padding: 8px 16px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    margin: 16px 0px 5px 16px;
-                    vertical-align: middle;
-                    transition: background 0.2s, color 0.2s;
-                }
-                .export-pdf-btn:hover {
-                    background: #f0f0f0;
-                    color: #000;
-                }
-                
-                .header-subtitle {
-                    font-size: 14px;
-                    margin: 0 0 5px 0;
-                    color: black;
-                }
-                
-                .header-period {
-                    font-size: 12px;
-                    margin: 0;
-                    color: #666;
-                }
-                
-                .header-meta {
-                    text-align: right;
-                    font-size: 10px;
-                    color: black;
-                }
-                
-                .page-info {
-                    font-size: 12px;
-                    margin-bottom: 5px;
-                }
-                
-                .generation-info {
-                    color: #666;
-                }
-                
-                .summary-section {
-                    background-color: #f8f8f8;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    border-radius: 0px;
-                    border: 1px solid #ccc;
-                }
-                
-                .summary-title {
-                    font-size: 16px;
-                    font-weight: bold;
-                    margin-bottom: 15px;
-                    color: black;
-                }
-                
-                .summary-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 15px;
-                    margin-bottom: 20px;
-                }
-                
-                .summary-item {
-                    background: white;
-                    padding: 12px;
-                    border-radius: 0px;
-                    border: 1px solid #ccc;
-                    text-align: center;
-                }
-                
-                .summary-label {
-                    font-size: 11px;
-                    color: #666;
-                    margin-bottom: 5px;
-                }
-                
-                .summary-value {
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: black;
-                }
-                
-                .salary-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 10px;
-                    margin-bottom: 20px;
-                    border: 1px solid #ccc;
-                }
-                
-                .salary-table th {
-                    background: white;
-                    color: black;
-                    padding: 8px 6px;
-                    text-align: center;
-                    border: 1px solid #ccc;
-                    font-weight: 600;
-                    font-size: 10px;
-                }
-                
-                .salary-table td {
-                    padding: 6px;
-                    border: 1px solid #ccc;
-                    text-align: center;
-                    font-size: 9px;
-                    background: white;
-                }
-                
-                .salary-table tr:nth-child(even) {
-                    background-color: #f5f5f5;
-                }
-                
-                .currency {
-                    font-weight: bold;
-                    color: black;
-                }
-                
-                .employee-info {
-                    text-align: center;
-                }
-                
-                .employee-name {
-                    font-weight: bold;
-                    color: black;
-                }
-                
-                .employee-code {
-                    font-size: 8px;
-                    color: #666;
-                }
-                
-                .attendance-details {
-                    font-size: 8px;
-                    line-height: 1.3;
-                }
-                
-                .attendance-present,
-                .attendance-absent,
-                .attendance-working {
-                    color: black;
-                }
-                
-                .overtime-details {
-                    font-size: 8px;
-                    line-height: 1.3;
-                    color: black;
-                }
-                
-                .total-salary {
-                    font-weight: bold;
-                    font-size: 11px;
-                    color: black;
-                }
-                
-                .footer {
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    text-align: center;
-                    font-size: 8px;
-                    color: #666;
-                    border-top: 1px solid #ccc;
-                    padding: 8px;
-                    background: white;
-                }
-                
-                /* HIDE EXPORT BUTTON WHEN PRINTING OR AFTER CLICK */
-                .export-pdf-btn.hidden {
-                    display: none !important;
-                }
-                
-                /* PRINT OPTIMIZATIONS */
-                @media print {
-                    body { 
-                        margin: 0; 
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    
-                    /* Hide export button during print */
-                    .export-pdf-btn {
-                        display: none !important;
-                    }
-                }
-                
-                @page {
-                    margin: 15mm;
-                    size: A4 landscape;
-                }
-            </style>
-            <script>
-                function exportToPDF() {
-                    // Hide the button immediately when clicked
-                    const btn = document.querySelector('.export-pdf-btn');
-                    if (btn) {
-                        btn.classList.add('hidden');
-                    }
-                    
-                    // Trigger print dialog
-                    window.print();
-                }
-                
-                // Optional: Show button again after print dialog is closed
-                window.addEventListener('afterprint', function() {
-                    const btn = document.querySelector('.export-pdf-btn');
-                    if (btn) {
-                        // Uncomment the line below if you want the button to reappear after printing
-                        // btn.classList.remove('hidden');
-                    }
-                });
-            </script>
-        </head>
-        <body>
-            <div class="header">
-                <div class="header-content">
-                    <div class="logo-area">
-                        <span style="color: #000; font-weight: bold;">LOGO</span>
-                    </div>
-                    <div class="header-info">
-                        <h1 class="header-title">${title}</h1>
-                        <p class="header-subtitle">${employeeInfo.department ? `Department: ${employeeInfo.department}` : 'Data export report'}</p>
-                        <p class="header-period">${filterInfo.month_year ? `Period: ${filterInfo.month_year}` : ''}</p>
-                    </div>
-                    <div class="header-meta">
-                        <div class="page-info">Page 1</div>
-                        <button class="export-pdf-btn" onclick="exportToPDF()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
-                                <path d="M14 2v6a2 2 0 0 0 2 2h6"/>
-                                <path d="M16 13v5"/>
-                                <path d="m19 16-3 3-3-3"/>
-                                <path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
-                            </svg>
-                            Export PDF
-                        </button>
-                        <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
-                    </div>
-                </div>
-            </div>
+// Format date
+export const formatDate = (dateInput) => {
+    const date = new Date(dateInput);
 
-            ${summaryStats ? `
-                <div class="summary-section">
-                    <div class="summary-title">Salary Summary</div>
-                    <div class="summary-grid">
-                        <div class="summary-item">
-                            <div class="summary-label">Total Employees</div>
-                            <div class="summary-value">${summaryStats.totalEmployees}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Base Salary</div>
-                            <div class="summary-value">₹${parseFloat(summaryStats.totalBaseSalary).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Paid Salary</div>
-                            <div class="summary-value">₹${parseFloat(summaryStats.totalPaidSalary).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Overtime</div>
-                            <div class="summary-value">₹${parseFloat(summaryStats.totalOvertimeSalary).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Week Off Salary</div>
-                            <div class="summary-value">₹${parseFloat(summaryStats.totalWeekOffSalary).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Average Salary</div>
-                            <div class="summary-value">₹${parseFloat(summaryStats.averageSalary).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Present Days</div>
-                            <div class="summary-value">${summaryStats.totalPresentDays}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Absent Days</div>
-                            <div class="summary-value">${summaryStats.totalAbsentDays}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Working Days</div>
-                            <div class="summary-value">${summaryStats.totalWorkingDays}</div>
-                        </div>
-                    </div>
-                </div>
-            ` : ''}
+    if (Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
+        return 'Invalid Date';
+    }
 
-            <table class="salary-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">S.No</th>
-                        <th style="width: 15%;">Employee</th>
-                        <th style="width: 10%;">Base Salary</th>
-                        <th style="width: 12%;">Attendance</th>
-                        <th style="width: 12%;">Overtime</th>
-                        <th style="width: 12%;">Week Off</th>
-                        <th style="width: 10%;">Subtotal</th>
-                        <th style="width: 12%;">Total Salary</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${reportData.map((employee, index) => `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td class="employee-info">
-                                <div class="employee-name">${employee.employee_name || 'N/A'}</div>
-                                <div class="employee-code">${employee.employee_code || 'N/A'}</div>
-                            </td>
-                            <td class="currency">₹${parseFloat(employee.employee_salary || 0).toLocaleString('en-IN')}</td>
-                            <td class="attendance-details">
-                                <div class="attendance-present">P: ${employee.present_days || 0}</div>
-                                <div class="attendance-absent">A: ${employee.absent_days || 0}</div>
-                                <div class="attendance-working">W: ${employee.working_days || 0}</div>
-                            </td>
-                            <td class="overtime-details">
-                                <div>Days: ${employee.overtime_days || 0}</div>
-                                <div class="currency">₹${parseFloat(employee.overtime_salary || 0).toLocaleString('en-IN')}</div>
-                            </td>
-                            <td class="overtime-details">
-                                <div>Days: ${employee.week_off_days || 0}</div>
-                                <div class="currency">₹${parseFloat(employee.week_off_salary || 0).toLocaleString('en-IN')}</div>
-                            </td>
-                            <td class="currency">₹${parseFloat(employee.subtotal_salary || 0).toLocaleString('en-IN')}</td>
-                            <td class="total-salary">₹${parseFloat(employee.total_salary || 0).toLocaleString('en-IN')}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
 
-        </body>
-        </html>
-    `;
+    return `${day}-${month}-${year}`;
 };
 
 /**
- * Enhanced Export to PDF Function - BLACK & WHITE THEME
- * @param {Array} data - Array of records to export
+ * Export payroll to Excel function - Black & White Theme
+ * @param {Array} payrollData - Array of payroll objects to export
+ * @param {string} monthYear - Month and year for the report
+ * @param {string} filename - Name of the file (without extension)
  * @param {string} title - Report title
- * @param {Object} filterInfo - Applied filters information (optional)
- * @param {Object} employeeInfo - Employee information for header (optional)
+ * @param {Function} getMonthYearDisplay - Function to format month/year display
  */
-export const exportToPDF = (data, title = 'Salary Report', filterInfo = {}, employeeInfo = {}) => {
-    try {
-        // Validate input data
-        if (!data || data.length === 0) {
-            console.error('No data to export');
-            return {
-                success: false,
-                message: 'No data available to export'
-            };
+export const exportPayrollToExcel = (
+    payrollData,
+    monthYear = null,
+    filename = 'payroll_report',
+    title = 'Monthly Salary Report',
+    getMonthYearDisplay = null
+) => {
+    if (!payrollData || payrollData.length === 0) {
+        console.error('No data to export');
+        throw new Error('No data available to export');
+    }
+
+    const payrollSummary = calculatePayrollSummary(payrollData);
+    const monthDisplay = getMonthYearDisplay ? getMonthYearDisplay(monthYear) : (monthYear || 'Current Period');
+    const currentDate = new Date().toLocaleDateString('en-GB');
+    const currentTime = new Date().toLocaleTimeString();
+
+    // Prepare data for Excel export
+    const excelData = [];
+
+    // Add report header
+    excelData.push(['', '', '', '',
+        title, '', '', '', '', '', '', '', ''
+    ]);
+    excelData.push([
+        '',
+        `Period: ${monthDisplay}`,
+        `Generated: ${currentDate} ${currentTime}`,
+        '',
+        `Total Employees: ${payrollSummary.totalEmployees}`,
+        `Total Net Salary: ₹${payrollSummary.totalNetSalary}`,
+        '', '', '', '', '', '', ''
+    ]);
+
+    // Add empty row
+    excelData.push(['']);
+
+    // Add summary statistics
+    excelData.push(['Payroll Summary', '', '', '', '', '', '', '', '', '', '', '', '']);
+    excelData.push(['Payroll Month', monthDisplay, '', 'Total Employees', payrollSummary.totalEmployees, '', '', '', '', '', '', '', '']);
+    excelData.push(['Total Base Salary', `₹${payrollSummary.totalBaseSalary}`, '', 'Total Working Days', payrollSummary.totalWorkingDays, '', '', '', '', '', '', '', '']);
+    excelData.push(['Total Present Days', payrollSummary.totalPresentDays, '', 'Total Absent Days', payrollSummary.totalAbsentDays, '', '', '', '', '', '', '', '']);
+    excelData.push(['Total Week Off Days', payrollSummary.totalWeekOffDays, '', 'Total Overtime Days', payrollSummary.totalOvertimeDays, '', '', '', '', '', '', '', '']);
+    excelData.push(['Total Subtotal Salary', `₹${payrollSummary.totalSubtotalSalary}`, '', 'Total Overtime Salary', `₹${payrollSummary.totalOvertimeSalary}`, '', '', '', '', '', '', '', '']);
+    excelData.push(['Total Week Off Salary', `₹${payrollSummary.totalWeekOffSalary}`, '', 'NET PAYROLL AMOUNT', `₹${payrollSummary.totalNetSalary}`, '', '', '', '', '', '', '', '']);
+
+    // Add empty rows
+    excelData.push(['']);
+    excelData.push(['']);
+
+    // Add detailed payroll data headers
+    excelData.push([
+        'NO.',
+        'Employee Code',
+        'Employee Name',
+        'Base Salary',
+        'Working Days',
+        'Week Off Days',
+        'Present Days',
+        'Absent Days',
+        'Overtime Days',
+        'Subtotal Salary',
+        'Overtime Salary',
+        'Week Off Salary',
+        'Total Salary'
+    ]);
+
+    // Add payroll data rows
+    payrollData.forEach((record, index) => {
+        excelData.push([
+            index + 1,
+            record.employee_code || '',
+            record.employee_name || '',
+            `₹${formatCurrency(record.employee_salary)}`,
+            record.working_days || 0,
+            record.week_off_days || 0,
+            record.present_days || 0,
+            record.absent_days || 0,
+            record.overtime_days || 0,
+            `₹${formatCurrency(record.subtotal_salary)}`,
+            `₹${formatCurrency(record.overtime_salary)}`,
+            `₹${formatCurrency(record.week_off_salary)}`,
+            `₹${formatCurrency(record.total_salary)}`
+        ]);
+    });
+
+    // Add totals row
+    excelData.push([
+        '',
+        '',
+        'TOTAL',
+        `₹${payrollSummary.totalBaseSalary}`,
+        payrollSummary.totalWorkingDays,
+        payrollSummary.totalWeekOffDays,
+        payrollSummary.totalPresentDays,
+        payrollSummary.totalAbsentDays,
+        payrollSummary.totalOvertimeDays,
+        `₹${payrollSummary.totalSubtotalSalary}`,
+        `₹${payrollSummary.totalOvertimeSalary}`,
+        `₹${payrollSummary.totalWeekOffSalary}`,
+        `₹${payrollSummary.totalNetSalary}`
+    ]);
+
+    // Convert to HTML table format with black and white theme
+    const tableHTML = `
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; border: 2px solid #000;">
+            <tbody>
+                ${excelData.map((row, rowIndex) => `
+                    <tr>
+                        ${row.map((cell, cellIndex) => {
+        // Base style for all cells
+        let cellStyle = "border: 1px solid #000; padding: 8px; text-align: center;";
+
+        // Report title row
+        if (rowIndex === 0 && cellIndex === 4) {
+            cellStyle += " color: #000; font-weight: bold; font-size: 20px; text-align: center; border: 2px solid #000;";
+        }
+        // Date and generated info row
+        else if (rowIndex === 1 && (cellIndex === 1 || cellIndex === 2 || cellIndex === 4 || cellIndex === 5)) {
+            cellStyle += " font-weight: bold; font-size: 14px; border: 1px solid #666;";
+        }
+        // Payroll summary header
+        else if (cell === 'Payroll Summary') {
+            cellStyle += " background-color: #f0f0f0; font-weight: bold; font-size: 16px; text-align: center; border: 2px solid #000;";
+        }
+        // Summary statistics data rows
+        else if ((rowIndex >= 4 && rowIndex <= 9) && cell !== '' && 
+                 cell !== 'Payroll Month' && cell !== 'Total Employees' && cell !== 'Total Base Salary' && 
+                 cell !== 'Total Working Days' && cell !== 'Total Present Days' && cell !== 'Total Absent Days' && 
+                 cell !== 'Total Week Off Days' && cell !== 'Total Overtime Days' && cell !== 'Total Subtotal Salary' && 
+                 cell !== 'Total Overtime Salary' && cell !== 'Total Week Off Salary' && cell !== 'NET PAYROLL AMOUNT') {
+            if (typeof cell === 'number' || (!isNaN(parseFloat(cell)) && isFinite(cell)) || 
+                (typeof cell === 'string' && (cell.includes('₹') || !isNaN(parseFloat(cell))))) {
+                cellStyle += " font-weight: bold; font-size: 14px; border: 1px solid #333;";
+            }
+        }
+        // Summary statistics labels
+        else if (cell === 'Payroll Month' || cell === 'Total Employees' || cell === 'Total Base Salary' || 
+                 cell === 'Total Working Days' || cell === 'Total Present Days' || cell === 'Total Absent Days' || 
+                 cell === 'Total Week Off Days' || cell === 'Total Overtime Days' || cell === 'Total Subtotal Salary' || 
+                 cell === 'Total Overtime Salary' || cell === 'Total Week Off Salary') {
+            cellStyle += " font-weight: bold; text-align: left; border: 1px solid #333;";
+        }
+        // NET PAYROLL AMOUNT highlight
+        else if (cell === 'NET PAYROLL AMOUNT') {
+            cellStyle += " background-color: #f5f5f5; font-weight: bold; font-size: 16px; text-align: left; border: 2px solid #000;";
+        }
+        // Table headers
+        else if (cell === 'NO.' || cell === 'Employee Code' || cell === 'Employee Name' || cell === 'Base Salary' ||
+                 cell === 'Working Days' || cell === 'Week Off Days' || cell === 'Present Days' || cell === 'Absent Days' ||
+                 cell === 'Overtime Days' || cell === 'Subtotal Salary' || cell === 'Overtime Salary' ||
+                 cell === 'Week Off Salary' || cell === 'Total Salary') {
+            cellStyle += " background-color: #000; color: #fff; font-weight: bold; text-align: center; border: 2px solid #000; font-size: 14px;";
+        }
+        // Totals row
+        else if (cell === 'TOTAL') {
+            cellStyle += " background-color: #f5f5f5; font-weight: bold; font-size: 16px; text-align: center; border: 2px solid #000;";
+        }
+        // Totals row values
+        else if (rowIndex === excelData.length - 1 && cell !== '' && cell !== 'TOTAL') {
+            if (typeof cell === 'string' && cell.includes('₹')) {
+                cellStyle += " background-color: #f8f8f8; font-weight: bold; border: 1px solid #000;";
+            } else {
+                cellStyle += " background-color: #f8f8f8; font-weight: bold; border: 1px solid #000;";
+            }
         }
 
-        // Calculate summary statistics
-        const summaryStats = calculateSalarySummary(data);
+        return `<td style="${cellStyle}">${cell}</td>`;
+    }).join('') }
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
 
-        // Generate HTML content
-        const htmlContent = generateSalaryPDFContent(data, title, summaryStats, filterInfo, employeeInfo);
-
-        // Create a new window for PDF generation
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-
-        return {
-            success: true,
-            message: 'PDF exported successfully!'
-        };
-
-    } catch (error) {
-        console.error('Error exporting PDF:', error);
-        return {
-            success: false,
-            message: 'Failed to export PDF: ' + error.message
-        };
-    }
-};
-
-// Legacy function for backward compatibility
-export const exportSalaryReportToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
-    return exportToPDF(reportData, title, filterInfo, employeeInfo);
+    // Create downloadable Excel file
+    const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 };
