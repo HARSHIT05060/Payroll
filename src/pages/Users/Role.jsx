@@ -270,17 +270,17 @@ const Role = () => {
                                     <table className="min-w-full divide-y divide-[var(--color-border-divider)]">
                                         <thead className="bg-[var(--color-blue-lightest)]">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Role Name
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Type
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                     Created Date
                                                 </th>
                                                 {(permissions['user_roles_edit'] || permissions['user_roles_delete']) && (
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
+                                                    <th className="px-6 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">
                                                         Actions
                                                     </th>
                                                 )}
@@ -289,8 +289,8 @@ const Role = () => {
                                         <tbody className="bg-[var(--color-bg-secondary)] divide-y divide-[var(--color-border-divider)]">
                                             {roles.map(role => (
                                                 <tr key={role.user_roles_id} className="hover:bg-[var(--color-bg-primary)] transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)]">
-                                                        <div className="flex items-center space-x-2">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[var(--color-text-primary)] text-center">
+                                                        <div className="flex items-center justify-center space-x-2">
                                                             {isAdminRole(role) ? (
                                                                 <Shield className="w-4 h-4 text-[var(--color-blue-dark)]" />
                                                             ) : (
@@ -299,30 +299,32 @@ const Role = () => {
                                                             <span>{role.name || 'Unnamed Role'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
-                                                        <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminRole(role)
-                                                            ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
-                                                            : 'bg-[var(--color-bg-gradient-start)] text-gray-800'
-                                                            }`}>
-                                                            {isAdminRole(role) ? (
-                                                                <>
-                                                                    <Shield className="w-3 h-3 mr-1" />
-                                                                    Admin
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <User className="w-3 h-3 mr-1" />
-                                                                    User
-                                                                </>
-                                                            )}
-                                                        </span>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)] text-center">
+                                                        <div className="flex justify-center">
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${isAdminRole(role)
+                                                                ? 'bg-[var(--color-blue-lighter)] text-[var(--color-blue-darkest)]'
+                                                                : 'bg-[var(--color-bg-gradient-start)] text-gray-800'
+                                                                }`}>
+                                                                {isAdminRole(role) ? (
+                                                                    <>
+                                                                        <Shield className="w-3 h-3 mr-1" />
+                                                                        Admin
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <User className="w-3 h-3 mr-1" />
+                                                                        User
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                        </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)]">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-text-secondary)] text-center">
                                                         {role.created_date ? new Date(role.created_date).toLocaleDateString('en-GB') : 'N/A'}
                                                     </td>
                                                     {(permissions['user_roles_edit'] || permissions['user_roles_delete']) && (
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                            <div className="flex space-x-2">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                                                            <div className="flex justify-center space-x-2">
                                                                 {permissions['user_roles_edit'] && (
                                                                     <button
                                                                         onClick={() => handleEditRole(role)}
