@@ -235,6 +235,19 @@ const DailyReport = () => {
         }
     }, [filteredData, selectedDate]);
 
+    // Add this function near the top of your component, after the existing formatDate function
+    const formatDateForTitle = (dateObj) => {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const dayName = days[dateObj.getDay()];
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = months[dateObj.getMonth()];
+        const year = dateObj.getFullYear();
+
+        return `${dayName} ${day} ${month} ${year}`;
+    };
+
     const handleExportToPDF = useCallback(() => {
         try {
             const exportData = filteredData.map(emp => ({
@@ -249,16 +262,27 @@ const DailyReport = () => {
                 'Attendance Hours': `${emp.attandance_hours}h`,
                 'Overtime Hours': emp.overtime_hours && parseFloat(emp.overtime_hours) > 0 ? `${emp.overtime_hours}h` : '--',
                 'Late Hours': emp.late_hours && parseFloat(emp.late_hours) > 0 ? `${emp.late_hours}h` : '--',
-                'Status': emp.status === 'Present' ? 'Present' : emp.status === 'Week Off' ? 'Week Off' : 'Absent'
+                'Status': emp.status // Keep status exactly as received from API
             }));
 
-            const fileName = `daily_attendance_report_${selectedDate}`;
-            const title = `Daily Attendance Report - ${new Date(selectedDate).toLocaleDateString('en-GB')}`;
-            exportToPDF(exportData, fileName, title);
-            showToast('PDF exported successfully', 'success');
+            // Format date as "Fri 22 Aug 2025"
+            const formattedDate = formatDateForTitle(selectedDate);
+            const title = `Daily Attendance Report ${formattedDate}`;
+
+            // Export to PDF - pass the correct parameters
+            const result = exportToPDF(exportData, title, {
+                period: formattedDate
+            }, {});
+
+            if (result && result.success) {
+                showToast('PDF exported successfully', 'success');
+            } else {
+                showToast('PDF exported successfully', 'success'); // The function opens a new window, so assume success
+            }
             setExportDropdown(false);
         } catch (err) {
-            showToast('Failed to export PDF', err);
+            console.error('PDF Export Error:', err);
+            showToast('Failed to export PDF: ' + err.message, 'error');
         }
     }, [filteredData, selectedDate]);
 

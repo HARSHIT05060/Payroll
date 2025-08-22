@@ -70,38 +70,40 @@ export const calculateSummary = (data) => {
 
 // Format date
 export const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-GB', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
     });
 };
 
-// Generate PDF content
-export const generatePDFContent = (attendanceData, reportSummary, groupedData, startDate, endDate) => {
+// Generate enhanced PDF content with BLACK & WHITE THEME
+export const generateEnhancedPDFContent = (attendanceData, title, filterInfo = {}, groupedData, reportSummary) => {
     return `
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>Employee Attendance Report</title>
+            <title>${title}</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    color: #333;
+                    color: #000;
                     line-height: 1.2;
                     font-size: 12px;
+                    background: white;
                 }
                 
                 .header {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 15px 20px;
                     margin-bottom: 20px;
                     position: relative;
                     min-height: 70px;
+                    border: 1px solid #ccc;
                 }
                 
                 .header-content {
@@ -114,6 +116,7 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     width: 60px;
                     height: 60px;
                     background: white;
+                    border: 1px solid #ccc;
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
@@ -129,23 +132,44 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     font-size: 22px;
                     font-weight: bold;
                     margin: 0 0 8px 0;
+                    display: inline-block;
+                    color: black;
+                }
+                
+                .export-pdf-btn {
+                    background: #fff;
+                    color: #000;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin: 16px 0px 5px 16px;
+                    vertical-align: middle;
+                    transition: background 0.2s, color 0.2s;
+                }
+                .export-pdf-btn:hover {
+                    background: #f0f0f0;
+                    color: #000;
                 }
                 
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
-                    opacity: 0.9;
+                    color: black;
                 }
                 
                 .header-period {
-                    font-size: 12px;
+                    font-size: 15px;
                     margin: 0;
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .header-meta {
                     text-align: right;
                     font-size: 10px;
+                    color: black;
                 }
                 
                 .page-info {
@@ -154,18 +178,18 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                 }
                 
                 .generation-info {
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .employee-section {
-                    margin-bottom: 25px;
+                    margin-bottom: 35px;
                     page-break-inside: avoid;
                 }
                 
                 .employee-header {
                     background-color: #f8fafc;
+                    border: 1px solid #ccc;
                     padding: 8px 15px;
-                    border-left: 4px solid #2563eb;
                     margin-bottom: 8px;
                     display: flex;
                     justify-content: space-between;
@@ -175,7 +199,7 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                 .employee-info h3 {
                     margin: 0;
                     font-size: 14px;
-                    color: #2563eb;
+                    color: #000;
                 }
                 
                 .employee-info p {
@@ -197,7 +221,7 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                 
                 .stat-value {
                     font-weight: bold;
-                    color: #2563eb;
+                    color: #000;
                     font-size: 12px;
                 }
                 
@@ -206,52 +230,55 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     border-collapse: collapse;
                     font-size: 9px;
                     margin-bottom: 15px;
+                    border: 1px solid #ccc;
                 }
                 
                 .attendance-table th {
-                    background-color: #f1f5f9;
-                    padding: 4px 6px;
-                    text-align: left;
-                    border: 1px solid #e2e8f0;
+                    background: white;
+                    color: black;
+                    padding: 8px 6px;
+                    text-align: center;
+                    border: 1px solid #ccc;
                     font-weight: 600;
-                    color: #475569;
-                    font-size: 9px;
+                    font-size: 10px;
                 }
                 
                 .attendance-table td {
-                    padding: 3px 6px;
-                    border: 1px solid #e2e8f0;
+                    padding: 6px;
+                    border: 1px solid #ccc;
+                    text-align: center;
                     font-size: 9px;
+                    background: white;
                 }
                 
                 .attendance-table tr:nth-child(even) {
-                    background-color: #f9fafb;
+                    background-color: #f5f5f5;
                 }
                 
                 .status-badge {
-                    padding: 1px 6px;
-                    border-radius: 8px;
+                    padding: 2px 8px;
+                    border-radius: 0px;
                     font-size: 8px;
-                    font-weight: 500;
+                    font-weight: normal;
+                    text-transform: uppercase;
+                    border: none;
+                    background: transparent;
+                    color: black;
                 }
                 
-                .status-present {
-                    background-color: #dcfce7;
-                    color: #166534;
-                }
-                
-                .status-absent {
-                    background-color: #fef2f2;
-                    color: #dc2626;
-                }
-                
-                .status-week-off {
-                    background-color: #dbeafe;
-                    color: #2563eb;
-                }
-                
-                .page-break {
-                    page-break-before: always;
+                /* SIMPLE TEXT-ONLY STATUS STYLES */
+                .status-present,
+                .status-absent,
+                .status-week-off,
+                .status-holiday,
+                .status-leave,
+                .status-half-day,
+                .status-late,
+                .status-overtime,
+                .status-default {
+                    background: transparent;
+                    color: black;
+                    border: none;
                 }
                 
                 .footer {
@@ -262,26 +289,27 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     text-align: center;
                     font-size: 8px;
                     color: #666;
-                    border-top: 1px solid #e2e8f0;
+                    border-top: 1px solid #ccc;
                     padding: 8px;
                     background: white;
                 }
                 
+                /* HIDE EXPORT BUTTON WHEN PRINTING OR AFTER CLICK */
+                .export-pdf-btn.hidden {
+                    display: none !important;
+                }
+                
+                /* PRINT OPTIMIZATIONS */
                 @media print {
                     body { 
                         margin: 0; 
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    .page-break { 
-                        page-break-before: always; 
-                    }
-                    .header {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    .employee-section {
-                        page-break-inside: avoid;
+                    
+                    /* Hide export button during print */
+                    .export-pdf-btn {
+                        display: none !important;
                     }
                 }
                 
@@ -290,27 +318,59 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     size: A4;
                 }
             </style>
+            <script>
+                function exportToPDF() {
+                    // Hide the button immediately when clicked
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        btn.classList.add('hidden');
+                    }
+                    
+                    // Trigger print dialog
+                    window.print();
+                }
+                
+                // Optional: Show button again after print dialog is closed
+                window.addEventListener('afterprint', function() {
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        // Uncomment the line below if you want the button to reappear after printing
+                        // btn.classList.remove('hidden');
+                    }
+                });
+            </script>
         </head>
         <body>
             <div class="header">
                 <div class="header-content">
                     <div class="logo-area">
-                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
-                    </div>
+                        <span style="color: #000; font-weight: bold;">LOGO</span>
+                    </div>  
                     <div class="header-info">
-                        <h1 class="header-title">Employee Attendance Report</h1>
-                        <p class="header-subtitle">Comprehensive attendance analysis</p>
-                        <p class="header-period">Period: ${formatDate(startDate)} to ${formatDate(endDate)}</p>
+                        <h1 class="header-title">${title}</h1>
+                        <p class="header-period">${filterInfo.startDate && filterInfo.endDate ? 
+                            `Period: ${new Date(filterInfo.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} to ${new Date(filterInfo.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : 
+                            'Date Range Report'
+                        }</p>
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
+                        <button class="export-pdf-btn" onclick="exportToPDF()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+                                <path d="M14 2v6a2 2 0 0 0 2 2h6"/>
+                                <path d="M16 13v5"/>
+                                <path d="m19 16-3 3-3-3"/>
+                                <path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            </svg>
+                            Export PDF
+                        </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
             </div>
 
             ${Object.entries(groupedData).map(([, employeeData], index) => `
-                <div class="employee-section ${index > 0 ? 'page-break' : ''}">
+                <div class="employee-section">
                     <div class="employee-header">
                         <div class="employee-info">
                             <h3>${employeeData.employee_name} (${employeeData.employee_code})</h3>
@@ -339,32 +399,29 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
                     <table class="attendance-table">
                         <thead>
                             <tr>
-                                <th style="width: 12%;">Date</th>
-                                <th style="width: 12%;">Status</th>
-                                <th style="width: 13%;">Clock In</th>
-                                <th style="width: 13%;">Clock Out</th>
-                                <th style="width: 10%;">Hours</th>
-                                <th style="width: 10%;">Overtime</th>
-                                <th style="width: 10%;">Late</th>
-                                <th style="width: 20%;">Remarks</th>
+                                <th style="width: 14%;">DATE</th>
+                                <th style="width: 14%;">STATUS</th>
+                                <th style="width: 16%;">CLOCK IN</th>
+                                <th style="width: 16%;">CLOCK OUT</th>
+                                <th style="width: 13%;">HOURS</th>
+                                <th style="width: 13%;">OVERTIME</th>
+                                <th style="width: 14%;">LATE</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${employeeData.records.map(record => `
                                 <tr>
-                                    <td>${formatDate(record.date)}</td>
+                                    <td>${new Date(record.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                                     <td>
-                                        <span class="status-badge ${record.status === 'Present' ? 'status-present' :
-            record.status === 'Absent' ? 'status-absent' : 'status-week-off'}">
+                                        <span class="status-badge status-default">
                                             ${record.status}
                                         </span>
                                     </td>
                                     <td>${record.attandance_first_clock_in || '-'}</td>
                                     <td>${record.attandance_last_clock_out || '-'}</td>
-                                    <td>${record.attandance_hours || '0'}</td>
-                                    <td>${record.overtime_hours || '0'}</td>
-                                    <td>${record.late_hours || '0'}</td>
-                                    <td>${record.remarks || '-'}</td>
+                                    <td>${record.attandance_hours ? `${record.attandance_hours}h` : '-'}</td>
+                                    <td>${record.overtime_hours && parseFloat(record.overtime_hours) > 0 ? `${record.overtime_hours}h` : '-'}</td>
+                                    <td>${record.late_hours && parseFloat(record.late_hours) > 0 ? `${record.late_hours}h` : '-'}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -380,20 +437,43 @@ export const generatePDFContent = (attendanceData, reportSummary, groupedData, s
     `;
 };
 
-// Export PDF function
-export const exportToPDF = (attendanceData, reportSummary, groupedData, startDate, endDate) => {
-    const htmlContent = generatePDFContent(attendanceData, reportSummary, groupedData, startDate, endDate);
+/**
+ * Enhanced Export to PDF Function for Date Range Reports
+ * @param {Array} data - Array of records to export
+ * @param {string} title - Report title
+ * @param {Object} filterInfo - Applied filters information (optional)
+ * @param {Object} groupedData - Grouped employee data
+ * @param {Object} reportSummary - Report summary statistics
+ */
+export const exportToPDF = (data, title = 'Employee Attendance Report', filterInfo = {}, groupedData = {}, reportSummary = {}) => {
+    try {
+        // Validate input data
+        if (!data || data.length === 0) {
+            console.error('No data to export');
+            return {
+                success: false,
+                message: 'No data available to export'
+            };
+        }
 
-    // Create a new window for PDF generation
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+        // Generate HTML content
+        const htmlContent = generateEnhancedPDFContent(data, title, filterInfo, groupedData, reportSummary);
 
-    // Wait for content to load then print
-    printWindow.onload = () => {
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 500);
-    };
+        // Create a new window for PDF generation
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+
+        return {
+            success: true,
+            message: 'PDF exported successfully!'
+        };
+
+    } catch (error) {
+        console.error('Error exporting PDF:', error);
+        return {
+            success: false,
+            message: 'Failed to export PDF: ' + error.message
+        };
+    }
 };

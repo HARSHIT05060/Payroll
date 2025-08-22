@@ -1,5 +1,3 @@
-// utils/enhancedPdfExport.js
-
 // Format date helper
 export const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -7,6 +5,17 @@ export const formatDate = (dateString) => {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
+    });
+};
+
+// Format date for title (e.g., "Fri 22 Aug 2025")
+export const formatDateForTitle = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
     });
 };
 
@@ -41,7 +50,7 @@ export const formatTableData = (data) => {
             formattedRecord.date = formatDate(formattedRecord.date);
         }
 
-        // Format hours fields
+        // Format hours fields - but keep status as-is
         ['attandance_hours', 'late_hours', 'overtime_hours'].forEach(field => {
             if (formattedRecord[field]) {
                 const hours = parseFloat(formattedRecord[field]);
@@ -49,24 +58,15 @@ export const formatTableData = (data) => {
             }
         });
 
+        // Keep status exactly as received - no modifications
+        // formattedRecord.status remains unchanged
+
         return formattedRecord;
     });
 };
 
-// Helper functions for styling
 const getStatusClass = (status) => {
-    const statusLower = status?.toLowerCase();
-    switch (statusLower) {
-        case 'present': return 'status-present';
-        case 'absent': return 'status-absent';
-        case 'week off': case 'weekoff': return 'status-week-off';
-        case 'holiday': return 'status-holiday';
-        case 'leave': return 'status-leave';
-        case 'half day': return 'status-half-day';
-        case 'late': return 'status-late';
-        case 'overtime': return 'status-overtime';
-        default: return 'status-default';
-    }
+    return 'status-default';
 };
 
 const getShiftClass = (shiftStatus) => {
@@ -85,7 +85,7 @@ const getHoursClass = (header, value) => {
     return '';
 };
 
-// Generate enhanced PDF content
+// Generate enhanced PDF content with BLACK & WHITE THEME
 export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, employeeInfo = {}) => {
     const headers = getTableHeaders(reportData);
     const formattedData = formatTableData(reportData);
@@ -101,18 +101,20 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    color: #333;
+                    color: #000;
                     line-height: 1.2;
                     font-size: 12px;
+                    background: white;
                 }
                 
                 .header {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 15px 20px;
                     margin-bottom: 20px;
                     position: relative;
                     min-height: 70px;
+                    border: 1px solid #ccc;
                 }
                 
                 .header-content {
@@ -125,6 +127,7 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     width: 60px;
                     height: 60px;
                     background: white;
+                    border: 1px solid #ccc;
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
@@ -141,12 +144,13 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     font-weight: bold;
                     margin: 0 0 8px 0;
                     display: inline-block;
+                    color: black;
                 }
                 
                 .export-pdf-btn {
                     background: #fff;
-                    color: #2563eb;
-                    border: 1px solid white;
+                    color: #000;
+                    border: 1px solid #ccc;
                     border-radius: 5px;
                     padding: 8px 16px;
                     font-size: 13px;
@@ -154,29 +158,29 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     cursor: pointer;
                     margin: 16px 0px 5px 16px;
                     vertical-align: middle;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
                     transition: background 0.2s, color 0.2s;
                 }
                 .export-pdf-btn:hover {
-                    background: #2563eb;
-                    color: #fff;
+                    background: #f0f0f0;
+                    color: #000;
                 }
                 
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
-                    opacity: 0.9;
+                    color: black;
                 }
                 
                 .header-period {
                     font-size: 12px;
                     margin: 0;
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .header-meta {
                     text-align: right;
                     font-size: 10px;
+                    color: black;
                 }
                 
                 .page-info {
@@ -185,7 +189,7 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                 }
                 
                 .generation-info {
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .attendance-table {
@@ -193,102 +197,73 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     border-collapse: collapse;
                     font-size: 10px;
                     margin-bottom: 20px;
+                    border: 1px solid #ccc;
                 }
                 
                 .attendance-table th {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 8px 6px;
                     text-align: center;
-                    border: 1px solid #1d4ed8;
+                    border: 1px solid #ccc;
                     font-weight: 600;
                     font-size: 10px;
                 }
                 
                 .attendance-table td {
                     padding: 6px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid #ccc;
                     text-align: center;
                     font-size: 9px;
+                    background: white;
                 }
                 
                 .attendance-table tr:nth-child(even) {
-                    background-color: #f9fafb;
+                    background-color: #f5f5f5;
                 }
                 
                 .status-badge {
                     padding: 2px 8px;
-                    border-radius: 12px;
+                    border-radius: 0px;
                     font-size: 8px;
-                    font-weight: 600;
+                    font-weight: normal;
                     text-transform: uppercase;
+                    border: none;
+                    background: transparent;
+                    color: black;
                 }
                 
-                .status-present {
-                    background-color: #dcfce7;
-                    color: #166534;
-                }
-                
-                .status-absent {
-                    background-color: #fee2e2;
-                    color: #dc2626;
-                }
-                
-                .status-week-off {
-                    background-color: #f3e8ff;
-                    color: #7c3aed;
-                }
-                
-                .status-holiday {
-                    background-color: #fef3c7;
-                    color: #d97706;
-                }
-                
-                .status-leave {
-                    background-color: #fef9c3;
-                    color: #ca8a04;
-                }
-                
-                .status-half-day {
-                    background-color: #dbeafe;
-                    color: #2563eb;
-                }
-                
-                .status-late {
-                    background-color: #fef9c3;
-                    color: #ca8a04;
-                }
-                
-                .status-overtime {
-                    background-color: #dcfce7;
-                    color: #166534;
-                }
-                
+                /* SIMPLE TEXT-ONLY STATUS STYLES */
+                .status-present,
+                .status-absent,
+                .status-week-off,
+                .status-holiday,
+                .status-leave,
+                .status-half-day,
+                .status-late,
+                .status-overtime,
                 .status-default {
-                    background-color: #f3f4f6;
-                    color: #6b7280;
+                    background: transparent;
+                    color: black;
+                    border: none;
                 }
                 
-                .shift-working {
-                    background-color: #dcfce7;
-                    color: #166534;
-                }
-                
+                /* SHIFT STYLES */
+                .shift-working,
                 .shift-weekoff {
-                    background-color: #f3e8ff;
-                    color: #7c3aed;
+                    background: transparent;
+                    color: black;
+                    font-weight: normal;
                 }
                 
-                .hours-highlight {
-                    background-color: #fef9c3;
-                    color: #ca8a04;
-                    font-weight: bold;
-                }
-                
+                /* HOURS HIGHLIGHT STYLES */
+                .hours-highlight,
                 .overtime-highlight {
-                    background-color: #dcfce7;
-                    color: #166534;
-                    font-weight: bold;
+                    background: transparent;
+                    color: black;
+                    font-weight: normal;
+                    border: none;
+                    text-decoration: none;
                 }
                 
                 .footer {
@@ -299,20 +274,27 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     text-align: center;
                     font-size: 8px;
                     color: #666;
-                    border-top: 1px solid #e2e8f0;
+                    border-top: 1px solid #ccc;
                     padding: 8px;
                     background: white;
                 }
                 
+                /* HIDE EXPORT BUTTON WHEN PRINTING OR AFTER CLICK */
+                .export-pdf-btn.hidden {
+                    display: none !important;
+                }
+                
+                /* PRINT OPTIMIZATIONS */
                 @media print {
                     body { 
                         margin: 0; 
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    .header {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
+                    
+                    /* Hide export button during print */
+                    .export-pdf-btn {
+                        display: none !important;
                     }
                 }
                 
@@ -321,27 +303,51 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
                     size: A4 landscape;
                 }
             </style>
+            <script>
+                function exportToPDF() {
+                    // Hide the button immediately when clicked
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        btn.classList.add('hidden');
+                    }
+                    
+                    // Trigger print dialog
+                    window.print();
+                }
+                
+                // Optional: Show button again after print dialog is closed
+                window.addEventListener('afterprint', function() {
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        // Uncomment the line below if you want the button to reappear after printing
+                        // btn.classList.remove('hidden');
+                    }
+                });
+            </script>
         </head>
         <body>
             <div class="header">
                 <div class="header-content">
                     <div class="logo-area">
-                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
+                        <span style="color: #000; font-weight: bold;">LOGO</span>
                     </div>  
                     <div class="header-info">
                         <h1 class="header-title">${title}</h1>
                         
                         <p class="header-subtitle">${employeeInfo.name ? `Employee: ${employeeInfo.name}` : 'Data export report'}</p>
-                        <p class="header-period">${filterInfo.period || filterInfo.month_year ? `Period: ${filterInfo.period || filterInfo.month_year}` : ''}</p>
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
-                        <button class="export-pdf-btn" onclick="window.print()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                        <button class="export-pdf-btn" onclick="exportToPDF()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+                                <path d="M14 2v6a2 2 0 0 0 2 2h6"/>
+                                <path d="M16 13v5"/>
+                                <path d="m19 16-3 3-3-3"/>
+                                <path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            </svg>
                             Export PDF
                         </button>
-                    <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
-
+                        <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
                     </div>
                 </div>
             </div>
@@ -390,7 +396,7 @@ export const generateEnhancedPDFContent = (reportData, title, filterInfo = {}, e
 };
 
 /**
- * Enhanced Export to PDF Function
+ * Enhanced Export to PDF Function - BLACK & WHITE THEME
  * @param {Array} data - Array of records to export
  * @param {string} title - Report title
  * @param {Object} filterInfo - Applied filters information (optional)
@@ -468,4 +474,3 @@ export const calculateMonthlySummary = (reportData) => {
         attendancePercentage
     };
 };
-

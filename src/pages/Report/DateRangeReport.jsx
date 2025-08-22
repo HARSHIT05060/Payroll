@@ -25,7 +25,7 @@ import {
     groupDataByEmployee,
     calculateSummary,
     exportToPDF
-} from '../../utils/exportUtils/DateRangeReport/PdfExportDateRange';
+} from '../../utils/exportUtils/DateRangeReport/PdfExportDateRange.js';
 import { exportToExcel } from '../../utils/exportUtils/DateRangeReport/ExcelExportDateRange.jsx';
 
 const DateRangeReport = () => {
@@ -55,6 +55,7 @@ const DateRangeReport = () => {
     };
 
     // Generate and export PDF directly
+    // Updated handleGenerateAndExport function - replace the existing one
     const handleGenerateAndExport = useCallback(async () => {
         if (!startDate || !endDate) {
             showToast('Please select both start and end dates', 'error');
@@ -99,8 +100,34 @@ const DateRangeReport = () => {
             // Step 3: Generate export based on selected type
             if (exportType === 'pdf') {
                 showToast('Generating PDF...', 'info');
-                exportToPDF(attendanceData, reportSummary, groupedData, formatDateForAPI(startDate), formatDateForAPI(endDate));
-                showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
+
+                // Format dates for title
+                const formattedStartDate = startDate.toLocaleDateString('en-GB', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                const formattedEndDate = endDate.toLocaleDateString('en-GB', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                const title = `Employee Attendance Report ${formattedStartDate} to ${formattedEndDate}`;
+
+                // Use the same export method as your first PDF export
+                const result = exportToPDF(attendanceData, title, {
+                    startDate: formatDateForAPI(startDate),
+                    endDate: formatDateForAPI(endDate)
+                }, groupedData, reportSummary);
+
+                if (result && result.success) {
+                    showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
+                } else {
+                    showToast(`PDF generated successfully! Report contains ${attendanceData.length} records for ${Object.keys(groupedData).length} employees`, 'success');
+                }
             } else if (exportType === 'excel') {
                 showToast('Generating Excel file...', 'info');
                 exportToExcel(attendanceData, formatDateForAPI(startDate), formatDateForAPI(endDate));

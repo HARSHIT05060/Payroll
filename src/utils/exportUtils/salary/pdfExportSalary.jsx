@@ -34,7 +34,7 @@ export const formatDate = (dateString) => {
     });
 };
 
-// Generate PDF content for salary report
+// Generate PDF content for salary report - BLACK & WHITE THEME
 export const generateSalaryPDFContent = (reportData, title, summaryStats, filterInfo = {}, employeeInfo = {}) => {
     return `
         <!DOCTYPE html>
@@ -47,18 +47,20 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    color: #333;
+                    color: #000;
                     line-height: 1.2;
                     font-size: 12px;
+                    background: white;
                 }
                 
                 .header {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 15px 20px;
                     margin-bottom: 20px;
                     position: relative;
                     min-height: 70px;
+                    border: 1px solid #ccc;
                 }
                 
                 .header-content {
@@ -71,6 +73,7 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     width: 60px;
                     height: 60px;
                     background: white;
+                    border: 1px solid #ccc;
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
@@ -86,12 +89,14 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     font-size: 22px;
                     font-weight: bold;
                     margin: 0 0 8px 0;
+                    display: inline-block;
+                    color: black;
                 }
                 
                 .export-pdf-btn {
                     background: #fff;
-                    color: #2563eb;
-                    border: 1px solid white;
+                    color: #000;
+                    border: 1px solid #ccc;
                     border-radius: 5px;
                     padding: 8px 16px;
                     font-size: 13px;
@@ -99,29 +104,29 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     cursor: pointer;
                     margin: 16px 0px 5px 16px;
                     vertical-align: middle;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
                     transition: background 0.2s, color 0.2s;
                 }
                 .export-pdf-btn:hover {
-                    background: #2563eb;
-                    color: #fff;
+                    background: #f0f0f0;
+                    color: #000;
                 }
                 
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
-                    opacity: 0.9;
+                    color: black;
                 }
                 
                 .header-period {
                     font-size: 12px;
                     margin: 0;
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .header-meta {
                     text-align: right;
                     font-size: 10px;
+                    color: black;
                 }
                 
                 .page-info {
@@ -130,22 +135,22 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                 }
                 
                 .generation-info {
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .summary-section {
-                    background-color: #f8fafc;
+                    background-color: #f8f8f8;
                     padding: 20px;
                     margin-bottom: 20px;
-                    border-radius: 8px;
-                    border-left: 4px solid #2563eb;
+                    border-radius: 0px;
+                    border: 1px solid #ccc;
                 }
                 
                 .summary-title {
                     font-size: 16px;
                     font-weight: bold;
                     margin-bottom: 15px;
-                    color: #2563eb;
+                    color: black;
                 }
                 
                 .summary-grid {
@@ -158,41 +163,21 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                 .summary-item {
                     background: white;
                     padding: 12px;
-                    border-radius: 6px;
-                    border: 1px solid #e2e8f0;
+                    border-radius: 0px;
+                    border: 1px solid #ccc;
                     text-align: center;
                 }
                 
                 .summary-label {
                     font-size: 11px;
-                    color: #64748b;
+                    color: #666;
                     margin-bottom: 5px;
                 }
                 
                 .summary-value {
                     font-size: 16px;
                     font-weight: bold;
-                    color: #1e293b;
-                }
-                
-                .summary-value.success {
-                    color: #22c55e;
-                }
-                
-                .summary-value.error {
-                    color: #ef4444;
-                }
-                
-                .summary-value.warning {
-                    color: #f59e0b;
-                }
-                
-                .summary-value.info {
-                    color: #3b82f6;
-                }
-                
-                .summary-value.purple {
-                    color: #8b5cf6;
+                    color: black;
                 }
                 
                 .salary-table {
@@ -200,46 +185,48 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     border-collapse: collapse;
                     font-size: 10px;
                     margin-bottom: 20px;
+                    border: 1px solid #ccc;
                 }
                 
                 .salary-table th {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 8px 6px;
                     text-align: center;
-                    border: 1px solid #1d4ed8;
+                    border: 1px solid #ccc;
                     font-weight: 600;
                     font-size: 10px;
                 }
                 
                 .salary-table td {
                     padding: 6px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid #ccc;
                     text-align: center;
                     font-size: 9px;
+                    background: white;
                 }
                 
                 .salary-table tr:nth-child(even) {
-                    background-color: #f9fafb;
+                    background-color: #f5f5f5;
                 }
                 
                 .currency {
                     font-weight: bold;
-                    color: #059669;
+                    color: black;
                 }
                 
                 .employee-info {
-                    text-align: left;
+                    text-align: center;
                 }
                 
                 .employee-name {
                     font-weight: bold;
-                    color: #1e293b;
+                    color: black;
                 }
                 
                 .employee-code {
                     font-size: 8px;
-                    color: #64748b;
+                    color: #666;
                 }
                 
                 .attendance-details {
@@ -247,27 +234,22 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     line-height: 1.3;
                 }
                 
-                .attendance-present {
-                    color: #059669;
-                }
-                
-                .attendance-absent {
-                    color: #dc2626;
-                }
-                
+                .attendance-present,
+                .attendance-absent,
                 .attendance-working {
-                    color: #2563eb;
+                    color: black;
                 }
                 
                 .overtime-details {
                     font-size: 8px;
                     line-height: 1.3;
+                    color: black;
                 }
                 
                 .total-salary {
                     font-weight: bold;
                     font-size: 11px;
-                    color: #059669;
+                    color: black;
                 }
                 
                 .footer {
@@ -278,26 +260,27 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     text-align: center;
                     font-size: 8px;
                     color: #666;
-                    border-top: 1px solid #e2e8f0;
+                    border-top: 1px solid #ccc;
                     padding: 8px;
                     background: white;
                 }
                 
+                /* HIDE EXPORT BUTTON WHEN PRINTING OR AFTER CLICK */
+                .export-pdf-btn.hidden {
+                    display: none !important;
+                }
+                
+                /* PRINT OPTIMIZATIONS */
                 @media print {
                     body { 
                         margin: 0; 
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    .header {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    .summary-section {
-                        page-break-inside: avoid;
-                    }
+                    
+                    /* Hide export button during print */
                     .export-pdf-btn {
-                        display: none;
+                        display: none !important;
                     }
                 }
                 
@@ -306,22 +289,48 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     size: A4 landscape;
                 }
             </style>
+            <script>
+                function exportToPDF() {
+                    // Hide the button immediately when clicked
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        btn.classList.add('hidden');
+                    }
+                    
+                    // Trigger print dialog
+                    window.print();
+                }
+                
+                // Optional: Show button again after print dialog is closed
+                window.addEventListener('afterprint', function() {
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        // Uncomment the line below if you want the button to reappear after printing
+                        // btn.classList.remove('hidden');
+                    }
+                });
+            </script>
         </head>
         <body>
             <div class="header">
                 <div class="header-content">
                     <div class="logo-area">
-                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
+                        <span style="color: #000; font-weight: bold;">LOGO</span>
                     </div>
                     <div class="header-info">
                         <h1 class="header-title">${title}</h1>
-                        <p class="header-subtitle">${employeeInfo.department ? `Department: ${employeeInfo.department}` : 'Monthly salary breakdown and analysis'}</p>
+                        <p class="header-subtitle">${employeeInfo.department ? `Department: ${employeeInfo.department}` : 'Data export report'}</p>
                         <p class="header-period">${filterInfo.month_year ? `Period: ${filterInfo.month_year}` : ''}</p>
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
-                        <button class="export-pdf-btn" onclick="window.print()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                        <button class="export-pdf-btn" onclick="exportToPDF()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+                                <path d="M14 2v6a2 2 0 0 0 2 2h6"/>
+                                <path d="M16 13v5"/>
+                                <path d="m19 16-3 3-3-3"/>
+                                <path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            </svg>
                             Export PDF
                         </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
@@ -335,7 +344,7 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                     <div class="summary-grid">
                         <div class="summary-item">
                             <div class="summary-label">Total Employees</div>
-                            <div class="summary-value info">${summaryStats.totalEmployees}</div>
+                            <div class="summary-value">${summaryStats.totalEmployees}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Base Salary</div>
@@ -343,31 +352,31 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Paid Salary</div>
-                            <div class="summary-value success">₹${parseFloat(summaryStats.totalPaidSalary).toLocaleString('en-IN')}</div>
+                            <div class="summary-value">₹${parseFloat(summaryStats.totalPaidSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Overtime</div>
-                            <div class="summary-value warning">₹${parseFloat(summaryStats.totalOvertimeSalary).toLocaleString('en-IN')}</div>
+                            <div class="summary-value">₹${parseFloat(summaryStats.totalOvertimeSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Week Off Salary</div>
-                            <div class="summary-value purple">₹${parseFloat(summaryStats.totalWeekOffSalary).toLocaleString('en-IN')}</div>
+                            <div class="summary-value">₹${parseFloat(summaryStats.totalWeekOffSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Average Salary</div>
-                            <div class="summary-value info">₹${parseFloat(summaryStats.averageSalary).toLocaleString('en-IN')}</div>
+                            <div class="summary-value">₹${parseFloat(summaryStats.averageSalary).toLocaleString('en-IN')}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Present Days</div>
-                            <div class="summary-value success">${summaryStats.totalPresentDays}</div>
+                            <div class="summary-value">${summaryStats.totalPresentDays}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Absent Days</div>
-                            <div class="summary-value error">${summaryStats.totalAbsentDays}</div>
+                            <div class="summary-value">${summaryStats.totalAbsentDays}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Total Working Days</div>
-                            <div class="summary-value info">${summaryStats.totalWorkingDays}</div>
+                            <div class="summary-value">${summaryStats.totalWorkingDays}</div>
                         </div>
                     </div>
                 </div>
@@ -421,16 +430,16 @@ export const generateSalaryPDFContent = (reportData, title, summaryStats, filter
 };
 
 /**
- * Enhanced Export Salary Report to PDF
- * @param {Array} reportData - Array of salary records
+ * Enhanced Export to PDF Function - BLACK & WHITE THEME
+ * @param {Array} data - Array of records to export
  * @param {string} title - Report title
- * @param {Object} filterInfo - Applied filters information
- * @param {Object} employeeInfo - Employee information for header
+ * @param {Object} filterInfo - Applied filters information (optional)
+ * @param {Object} employeeInfo - Employee information for header (optional)
  */
-export const exportToPDF = (reportData, title = 'Monthly Salary Report', filterInfo = {}, employeeInfo = {}) => {
+export const exportToPDF = (data, title = 'Salary Report', filterInfo = {}, employeeInfo = {}) => {
     try {
         // Validate input data
-        if (!reportData || reportData.length === 0) {
+        if (!data || data.length === 0) {
             console.error('No data to export');
             return {
                 success: false,
@@ -439,10 +448,10 @@ export const exportToPDF = (reportData, title = 'Monthly Salary Report', filterI
         }
 
         // Calculate summary statistics
-        const summaryStats = calculateSalarySummary(reportData);
+        const summaryStats = calculateSalarySummary(data);
 
         // Generate HTML content
-        const htmlContent = generateSalaryPDFContent(reportData, title, summaryStats, filterInfo, employeeInfo);
+        const htmlContent = generateSalaryPDFContent(data, title, summaryStats, filterInfo, employeeInfo);
 
         // Create a new window for PDF generation
         const printWindow = window.open('', '_blank');

@@ -12,30 +12,6 @@ export const calculateEmployeeDirectorySummary = (reportData) => {
     const maleCount = reportData.filter(emp => emp.gender?.toLowerCase() === 'male').length;
     const femaleCount = reportData.filter(emp => emp.gender?.toLowerCase() === 'female').length;
 
-    // Department distribution
-    const departmentCounts = {};
-    reportData.forEach(emp => {
-        if (emp.department_name) {
-            departmentCounts[emp.department_name] = (departmentCounts[emp.department_name] || 0) + 1;
-        }
-    });
-
-    // Branch distribution
-    const branchCounts = {};
-    reportData.forEach(emp => {
-        if (emp.branch_name) {
-            branchCounts[emp.branch_name] = (branchCounts[emp.branch_name] || 0) + 1;
-        }
-    });
-
-    // Designation distribution
-    const designationCounts = {};
-    reportData.forEach(emp => {
-        if (emp.designation_name) {
-            designationCounts[emp.designation_name] = (designationCounts[emp.designation_name] || 0) + 1;
-        }
-    });
-
     // Calculate percentages
     const activePercentage = totalEmployees > 0 ? ((activeEmployees / totalEmployees) * 100).toFixed(1) : 0;
     const malePercentage = totalEmployees > 0 ? ((maleCount / totalEmployees) * 100).toFixed(1) : 0;
@@ -47,9 +23,6 @@ export const calculateEmployeeDirectorySummary = (reportData) => {
         inactiveEmployees,
         maleCount,
         femaleCount,
-        departmentCounts,
-        branchCounts,
-        designationCounts,
         activePercentage,
         malePercentage,
         femalePercentage
@@ -83,7 +56,7 @@ export const getStatusInfo = (status) => {
     }
 };
 
-// Generate PDF content for employee directory
+// Generate PDF content for employee directory - BLACK & WHITE THEME
 export const generateEmployeeDirectoryPDFContent = (reportData, title, summaryStats, filterInfo = {}) => {
     return `
         <!DOCTYPE html>
@@ -96,18 +69,20 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
-                    color: #333;
+                    color: #000;
                     line-height: 1.2;
                     font-size: 12px;
+                    background: white;
                 }
                 
                 .header {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 15px 20px;
                     margin-bottom: 20px;
                     position: relative;
                     min-height: 70px;
+                    border: 1px solid #ccc;
                 }
                 
                 .header-content {
@@ -120,6 +95,7 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     width: 60px;
                     height: 60px;
                     background: white;
+                    border: 1px solid #ccc;
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
@@ -135,12 +111,14 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     font-size: 22px;
                     font-weight: bold;
                     margin: 0 0 8px 0;
+                    display: inline-block;
+                    color: black;
                 }
                 
                 .export-pdf-btn {
                     background: #fff;
-                    color: #2563eb;
-                    border: 1px solid white;
+                    color: #000;
+                    border: 1px solid #ccc;
                     border-radius: 5px;
                     padding: 8px 16px;
                     font-size: 13px;
@@ -148,29 +126,29 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     cursor: pointer;
                     margin: 16px 0px 5px 16px;
                     vertical-align: middle;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
                     transition: background 0.2s, color 0.2s;
                 }
                 .export-pdf-btn:hover {
-                    background: #2563eb;
-                    color: #fff;
+                    background: #f0f0f0;
+                    color: #000;
                 }
                 
                 .header-subtitle {
                     font-size: 14px;
                     margin: 0 0 5px 0;
-                    opacity: 0.9;
+                    color: black;
                 }
                 
                 .header-period {
                     font-size: 12px;
                     margin: 0;
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .header-meta {
                     text-align: right;
                     font-size: 10px;
+                    color: black;
                 }
                 
                 .page-info {
@@ -179,22 +157,22 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 }
                 
                 .generation-info {
-                    opacity: 0.8;
+                    color: #666;
                 }
                 
                 .summary-section {
-                    background-color: #f8fafc;
+                    background-color: #f8f8f8;
                     padding: 20px;
                     margin-bottom: 20px;
-                    border-radius: 8px;
-                    border-left: 4px solid #2563eb;
+                    border-radius: 0px;
+                    border: 1px solid #ccc;
                 }
                 
                 .summary-title {
                     font-size: 16px;
                     font-weight: bold;
                     margin-bottom: 15px;
-                    color: #2563eb;
+                    color: black;
                 }
                 
                 .summary-grid {
@@ -207,45 +185,21 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                 .summary-item {
                     background: white;
                     padding: 12px;
-                    border-radius: 6px;
-                    border: 1px solid #e2e8f0;
+                    border-radius: 0px;
+                    border: 1px solid #ccc;
                     text-align: center;
                 }
                 
                 .summary-label {
                     font-size: 11px;
-                    color: #64748b;
+                    color: #666;
                     margin-bottom: 5px;
                 }
                 
                 .summary-value {
                     font-size: 16px;
                     font-weight: bold;
-                    color: #1e293b;
-                }
-                
-                .summary-value.success {
-                    color: #22c55e;
-                }
-                
-                .summary-value.error {
-                    color: #ef4444;
-                }
-                
-                .summary-value.warning {
-                    color: #f59e0b;
-                }
-                
-                .summary-value.info {
-                    color: #3b82f6;
-                }
-                
-                .summary-value.purple {
-                    color: #8b5cf6;
-                }
-                
-                .summary-value.pink {
-                    color: #ec4899;
+                    color: black;
                 }
                 
                 .employee-table {
@@ -253,108 +207,94 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     border-collapse: collapse;
                     font-size: 10px;
                     margin-bottom: 20px;
+                    border: 1px solid #ccc;
                 }
                 
                 .employee-table th {
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                    color: white;
+                    background: white;
+                    color: black;
                     padding: 8px 6px;
                     text-align: center;
-                    border: 1px solid #1d4ed8;
+                    border: 1px solid #ccc;
                     font-weight: 600;
                     font-size: 10px;
                 }
                 
                 .employee-table td {
                     padding: 6px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid #ccc;
                     text-align: center;
                     font-size: 9px;
+                    background: white;
                 }
                 
                 .employee-table tr:nth-child(even) {
-                    background-color: #f9fafb;
+                    background-color: #f5f5f5;
                 }
                 
                 .employee-name {
                     font-weight: 600;
-                    color: #1e293b;
+                    color: black;
                     font-size: 10px;
                     margin-bottom: 2px;
                 }
                 
                 .employee-id {
                     font-size: 8px;
-                    color: #64748b;
+                    color: #666;
                     font-family: 'Courier New', monospace;
-                    background: #f1f5f9;
+                    background: #f5f5f5;
                     padding: 1px 4px;
-                    border-radius: 3px;
+                    border-radius: 0px;
                     display: inline-block;
                 }
                 
                 .gender-info {
                     font-size: 8px;
-                    color: #64748b;
+                    color: #666;
                     margin-top: 2px;
                 }
                 
                 .contact-info {
                     line-height: 1.3;
-                    text-align: left;
+                    text-align: center;
                 }
                 
                 .contact-item {
                     font-size: 8px;
-                    color: #475569;
+                    color: black;
                     margin-bottom: 2px;
                 }
                 
                 .status-badge {
                     padding: 2px 8px;
-                    border-radius: 12px;
+                    border-radius: 0px;
                     font-size: 8px;
-                    font-weight: 600;
+                    font-weight: normal;
                     text-transform: uppercase;
+                    border: none;
+                    background: transparent;
+                    color: black;
                 }
                 
-                .status-active {
-                    background-color: #dcfce7;
-                    color: #166534;
-                }
-                
-                .status-inactive {
-                    background-color: #fee2e2;
-                    color: #dc2626;
-                }
-                
+                .status-active,
+                .status-inactive,
                 .status-default {
-                    background-color: #f3f4f6;
-                    color: #6b7280;
+                    background: transparent;
+                    color: black;
+                    border: none;
                 }
                 
                 .department-tag, .designation-tag, .branch-tag {
                     font-size: 8px;
-                    font-weight: 500;
+                    font-weight: normal;
                     padding: 3px 6px;
-                    border-radius: 4px;
+                    border-radius: 0px;
                     display: inline-block;
                     text-align: center;
-                }
-                
-                .department-tag {
-                    background: #dbeafe;
-                    color: #1e40af;
-                }
-                
-                .designation-tag {
-                    background: #fef3c7;
-                    color: #d97706;
-                }
-                
-                .branch-tag {
-                    background: #f3e8ff;
-                    color: #7c3aed;
+                    background: transparent;
+                    color: black;
+                    border: none;
                 }
                 
                 .footer {
@@ -365,23 +305,27 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     text-align: center;
                     font-size: 8px;
                     color: #666;
-                    border-top: 1px solid #e2e8f0;
+                    border-top: 1px solid #ccc;
                     padding: 8px;
                     background: white;
                 }
                 
+                /* HIDE EXPORT BUTTON WHEN PRINTING OR AFTER CLICK */
+                .export-pdf-btn.hidden {
+                    display: none !important;
+                }
+                
+                /* PRINT OPTIMIZATIONS */
                 @media print {
                     body { 
                         margin: 0; 
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    .header {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    .summary-section {
-                        page-break-inside: avoid;
+                    
+                    /* Hide export button during print */
+                    .export-pdf-btn {
+                        display: none !important;
                     }
                 }
                 
@@ -390,12 +334,33 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     size: A4 landscape;
                 }
             </style>
+            <script>
+                function exportToPDF() {
+                    // Hide the button immediately when clicked
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        btn.classList.add('hidden');
+                    }
+                    
+                    // Trigger print dialog
+                    window.print();
+                }
+                
+                // Optional: Show button again after print dialog is closed
+                window.addEventListener('afterprint', function() {
+                    const btn = document.querySelector('.export-pdf-btn');
+                    if (btn) {
+                        // Uncomment the line below if you want the button to reappear after printing
+                        // btn.classList.remove('hidden');
+                    }
+                });
+            </script>
         </head>
         <body>
             <div class="header">
                 <div class="header-content">
                     <div class="logo-area">
-                        <span style="color: #2563eb; font-weight: bold;">LOGO</span>
+                        <span style="color: #000; font-weight: bold;">LOGO</span>
                     </div>
                     <div class="header-info">
                         <h1 class="header-title">${title}</h1>
@@ -404,8 +369,13 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                     </div>
                     <div class="header-meta">
                         <div class="page-info">Page 1</div>
-                        <button class="export-pdf-btn" onclick="window.print()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-file-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M14 2v6a2 2 0 0 0 2 2h6"/><path d="M16 13v5"/><path d="m19 16-3 3-3-3"/><path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+                        <button class="export-pdf-btn" onclick="exportToPDF()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+                                <path d="M14 2v6a2 2 0 0 0 2 2h6"/>
+                                <path d="M16 13v5"/>
+                                <path d="m19 16-3 3-3-3"/>
+                                <path d="M6 2h8a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            </svg>
                             Export PDF
                         </button>
                         <div class="generation-info">Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}</div>
@@ -423,31 +393,19 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Active Employees</div>
-                            <div class="summary-value success">${summaryStats.activeEmployees} (${summaryStats.activePercentage}%)</div>
+                            <div class="summary-value">${summaryStats.activeEmployees} (${summaryStats.activePercentage}%)</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Inactive Employees</div>
-                            <div class="summary-value error">${summaryStats.inactiveEmployees}</div>
+                            <div class="summary-value">${summaryStats.inactiveEmployees}</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Male Employees</div>
-                            <div class="summary-value info">${summaryStats.maleCount} (${summaryStats.malePercentage}%)</div>
+                            <div class="summary-value">${summaryStats.maleCount} (${summaryStats.malePercentage}%)</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-label">Female Employees</div>
-                            <div class="summary-value pink">${summaryStats.femaleCount} (${summaryStats.femalePercentage}%)</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Departments</div>
-                            <div class="summary-value purple">${Object.keys(summaryStats.departmentCounts).length}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Branches</div>
-                            <div class="summary-value warning">${Object.keys(summaryStats.branchCounts).length}</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-label">Total Designations</div>
-                            <div class="summary-value info">${Object.keys(summaryStats.designationCounts).length}</div>
+                            <div class="summary-value">${summaryStats.femaleCount} (${summaryStats.femalePercentage}%)</div>
                         </div>
                     </div>
                 </div>
@@ -486,8 +444,8 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
                                 </td>
                                 <td>
                                     <div class="contact-info">
-                                        ${employee.email ? `<div class="contact-item">📧 ${employee.email}</div>` : ''}
-                                        ${employee.phone ? `<div class="contact-item">📱 ${employee.phone}</div>` : ''}
+                                        ${employee.email ? `<div class="contact-item">${employee.email}</div>` : ''}
+                                        ${employee.phone ? `<div class="contact-item">${employee.phone}</div>` : ''}
                                         ${!employee.email && !employee.phone ? '<div class="contact-item">No contact info</div>' : ''}
                                     </div>
                                 </td>
@@ -507,40 +465,31 @@ export const generateEmployeeDirectoryPDFContent = (reportData, title, summarySt
 };
 
 /**
- * Export Employee Directory Report to PDF
- * @param {Array} reportData - Array of employee records
- * @param {string} fileName - Name for the PDF file
+ * Enhanced Export to PDF Function - BLACK & WHITE THEME
+ * @param {Array} data - Array of employee records to export
  * @param {string} title - Report title
- * @param {Object} summaryStats - Summary statistics object
- * @param {Object} filterInfo - Applied filters information
+ * @param {Object} filterInfo - Applied filters information (optional)
+ * @param {Object} employeeInfo - Employee information for header (optional)
  */
-export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}) => {
+export const exportToPDF = (data, title = 'Employee Directory', filterInfo = {}, employeeInfo = {}) => {
     try {
         // Validate input data
-        if (!reportData || !Array.isArray(reportData) || reportData.length === 0) {
-            throw new Error('No employee data available for export');
+        if (!data || data.length === 0) {
+            console.error('No data to export');
+            return {
+                success: false,
+                message: 'No data available to export'
+            };
         }
 
-        // Calculate summary stats if not provided
-        if (!summaryStats) {
-            summaryStats = calculateEmployeeDirectorySummary(reportData);
-        }
+        // Calculate summary statistics
+        const summaryStats = calculateEmployeeDirectorySummary(data);
 
         // Generate HTML content
-        const htmlContent = generateEmployeeDirectoryPDFContent(
-            reportData,
-            title || 'Employee Directory',
-            summaryStats,
-            filterInfo
-        );
+        const htmlContent = generateEmployeeDirectoryPDFContent(data, title, summaryStats, filterInfo);
 
         // Create a new window for PDF generation
         const printWindow = window.open('', '_blank');
-
-        if (!printWindow) {
-            throw new Error('Unable to open print window. Please check popup blocker settings.');
-        }
-
         printWindow.document.write(htmlContent);
         printWindow.document.close();
 
@@ -550,7 +499,7 @@ export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summar
         };
 
     } catch (error) {
-        console.error('Error exporting Employee Directory PDF:', error);
+        console.error('Error exporting PDF:', error);
         return {
             success: false,
             message: 'Failed to export PDF: ' + error.message
@@ -558,8 +507,17 @@ export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summar
     }
 };
 
-// Alternative export name for consistency
-export const exportToPDF = exportEmployeeDirectoryToPDF;
+/**
+ * Export Employee Directory Report to PDF
+ * @param {Array} reportData - Array of employee records
+ * @param {string} fileName - Name for the PDF file
+ * @param {string} title - Report title
+ * @param {Object} summaryStats - Summary statistics object
+ * @param {Object} filterInfo - Applied filters information
+ */
+export const exportEmployeeDirectoryToPDF = (reportData, fileName, title, summaryStats, filterInfo = {}) => {
+    return exportToPDF(reportData, title, filterInfo);
+};
 
 // Default export
-export default exportEmployeeDirectoryToPDF;
+export default exportToPDF;
